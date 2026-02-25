@@ -352,6 +352,74 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .stripe-btn:hover { background: #2a2a28; }
 
 @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+
+@media (max-width: 768px) {
+  /* Nav */
+  nav { padding: 0.75rem 1rem; }
+  .nav-right { gap: 0.5rem; }
+  .btn-sm { padding: 0.45rem 0.8rem; font-size: 0.8rem; }
+
+  /* Hero */
+  .hero { padding: 3rem 1.2rem 2.5rem; }
+  .hero h1 { font-size: 2.2rem; }
+  .hero p { font-size: 1rem; }
+  .hero-btns { flex-direction: column; align-items: center; gap: 0.75rem; }
+  .btn-hero { width: 100%; max-width: 320px; text-align: center; }
+
+  /* Plans */
+  .plans { grid-template-columns: 1fr; gap: 1rem; }
+
+  /* App layout */
+  .app-layout { grid-template-columns: 1fr; }
+  .app-sidebar {
+    display: flex; flex-direction: row; flex-wrap: wrap;
+    width: 100%; border-right: none; border-bottom: 1px solid var(--border);
+    padding: 0.5rem 0.75rem; gap: 0.25rem; min-height: unset;
+    position: sticky; top: 65px; z-index: 40;
+  }
+  .app-sidebar { flex-direction: row !important; flex-wrap: wrap; gap: 0.4rem; }
+  .sidebar-item {
+    padding: 0.4rem 0.9rem !important; font-size: 0.8rem !important;
+    border-radius: 20px !important; border-left: none !important;
+    border: 1px solid var(--border) !important; flex: 0 0 auto;
+  }
+  .sidebar-item.active {
+    background: var(--ink) !important; color: var(--gold-light) !important;
+    border-color: var(--ink) !important;
+  }
+  .quota-info { display: none; }
+
+  /* App pages */
+  .app-page { padding: 1.2rem 1rem; }
+  .stats-row { grid-template-columns: repeat(3,1fr); gap: 0.5rem; }
+  .stat-card { padding: 0.8rem 0.5rem; }
+  .stat-val { font-size: 1.4rem; }
+
+  /* Gen card */
+  .gen-card { padding: 1.2rem; }
+  .gen-row { flex-direction: column; gap: 0.5rem; }
+  .gen-row > * { width: 100%; }
+
+  /* Quote */
+  .quote-wrap { padding: 0; }
+  #quoteDoc { padding: 1.2rem; border-radius: 8px; font-size: 0.82rem; }
+  .q-table th, .q-table td { padding: 0.5rem 0.4rem; font-size: 0.75rem; }
+  .quote-toolbar { flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem 1rem; }
+  .quote-toolbar button { font-size: 0.78rem; padding: 0.4rem 0.8rem; }
+
+  /* Modal */
+  .modal-box { width: 95vw; padding: 1.5rem 1.2rem; margin: 1rem; }
+
+  /* History */
+  .hist-item { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+}
+
+@media (max-width: 400px) {
+  .hero h1 { font-size: 1.8rem; }
+  nav svg { width: 140px; height: 32px; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+}
+
 @media print {
   nav, .app-sidebar, .gen-card, .stats-row, .quote-toolbar, .edit-hint, .add-row-btn, .del-row-btn { display: none !important; }
   .app-layout { display: block; }
@@ -883,9 +951,30 @@ async function loadHistory() {
     return;
   }
   el.innerHTML = `<table class="history-table">
-    <thead><tr><th>Datum</th><th>Tid</th></tr></thead>
-    <tbody>${data.map(r => `<tr><td>${new Date(r.created_at).toLocaleDateString('sv-SE')}</td><td>${new Date(r.created_at).toLocaleTimeString('sv-SE', {hour:'2-digit',minute:'2-digit'})}</td></tr>`).join('')}</tbody>
+    <thead><tr><th>Datum</th><th>Kund</th><th>Titel</th><th style="text-align:right">Belopp</th><th></th></tr></thead>
+    <tbody>${data.map((r,i) => `<tr>
+      <td style="white-space:nowrap;color:#888;font-size:0.8rem">${new Date(r.created_at).toLocaleDateString('sv-SE')}</td>
+      <td>${r.client_name || '–'}</td>
+      <td>${r.title || '–'}</td>
+      <td style="text-align:right;font-weight:600;color:var(--ink)">${r.total_amount ? Number(r.total_amount).toLocaleString('sv-SE',{maximumFractionDigits:0})+' kr' : '–'}</td>
+      <td>${r.quote_html ? `<button class="btn-sm btn-outline" onclick="openHistoryQuote(${i})">Öppna</button>` : ''}</td>
+    </tr>`).join('')}</tbody>
   </table>`;
+  window._historyData = data;
+}
+
+// ===== OPEN HISTORY QUOTE =====
+function openHistoryQuote(i) {
+  const r = window._historyData?.[i];
+  if (!r?.quote_html) return;
+  showPage('generate');
+  document.getElementById('quoteWrap').style.display = 'block';
+  document.getElementById('quoteDoc').innerHTML = r.quote_html;
+  document.getElementById('quoteDoc').querySelectorAll('.editable').forEach(el => {
+    el.setAttribute('contenteditable', 'true');
+  });
+  document.getElementById('quoteTabs').style.display = 'flex';
+  document.getElementById('quoteTab').click();
 }
 
 // ===== UPGRADE =====
@@ -984,8 +1073,15 @@ Rimliga svenska priser 2024. Minst 5 rader.` }]
     document.getElementById('statusBar').style.display = 'none';
     btn.disabled = false;
 
-    // log usage
-    await sb.from('quote_usage').insert({ user_id: currentUser.id });
+    // log usage + spara offert
+    const quoteHtml = document.getElementById('quoteDoc')?.innerHTML || '';
+    await sb.from('quote_usage').insert({
+      user_id: currentUser.id,
+      title: q.title || 'Offert',
+      client_name: q.clientName || '',
+      total_amount: q.totalAfterRot || q.totalInclVat || 0,
+      quote_html: quoteHtml
+    });
     weeklyUsed++;
     const { count: total } = await sb.from('quote_usage').select('*',{count:'exact',head:true}).eq('user_id',currentUser.id);
     updateUI(currentProfile, weeklyUsed, total||0);
