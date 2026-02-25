@@ -971,6 +971,9 @@ Rimliga svenska priser 2024. Minst 5 rader.` }]
       })
     });
     const data = await res.json();
+    console.log('Edge function response:', JSON.stringify(data));
+    if (data.error) throw new Error('Edge function fel: ' + data.error);
+    if (!data.content || !data.content[0]) throw new Error('Oväntat svar: ' + JSON.stringify(data));
     const rawText = data.content[0].text.trim();
     const start = rawText.indexOf('{');
     const end = rawText.lastIndexOf('}');
@@ -993,8 +996,8 @@ Rimliga svenska priser 2024. Minst 5 rader.` }]
     clearInterval(interval);
     document.getElementById('statusBar').style.display = 'none';
     btn.disabled = false;
-    console.error(err);
-    alert('Något gick fel. Kontrollera att Anthropic API-nyckeln är angiven i koden.');
+    console.error('Full error:', err);
+    alert('Något gick fel: ' + (err?.message || err) + '\n\nKolla konsolen (F12) för mer info.');
   }
 }
 
