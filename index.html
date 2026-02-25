@@ -685,7 +685,7 @@ const STRIPE_LINKS = {
 };
 
 // 🤖 Anthropic API key – flytta till Supabase Edge Function i produktion!
-const ANTHROPIC_KEY = 'LÄGG_IN_DIN_ANTHROPIC_API_NYCKEL_HÄR';
+// API-nyckeln är nu säkert lagrad i Supabase Edge Function
 
 const PLAN_LIMITS = { free: 2, pro: 10, unlimited: Infinity };
 const PLAN_LABELS = { free: 'Gratis', pro: 'Pro', unlimited: 'Obegränsat' };
@@ -950,9 +950,10 @@ async function generateQuote() {
   currentInfo = { company, orgNum: p.org_number||'', vatNum: p.vat_number||'', phone: p.phone||'', email: p.email||'', website: p.website||'', address: p.address||'', bankgiro: p.bankgiro||'', vatPct, payterms, quoteNum, dateStr, validStr, inclRot };
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch('https://yfnmmcrvzcwcinwopnlj.supabase.co/functions/v1/super-task', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514', max_tokens: 1500,
         system: 'Du är expert på svenska offerter. Svara ALLTID med giltig JSON och inget annat.',
