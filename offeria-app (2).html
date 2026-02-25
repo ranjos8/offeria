@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offeria</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #0d0d0b; --paper: #f7f4ee; --cream: #ede8db;
+  --gold: #b8902e; --gold-light: #e8d5a0; --border: #ddd8cc;
+  --teal: #1d5c5c; --rust: #b84b24; --muted: #7a7570;
+}
+body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+
+/* ===== VIEWS ===== */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ===== NAV ===== */
+nav {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.9rem 2.5rem; border-bottom: 1px solid var(--border);
+  background: rgba(247,244,238,0.97); backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 50; gap: 1rem;
+}
+.brand { font-family: 'Fraunces', serif; font-size: 1.5rem; letter-spacing: -1px; cursor: pointer; }
+.brand span { color: var(--gold); }
+.nav-right { display: flex; align-items: center; gap: 0.75rem; }
+.nav-user { font-size: 0.85rem; color: var(--muted); }
+.nav-plan-badge {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; padding: 0.2rem 0.6rem; border-radius: 20px;
+  background: var(--cream); color: var(--gold); border: 1px solid var(--gold-light);
+}
+.btn-sm {
+  padding: 0.55rem 1.3rem; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.15s; border: none;
+  letter-spacing: 0.01em; white-space: nowrap;
+}
+.btn-dark { background: var(--ink); color: var(--gold-light); }
+.btn-dark:hover { background: #2a2a28; }
+.btn-outline { background: transparent; color: var(--ink); border: 1.5px solid #bbb; }
+.btn-outline:hover { border-color: var(--ink); }
+
+/* ===== LANDING ===== */
+.hero {
+  min-height: calc(100vh - 65px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 4rem 2rem;
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(184,144,46,0.1) 0%, transparent 60%);
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: white; border: 1px solid var(--border); border-radius: 20px;
+  padding: 0.35rem 1rem; font-size: 0.75rem; font-weight: 600;
+  color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 1.5rem; animation: fadeUp 0.5s ease both;
+}
+.hero h1 {
+  font-family: 'Fraunces', serif; font-size: clamp(2.8rem, 6vw, 5rem);
+  line-height: 1.08; letter-spacing: -2px; max-width: 750px;
+  animation: fadeUp 0.5s 0.1s ease both;
+}
+.hero h1 em { font-style: italic; color: var(--gold); }
+.hero p {
+  font-size: 1rem; color: var(--muted); max-width: 460px;
+  line-height: 1.75; margin: 1.5rem auto 2.5rem;
+  animation: fadeUp 0.5s 0.2s ease both;
+}
+.hero-btns { display: flex; gap: 1rem; justify-content: center; animation: fadeUp 0.5s 0.3s ease both; }
+.btn-hero {
+  background: var(--ink); color: var(--gold-light); border: none;
+  border-radius: 10px; padding: 0.9rem 2.2rem;
+  font-family: 'Fraunces', serif; font-size: 1.05rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-hero:hover { background: #2a2a28; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.btn-hero-sec {
+  background: transparent; color: var(--ink);
+  border: 1.5px solid var(--border); border-radius: 10px; padding: 0.9rem 2rem;
+  font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.15s;
+}
+.btn-hero-sec:hover { border-color: var(--ink); }
+
+/* pricing */
+.pricing-wrap { padding: 5rem 2rem; background: var(--ink); }
+.pricing-inner { max-width: 860px; margin: 0 auto; text-align: center; }
+.eyebrow { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.7rem; }
+.section-h { font-family: 'Fraunces', serif; font-size: clamp(1.8rem,3.5vw,2.8rem); letter-spacing: -1px; }
+.pricing-wrap .section-h { color: white; margin-bottom: 2.5rem; }
+.plans { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 2rem; }
+.plan {
+  background: #1a1a18; border: 1px solid #2a2a28;
+  border-radius: 14px; padding: 1.8rem; text-align: left;
+  position: relative; transition: transform 0.2s;
+}
+.plan:hover { transform: translateY(-4px); }
+.plan.featured { background: white; color: var(--ink); border: 2px solid var(--gold); }
+.plan-badge {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  background: var(--gold); color: white; font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 0.2rem 0.8rem; border-radius: 20px; white-space: nowrap;
+}
+.plan-name { font-family: 'Fraunces', serif; font-size: 1.2rem; margin-bottom: 0.2rem; color: white; }
+.plan.featured .plan-name { color: var(--ink); }
+.plan-tagline { font-size: 0.78rem; color: #666; margin-bottom: 1.2rem; }
+.plan-amount { font-family: 'Fraunces', serif; font-size: 2.2rem; font-weight: 700; color: var(--gold); }
+.plan-period { font-size: 0.8rem; color: #777; }
+.plan-features { list-style: none; margin: 1.2rem 0 1.5rem; }
+.plan-features li { font-size: 0.82rem; color: #bbb; padding: 0.4rem 0; border-bottom: 1px solid #2a2a28; display: flex; align-items: center; gap: 0.5rem; }
+.plan-features li::before { content: '✓'; color: var(--gold); font-weight: 700; }
+.plan.featured .plan-features li { color: var(--ink); border-color: #eee; }
+.plan-cta {
+  width: 100%; padding: 0.75rem; border-radius: 8px;
+  border: 1.5px solid #333; background: transparent; color: #bbb;
+  font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.15s;
+}
+.plan-cta:hover { border-color: var(--gold-light); color: var(--gold-light); }
+.plan.featured .plan-cta { background: var(--ink); color: var(--gold-light); border-color: var(--ink); }
+.plan.featured .plan-cta:hover { background: #222; }
+
+/* ===== AUTH MODAL ===== */
+.overlay {
+  display: none; position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,0.65); backdrop-filter: blur(6px);
+  align-items: center; justify-content: center;
+}
+.overlay.open { display: flex; }
+.modal {
+  background: white; border-radius: 16px; width: 100%; max-width: 400px;
+  margin: 1rem; box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+  animation: modalUp 0.25s ease both; overflow: hidden; position: relative;
+}
+@keyframes modalUp { from { opacity:0; transform: translateY(20px) scale(0.97); } to { opacity:1; transform: none; } }
+.modal-head { background: var(--ink); padding: 1.6rem 2rem 1.3rem; text-align: center; }
+.modal-head .brand { font-size: 1.3rem; color: var(--gold-light); }
+.modal-head p { font-size: 0.8rem; color: #888; margin-top: 0.3rem; }
+.modal-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.mtab { flex: 1; padding: 0.85rem; border: none; background: none; font-size: 0.85rem; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2.5px solid transparent; transition: all 0.15s; }
+.mtab.on { color: var(--ink); border-bottom-color: var(--gold); }
+.modal-body { padding: 1.6rem 2rem; }
+.mfield { margin-bottom: 0.9rem; }
+.mfield label { display: block; font-size: 0.76rem; font-weight: 600; color: #555; margin-bottom: 0.3rem; }
+.mfield input {
+  width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 0.6rem 0.85rem; font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+  outline: none; background: var(--paper); transition: border-color 0.15s;
+}
+.mfield input:focus { border-color: var(--gold); background: white; }
+.msub {
+  width: 100%; padding: 0.82rem; background: var(--ink); color: var(--gold-light);
+  border: none; border-radius: 8px; font-family: 'Fraunces', serif; font-size: 1rem;
+  cursor: pointer; margin-top: 0.4rem; transition: background 0.15s;
+}
+.msub:hover { background: #222; }
+.msub:disabled { opacity: 0.5; cursor: not-allowed; }
+.mfoot { text-align: center; font-size: 0.75rem; color: #aaa; margin-top: 0.8rem; }
+.mfoot a { color: var(--gold); cursor: pointer; }
+.modal-close { position: absolute; top: 0.8rem; right: 0.8rem; width: 28px; height: 28px; border-radius: 50%; background: #222; border: none; color: #aaa; cursor: pointer; font-size: 0.9rem; }
+.modal-close:hover { background: #333; }
+.merror { background: #fff0ee; border: 1px solid #f5c0b0; border-radius: 6px; padding: 0.6rem 0.8rem; font-size: 0.8rem; color: var(--rust); margin-bottom: 0.8rem; display: none; }
+.merror.show { display: block; }
+
+/* ===== APP (logged in) ===== */
+.app-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 65px); }
+.app-sidebar {
+  background: var(--ink); color: white;
+  padding: 1.8rem 1.2rem; display: flex; flex-direction: column; gap: 0.3rem;
+}
+.sidebar-section-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: #555; padding: 0.8rem 0.6rem 0.3rem; }
+.sidebar-item {
+  display: flex; align-items: center; gap: 0.7rem;
+  padding: 0.6rem 0.8rem; border-radius: 8px;
+  font-size: 0.85rem; color: #aaa; cursor: pointer; transition: all 0.15s;
+}
+.sidebar-item:hover { background: #1a1a18; color: white; }
+.sidebar-item.active { background: #1a1a18; color: white; font-weight: 600; }
+.quota-box {
+  margin-top: auto; background: #1a1a18; border-radius: 10px; padding: 1rem;
+}
+.quota-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: #555; margin-bottom: 0.3rem; }
+.quota-plan { font-family: 'Fraunces', serif; font-size: 1rem; color: var(--gold); margin-bottom: 0.2rem; }
+.quota-count { font-size: 0.78rem; color: #888; margin-bottom: 0.5rem; }
+.quota-bar-bg { background: #2a2a28; border-radius: 4px; height: 4px; }
+.quota-bar-fill { background: var(--gold); border-radius: 4px; height: 100%; transition: width 0.3s; }
+.upgrade-btn {
+  display: block; width: 100%; margin-top: 0.8rem; padding: 0.5rem;
+  background: var(--gold); color: var(--ink); border: none; border-radius: 6px;
+  font-size: 0.78rem; font-weight: 700; cursor: pointer; text-align: center; transition: background 0.15s;
+}
+.upgrade-btn:hover { background: var(--gold-light); }
+
+/* app pages */
+.app-page { display: none; padding: 2.5rem 3rem; }
+.app-page.active { display: block; }
+.page-title { font-family: 'Fraunces', serif; font-size: 1.8rem; letter-spacing: -1px; margin-bottom: 0.3rem; }
+.page-sub { font-size: 0.88rem; color: var(--muted); margin-bottom: 2rem; }
+
+/* stats row */
+.stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 2rem; }
+.stat-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.3rem; }
+.stat-val { font-family: 'Fraunces', serif; font-size: 2rem; }
+.stat-lbl { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
+
+/* generator card */
+.gen-card { background: white; border: 1px solid var(--border); border-radius: 14px; padding: 2rem; margin-bottom: 1.5rem; }
+.card-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.2rem; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.field { display: flex; flex-direction: column; gap: 0.3rem; }
+.field label { font-size: 0.76rem; font-weight: 600; color: #555; }
+.field input, .field select, .field textarea {
+  border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 0.6rem 0.85rem; font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+  outline: none; background: var(--paper); transition: border-color 0.15s; color: var(--ink);
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); background: white; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+.chip {
+  padding: 0.4rem 1rem; border-radius: 20px; border: 1.5px solid var(--border);
+  font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.15s; background: white;
+}
+.chip input { display: none; }
+.chip.on { background: var(--ink); color: white; border-color: var(--ink); }
+.prompt-area {
+  width: 100%; height: 90px; border: 2px solid var(--border); border-radius: 10px;
+  padding: 0.9rem 1.1rem; font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+  resize: none; outline: none; background: white; transition: border-color 0.2s;
+}
+.prompt-area:focus { border-color: var(--ink); }
+.prompt-area::placeholder { color: #bbb; }
+.ex-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.8rem; }
+.ex-pill {
+  font-size: 0.76rem; padding: 0.3rem 0.75rem; border: 1px solid var(--border);
+  border-radius: 20px; cursor: pointer; background: white; color: #666; transition: all 0.15s;
+}
+.ex-pill:hover { border-color: var(--ink); color: var(--ink); }
+.gen-row { display: flex; align-items: center; gap: 1rem; margin-top: 0.8rem; }
+.gen-btn {
+  background: var(--ink); color: var(--gold-light); border: none; border-radius: 10px;
+  padding: 0.82rem 2rem; font-family: 'Fraunces', serif; font-size: 1rem;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.gen-btn:hover { background: #2a2a28; }
+.gen-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.quota-note { font-size: 0.78rem; color: var(--muted); }
+.quota-note.warn { color: var(--rust); font-weight: 600; }
+
+/* loading */
+.status-bar { display: none; align-items: center; gap: 0.8rem; padding: 0.9rem 1.2rem; background: var(--cream); border-radius: 8px; font-size: 0.84rem; color: #666; margin-top: 0.8rem; }
+.spinner { width: 18px; height: 18px; border: 2.5px solid var(--border); border-top-color: var(--ink); border-radius: 50%; animation: spin 0.75s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* quote output */
+.quote-wrap { display: none; margin-top: 1.5rem; animation: fadeUp 0.35s ease; }
+.quote-toolbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.7rem 1.2rem; background: var(--ink); border-radius: 12px 12px 0 0;
+}
+.qt-label { font-size: 0.76rem; color: var(--gold-light); letter-spacing: 0.07em; text-transform: uppercase; }
+.qt-btns { display: flex; gap: 0.5rem; }
+.qt-btn { padding: 0.38rem 0.9rem; border-radius: 6px; border: 1px solid #444; background: transparent; color: #ccc; font-family: 'DM Sans',sans-serif; font-size: 0.78rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+.qt-btn:hover { border-color: var(--gold-light); color: var(--gold-light); }
+.qt-btn.primary { background: var(--gold); color: var(--ink); border-color: var(--gold); font-weight: 700; }
+.qt-btn.primary:hover { background: var(--gold-light); }
+
+/* quote doc */
+#quoteDoc {
+  background: white; border: 1px solid var(--border); border-top: none;
+  border-radius: 0 0 12px 12px; padding: 3rem;
+  font-size: 0.87rem; line-height: 1.65; box-shadow: 0 6px 40px rgba(0,0,0,0.06);
+}
+.q-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 1.5rem; border-bottom: 3px solid var(--ink); margin-bottom: 2rem; }
+.q-company-name { font-family: 'Fraunces', serif; font-size: 1.6rem; font-weight: 700; margin-bottom: 0.3rem; }
+.q-company-info { font-size: 0.8rem; color: #666; line-height: 1.8; }
+.q-logo-preview { max-height: 70px; max-width: 150px; object-fit: contain; }
+.q-logo-ph { width: 90px; height: 45px; background: var(--cream); border-radius: 6px; border: 1px dashed var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #bbb; }
+.q-meta-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
+.q-offer-title { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; }
+.q-meta { text-align: right; font-size: 0.8rem; color: #666; line-height: 1.9; }
+.q-meta strong { color: var(--ink); }
+.valid-badge { display: inline-block; background: var(--teal); color: white; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; padding: 0.18rem 0.6rem; border-radius: 20px; margin-left: 0.5rem; vertical-align: middle; }
+.q-client { background: var(--cream); border-left: 4px solid var(--gold); padding: 0.8rem 1.2rem; border-radius: 0 8px 8px 0; margin-bottom: 1.5rem; font-size: 0.84rem; }
+.q-client .lbl { font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.12em; color: #999; margin-bottom: 0.2rem; }
+.q-intro { font-size: 0.84rem; color: #444; margin-bottom: 1.5rem; padding: 0.9rem 1.1rem; background: #f8f8f6; border-radius: 8px; line-height: 1.75; }
+.edit-hint { font-size: 0.72rem; color: var(--gold); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.6rem; padding: 0.35rem 0.8rem; background: #fffaee; border: 1px solid var(--gold-light); border-radius: 6px; width: fit-content; }
+table.qt { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 0.83rem; }
+table.qt th { background: var(--ink); color: white; padding: 0.52rem 0.85rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500; text-align: left; }
+table.qt th:last-child { text-align: right; }
+table.qt td { padding: 0.62rem 0.85rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+table.qt td:last-child { text-align: right; font-weight: 500; }
+table.qt tr:nth-child(even) td { background: #fbfaf8; }
+.editable { outline: none; border-radius: 4px; padding: 1px 4px; margin: -1px -4px; transition: background 0.15s, box-shadow 0.15s; cursor: text; display: inline-block; min-width: 2rem; }
+.editable:hover { background: #fff8e8; }
+.editable:focus { background: #fff8e8; box-shadow: 0 0 0 2px var(--gold); }
+.add-row-btn { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 0.4rem; font-size: 0.78rem; color: var(--gold); cursor: pointer; border: 1px dashed var(--gold-light); background: #fffaee; border-radius: 6px; padding: 0.35rem 0.8rem; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.add-row-btn:hover { border-color: var(--gold); }
+.del-row-btn { background: none; border: none; color: #ccc; cursor: pointer; font-size: 1rem; padding: 0 0.3rem; transition: color 0.15s; }
+.del-row-btn:hover { color: var(--rust); }
+.q-totals { display: flex; justify-content: flex-end; margin: 1rem 0 1.5rem; }
+.q-totals-box { min-width: 255px; }
+.trow { display: flex; justify-content: space-between; padding: 0.33rem 0; font-size: 0.83rem; border-bottom: 1px solid #eee; }
+.trow.rot-row { color: var(--rust); font-weight: 500; }
+.trow.final-row { font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; border-bottom: none; border-top: 2px solid var(--ink); padding-top: 0.65rem; margin-top: 0.2rem; color: var(--teal); }
+.q-terms { background: var(--cream); border-radius: 8px; padding: 1rem 1.2rem; font-size: 0.79rem; color: #666; margin-bottom: 1.5rem; }
+.q-terms h4 { font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.12em; color: #999; margin-bottom: 0.5rem; }
+.q-footer { display: flex; justify-content: space-between; align-items: flex-end; padding-top: 1.5rem; border-top: 1px solid var(--border); font-size: 0.78rem; color: #888; }
+.sig-block { text-align: right; }
+.sig-line { width: 155px; border-bottom: 1.5px solid #aaa; margin-left: auto; margin-bottom: 0.3rem; height: 30px; }
+
+/* history table */
+.history-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.history-table th { background: var(--ink); color: white; padding: 0.7rem 1rem; text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500; }
+.history-table td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); }
+.history-table tr:last-child td { border-bottom: none; }
+.history-table tr:hover td { background: #fafaf8; }
+.badge { font-size: 0.68rem; font-weight: 700; padding: 0.18rem 0.55rem; border-radius: 20px; }
+.badge-free { background: #e8f5e9; color: #2e7d32; }
+.badge-pro  { background: #fff8e1; color: #b8902e; }
+.badge-unl  { background: #e3f2fd; color: #1565c0; }
+.empty-state { text-align: center; padding: 4rem; color: var(--muted); }
+.empty-state .big { font-size: 2.5rem; margin-bottom: 1rem; }
+
+/* profile page */
+.save-btn {
+  background: var(--ink); color: var(--gold-light); border: none;
+  border-radius: 8px; padding: 0.7rem 1.8rem;
+  font-family: 'Fraunces', serif; font-size: 0.95rem; cursor: pointer; transition: background 0.15s;
+}
+.save-btn:hover { background: #2a2a28; }
+.save-ok { color: var(--teal); font-size: 0.82rem; margin-left: 1rem; display: none; }
+
+/* upgrade modal */
+.upgrade-modal { max-width: 560px; }
+.upgrade-plans { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; padding: 1.5rem 2rem; }
+.uplan { border: 1.5px solid var(--border); border-radius: 12px; padding: 1.2rem; cursor: pointer; transition: all 0.15s; }
+.uplan:hover { border-color: var(--gold); }
+.uplan.sel { border-color: var(--gold); background: #fffaee; }
+.uplan-name { font-family: 'Fraunces', serif; font-size: 1rem; margin-bottom: 0.2rem; }
+.uplan-price { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.6rem; }
+.uplan-features { font-size: 0.76rem; color: #666; line-height: 1.7; }
+.stripe-note { padding: 0 2rem 1.5rem; font-size: 0.78rem; color: var(--muted); text-align: center; }
+.stripe-btn {
+  display: block; margin: 0 2rem 1.5rem; padding: 0.85rem;
+  background: var(--ink); color: var(--gold-light); border: none;
+  border-radius: 8px; font-family: 'Fraunces', serif; font-size: 1rem;
+  cursor: pointer; transition: background 0.15s; text-align: center; width: calc(100% - 4rem);
+}
+.stripe-btn:hover { background: #2a2a28; }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+@media print {
+  nav, .app-sidebar, .gen-card, .stats-row, .quote-toolbar, .edit-hint, .add-row-btn, .del-row-btn { display: none !important; }
+  .app-layout { display: block; }
+  .app-page.active { padding: 0; }
+  .quote-wrap { display: block !important; }
+  #quoteDoc { border: none; box-shadow: none; padding: 0; border-radius: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <svg onclick="goHome()" style="cursor:pointer;display:block;flex-shrink:0" width="174" height="40" viewBox="0 0 174 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="lg" x1="46" y1="0" x2="174" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#0d0d0b"/>
+        <stop offset="100%" stop-color="#c4982e"/>
+      </linearGradient>
+    </defs>
+    <!-- back paper -->
+    <rect x="7" y="4" width="22" height="30" rx="2.5" fill="#e8d5a0" opacity="0.7"/>
+    <!-- mid paper -->
+    <rect x="4" y="2" width="22" height="30" rx="2.5" fill="#f5f0e8" stroke="#d8d0c0" stroke-width="1"/>
+    <!-- front paper -->
+    <rect x="1" y="0" width="22" height="30" rx="2.5" fill="white" stroke="#c8c0b0" stroke-width="1"/>
+    <!-- gold line -->
+    <line x1="4.5" y1="8" x2="19.5" y2="8" stroke="#b8902e" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- content lines -->
+    <line x1="4.5" y1="13" x2="19.5" y2="13" stroke="#ddd8cc" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="4.5" y1="18" x2="16" y2="18" stroke="#ddd8cc" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="4.5" y1="23" x2="18" y2="23" stroke="#ddd8cc" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- wordmark -->
+    <text x="31" y="29" font-family="Fraunces, serif" font-style="italic" font-weight="700" font-size="28" fill="url(#lg)" letter-spacing="-0.8">Offeria</text>
+  </svg>
+  <div class="nav-right">
+    <div id="navUserArea" style="display:none; align-items:center; gap:0.8rem;">
+      <span class="nav-user" id="navUserName"></span>
+      <span class="nav-plan-badge" id="navPlanBadge">Gratis</span>
+      <button class="btn-sm btn-outline" onclick="signOut()">Logga ut</button>
+    </div>
+    <div id="navAuthBtns">
+      <button class="btn-sm btn-outline" onclick="openModal('login')">Logga in</button>
+      <button class="btn-sm btn-dark" onclick="openModal('register')">Kom igång gratis</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== LANDING VIEW ===== -->
+<div class="view active" id="viewLanding">
+
+  <section class="hero">
+    <div class="hero-badge">✦ AI-driven offertgenerering · Offeria</div>
+    <h1>Proffsiga offerter<br>på <em>sekunder</em></h1>
+    <p>Beskriv jobbet med egna ord – få en komplett klar-att-skicka offert direkt.</p>
+    <div class="hero-btns">
+      <button class="btn-hero" onclick="openModal('register')">Kom igång gratis →</button>
+      <button class="btn-hero-sec" onclick="document.getElementById('pricingSection').scrollIntoView({behavior:'smooth'})">Se priser</button>
+    </div>
+  </section>
+
+  <div class="pricing-wrap" id="pricingSection">
+    <div class="pricing-inner">
+      <div class="eyebrow">Priser</div>
+      <div class="section-h">Välj din plan</div>
+      <div class="plans">
+        <div class="plan">
+          <div class="plan-name">Gratis</div>
+          <div class="plan-tagline">Perfekt för att prova</div>
+          <div><span class="plan-amount">0</span><span class="plan-period"> kr/mån</span></div>
+          <ul class="plan-features">
+            <li>2 offerter per vecka</li>
+            <li>Alla branscher</li>
+            <li>PDF-export</li>
+            <li>Redigerbara rader</li>
+          </ul>
+          <button class="plan-cta" onclick="openModal('register')">Kom igång</button>
+        </div>
+        <div class="plan featured">
+          <div class="plan-badge">Mest populär</div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-tagline">För aktiva hantverkare</div>
+          <div><span class="plan-amount">99</span><span class="plan-period"> kr/mån</span></div>
+          <ul class="plan-features">
+            <li>10 offerter per vecka</li>
+            <li>Egen logotyp</li>
+            <li>ROT & RUT-beräkning</li>
+            <li>Offerthistorik</li>
+            <li>Redigerbara rader</li>
+          </ul>
+          <button class="plan-cta" onclick="openModal('register')">Välj Pro</button>
+        </div>
+        <div class="plan">
+          <div class="plan-name">Obegränsat</div>
+          <div class="plan-tagline">För proffs med volym</div>
+          <div><span class="plan-amount">299</span><span class="plan-period"> kr/mån</span></div>
+          <ul class="plan-features">
+            <li>Obegränsade offerter</li>
+            <li>Eget företagstema</li>
+            <li>Offerthistorik</li>
+            <li>Redigerbara rader</li>
+            <li>Prioriterad AI</li>
+          </ul>
+          <button class="plan-cta" onclick="openModal('register')">Välj Obegränsat</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== APP VIEW (logged in) ===== -->
+<div class="view" id="viewApp">
+  <div class="app-layout">
+
+    <!-- sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-item active" id="sNav-generate" onclick="showPage('generate')">📄 Ny offert</div>
+      <div class="sidebar-item" id="sNav-history" onclick="showPage('history')">🗂 Historik</div>
+      <div class="sidebar-item" id="sNav-profile" onclick="showPage('profile')">🏢 Företagsprofil</div>
+
+      <div class="quota-box">
+        <div class="quota-label">Din plan</div>
+        <div class="quota-plan" id="sidebarPlan">Gratis</div>
+        <div class="quota-count" id="sidebarQuotaCount">0 / 2 denna vecka</div>
+        <div class="quota-bar-bg"><div class="quota-bar-fill" id="sidebarQuotaBar" style="width:0%"></div></div>
+        <button class="upgrade-btn" onclick="openUpgradeModal()" id="upgradeBtn">↑ Uppgradera</button>
+      </div>
+    </aside>
+
+    <!-- pages -->
+    <main>
+
+      <!-- GENERATE PAGE -->
+      <div class="app-page active" id="page-generate">
+        <div class="page-title">Ny offert</div>
+        <div class="page-sub">Beskriv uppdraget – AI:n skapar resten</div>
+
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">Offerter totalt</div></div>
+          <div class="stat-card"><div class="stat-val" id="statWeek">0</div><div class="stat-lbl">Denna vecka</div></div>
+          <div class="stat-card"><div class="stat-val" id="statLeft">0</div><div class="stat-lbl">Kvar denna vecka</div></div>
+        </div>
+
+        <!-- Company settings (collapsible) -->
+        <div class="gen-card">
+          <div class="card-label">⚙️ Offertinställningar</div>
+          <div class="grid3">
+            <div class="field"><label>Bransch</label>
+              <select id="industry">
+                <option value="Bygg & Snickeri">🔨 Bygg & Snickeri</option>
+                <option value="El">⚡ El</option>
+                <option value="VVS">🔧 VVS</option>
+                <option value="Städ">🧹 Städ</option>
+                <option value="Mark & Trädgård">🌿 Mark & Trädgård</option>
+                <option value="Måleri">🎨 Måleri</option>
+                <option value="Transport">🚚 Transport</option>
+                <option value="Konsult / IT">💼 Konsult / IT</option>
+              </select>
+            </div>
+            <div class="field"><label>Momssats</label>
+              <select id="vatRate">
+                <option value="25">25%</option><option value="12">12%</option>
+                <option value="6">6%</option><option value="0">0%</option>
+              </select>
+            </div>
+            <div class="field"><label>Betalningsvillkor</label>
+              <select id="payTerms">
+                <option>30 dagar netto</option><option>14 dagar netto</option>
+                <option>10 dagar netto</option><option>Förskott 50%, resten vid leverans</option>
+              </select>
+            </div>
+          </div>
+          <div class="card-label" style="margin-top:0.3rem">Inkludera</div>
+          <div class="chips">
+            <label class="chip on" id="chip-rot"><input type="checkbox" id="inclRot" checked onchange="toggleChip('chip-rot',this)">ROT-avdrag</label>
+            <label class="chip on" id="chip-warranty"><input type="checkbox" id="inclWarranty" checked onchange="toggleChip('chip-warranty',this)">Garanti</label>
+            <label class="chip on" id="chip-materials"><input type="checkbox" id="inclMaterials" checked onchange="toggleChip('chip-materials',this)">Material</label>
+            <label class="chip" id="chip-timeline"><input type="checkbox" id="inclTimeline" onchange="toggleChip('chip-timeline',this)">Tidplan</label>
+          </div>
+        </div>
+
+        <div class="gen-card">
+          <div class="card-label">✍️ Beskriv uppdraget</div>
+          <div class="ex-pills">
+            <span class="ex-pill" onclick="setPrompt(this.textContent)">Bygga 20 kvm trädäck med räcke</span>
+            <span class="ex-pill" onclick="setPrompt(this.textContent)">Byta 5 eluttag i kök</span>
+            <span class="ex-pill" onclick="setPrompt(this.textContent)">Kontorsrengöring 400 kvm, varannan vecka</span>
+            <span class="ex-pill" onclick="setPrompt(this.textContent)">Måla om 3 rum, 80 kvm</span>
+            <span class="ex-pill" onclick="setPrompt(this.textContent)">Byta badrumsrör och ny dusch</span>
+          </div>
+          <textarea class="prompt-area" id="jobPrompt" placeholder="Beskriv vad som ska göras, ungefär hur stort, var…"></textarea>
+          <div class="gen-row">
+            <button class="gen-btn" id="genBtn" onclick="generateQuote()">✦ Generera offert</button>
+            <span class="quota-note" id="quotaNote"></span>
+          </div>
+          <div class="status-bar" id="statusBar">
+            <div class="spinner"></div>
+            <span id="statusText">Analyserar uppdraget…</span>
+          </div>
+        </div>
+
+        <!-- quote output -->
+        <div class="quote-wrap" id="quoteWrap">
+          <div class="quote-toolbar">
+            <span class="qt-label">✦ Offert genererad</span>
+            <div class="qt-btns">
+              <button class="qt-btn" onclick="generateQuote()">↻ Generera om</button>
+              <button class="qt-btn primary" onclick="window.print()">🖨 PDF / Skriv ut</button>
+            </div>
+          </div>
+          <div id="quoteDoc"></div>
+        </div>
+      </div>
+
+      <!-- HISTORY PAGE -->
+      <div class="app-page" id="page-history">
+        <div class="page-title">Offerthistorik</div>
+        <div class="page-sub">Alla dina genererade offerter</div>
+        <div id="historyContent"><div class="empty-state"><div class="big">📂</div><p>Inga offerter ännu – generera din första!</p></div></div>
+      </div>
+
+      <!-- PROFILE PAGE -->
+      <div class="app-page" id="page-profile">
+        <div class="page-title">Företagsprofil</div>
+        <div class="page-sub">Sparas automatiskt i dina offerter</div>
+        <div class="gen-card" style="max-width:600px">
+          <div class="card-label">📋 Företagsuppgifter</div>
+          <div class="grid2">
+            <div class="field"><label>Företagsnamn</label><input id="pCompany" placeholder="Svenssons Bygg AB"></div>
+            <div class="field"><label>Organisationsnummer</label><input id="pOrg" placeholder="556xxx-xxxx"></div>
+          </div>
+          <div class="grid3" style="margin-bottom:1rem">
+            <div class="field"><label>Telefon</label><input id="pPhone" placeholder="070-000 00 00"></div>
+            <div class="field"><label>E-post</label><input id="pEmail" placeholder="info@foretaget.se"></div>
+            <div class="field"><label>Webbplats</label><input id="pWebsite" placeholder="www.foretaget.se"></div>
+          </div>
+          <div class="grid2">
+            <div class="field"><label>Adress</label><input id="pAddress" placeholder="Storgatan 1, 123 45 Stad"></div>
+            <div class="field"><label>Bankgiro</label><input id="pBankgiro" placeholder="123-4567"></div>
+          </div>
+          <div style="margin-top:1.2rem; display:flex; align-items:center;">
+            <button class="save-btn" onclick="saveProfile()">Spara profil</button>
+            <span class="save-ok" id="saveOk">✓ Sparat!</span>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ===== AUTH MODAL ===== -->
+<div class="overlay" id="authOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-head">
+      <svg width="130" height="32" viewBox="0 0 260 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="gmod" x1="46" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#b8902e"/></linearGradient></defs>
+        <rect x="6" y="8" width="36" height="50" rx="3" fill="#b8902e" opacity="0.1"/>
+        <rect x="3" y="5" width="36" height="50" rx="3" fill="#1a1a18" stroke="#333" stroke-width="1"/>
+        <rect x="0" y="2" width="36" height="50" rx="3" fill="#222" stroke="#333" stroke-width="1.3"/>
+        <line x1="6" y1="16" x2="28" y2="16" stroke="#b8902e" stroke-width="2" stroke-linecap="round"/>
+        <line x1="6" y1="24" x2="28" y2="24" stroke="#2a2a28" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="6" y1="30" x2="24" y2="30" stroke="#2a2a28" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="6" y1="36" x2="26" y2="36" stroke="#2a2a28" stroke-width="1.3" stroke-linecap="round"/>
+        <text x="46" y="48" font-family="Fraunces, serif" font-style="italic" font-weight="700" font-size="36" fill="url(#gmod)" letter-spacing="-1">Offeria</text>
+      </svg>
+      <p id="modalSub">Skapa ditt konto – gratis</p>
+    </div>
+    <div class="modal-tabs">
+      <button class="mtab on" id="tab-reg" onclick="switchTab('register')">Registrera</button>
+      <button class="mtab" id="tab-log" onclick="switchTab('login')">Logga in</button>
+    </div>
+    <div class="modal-body">
+      <div class="merror" id="merror"></div>
+
+      <div id="formRegister">
+        <div class="mfield"><label>Namn</label><input type="text" id="regName" placeholder="Erik Svensson"></div>
+        <div class="mfield"><label>E-post</label><input type="email" id="regEmail" placeholder="erik@foretaget.se"></div>
+        <div class="mfield"><label>Lösenord</label><input type="password" id="regPass" placeholder="Minst 6 tecken"></div>
+        <div class="mfield"><label>Företagsnamn</label><input type="text" id="regCompany" placeholder="Svenssons Bygg AB"></div>
+        <button class="msub" id="regBtn" onclick="doRegister()">Skapa konto gratis →</button>
+        <div class="mfoot">Har du ett konto? <a onclick="switchTab('login')">Logga in</a></div>
+      </div>
+
+      <div id="formLogin" style="display:none">
+        <div class="mfield"><label>E-post</label><input type="email" id="logEmail" placeholder="din@epost.se"></div>
+        <div class="mfield"><label>Lösenord</label><input type="password" id="logPass" placeholder="••••••••"></div>
+        <button class="msub" id="logBtn" onclick="doLogin()">Logga in →</button>
+        <div class="mfoot">Inget konto? <a onclick="switchTab('register')">Registrera dig</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== UPGRADE MODAL ===== -->
+<div class="overlay" id="upgradeOverlay" onclick="if(event.target===this)closeUpgradeModal()">
+  <div class="modal upgrade-modal">
+    <button class="modal-close" onclick="closeUpgradeModal()">✕</button>
+    <div class="modal-head">
+      <div style="font-family:'Fraunces',serif;font-size:1.2rem;color:var(--gold-light)">Uppgradera din plan</div>
+      <p>Välj en plan och betala säkert via Stripe</p>
+    </div>
+    <div class="upgrade-plans">
+      <div class="uplan sel" id="uplan-pro" onclick="selectUPlan('pro')">
+        <div class="uplan-name">Pro</div>
+        <div class="uplan-price">99 kr/mån</div>
+        <div class="uplan-features">10 offerter/vecka<br>Egen logotyp<br>Offerthistorik</div>
+      </div>
+      <div class="uplan" id="uplan-unlimited" onclick="selectUPlan('unlimited')">
+        <div class="uplan-name">Obegränsat</div>
+        <div class="uplan-price">299 kr/mån</div>
+        <div class="uplan-features">Obegränsade offerter<br>Eget tema<br>Prioriterad AI</div>
+      </div>
+    </div>
+    <div class="stripe-note">🔒 Betalning hanteras säkert av Stripe. Du kan avbryta när som helst.</div>
+    <button class="stripe-btn" onclick="goToStripe()">Betala via Stripe →</button>
+  </div>
+</div>
+
+<script>
+// ===== CONFIG =====
+const SUPABASE_URL = 'https://yfnmmcrvzcwcinwopnlj.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmbm1tY3J2emN3Y2lud29wbmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MzY4NjQsImV4cCI6MjA4NzUxMjg2NH0.MpF3oRLWwXkmrjEGJ0Qqrsw_87FixbaNHmHmPxFyXKc';
+
+// 🔑 Stripe payment links – ersätt med dina riktiga länkar från Stripe Dashboard
+const STRIPE_LINKS = {
+  pro:       'https://buy.stripe.com/ERSÄTT_MED_DIN_PRO_LÄNK',
+  unlimited: 'https://buy.stripe.com/ERSÄTT_MED_DIN_UNLIMITED_LÄNK'
+};
+
+// 🤖 Anthropic API key – flytta till Supabase Edge Function i produktion!
+const ANTHROPIC_KEY = 'LÄGG_IN_DIN_ANTHROPIC_API_NYCKEL_HÄR';
+
+const PLAN_LIMITS = { free: 2, pro: 10, unlimited: Infinity };
+const PLAN_LABELS = { free: 'Gratis', pro: 'Pro', unlimited: 'Obegränsat' };
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let currentUser = null;
+let currentProfile = null;
+let weeklyUsed = 0;
+
+// ===== INIT =====
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) await onLogin(session.user);
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) await onLogin(session.user);
+    if (event === 'SIGNED_OUT') onLogout();
+  });
+}
+
+async function onLogin(user) {
+  currentUser = user;
+  closeModal();
+
+  // load profile
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
+  currentProfile = profile;
+
+  // load weekly usage
+  const weekStart = getWeekStart();
+  const { count } = await sb.from('quote_usage')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .gte('created_at', weekStart.toISOString());
+  weeklyUsed = count || 0;
+
+  // load total
+  const { count: total } = await sb.from('quote_usage')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id);
+
+  updateUI(profile, weeklyUsed, total || 0);
+  showView('app');
+  fillProfileForm(profile);
+}
+
+function onLogout() {
+  currentUser = null; currentProfile = null; weeklyUsed = 0;
+  showView('landing');
+  document.getElementById('navUserArea').style.display = 'none';
+  document.getElementById('navAuthBtns').style.display = '';
+}
+
+function updateUI(profile, used, total) {
+  const plan = profile?.plan || 'free';
+  const limit = PLAN_LIMITS[plan];
+  const left = limit === Infinity ? '∞' : Math.max(0, limit - used);
+  const limitStr = limit === Infinity ? '∞' : limit;
+
+  document.getElementById('navUserArea').style.display = 'flex';
+  document.getElementById('navAuthBtns').style.display = 'none';
+  document.getElementById('navUserName').textContent = profile?.full_name || profile?.email || '';
+  document.getElementById('navPlanBadge').textContent = PLAN_LABELS[plan];
+
+  document.getElementById('sidebarPlan').textContent = PLAN_LABELS[plan];
+  document.getElementById('sidebarQuotaCount').textContent = `${used} / ${limitStr} denna vecka`;
+  document.getElementById('sidebarQuotaBar').style.width = limit === Infinity ? '20%' : `${Math.min(100, used/limit*100)}%`;
+  if (plan === 'unlimited') document.getElementById('upgradeBtn').style.display = 'none';
+
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statWeek').textContent = used;
+  document.getElementById('statLeft').textContent = left;
+
+  const qNote = document.getElementById('quotaNote');
+  if (plan !== 'unlimited' && used >= limit) {
+    qNote.textContent = '🚫 Du har nått veckogränsen – uppgradera för fler offerter';
+    qNote.className = 'quota-note warn';
+    document.getElementById('genBtn').disabled = true;
+  } else {
+    qNote.textContent = `${left} ${limit === Infinity ? 'obegränsade' : ''} offerter kvar denna vecka`;
+    qNote.className = 'quota-note';
+    document.getElementById('genBtn').disabled = false;
+  }
+}
+
+function getWeekStart() {
+  const now = new Date();
+  const day = now.getDay() || 7;
+  const diff = now.getDate() - day + 1;
+  return new Date(now.getFullYear(), now.getMonth(), diff, 0, 0, 0, 0);
+}
+
+// ===== AUTH =====
+function openModal(tab) {
+  document.getElementById('authOverlay').classList.add('open');
+  switchTab(tab);
+  showError('');
+}
+function closeModal() { document.getElementById('authOverlay').classList.remove('open'); }
+function closeModalOutside(e) { if (e.target.id === 'authOverlay') closeModal(); }
+function switchTab(tab) {
+  document.getElementById('tab-reg').classList.toggle('on', tab === 'register');
+  document.getElementById('tab-log').classList.toggle('on', tab === 'login');
+  document.getElementById('formRegister').style.display = tab === 'register' ? '' : 'none';
+  document.getElementById('formLogin').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('modalSub').textContent = tab === 'register' ? 'Skapa ditt konto – gratis' : 'Välkommen tillbaka';
+  showError('');
+}
+function showError(msg) {
+  const el = document.getElementById('merror');
+  el.textContent = msg; el.classList.toggle('show', !!msg);
+}
+
+async function doRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const company = document.getElementById('regCompany').value.trim();
+  if (!email || !pass) return showError('Fyll i e-post och lösenord.');
+  const btn = document.getElementById('regBtn');
+  btn.disabled = true; btn.textContent = 'Skapar konto…';
+  const { error } = await sb.auth.signUp({
+    email, password: pass,
+    options: { data: { full_name: name, company_name: company } }
+  });
+  btn.disabled = false; btn.textContent = 'Skapa konto gratis →';
+  if (error) return showError(error.message);
+  // update company name in profile
+  if (company && currentUser) {
+    await sb.from('profiles').update({ company_name: company, full_name: name }).eq('id', currentUser.id);
+  }
+}
+
+async function doLogin() {
+  const email = document.getElementById('logEmail').value.trim();
+  const pass = document.getElementById('logPass').value;
+  if (!email || !pass) return showError('Fyll i e-post och lösenord.');
+  const btn = document.getElementById('logBtn');
+  btn.disabled = true; btn.textContent = 'Loggar in…';
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  btn.disabled = false; btn.textContent = 'Logga in →';
+  if (error) return showError('Fel e-post eller lösenord.');
+}
+
+async function signOut() { await sb.auth.signOut(); }
+
+// ===== VIEWS =====
+function showView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.getElementById('view' + v.charAt(0).toUpperCase() + v.slice(1)).classList.add('active');
+}
+function goHome() { if (currentUser) showView('app'); else showView('landing'); }
+
+function showPage(p) {
+  document.querySelectorAll('.app-page').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('sNav-' + p).classList.add('active');
+  if (p === 'history') loadHistory();
+}
+
+// ===== PROFILE =====
+function fillProfileForm(profile) {
+  if (!profile) return;
+  document.getElementById('pCompany').value = profile.company_name || '';
+  document.getElementById('pOrg').value = profile.org_number || '';
+  document.getElementById('pPhone').value = profile.phone || '';
+  document.getElementById('pEmail').value = profile.email || '';
+  document.getElementById('pWebsite').value = profile.website || '';
+  document.getElementById('pAddress').value = profile.address || '';
+  document.getElementById('pBankgiro').value = profile.bankgiro || '';
+}
+
+async function saveProfile() {
+  const updates = {
+    company_name: document.getElementById('pCompany').value.trim(),
+    org_number: document.getElementById('pOrg').value.trim(),
+    phone: document.getElementById('pPhone').value.trim(),
+    email: document.getElementById('pEmail').value.trim(),
+    website: document.getElementById('pWebsite').value.trim(),
+    address: document.getElementById('pAddress').value.trim(),
+    bankgiro: document.getElementById('pBankgiro').value.trim(),
+  };
+  await sb.from('profiles').update(updates).eq('id', currentUser.id);
+  currentProfile = { ...currentProfile, ...updates };
+  const ok = document.getElementById('saveOk');
+  ok.style.display = 'inline'; setTimeout(() => ok.style.display = 'none', 2500);
+}
+
+// ===== HISTORY =====
+async function loadHistory() {
+  const { data } = await sb.from('quote_usage').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+  const el = document.getElementById('historyContent');
+  if (!data || data.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="big">📂</div><p>Inga offerter ännu</p></div>';
+    return;
+  }
+  el.innerHTML = `<table class="history-table">
+    <thead><tr><th>Datum</th><th>Tid</th></tr></thead>
+    <tbody>${data.map(r => `<tr><td>${new Date(r.created_at).toLocaleDateString('sv-SE')}</td><td>${new Date(r.created_at).toLocaleTimeString('sv-SE', {hour:'2-digit',minute:'2-digit'})}</td></tr>`).join('')}</tbody>
+  </table>`;
+}
+
+// ===== UPGRADE =====
+let selectedUPlan = 'pro';
+function openUpgradeModal() { document.getElementById('upgradeOverlay').classList.add('open'); }
+function closeUpgradeModal() { document.getElementById('upgradeOverlay').classList.remove('open'); }
+function selectUPlan(p) {
+  selectedUPlan = p;
+  document.getElementById('uplan-pro').classList.toggle('sel', p === 'pro');
+  document.getElementById('uplan-unlimited').classList.toggle('sel', p === 'unlimited');
+}
+function goToStripe() {
+  const link = STRIPE_LINKS[selectedUPlan];
+  if (link.includes('ERSÄTT')) {
+    alert('Stripe-länkarna är inte konfigurerade ännu.\n\nSkapa produkter i ditt Stripe-konto och klistra in Payment Link-URL:erna i STRIPE_LINKS i koden.');
+    return;
+  }
+  window.open(link + '?client_reference_id=' + currentUser.id, '_blank');
+}
+
+// ===== QUOTE GENERATOR =====
+function toggleChip(id, cb) {
+  document.getElementById(id).classList.toggle('on', cb.checked);
+}
+function setPrompt(t) { document.getElementById('jobPrompt').value = t; document.getElementById('jobPrompt').focus(); }
+
+let currentInfo = {};
+
+async function generateQuote() {
+  const plan = currentProfile?.plan || 'free';
+  const limit = PLAN_LIMITS[plan];
+  if (limit !== Infinity && weeklyUsed >= limit) {
+    openUpgradeModal(); return;
+  }
+  const prompt = document.getElementById('jobPrompt').value.trim();
+  if (!prompt) { alert('Beskriv uppdraget först!'); return; }
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  document.getElementById('statusBar').style.display = 'flex';
+  document.getElementById('quoteWrap').style.display = 'none';
+
+  const statuses = ['Analyserar uppdraget…','Beräknar material och arbetstid…','Formulerar offerttext…','Sätter samman dokumentet…'];
+  let si = 0;
+  const interval = setInterval(() => { si=(si+1)%statuses.length; document.getElementById('statusText').textContent = statuses[si]; }, 1800);
+
+  const p = currentProfile || {};
+  const company = p.company_name || 'Ditt Företag AB';
+  const vatPct = document.getElementById('vatRate').value;
+  const payterms = document.getElementById('payTerms').value;
+  const industry = document.getElementById('industry').value;
+  const inclRot = document.getElementById('inclRot').checked;
+  const inclWarranty = document.getElementById('inclWarranty').checked;
+  const inclMaterials = document.getElementById('inclMaterials').checked;
+  const inclTimeline = document.getElementById('inclTimeline').checked;
+
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('sv-SE');
+  const validStr = new Date(today.setDate(today.getDate()+30)).toLocaleDateString('sv-SE');
+  const quoteNum = 'OFF-' + Math.floor(1000+Math.random()*9000);
+
+  currentInfo = { company, orgNum: p.org_number||'', vatNum: p.vat_number||'', phone: p.phone||'', email: p.email||'', website: p.website||'', address: p.address||'', bankgiro: p.bankgiro||'', vatPct, payterms, quoteNum, dateStr, validStr, inclRot };
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 1500,
+        system: 'Du är expert på svenska offerter. Svara ALLTID med giltig JSON och inget annat.',
+        messages: [{ role: 'user', content: `Skapa en komplett offert för:
+UPPDRAG: ${prompt}
+BRANSCH: ${industry}
+MOMSSATS: ${vatPct}%
+BETALNINGSVILLKOR: ${payterms}
+ROT: ${inclRot}, GARANTI: ${inclWarranty}, MATERIAL: ${inclMaterials}, TIDPLAN: ${inclTimeline}
+
+JSON-struktur:
+{"title":"Offert – [beskrivning]","clientName":"[namn]","clientAddress":"[adress]","introduction":"[2-3 meningar]","items":[{"description":"[rad]","qty":"[antal+enhet]","unitPrice":[pris],"total":[totalt]}],"subtotal":[netto],"vatAmount":[moms],"rotAmount":[rot eller 0],"totalInclVat":[inkl moms],"totalAfterRot":[efter rot],"terms":"[villkor]","timeline":${inclTimeline?'"[tidplan]"':'null'},"materials":${inclMaterials?'"[material]"':'null'},"warrantyText":${inclWarranty?'"[garanti]"':'null'},"closingNote":"[avslutning]"}
+
+Rimliga svenska priser 2024. Minst 5 rader.` }]
+      })
+    });
+    const data = await res.json();
+    const rawText = data.content[0].text.trim();
+    const start = rawText.indexOf('{');
+    const end = rawText.lastIndexOf('}');
+    if (start === -1 || end === -1) throw new Error('Ingen JSON hittades');
+    const q = JSON.parse(rawText.slice(start, end + 1));
+
+    clearInterval(interval);
+    document.getElementById('statusBar').style.display = 'none';
+    btn.disabled = false;
+
+    // log usage
+    await sb.from('quote_usage').insert({ user_id: currentUser.id });
+    weeklyUsed++;
+    const { count: total } = await sb.from('quote_usage').select('*',{count:'exact',head:true}).eq('user_id',currentUser.id);
+    updateUI(currentProfile, weeklyUsed, total||0);
+
+    renderQuote(q);
+
+  } catch(err) {
+    clearInterval(interval);
+    document.getElementById('statusBar').style.display = 'none';
+    btn.disabled = false;
+    console.error(err);
+    alert('Något gick fel. Kontrollera att Anthropic API-nyckeln är angiven i koden.');
+  }
+}
+
+// ===== QUOTE RENDER =====
+function fmtSEK(n) { return Number(n).toLocaleString('sv-SE',{maximumFractionDigits:0})+' kr'; }
+function parseSEK(s) { return parseFloat(String(s).replace(/\s|\u00a0/g,'').replace('kr','').replace(',','.')) || 0; }
+
+function buildRow(it) {
+  return `<tr>
+    <td><span class="editable" contenteditable="true">${it.description}</span></td>
+    <td><span class="editable" contenteditable="true">${it.qty}</span></td>
+    <td style="text-align:right"><span class="editable unit-price" contenteditable="true">${fmtSEK(it.unitPrice)}</span></td>
+    <td style="text-align:right;font-weight:500"><span class="row-total">${fmtSEK(it.total)}</span></td>
+    <td style="width:26px;padding:0 0.3rem"><button class="del-row-btn" onclick="delRow(this)">×</button></td>
+  </tr>`;
+}
+
+function recalc() {
+  const info = currentInfo;
+  const vatPct = parseFloat(info.vatPct)/100;
+  let sub = 0;
+  document.querySelectorAll('#itemsTbody tr').forEach(row => {
+    const pe = row.querySelector('.unit-price');
+    const te = row.querySelector('.row-total');
+    const qe = row.querySelector('td:nth-child(2) .editable');
+    if (!pe||!te) return;
+    const price = parseSEK(pe.textContent);
+    const qty = parseFloat((qe?qe.textContent:'1').replace(',','.')) || 1;
+    const tot = price*qty; te.textContent = fmtSEK(tot); sub+=tot;
+  });
+  const vat = sub*vatPct, incl = sub+vat;
+  const rotEl = document.getElementById('tot-rot');
+  let rot = 0;
+  if (rotEl && info.inclRot) { rot = Math.min(sub*0.3, 50000); rotEl.textContent = '- '+fmtSEK(rot); }
+  const final = info.inclRot && rot>0 ? incl-rot : incl;
+  document.getElementById('tot-sub').textContent = fmtSEK(sub);
+  document.getElementById('tot-vat').textContent = fmtSEK(vat);
+  document.getElementById('tot-incl').textContent = fmtSEK(incl);
+  document.getElementById('tot-final').textContent = fmtSEK(final);
+  document.getElementById('tot-final-lbl').textContent = info.inclRot&&rot>0?'ATT BETALA (efter ROT)':'ATT BETALA';
+}
+
+function delRow(btn) { btn.closest('tr').remove(); recalc(); }
+
+function addRow() {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><span class="editable" contenteditable="true">Ny rad</span></td><td><span class="editable" contenteditable="true">1 st</span></td><td style="text-align:right"><span class="editable unit-price" contenteditable="true">${fmtSEK(0)}</span></td><td style="text-align:right;font-weight:500"><span class="row-total">${fmtSEK(0)}</span></td><td style="width:26px;padding:0 0.3rem"><button class="del-row-btn" onclick="delRow(this)">×</button></td>`;
+  document.getElementById('itemsTbody').appendChild(tr);
+  attachListeners(tr);
+  tr.querySelector('.editable').focus();
+}
+
+function attachListeners(tr) {
+  tr.querySelectorAll('.editable').forEach(el => {
+    el.addEventListener('blur', () => { if (el.classList.contains('unit-price')) { const v=parseSEK(el.textContent); el.textContent=fmtSEK(v); } recalc(); });
+    el.addEventListener('keydown', e => { if (e.key==='Enter'){e.preventDefault();el.blur();} });
+  });
+}
+
+function renderQuote(q) {
+  const info = currentInfo;
+  const p = currentProfile || {};
+  const logoHtml = p.logo_url ? `<img class="q-logo-preview" src="${p.logo_url}">` : `<div class="q-logo-ph">Logotyp</div>`;
+  const vatInfo = info.vatNum ? `<br>VAT: ${info.vatNum}` : '';
+  const webInfo = info.website ? `<br>${info.website}` : '';
+  const bankInfo = info.bankgiro ? `<br>BG: ${info.bankgiro}` : '';
+  const rotRowHtml = info.inclRot&&q.rotAmount>0 ? `<div class="trow rot-row"><span>ROT-avdrag</span><span id="tot-rot">- ${fmtSEK(q.rotAmount)}</span></div>` : '';
+  const finalTotal = info.inclRot&&q.rotAmount>0 ? q.totalAfterRot : q.totalInclVat;
+  const finalLabel = info.inclRot&&q.rotAmount>0 ? 'ATT BETALA (efter ROT)' : 'ATT BETALA';
+
+  document.getElementById('quoteDoc').innerHTML = `
+    <div class="q-header">
+      <div><div class="q-company-name">${info.company}</div>
+      <div class="q-company-info">Org.nr: ${info.orgNum}${vatInfo}<br>${info.phone}${info.phone&&info.email?' | ':''}${info.email}${webInfo}<br>${info.address}${bankInfo}</div></div>
+      ${logoHtml}
+    </div>
+    <div class="q-meta-row">
+      <div class="q-offer-title">${q.title} <span class="valid-badge">Giltig 30 dagar</span></div>
+      <div class="q-meta"><strong>Nr:</strong> ${info.quoteNum}<br><strong>Datum:</strong> ${info.dateStr}<br><strong>Giltig till:</strong> ${info.validStr}</div>
+    </div>
+    <div class="q-client"><div class="lbl">Kund</div><strong class="editable" contenteditable="true">${q.clientName}</strong><br><span class="editable" contenteditable="true">${q.clientAddress}</span></div>
+    <div class="q-intro">${q.introduction}</div>
+    <div class="edit-hint">✏️ Klicka på rad för att redigera – summor räknas om automatiskt</div>
+    <table class="qt">
+      <thead><tr><th style="width:44%">Beskrivning</th><th>Antal</th><th style="text-align:right">À-pris</th><th style="text-align:right">Summa</th><th style="width:26px"></th></tr></thead>
+      <tbody id="itemsTbody">${q.items.map(it=>buildRow(it)).join('')}</tbody>
+    </table>
+    <button class="add-row-btn" onclick="addRow()">+ Lägg till rad</button>
+    <div class="q-totals">
+      <div class="q-totals-box">
+        <div class="trow"><span>Netto (exkl. moms)</span><span id="tot-sub">${fmtSEK(q.subtotal)}</span></div>
+        <div class="trow"><span>Moms (${info.vatPct}%)</span><span id="tot-vat">${fmtSEK(q.vatAmount)}</span></div>
+        <div class="trow"><span>Totalt (inkl. moms)</span><span id="tot-incl">${fmtSEK(q.totalInclVat)}</span></div>
+        ${rotRowHtml}
+        <div class="trow final-row"><span id="tot-final-lbl">${finalLabel}</span><span id="tot-final">${fmtSEK(finalTotal)}</span></div>
+      </div>
+    </div>
+    ${q.timeline?`<div class="q-terms" style="margin-bottom:1rem"><h4>📅 Tidplan</h4><p>${q.timeline}</p></div>`:''}
+    ${q.materials?`<div class="q-terms" style="margin-bottom:1rem"><h4>🔩 Material</h4><p>${q.materials}</p></div>`:''}
+    <div class="q-terms"><h4>📄 Villkor & betalning</h4><p>• Betalningsvillkor: ${info.payterms}</p>${q.warrantyText?`<p>• ${q.warrantyText}</p>`:''}<p>${q.terms}</p></div>
+    <p style="font-size:0.82rem;color:#555;margin-bottom:1.5rem;font-style:italic">${q.closingNote}</p>
+    <div class="q-footer">
+      <div><strong>${info.company}</strong><br>${info.phone} ${info.email}</div>
+      <div class="sig-block"><div class="sig-line"></div><div style="font-size:0.73rem;color:#888">Underskrift & godkännande</div><div style="font-size:0.73rem;color:#888;margin-top:0.2rem">Datum: ___________</div></div>
+    </div>`;
+
+  document.querySelectorAll('#itemsTbody tr').forEach(tr => attachListeners(tr));
+  const w = document.getElementById('quoteWrap');
+  w.style.display = 'block';
+  w.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+init();
+</script>
+</body>
+</html>
