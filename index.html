@@ -637,18 +637,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         </div>
 
         <!-- quote output -->
-        <div class="quote-wrap" id="quoteWrap">
-          <div class="quote-toolbar">
-            <span class="qt-label">✦ Offert genererad</span>
-            <div class="qt-btns">
-              <button class="qt-btn" onclick="generateQuote()">↻ Generera om</button>
-              <button class="qt-btn" onclick="shareQuote('mail')">✉ E-post</button>
-              <button class="qt-btn" onclick="shareQuote('whatsapp')">💬 WhatsApp</button>
-              <button class="qt-btn primary" onclick="downloadPDF()">⬇ Ladda ner PDF</button>
-            </div>
-          </div>
-          <div id="quoteDoc"></div>
-        </div>
+        <div class="quote-wrap" id="quoteWrap" style="display:none"></div>
       </div>
 
       <!-- HISTORY PAGE -->
@@ -1122,6 +1111,50 @@ function getCleanQuoteHTML(html) {
   return div.innerHTML;
 }
 
+function openQuoteModal() {
+  document.getElementById('quoteModalOverlay').classList.add('open');
+}
+function closeQuoteModal() {
+  document.getElementById('quoteModalOverlay').classList.remove('open');
+}
+
+async function saveQuoteEdits() {
+  if (!currentUser) return;
+  const btn = document.getElementById('saveEditsBtn');
+  btn.textContent = '⏳ Sparar...';
+  btn.disabled = true;
+
+  // Read current DOM values
+  const quoteHtml = document.getElementById('quoteDoc').innerHTML;
+  const title = document.querySelector('#quoteDoc .q-title')?.textContent?.trim() || '';
+  const clientName = document.querySelector('#quoteDoc .q-client strong')?.textContent?.trim() || '';
+
+  // Find the latest quote for this user and update it
+  const { data } = await sb.from('quote_usage')
+    .select('id')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false })
+    .limit(1);
+
+  if (data && data[0]) {
+    await sb.from('quote_usage').update({
+      title: title,
+      client_name: clientName,
+      quote_html: quoteHtml
+    }).eq('id', data[0].id);
+  }
+
+  btn.textContent = '✓ Sparat!';
+  btn.style.background = '#2a6e4e';
+  btn.style.color = 'white';
+  setTimeout(() => {
+    btn.textContent = '💾 Spara ändringar';
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.disabled = false;
+  }, 2500);
+}
+
 function downloadPDF(html, filename) {
   const name = filename || (() => {
     const t = document.querySelector('#quoteDoc .q-title');
@@ -1166,7 +1199,7 @@ function openHistoryQuote(i) {
   const r = window._historyData?.[i];
   if (!r?.quote_html) return;
   showPage('generate');
-  document.getElementById('quoteWrap').style.display = 'block';
+  openQuoteModal();
   document.getElementById('quoteDoc').innerHTML = r.quote_html;
   document.getElementById('quoteDoc').querySelectorAll('.editable').forEach(el => {
     el.setAttribute('contenteditable', 'true');
@@ -1480,5 +1513,24 @@ function renderQuote(q) {
 
 init();
 </script>
+
+<!-- ===== QUOTE MODAL ===== -->
+<div class="overlay" id="quoteModalOverlay" style="align-items:flex-start;padding:1.5rem;overflow-y:auto" onclick="if(event.target===this)closeQuoteModal()">
+  <div style="background:white;border-radius:16px;width:100%;max-width:860px;margin:auto;overflow:hidden;box-shadow:0 20px 80px rgba(0,0,0,0.3)">
+    <div class="quote-toolbar" style="border-radius:0">
+      <span class="qt-label">✦ Offert genererad</span>
+      <div class="qt-btns">
+        <button class="qt-btn" onclick="generateQuote()">↻ Generera om</button>
+        <button class="qt-btn" onclick="saveQuoteEdits()" id="saveEditsBtn">💾 Spara ändringar</button>
+        <button class="qt-btn" onclick="shareQuote('mail')">✉ E-post</button>
+        <button class="qt-btn" onclick="shareQuote('whatsapp')">💬 WhatsApp</button>
+        <button class="qt-btn primary" onclick="downloadPDF()">⬇ Ladda ner PDF</button>
+        <button class="qt-btn" onclick="closeQuoteModal()" style="margin-left:0.5rem">✕ Stäng</button>
+      </div>
+    </div>
+    <div id="quoteDoc" style="padding:2rem 3rem"></div>
+  </div>
+</div>
+
 </body>
 </html>
