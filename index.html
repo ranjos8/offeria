@@ -1123,51 +1123,45 @@ function getCleanQuoteHTML(html) {
 }
 
 function downloadPDF(html, filename) {
-  const name = filename || 'offert.pdf';
-  const src = html || document.getElementById('quoteDoc').innerHTML;
-  const cleanHtml = getCleanQuoteHTML(src);
+  const name = filename || (() => {
+    const t = document.querySelector('#quoteDoc .q-title');
+    return t ? t.textContent.trim().substring(0,50) + '.pdf' : 'offert.pdf';
+  })();
 
-  // Build a hidden but properly sized div for rendering
-  const div = document.createElement('div');
-  div.id = 'pdf-render-area';
-  div.innerHTML = cleanHtml;
-  div.style.cssText = [
-    'position:absolute',
-    'left:0',
-    'top:0',
-    'width:700px',
-    'background:white',
-    'padding:40px',
-    'font-family:DM Sans,sans-serif',
-    'font-size:13px',
-    'line-height:1.65',
-    'color:#1a1a18',
-    'z-index:-9999',
-    'visibility:hidden'
-  ].join(';');
-
-  // Clean up edit UI
-  div.querySelectorAll('.edit-hint,.add-row-btn,.del-row-btn').forEach(el => el.remove());
-  div.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
-
-  document.body.appendChild(div);
-
-  html2pdf().from(div).set({
-    margin: [10, 10, 10, 10],
+  // Shared PDF options
+  const pdfOpts = (el) => html2pdf().from(el).set({
+    margin: [10,10,10,10],
     filename: name,
-    image: { type: 'jpeg', quality: 0.97 },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      scrollX: 0,
-      scrollY: -window.scrollY,
-      windowWidth: 780
-    },
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  }).save().then(() => {
-    document.body.removeChild(div);
   });
+
+  if (!html) {
+    // Current quote - clone quoteDoc only (no toolbar)
+    const original = document.getElementById('quoteDoc');
+    const clone = original.cloneNode(true);
+    clone.querySelectorAll('.edit-hint,.add-row-btn,.del-row-btn').forEach(e => e.remove());
+    clone.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
+    clone.style.cssText = 'background:white;padding:1.5rem 2rem;font-family:DM Sans,sans-serif;font-size:12px;line-height:1.6;color:#1a1a18;width:680px;position:fixed;top:0;left:0;z-index:9999;border:none;box-shadow:none;border-radius:0';
+    document.body.appendChild(clone);
+    pdfOpts(clone).save().then(() => document.body.removeChild(clone));
+
+  } else {
+    // History quote - show in visible overlay
+    const cleanHtml = getCleanQuoteHTML(html);
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:9998;background:rgba(0,0,0,0.4);overflow:auto';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:white;width:680px;padding:1.5rem 2rem;margin:20px auto;font-family:DM Sans,sans-serif;font-size:12px;line-height:1.6;color:#1a1a18';
+    box.innerHTML = cleanHtml;
+    box.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    setTimeout(() => {
+      pdfOpts(box).save().then(() => document.body.removeChild(overlay));
+    }, 600);
+  }
 }
 
 
@@ -1341,10 +1335,13 @@ Rimliga svenska priser 2024. Minst 5 rader.` }]
     // log usage + spara offert (after render so HTML is populated)
     await new Promise(r => setTimeout(r, 100)); // wait for DOM
     const quoteHtml = document.getElementById('quoteDoc')?.innerHTML || '';
+    // Read edited client name from DOM (user may have changed it)
+    const savedClientName = document.querySelector('#quoteDoc .q-client-box strong')?.textContent || q.clientName || '';
+    const savedTitle = document.querySelector('#quoteDoc .q-title')?.textContent || q.title || 'Offert';
     await sb.from('quote_usage').insert({
       user_id: currentUser.id,
-      title: q.title || 'Offert',
-      client_name: q.clientName || '',
+      title: savedTitle,
+      client_name: savedClientName,
       total_amount: q.totalAfterRot || q.totalInclVat || 0,
       quote_html: quoteHtml
     });
