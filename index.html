@@ -91,7 +91,7 @@ nav {
 .eyebrow { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.7rem; }
 .section-h { font-family: 'Fraunces', serif; font-size: clamp(1.8rem,3.5vw,2.8rem); letter-spacing: -1px; }
 .pricing-wrap .section-h { color: white; margin-bottom: 2.5rem; }
-.plans { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 2rem; }
+.plans { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin-top: 2rem; }
 .plan {
   background: #1a1a18; border: 1px solid #2a2a28;
   border-radius: 14px; padding: 1.8rem; text-align: left;
@@ -367,7 +367,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   .btn-hero { width: 100%; max-width: 320px; text-align: center; }
 
   /* Plans */
-  .plans { grid-template-columns: 1fr; gap: 1rem; }
+  .plans { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 
   /* App layout */
   .app-layout { grid-template-columns: 1fr; }
@@ -491,12 +491,25 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div class="plan-tagline">Perfekt för att prova</div>
           <div><span class="plan-amount">0</span><span class="plan-period"> kr/mån</span></div>
           <ul class="plan-features">
-            <li>2 offerter per vecka</li>
+            <li>2 offerter per månad</li>
             <li>Alla branscher</li>
             <li>PDF-export</li>
             <li>Redigerbara rader</li>
           </ul>
           <button class="plan-cta" onclick="openModal('register')">Kom igång</button>
+        </div>
+        <div class="plan">
+          <div class="plan-name">Styck</div>
+          <div class="plan-tagline">Betala per offert</div>
+          <div><span class="plan-amount">29</span><span class="plan-period"> kr/offert</span></div>
+          <ul class="plan-features">
+            <li>1 offert per köp</li>
+            <li>Alla funktioner inkl.</li>
+            <li>Egen logotyp</li>
+            <li>Offerthistorik</li>
+            <li>Ingen bindningstid</li>
+          </ul>
+          <button class="plan-cta" onclick="openModal('register')">Köp offert</button>
         </div>
         <div class="plan featured">
           <div class="plan-badge">Mest populär</div>
@@ -504,7 +517,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div class="plan-tagline">För aktiva hantverkare</div>
           <div><span class="plan-amount">99</span><span class="plan-period"> kr/mån</span></div>
           <ul class="plan-features">
-            <li>10 offerter per vecka</li>
+            <li>10 offerter per månad</li>
             <li>Egen logotyp</li>
             <li>ROT & RUT-beräkning</li>
             <li>Offerthistorik</li>
@@ -544,7 +557,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <div class="quota-box">
         <div class="quota-label">Din plan</div>
         <div class="quota-plan" id="sidebarPlan">Gratis</div>
-        <div class="quota-count" id="sidebarQuotaCount">0 / 2 denna vecka</div>
+        <div class="quota-count" id="sidebarQuotaCount">0 / 2 denna månad</div>
         <div class="quota-bar-bg"><div class="quota-bar-fill" id="sidebarQuotaBar" style="width:0%"></div></div>
         <button class="upgrade-btn" onclick="openUpgradeModal()" id="upgradeBtn">↑ Uppgradera</button>
       </div>
@@ -560,13 +573,13 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
         <div class="stats-row">
           <div class="stat-card"><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">Offerter totalt</div></div>
-          <div class="stat-card"><div class="stat-val" id="statWeek">0</div><div class="stat-lbl">Denna vecka</div></div>
-          <div class="stat-card"><div class="stat-val" id="statLeft">0</div><div class="stat-lbl">Kvar denna vecka</div></div>
+          <div class="stat-card"><div class="stat-val" id="statWeek">0</div><div class="stat-lbl">Denna månad</div></div>
+          <div class="stat-card"><div class="stat-val" id="statLeft">0</div><div class="stat-lbl">Kvar denna månad</div></div>
         </div>
 
         <!-- Company settings (collapsible) -->
         <div class="gen-card">
-          <div class="card-label">⚙️ Offertinställningar</div>
+          <div class="card-label">⚙️ AI-inställningar <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Styr hur AI:n genererar och prissätter</span></div>
           <div class="grid3">
             <div class="field"><label>Bransch</label>
               <select id="industry">
@@ -603,7 +616,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         </div>
 
         <div class="gen-card">
-          <div class="card-label">✍️ Beskriv uppdraget</div>
+          <div class="card-label">✍️ Beskriv uppdraget <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Skriv vad som ska utföras – oavsett bransch</span></div>
           <div class="ex-pills">
             <span class="ex-pill" onclick="setPrompt(this.textContent)">Bygga 20 kvm trädäck med räcke</span>
             <span class="ex-pill" onclick="setPrompt(this.textContent)">Byta 5 eluttag i kök</span>
@@ -743,11 +756,16 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <div style="font-family:'Fraunces',serif;font-size:1.2rem;color:var(--gold-light)">Uppgradera din plan</div>
       <p>Välj en plan och betala säkert via Stripe</p>
     </div>
-    <div class="upgrade-plans">
+    <div class="upgrade-plans" style="grid-template-columns:repeat(3,1fr)">
+      <div class="uplan" id="uplan-credit" onclick="selectUPlan('credit')">
+        <div class="uplan-name">Styck</div>
+        <div class="uplan-price">29 kr / offert</div>
+        <div class="uplan-features">1 offert<br>Alla funktioner<br>Ingen bindningstid</div>
+      </div>
       <div class="uplan sel" id="uplan-pro" onclick="selectUPlan('pro')">
         <div class="uplan-name">Pro</div>
         <div class="uplan-price">99 kr/mån</div>
-        <div class="uplan-features">10 offerter/vecka<br>Egen logotyp<br>Offerthistorik</div>
+        <div class="uplan-features">10 offerter/månad<br>Egen logotyp<br>Offerthistorik</div>
       </div>
       <div class="uplan" id="uplan-unlimited" onclick="selectUPlan('unlimited')">
         <div class="uplan-name">Obegränsat</div>
@@ -767,6 +785,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 // 🔑 Stripe payment links – ersätt med dina riktiga länkar från Stripe Dashboard
 const STRIPE_LINKS = {
+  credit:    'https://buy.stripe.com/ERSÄTT_MED_DIN_STYCK_LÄNK',
   pro:       'https://buy.stripe.com/ERSÄTT_MED_DIN_PRO_LÄNK',
   unlimited: 'https://buy.stripe.com/ERSÄTT_MED_DIN_UNLIMITED_LÄNK'
 };
@@ -774,13 +793,13 @@ const STRIPE_LINKS = {
 // 🤖 Anthropic API key – flytta till Supabase Edge Function i produktion!
 // API-nyckeln är nu säkert lagrad i Supabase Edge Function
 
-const PLAN_LIMITS = { free: 2, pro: 10, unlimited: Infinity };
-const PLAN_LABELS = { free: 'Gratis', pro: 'Pro', unlimited: 'Obegränsat' };
+const PLAN_LIMITS = { free: 2, pro: 10, unlimited: Infinity, credit: Infinity };
+const PLAN_LABELS = { free: 'Gratis', pro: 'Pro', unlimited: 'Obegränsat', credit: 'Köpta offerter' };
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
 let currentProfile = null;
-let weeklyUsed = 0;
+let monthlyUsed = 0;
 
 // ===== INIT =====
 async function init() {
@@ -801,25 +820,25 @@ async function onLogin(user) {
   currentProfile = profile;
 
   // load weekly usage
-  const weekStart = getWeekStart();
+  const weekStart = getMonthStart();
   const { count } = await sb.from('quote_usage')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
     .gte('created_at', weekStart.toISOString());
-  weeklyUsed = count || 0;
+  monthlyUsed = count || 0;
 
   // load total
   const { count: total } = await sb.from('quote_usage')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id);
 
-  updateUI(profile, weeklyUsed, total || 0);
+  updateUI(profile, monthlyUsed, total || 0);
   showView('app');
   fillProfileForm(profile);
 }
 
 function onLogout() {
-  currentUser = null; currentProfile = null; weeklyUsed = 0;
+  currentUser = null; currentProfile = null; monthlyUsed = 0;
   showView('landing');
   document.getElementById('navUserArea').style.display = 'none';
   document.getElementById('navAuthBtns').style.display = '';
@@ -837,7 +856,7 @@ function updateUI(profile, used, total) {
   document.getElementById('navPlanBadge').textContent = PLAN_LABELS[plan];
 
   document.getElementById('sidebarPlan').textContent = PLAN_LABELS[plan];
-  document.getElementById('sidebarQuotaCount').textContent = `${used} / ${limitStr} denna vecka`;
+  document.getElementById('sidebarQuotaCount').textContent = `${used} / ${limitStr} denna månad`;
   document.getElementById('sidebarQuotaBar').style.width = limit === Infinity ? '20%' : `${Math.min(100, used/limit*100)}%`;
   if (plan === 'unlimited') document.getElementById('upgradeBtn').style.display = 'none';
 
@@ -856,13 +875,13 @@ function updateUI(profile, used, total) {
       banner = document.createElement('div');
       banner.id = 'upgradeBanner';
       banner.style.cssText = 'background:linear-gradient(135deg,#0d0d0b,#1a1a18);color:white;padding:1rem 1.5rem;border-radius:12px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap';
-      banner.innerHTML = '<div><div style="font-family:Fraunces,serif;font-style:italic;font-size:1.1rem;color:#c4982e">Du har använt alla offerter denna vecka</div><div style="font-size:0.82rem;color:#aaa;margin-top:0.2rem">Uppgradera till Pro för 99 kr/mån och få 10 offerter/vecka</div></div><button onclick="openUpgradeModal()" style="background:#b8902e;color:white;border:none;padding:0.6rem 1.4rem;border-radius:8px;font-weight:700;font-size:0.9rem;cursor:pointer;white-space:nowrap">Uppgradera ✦</button>';
+      banner.innerHTML = '<div><div style="font-family:Fraunces,serif;font-style:italic;font-size:1.1rem;color:#c4982e">Du har använt alla offerter denna månad</div><div style="font-size:0.82rem;color:#aaa;margin-top:0.2rem">Uppgradera till Pro för 99 kr/mån och få 10 offerter/månad</div></div><button onclick="openUpgradeModal()" style="background:#b8902e;color:white;border:none;padding:0.6rem 1.4rem;border-radius:8px;font-weight:700;font-size:0.9rem;cursor:pointer;white-space:nowrap">Uppgradera ✦</button>';
       const genCard = document.querySelector('.gen-card');
       if (genCard) genCard.parentNode.insertBefore(banner, genCard);
     }
     banner.style.display = 'flex';
   } else {
-    qNote.textContent = `${left} ${limit === Infinity ? 'obegränsade' : ''} offerter kvar denna vecka`;
+    qNote.textContent = `${left} ${limit === Infinity ? 'obegränsade' : ''} offerter kvar denna månad`;
     qNote.className = 'quota-note';
     document.getElementById('genBtn').disabled = false;
     const banner = document.getElementById('upgradeBanner');
@@ -870,11 +889,9 @@ function updateUI(profile, used, total) {
   }
 }
 
-function getWeekStart() {
+function getMonthStart() {
   const now = new Date();
-  const day = now.getDay() || 7;
-  const diff = now.getDate() - day + 1;
-  return new Date(now.getFullYear(), now.getMonth(), diff, 0, 0, 0, 0);
+  return new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
 }
 
 // ===== AUTH =====
@@ -960,6 +977,9 @@ function fillProfileForm(profile) {
 }
 
 async function saveProfile() {
+  const btn = document.querySelector('.save-btn');
+  btn.textContent = '⏳ Sparar...';
+  btn.disabled = true;
   const updates = {
     company_name: document.getElementById('pCompany').value.trim(),
     org_number: document.getElementById('pOrg').value.trim(),
@@ -969,10 +989,21 @@ async function saveProfile() {
     address: document.getElementById('pAddress').value.trim(),
     bankgiro: document.getElementById('pBankgiro').value.trim(),
   };
-  await sb.from('profiles').update(updates).eq('id', currentUser.id);
+  const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
+  if (error) {
+    alert('Något gick fel vid sparandet: ' + error.message);
+    btn.textContent = 'Spara profil';
+    btn.disabled = false;
+    return;
+  }
   currentProfile = { ...currentProfile, ...updates };
-  const ok = document.getElementById('saveOk');
-  ok.style.display = 'inline'; setTimeout(() => ok.style.display = 'none', 2500);
+  btn.textContent = '✓ Sparat!';
+  btn.style.background = '#2d6a2d';
+  setTimeout(() => {
+    btn.textContent = 'Spara profil';
+    btn.style.background = '';
+    btn.disabled = false;
+  }, 2500);
 }
 
 // ===== LOGO UPLOAD =====
@@ -980,14 +1011,27 @@ async function handleLogoUpload(e) {
   const file = e.target.files[0];
   if (!file) return;
   if (file.size > 2 * 1024 * 1024) { alert('Filen är för stor – max 2 MB.'); return; }
+  // Show loading state
+  const label = document.getElementById('logoUploadLabel');
+  const origText = label.innerHTML;
+  label.innerHTML = '<span>⏳ Laddar upp...</span>';
+  label.style.pointerEvents = 'none';
   const reader = new FileReader();
   reader.onload = async (ev) => {
-    const dataUrl = ev.target.result;
-    // Save as base64 in profile
-    await sb.from('profiles').update({ logo_url: dataUrl }).eq('id', currentUser.id);
-    currentProfile.logo_url = dataUrl;
-    showLogoPreview(dataUrl);
+    try {
+      const dataUrl = ev.target.result;
+      const { error } = await sb.from('profiles').update({ logo_url: dataUrl }).eq('id', currentUser.id);
+      if (error) throw error;
+      currentProfile.logo_url = dataUrl;
+      showLogoPreview(dataUrl);
+      alert('✓ Logotyp sparad!');
+    } catch(err) {
+      alert('Kunde inte spara logotypen: ' + (err.message || err));
+      label.innerHTML = origText;
+      label.style.pointerEvents = '';
+    }
   };
+  reader.onerror = () => { alert('Kunde inte läsa filen.'); label.innerHTML = origText; label.style.pointerEvents = ''; };
   reader.readAsDataURL(file);
 }
 
@@ -1095,6 +1139,7 @@ function openUpgradeModal() { document.getElementById('upgradeOverlay').classLis
 function closeUpgradeModal() { document.getElementById('upgradeOverlay').classList.remove('open'); }
 function selectUPlan(p) {
   selectedUPlan = p;
+  document.getElementById('uplan-credit').classList.toggle('sel', p === 'credit');
   document.getElementById('uplan-pro').classList.toggle('sel', p === 'pro');
   document.getElementById('uplan-unlimited').classList.toggle('sel', p === 'unlimited');
 }
@@ -1118,7 +1163,7 @@ let currentInfo = {};
 async function generateQuote() {
   const plan = currentProfile?.plan || 'free';
   const limit = PLAN_LIMITS[plan];
-  if (limit !== Infinity && weeklyUsed >= limit) {
+  if (limit !== Infinity && monthlyUsed >= limit) {
     openUpgradeModal(); return;
   }
   const prompt = document.getElementById('jobPrompt').value.trim();
@@ -1150,17 +1195,50 @@ async function generateQuote() {
 
   currentInfo = { company, orgNum: p.org_number||'', vatNum: p.vat_number||'', phone: p.phone||'', email: p.email||'', website: p.website||'', address: p.address||'', bankgiro: p.bankgiro||'', vatPct, payterms, quoteNum, dateStr, validStr, inclRot };
 
+  // Check mismatch between industry and job
+  const industryKeywords = {
+    'Städ': ['städ','rengör','tvätt','fönsterputsn','storstäd','kontor'],
+    'El': ['el','uttag','ledning','elcentral','belysning','kabel','lampa','säkring'],
+    'VVS': ['rör','vvs','dusch','badrum','toalett','radiator','värme','vatten','avlopp'],
+    'Bygg & Snickeri': ['bygg','snick','trä','vägg','golv','tak','dörr','fönster','däck','terrass'],
+    'Måleri': ['måla','puts','tapets','färg','spackel'],
+    'Mark & Trädgård': ['trädgård','gräs','häck','träd','mark','gång','altan','jord'],
+    'Transport': ['transport','flytt','frakt','leverans','kör'],
+    'Konsult / IT': ['konsult','it','system','webb','kod','program','analys','rådgivning']
+  };
+  const jobLower = prompt.toLowerCase();
+  const selectedKws = industryKeywords[industry] || [];
+  const allKws = Object.values(industryKeywords).flat();
+  const matchesOther = Object.entries(industryKeywords).some(([ind, kws]) =>
+    ind !== industry && kws.some(kw => jobLower.includes(kw))
+  );
+  const matchesCurrent = selectedKws.some(kw => jobLower.includes(kw));
+  if (matchesOther && !matchesCurrent) {
+    const confirmed = confirm('⚠️ Uppdraget verkar inte stämma med vald bransch "' + industry + '".
+
+Vill du ändå fortsätta, eller byta bransch?');
+    if (!confirmed) {
+      clearInterval(interval);
+      document.getElementById('statusBar').style.display = 'none';
+      btn.disabled = false;
+      return;
+    }
+  }
+
   try {
     const { data: { session } } = await sb.auth.getSession();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
     const res = await fetch('https://yfnmmcrvzcwcinwopnlj.supabase.co/functions/v1/super-task', {
       method: 'POST',
+      signal: controller.signal,
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514', max_tokens: 1500,
-        system: 'Du är expert på svenska offerter. Svara ALLTID med giltig JSON och inget annat.',
+        system: 'Du är expert på svenska offerter. Svara ALLTID med giltig JSON och inget annat. Basera prissättning på uppdraget, inte branschvalet.',
         messages: [{ role: 'user', content: `Skapa en komplett offert för:
 UPPDRAG: ${prompt}
-BRANSCH: ${industry}
+PRISSÄTTNINGSSTÖD (bransch): ${industry}
 MOMSSATS: ${vatPct}%
 BETALNINGSVILLKOR: ${payterms}
 ROT: ${inclRot}, GARANTI: ${inclWarranty}, MATERIAL: ${inclMaterials}, TIDPLAN: ${inclTimeline}
@@ -1171,6 +1249,7 @@ JSON-struktur:
 Rimliga svenska priser 2024. Minst 5 rader.` }]
       })
     });
+    clearTimeout(timeoutId);
     const data = await res.json();
     console.log('Edge function response:', JSON.stringify(data));
     if (data.error) throw new Error('Edge function fel: ' + data.error);
@@ -1185,7 +1264,11 @@ Rimliga svenska priser 2024. Minst 5 rader.` }]
     document.getElementById('statusBar').style.display = 'none';
     btn.disabled = false;
 
-    // log usage + spara offert
+    // Render quote first so we can capture its HTML
+    renderQuote(q);
+
+    // log usage + spara offert (after render so HTML is populated)
+    await new Promise(r => setTimeout(r, 100)); // wait for DOM
     const quoteHtml = document.getElementById('quoteDoc')?.innerHTML || '';
     await sb.from('quote_usage').insert({
       user_id: currentUser.id,
@@ -1194,18 +1277,20 @@ Rimliga svenska priser 2024. Minst 5 rader.` }]
       total_amount: q.totalAfterRot || q.totalInclVat || 0,
       quote_html: quoteHtml
     });
-    weeklyUsed++;
+    monthlyUsed++;
     const { count: total } = await sb.from('quote_usage').select('*',{count:'exact',head:true}).eq('user_id',currentUser.id);
-    updateUI(currentProfile, weeklyUsed, total||0);
-
-    renderQuote(q);
+    updateUI(currentProfile, monthlyUsed, total||0);
 
   } catch(err) {
     clearInterval(interval);
     document.getElementById('statusBar').style.display = 'none';
     btn.disabled = false;
     console.error('Full error:', err);
-    alert('Något gick fel: ' + (err?.message || err) + '\n\nKolla konsolen (F12) för mer info.');
+    if (err?.name === 'AbortError') {
+      alert('⏱ Timeout – generering tog för lång tid.\n\nFörsök igen eller förkorta beskrivningen.');
+    } else {
+      alert('Något gick fel: ' + (err?.message || err));
+    }
   }
 }
 
