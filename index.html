@@ -277,7 +277,7 @@ nav {
 .q-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 1.5rem; border-bottom: 3px solid var(--ink); margin-bottom: 2rem; }
 .q-company-name { font-family: 'Fraunces', serif; font-size: 1.6rem; font-weight: 700; margin-bottom: 0.3rem; }
 .q-company-info { font-size: 0.8rem; color: #666; line-height: 1.8; }
-.q-logo-preview { max-height: 70px; max-width: 150px; object-fit: contain; }
+.q-logo-preview { max-height: 140px; max-width: 300px; object-fit: contain; }
 .q-logo-ph { width: 90px; height: 45px; background: var(--cream); border-radius: 6px; border: 1px dashed var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #bbb; }
 .q-meta-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
 .q-offer-title { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; }
@@ -1025,7 +1025,12 @@ async function handleLogoUpload(e) {
       if (error) throw error;
       currentProfile.logo_url = dataUrl;
       showLogoPreview(dataUrl);
-      alert('✓ Logotyp sparad!');
+      const plan = currentProfile?.plan || 'free';
+      if (plan === 'free') {
+        alert('✓ Logotyp sparad!\n\nObs: Din logotyp syns inte i offerterna på gratisplanen. Uppgradera till Pro eller Obegränsat för att visa din egen logotyp.');
+      } else {
+        alert('✓ Logotyp sparad!');
+      }
     } catch(err) {
       alert('Kunde inte spara logotypen: ' + (err.message || err));
       label.innerHTML = origText;
@@ -1110,19 +1115,53 @@ function downloadPDF(html, filename) {
   const src = html || document.getElementById('quoteDoc').innerHTML;
   const name = filename || 'offert.pdf';
   const cleanHtml = getCleanQuoteHTML(src);
-  const container = document.createElement('div');
-  container.style.cssText = 'font-family:DM Sans,sans-serif;padding:2rem;max-width:780px;margin:0 auto;background:white';
-  container.innerHTML = cleanHtml;
-  document.body.appendChild(container);
+
+  const pdfCSS = `
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;1,700&family=DM+Sans:wght@400;500;600&display=swap');
+    * { box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 1.65; color: #1a1a18; background: white; margin: 0; padding: 0; }
+    .q-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 1.5rem; border-bottom: 3px solid #1a1a18; margin-bottom: 2rem; }
+    .q-company { font-size: 0.9rem; }
+    .q-company strong { font-size: 1.05rem; display: block; margin-bottom: 0.2rem; }
+    .q-logo-preview { max-height: 120px; max-width: 280px; object-fit: contain; }
+    .q-logo-ph { display: none; }
+    .q-badge { display: inline-block; background: #2a6e4e; color: white; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; padding: 0.2rem 0.6rem; border-radius: 3px; margin-left: 0.8rem; vertical-align: middle; }
+    .q-title { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 700; color: #1a1a18; margin-bottom: 0.5rem; }
+    .q-meta { font-size: 0.78rem; color: #555; margin-bottom: 1.5rem; }
+    .q-meta span { font-weight: 600; color: #1a1a18; }
+    .q-client-box { background: #faf8f3; border-left: 3px solid #c4982e; padding: 0.8rem 1rem; margin-bottom: 1.5rem; border-radius: 0 6px 6px 0; }
+    .q-client-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: #999; margin-bottom: 0.2rem; }
+    .q-intro { background: #f9f7f2; border-radius: 8px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; font-style: italic; color: #444; font-size: 0.85rem; }
+    .q-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.82rem; }
+    .q-table thead { background: #1a1a18; color: white; }
+    .q-table th { padding: 0.6rem 0.8rem; text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
+    .q-table td { padding: 0.65rem 0.8rem; border-bottom: 1px solid #f0ebe0; }
+    .q-table tbody tr:last-child td { border-bottom: none; }
+    .q-totals { margin-left: auto; width: 260px; font-size: 0.85rem; }
+    .q-total-row { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px solid #f0ebe0; }
+    .q-total-final { display: flex; justify-content: space-between; padding: 0.5rem 0; font-weight: 700; font-size: 1rem; border-top: 2px solid #1a1a18; margin-top: 0.3rem; }
+    .q-terms { font-size: 0.78rem; color: #555; margin-bottom: 1rem; }
+    .q-terms h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #999; margin-bottom: 0.3rem; }
+    .q-footer { display: flex; justify-content: space-between; align-items: flex-end; padding-top: 1.5rem; border-top: 1px solid #e8e4dc; font-size: 0.78rem; color: #888; margin-top: 1rem; }
+    .sig-line { width: 160px; border-bottom: 1px solid #ccc; margin-bottom: 0.3rem; height: 30px; }
+    .edit-hint, .add-row-btn, .del-row-btn { display: none !important; }
+    a { color: #b8902e; text-decoration: none; }
+  `;
+
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'position:absolute;left:-9999px;top:0;width:210mm;background:white';
+  wrapper.innerHTML = '<style>' + pdfCSS + '</style><div style="padding:16mm 18mm">' + cleanHtml + '</div>';
+  document.body.appendChild(wrapper);
+
   const opt = {
-    margin: 10,
+    margin: 0,
     filename: name,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
-  html2pdf().set(opt).from(container).save().then(() => {
-    document.body.removeChild(container);
+  html2pdf().set(opt).from(wrapper).save().then(() => {
+    document.body.removeChild(wrapper);
   });
 }
 
@@ -1395,7 +1434,8 @@ function renderQuote(q) {
     <line x1="4.5" y1="23" x2="18" y2="23" stroke="#ddd8cc" stroke-width="1.2" stroke-linecap="round"/>
     <text x="31" y="29" font-family="Fraunces, serif" font-style="italic" font-weight="700" font-size="28" fill="url(#qlg)" letter-spacing="-0.8">Offeria</text>
   </svg>`;
-  const logoHtml = p.logo_url ? `<img class="q-logo-preview" src="${p.logo_url}">` : offeriaSvgLogo;
+  const isFree = (p.plan || 'free') === 'free';
+  const logoHtml = (!isFree && p.logo_url) ? `<img class="q-logo-preview" src="${p.logo_url}">` : offeriaSvgLogo;
   const vatInfo = info.vatNum ? `<br>VAT: ${info.vatNum}` : '';
   const webInfo = info.website ? `<br>${info.website}` : '';
   const bankInfo = info.bankgiro ? `<br>BG: ${info.bankgiro}` : '';
