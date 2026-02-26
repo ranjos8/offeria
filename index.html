@@ -1137,11 +1137,17 @@ async function saveQuoteEdits() {
     .limit(1);
 
   if (data && data[0]) {
-    await sb.from('quote_usage').update({
+    const { error: updateError } = await sb.from('quote_usage').update({
       title: title,
       client_name: clientName,
       quote_html: quoteHtml
     }).eq('id', data[0].id);
+    if (updateError) {
+      alert('Fel vid sparande: ' + updateError.message);
+      btn.textContent = '💾 Spara ändringar';
+      btn.disabled = false;
+      return;
+    }
   }
 
   btn.textContent = '✓ Sparat!';
