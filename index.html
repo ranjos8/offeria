@@ -1214,9 +1214,7 @@ async function generateQuote() {
   );
   const matchesCurrent = selectedKws.some(kw => jobLower.includes(kw));
   if (matchesOther && !matchesCurrent) {
-    const confirmed = confirm('⚠️ Uppdraget verkar inte stämma med vald bransch "' + industry + '".
-
-Vill du ändå fortsätta, eller byta bransch?');
+    const confirmed = confirm('⚠️ Uppdraget verkar inte stämma med vald bransch "' + industry + '". Vill du ändå fortsätta, eller byta bransch?');
     if (!confirmed) {
       clearInterval(interval);
       document.getElementById('statusBar').style.display = 'none';
