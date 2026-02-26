@@ -1054,6 +1054,9 @@ function showLogoPreview(url) {
   document.getElementById('logoPreviewImg').src = url;
   document.getElementById('logoPreviewWrap').style.display = 'block';
   document.getElementById('logoUploadLabel').style.display = 'none';
+  // Keep info msg visible
+  const msg = document.getElementById('logoInfoMsg');
+  if (msg && msg.innerHTML) msg.style.display = 'block';
 }
 
 async function removeLogo() {
@@ -1157,15 +1160,15 @@ function downloadPDF(html, filename) {
   `;
 
   const wrapper = document.createElement('div');
-  wrapper.style.cssText = 'position:absolute;left:-9999px;top:0;width:210mm;background:white';
+  wrapper.style.cssText = 'position:fixed;top:0;left:0;width:210mm;background:white;z-index:-1;opacity:0;pointer-events:none';
   wrapper.innerHTML = '<style>' + pdfCSS + '</style><div style="padding:16mm 18mm">' + cleanHtml + '</div>';
   document.body.appendChild(wrapper);
 
   const opt = {
-    margin: 0,
+    margin: [10, 10, 10, 10],
     filename: name,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollX: 0, scrollY: 0 },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
   html2pdf().set(opt).from(wrapper).save().then(() => {
