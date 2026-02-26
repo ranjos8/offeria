@@ -1147,6 +1147,8 @@ async function saveQuoteEdits() {
   btn.textContent = '✓ Sparat!';
   btn.style.background = '#2a6e4e';
   btn.style.color = 'white';
+  // Reload history cache so next open shows updated data
+  await loadHistory();
   setTimeout(() => {
     btn.textContent = '💾 Spara ändringar';
     btn.style.background = '';
@@ -1209,20 +1211,42 @@ function openHistoryQuote(i) {
 }
 
 // ===== SHARE QUOTE =====
-function shareQuote(method) {
+function getQuoteText() {
   const title = document.querySelector('#quoteDoc .q-title')?.textContent || 'Offert';
-  const client = document.querySelector('#quoteDoc strong.editable')?.textContent || '';
+  const client = document.querySelector('#quoteDoc .q-client strong')?.textContent || '';
   const total = document.getElementById('tot-final')?.textContent || '';
-  const text = `${title}${client ? ' – ' + client : ''}${total ? ' – ' + total : ''}\n\nSkapad med Offeria: https://offeria.se`;
-  if (method === 'whatsapp') {
-    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  return { title, client, total };
+}
+
+async function shareViaEmail() {
+  // First download PDF, then open mail
+  const { title, client, total } = getQuoteText();
+  const subject = `${title}${client && client !== 'Kund' ? ' – ' + client : ''}`;
+  const body = `Hej,\n\nBifogat finner du vår offert: ${title}${client && client !== 'Kund' ? ' till ' + client : ''}.${total ? '\nBelopp: ' + total : ''}\n\nMed vänliga hälsningar`;
+  // Download PDF first
+  downloadPDF();
+  // Small delay then open mail
+  setTimeout(() => {
+    window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  }, 800);
+}
+
+async function shareNative() {
+  const { title, client, total } = getQuoteText();
+  const text = `${title}${client && client !== 'Kund' ? ' – ' + client : ''}${total ? ' – ' + total : ''}\n\nOffert skapad med Offeria: https://offeria.se`;
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: title, text: text });
+    } catch(e) { /* user cancelled */ }
   } else {
-    window.open('mailto:?subject=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(text), '_blank');
+    // Fallback: copy to clipboard
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Kopierat! Klistra in i SMS, mail eller annan app.');
+    });
   }
 }
 
-// ===== UPGRADE =====
-let selectedUPlan = 'pro';
+
 function openUpgradeModal() { document.getElementById('upgradeOverlay').classList.add('open'); }
 function closeUpgradeModal() { document.getElementById('upgradeOverlay').classList.remove('open'); }
 function selectUPlan(p) {
