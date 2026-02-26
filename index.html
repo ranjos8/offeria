@@ -1506,9 +1506,7 @@ function renderQuote(q) {
     ${currentProfile?.plan === 'free' ? '<div style="text-align:center;margin-top:1.2rem;padding-top:1rem;border-top:1px solid #f0ebe0"><span style="font-size:0.68rem;color:#ccc;letter-spacing:0.08em">Skapad med </span><a href="https://offeria.se" target="_blank" style="font-family:Fraunces,serif;font-style:italic;font-size:0.75rem;color:#b8902e;text-decoration:none;font-weight:700">Offeria</a></div>' : ''}`;
 
   document.querySelectorAll('#itemsTbody tr').forEach(tr => attachListeners(tr));
-  const w = document.getElementById('quoteWrap');
-  w.style.display = 'block';
-  w.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  openQuoteModal();
 }
 
 init();
