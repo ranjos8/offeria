@@ -1166,7 +1166,7 @@ async function generateQuote() {
   if (limit !== Infinity && monthlyUsed >= limit) {
     openUpgradeModal(); return;
   }
-  const prompt = document.getElementById('jobPrompt').value.trim();
+  const jobText = document.getElementById('jobPrompt').value.trim();
   if (!prompt) { alert('Beskriv uppdraget först!'); return; }
 
   const btn = document.getElementById('genBtn');
@@ -1206,7 +1206,7 @@ async function generateQuote() {
     'Transport': ['transport','flytt','frakt','leverans','kör'],
     'Konsult / IT': ['konsult','it','system','webb','kod','program','analys','rådgivning']
   };
-  const jobLower = prompt.toLowerCase();
+  const jobLower = jobText.toLowerCase();
   const selectedKws = industryKeywords[industry] || [];
   const allKws = Object.values(industryKeywords).flat();
   const matchesOther = Object.entries(industryKeywords).some(([ind, kws]) =>
@@ -1237,7 +1237,7 @@ Vill du ändå fortsätta, eller byta bransch?');
         model: 'claude-sonnet-4-20250514', max_tokens: 1500,
         system: 'Du är expert på svenska offerter. Svara ALLTID med giltig JSON och inget annat. Basera prissättning på uppdraget, inte branschvalet.',
         messages: [{ role: 'user', content: `Skapa en komplett offert för:
-UPPDRAG: ${prompt}
+UPPDRAG: ${jobText}
 PRISSÄTTNINGSSTÖD (bransch): ${industry}
 MOMSSATS: ${vatPct}%
 BETALNINGSVILLKOR: ${payterms}
