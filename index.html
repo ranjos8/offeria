@@ -1027,10 +1027,17 @@ async function handleLogoUpload(e) {
       currentProfile.logo_url = dataUrl;
       showLogoPreview(dataUrl);
       const plan = currentProfile?.plan || 'free';
-      if (plan === 'free') {
-        alert('✓ Logotyp sparad!\n\nObs: Din logotyp syns inte i offerterna på gratisplanen. Uppgradera till Pro eller Obegränsat för att visa din egen logotyp.');
-      } else {
-        alert('✓ Logotyp sparad!');
+      const msg = document.getElementById('logoInfoMsg');
+      if (msg) {
+        msg.style.display = 'block';
+        if (plan === 'free') {
+          msg.style.cssText = 'display:block;margin-top:0.6rem;padding:0.6rem 0.9rem;border-radius:8px;font-size:0.8rem;line-height:1.5;background:#fff8e8;border:1px solid #e8c97a;color:#7a5a00';
+          msg.innerHTML = '✓ Logotyp sparad! <strong>Obs:</strong> visas ej på gratisplanen. <a onclick="openUpgradeModal()" style="color:#b8902e;font-weight:700;cursor:pointer;text-decoration:underline">Uppgradera</a> för att aktivera.';
+        } else {
+          msg.style.cssText = 'display:block;margin-top:0.6rem;padding:0.6rem 0.9rem;border-radius:8px;font-size:0.8rem;line-height:1.5;background:#edf7ed;border:1px solid #a3d4a3;color:#2d6a2d';
+          msg.innerHTML = '✓ Logotyp sparad och aktiverad!';
+          setTimeout(() => { msg.style.display = 'none'; }, 3000);
+        }
       }
     } catch(err) {
       alert('Kunde inte spara logotypen: ' + (err.message || err));
