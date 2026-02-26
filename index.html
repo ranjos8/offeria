@@ -628,6 +628,8 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <span class="qt-label">✦ Offert genererad</span>
             <div class="qt-btns">
               <button class="qt-btn" onclick="generateQuote()">↻ Generera om</button>
+              <button class="qt-btn" onclick="shareQuote('mail')">✉ E-post</button>
+              <button class="qt-btn" onclick="shareQuote('whatsapp')">💬 WhatsApp</button>
               <button class="qt-btn primary" onclick="window.print()">🖨 PDF / Skriv ut</button>
             </div>
           </div>
@@ -639,6 +641,9 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <div class="app-page" id="page-history">
         <div class="page-title">Offerthistorik</div>
         <div class="page-sub">Alla dina genererade offerter</div>
+        <div style="margin-bottom:1rem">
+          <input id="historySearch" type="text" placeholder="🔍 Sök på kund eller titel..." oninput="filterHistory()" style="width:100%;max-width:400px;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit">
+        </div>
         <div id="historyContent"><div class="empty-state"><div class="big">📂</div><p>Inga offerter ännu – generera din första!</p></div></div>
       </div>
 
@@ -660,6 +665,20 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div class="grid2">
             <div class="field"><label>Adress</label><input id="pAddress" placeholder="Storgatan 1, 123 45 Stad"></div>
             <div class="field"><label>Bankgiro</label><input id="pBankgiro" placeholder="123-4567"></div>
+          </div>
+          <div style="margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid var(--border)">
+            <div class="card-label">🖼 Logotyp</div>
+            <div id="logoSection">
+              <div id="logoPreviewWrap" style="margin:0.8rem 0; display:none">
+                <img id="logoPreviewImg" style="max-height:70px;max-width:160px;object-fit:contain;border-radius:6px;border:1px solid var(--border);padding:6px;background:white">
+                <br><button onclick="removeLogo()" style="margin-top:0.5rem;font-size:0.75rem;color:#e05;background:none;border:none;cursor:pointer">× Ta bort logotyp</button>
+              </div>
+              <label id="logoUploadLabel" style="display:inline-flex;align-items:center;gap:0.5rem;cursor:pointer;background:var(--cream);border:1.5px dashed var(--border);border-radius:8px;padding:0.7rem 1.2rem;font-size:0.85rem;color:#666;transition:border-color 0.15s">
+                <span>📁</span> Välj logotyp (PNG, JPG, SVG)
+                <input type="file" id="logoFileInput" accept="image/*" style="display:none" onchange="handleLogoUpload(event)">
+              </label>
+              <p style="font-size:0.72rem;color:#aaa;margin-top:0.5rem">Max 2 MB. Rekommenderas: bred bild med transparent bakgrund.</p>
+            </div>
           </div>
           <div style="margin-top:1.2rem; display:flex; align-items:center;">
             <button class="save-btn" onclick="saveProfile()">Spara profil</button>
@@ -828,13 +847,26 @@ function updateUI(profile, used, total) {
 
   const qNote = document.getElementById('quotaNote');
   if (plan !== 'unlimited' && used >= limit) {
-    qNote.textContent = '🚫 Du har nått veckogränsen – uppgradera för fler offerter';
+    qNote.innerHTML = '🚫 Veckogränsen nådd! <a onclick="openUpgradeModal()" style="color:var(--gold);font-weight:700;cursor:pointer;text-decoration:underline">Uppgradera nu →</a>';
     qNote.className = 'quota-note warn';
     document.getElementById('genBtn').disabled = true;
+    // Show upgrade banner
+    let banner = document.getElementById('upgradeBanner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'upgradeBanner';
+      banner.style.cssText = 'background:linear-gradient(135deg,#0d0d0b,#1a1a18);color:white;padding:1rem 1.5rem;border-radius:12px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap';
+      banner.innerHTML = '<div><div style="font-family:Fraunces,serif;font-style:italic;font-size:1.1rem;color:#c4982e">Du har använt alla offerter denna vecka</div><div style="font-size:0.82rem;color:#aaa;margin-top:0.2rem">Uppgradera till Pro för 99 kr/mån och få 10 offerter/vecka</div></div><button onclick="openUpgradeModal()" style="background:#b8902e;color:white;border:none;padding:0.6rem 1.4rem;border-radius:8px;font-weight:700;font-size:0.9rem;cursor:pointer;white-space:nowrap">Uppgradera ✦</button>';
+      const genCard = document.querySelector('.gen-card');
+      if (genCard) genCard.parentNode.insertBefore(banner, genCard);
+    }
+    banner.style.display = 'flex';
   } else {
     qNote.textContent = `${left} ${limit === Infinity ? 'obegränsade' : ''} offerter kvar denna vecka`;
     qNote.className = 'quota-note';
     document.getElementById('genBtn').disabled = false;
+    const banner = document.getElementById('upgradeBanner');
+    if (banner) banner.style.display = 'none';
   }
 }
 
@@ -912,6 +944,7 @@ function showPage(p) {
   document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
   document.getElementById('sNav-' + p).classList.add('active');
   if (p === 'history') loadHistory();
+  if (p === 'profile' && currentProfile?.logo_url) showLogoPreview(currentProfile.logo_url);
 }
 
 // ===== PROFILE =====
@@ -942,12 +975,55 @@ async function saveProfile() {
   ok.style.display = 'inline'; setTimeout(() => ok.style.display = 'none', 2500);
 }
 
+// ===== LOGO UPLOAD =====
+async function handleLogoUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { alert('Filen är för stor – max 2 MB.'); return; }
+  const reader = new FileReader();
+  reader.onload = async (ev) => {
+    const dataUrl = ev.target.result;
+    // Save as base64 in profile
+    await sb.from('profiles').update({ logo_url: dataUrl }).eq('id', currentUser.id);
+    currentProfile.logo_url = dataUrl;
+    showLogoPreview(dataUrl);
+  };
+  reader.readAsDataURL(file);
+}
+
+function showLogoPreview(url) {
+  if (!url) return;
+  document.getElementById('logoPreviewImg').src = url;
+  document.getElementById('logoPreviewWrap').style.display = 'block';
+  document.getElementById('logoUploadLabel').style.display = 'none';
+}
+
+async function removeLogo() {
+  if (!confirm('Ta bort logotypen?')) return;
+  await sb.from('profiles').update({ logo_url: null }).eq('id', currentUser.id);
+  currentProfile.logo_url = null;
+  document.getElementById('logoPreviewWrap').style.display = 'none';
+  document.getElementById('logoUploadLabel').style.display = 'inline-flex';
+  document.getElementById('logoFileInput').value = '';
+}
+
 // ===== HISTORY =====
 async function loadHistory() {
   const { data } = await sb.from('quote_usage').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
   const el = document.getElementById('historyContent');
   if (!data || data.length === 0) {
     el.innerHTML = '<div class="empty-state"><div class="big">📂</div><p>Inga offerter ännu</p></div>';
+    return;
+  }
+  window._historyData = data;
+  renderHistoryTable(data);
+}
+
+// ===== HISTORY RENDER & FILTER =====
+function renderHistoryTable(data) {
+  const el = document.getElementById('historyContent');
+  if (!data || data.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="big">📂</div><p>Inga offerter hittades</p></div>';
     return;
   }
   el.innerHTML = `<table class="history-table">
@@ -957,10 +1033,33 @@ async function loadHistory() {
       <td>${r.client_name || '–'}</td>
       <td>${r.title || '–'}</td>
       <td style="text-align:right;font-weight:600;color:var(--ink)">${r.total_amount ? Number(r.total_amount).toLocaleString('sv-SE',{maximumFractionDigits:0})+' kr' : '–'}</td>
-      <td>${r.quote_html ? `<button class="btn-sm btn-outline" onclick="openHistoryQuote(${i})">Öppna</button>` : ''}</td>
+      <td style="display:flex;gap:0.4rem;flex-wrap:wrap">
+        ${r.quote_html ? `<button class="btn-sm btn-outline" onclick="openHistoryQuote(${window._historyData.indexOf(r)})">Öppna</button>` : ''}
+        ${r.quote_html ? `<button class="btn-sm btn-dark" onclick="printHistoryQuote(${window._historyData.indexOf(r)})">PDF</button>` : ''}
+      </td>
     </tr>`).join('')}</tbody>
   </table>`;
-  window._historyData = data;
+}
+
+function filterHistory() {
+  const q = document.getElementById('historySearch')?.value?.toLowerCase() || '';
+  if (!window._historyData) return;
+  const filtered = q ? window._historyData.filter(r =>
+    (r.client_name||'').toLowerCase().includes(q) ||
+    (r.title||'').toLowerCase().includes(q)
+  ) : window._historyData;
+  renderHistoryTable(filtered);
+}
+
+function printHistoryQuote(i) {
+  const r = window._historyData?.[i];
+  if (!r?.quote_html) return;
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>${r.title||'Offert'}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;1,700&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <style>body{font-family:'DM Sans',sans-serif;padding:2rem;max-width:800px;margin:0 auto}@media print{body{padding:0}}</style>
+  </head><body>${r.quote_html}<script>window.onload=()=>window.print()<\/script></body></html>`);
+  win.document.close();
 }
 
 // ===== OPEN HISTORY QUOTE =====
@@ -975,6 +1074,19 @@ function openHistoryQuote(i) {
   });
   document.getElementById('quoteTabs').style.display = 'flex';
   document.getElementById('quoteTab').click();
+}
+
+// ===== SHARE QUOTE =====
+function shareQuote(method) {
+  const title = document.querySelector('#quoteDoc .q-title')?.textContent || 'Offert';
+  const client = document.querySelector('#quoteDoc strong.editable')?.textContent || '';
+  const total = document.getElementById('tot-final')?.textContent || '';
+  const text = `${title}${client ? ' – ' + client : ''}${total ? ' – ' + total : ''}\n\nSkapad med Offeria: https://offeria.se`;
+  if (method === 'whatsapp') {
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  } else {
+    window.open('mailto:?subject=' + encodeURIComponent(title) + '&body=' + encodeURIComponent(text), '_blank');
+  }
 }
 
 // ===== UPGRADE =====
@@ -1156,7 +1268,23 @@ function attachListeners(tr) {
 function renderQuote(q) {
   const info = currentInfo;
   const p = currentProfile || {};
-  const logoHtml = p.logo_url ? `<img class="q-logo-preview" src="${p.logo_url}">` : `<div class="q-logo-ph">Logotyp</div>`;
+  const offeriaSvgLogo = `<svg width="120" height="28" viewBox="0 0 174 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="qlg" x1="46" y1="0" x2="174" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#0d0d0b"/>
+        <stop offset="100%" stop-color="#c4982e"/>
+      </linearGradient>
+    </defs>
+    <rect x="7" y="4" width="22" height="30" rx="2.5" fill="#e8d5a0" opacity="0.7"/>
+    <rect x="4" y="2" width="22" height="30" rx="2.5" fill="#f5f0e8" stroke="#d8d0c0" stroke-width="1"/>
+    <rect x="1" y="0" width="22" height="30" rx="2.5" fill="white" stroke="#c8c0b0" stroke-width="1"/>
+    <line x1="4.5" y1="8" x2="19.5" y2="8" stroke="#b8902e" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="4.5" y1="13" x2="19.5" y2="13" stroke="#ddd8cc" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="4.5" y1="18" x2="16" y2="18" stroke="#ddd8cc" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="4.5" y1="23" x2="18" y2="23" stroke="#ddd8cc" stroke-width="1.2" stroke-linecap="round"/>
+    <text x="31" y="29" font-family="Fraunces, serif" font-style="italic" font-weight="700" font-size="28" fill="url(#qlg)" letter-spacing="-0.8">Offeria</text>
+  </svg>`;
+  const logoHtml = p.logo_url ? `<img class="q-logo-preview" src="${p.logo_url}">` : offeriaSvgLogo;
   const vatInfo = info.vatNum ? `<br>VAT: ${info.vatNum}` : '';
   const webInfo = info.website ? `<br>${info.website}` : '';
   const bankInfo = info.bankgiro ? `<br>BG: ${info.bankgiro}` : '';
@@ -1198,7 +1326,8 @@ function renderQuote(q) {
     <div class="q-footer">
       <div><strong>${info.company}</strong><br>${info.phone} ${info.email}</div>
       <div class="sig-block"><div class="sig-line"></div><div style="font-size:0.73rem;color:#888">Underskrift & godkännande</div><div style="font-size:0.73rem;color:#888;margin-top:0.2rem">Datum: ___________</div></div>
-    </div>`;
+    </div>
+    ${currentProfile?.plan === 'free' ? '<div style="text-align:center;margin-top:1.2rem;padding-top:1rem;border-top:1px solid #f0ebe0"><span style="font-size:0.68rem;color:#ccc;letter-spacing:0.08em">Skapad med </span><a href="https://offeria.se" target="_blank" style="font-family:Fraunces,serif;font-style:italic;font-size:0.75rem;color:#b8902e;text-decoration:none;font-weight:700">Offeria</a></div>' : ''}`;
 
   document.querySelectorAll('#itemsTbody tr').forEach(tr => attachListeners(tr));
   const w = document.getElementById('quoteWrap');
