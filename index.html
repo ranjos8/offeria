@@ -1126,7 +1126,7 @@ async function saveQuoteEdits() {
 
   // Read current DOM values
   const quoteHtml = document.getElementById('quoteDoc').innerHTML;
-  const title = document.querySelector('#quoteDoc .q-title')?.textContent?.trim() || '';
+  const title = document.querySelector('#quoteDoc .q-offer-title')?.firstChild?.textContent?.trim() || '';
   const clientName = document.querySelector('#quoteDoc .q-client strong')?.textContent?.trim() || '';
 
   // Find the latest quote for this user and update it
@@ -1165,8 +1165,8 @@ async function saveQuoteEdits() {
 
 function downloadPDF(html, filename) {
   const name = filename || (() => {
-    const t = document.querySelector('#quoteDoc .q-title');
-    return t ? t.textContent.trim().substring(0,50) + '.pdf' : 'offert.pdf';
+    const t = document.querySelector('#quoteDoc .q-offer-title');
+    return t ? (t.firstChild?.textContent?.trim() || t.textContent.trim()).substring(0,50) + '.pdf' : 'offert.pdf';
   })();
 
   // Get HTML - from history param or from current visible quote
@@ -1218,7 +1218,7 @@ function openHistoryQuote(i) {
 
 // ===== SHARE QUOTE =====
 function getQuoteText() {
-  const title = document.querySelector('#quoteDoc .q-title')?.textContent || 'Offert';
+  const title = document.querySelector('#quoteDoc .q-offer-title')?.firstChild?.textContent?.trim() || 'Offert';
   const client = document.querySelector('#quoteDoc .q-client strong')?.textContent || '';
   const total = document.getElementById('tot-final')?.textContent || '';
   return { title, client, total };
@@ -1389,7 +1389,7 @@ Rimliga svenska priser 2024. Minst 5 rader.` }]
     const quoteHtml = document.getElementById('quoteDoc')?.innerHTML || '';
     // Read edited client name from DOM (user may have changed it)
     const savedClientName = document.querySelector('#quoteDoc .q-client strong')?.textContent || q.clientName || '';
-    const savedTitle = document.querySelector('#quoteDoc .q-title')?.textContent || q.title || 'Offert';
+    const savedTitle = document.querySelector('#quoteDoc .q-offer-title')?.firstChild?.textContent?.trim() || q.title || 'Offert';
     await sb.from('quote_usage').insert({
       user_id: currentUser.id,
       title: savedTitle,
