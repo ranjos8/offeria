@@ -504,7 +504,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div><span class="plan-amount">29</span><span class="plan-period"> kr/offert</span></div>
           <ul class="plan-features">
             <li>1 offert per köp</li>
-            <li>Alla funktioner inkl.</li>
+            <li>Alla funktioner</li>
             <li>Egen logotyp</li>
             <li>Offerthistorik</li>
             <li>Ingen bindningstid</li>
@@ -785,16 +785,16 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 // 🔑 Stripe payment links – ersätt med dina riktiga länkar från Stripe Dashboard
 const STRIPE_LINKS = {
-  credit:    'https://buy.stripe.com/ERSÄTT_MED_DIN_STYCK_LÄNK',
-  pro:       'https://buy.stripe.com/ERSÄTT_MED_DIN_PRO_LÄNK',
-  unlimited: 'https://buy.stripe.com/ERSÄTT_MED_DIN_UNLIMITED_LÄNK'
+  credit:    'https://buy.stripe.com/CREDIT_LINK',
+  pro:       'https://buy.stripe.com/PRO_LINK',
+  unlimited: 'https://buy.stripe.com/UNLIMITED_LINK'
 };
 
 // 🤖 Anthropic API key – flytta till Supabase Edge Function i produktion!
 // API-nyckeln är nu säkert lagrad i Supabase Edge Function
 
 const PLAN_LIMITS = { free: 2, pro: 10, unlimited: Infinity, credit: Infinity };
-const PLAN_LABELS = { free: 'Gratis', pro: 'Pro', unlimited: 'Obegränsat', credit: 'Köpta offerter' };
+const PLAN_LABELS = { free: 'Gratis', pro: 'Pro', unlimited: 'Obegränsat', credit: 'Styck' };
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
@@ -1139,13 +1139,14 @@ function openUpgradeModal() { document.getElementById('upgradeOverlay').classLis
 function closeUpgradeModal() { document.getElementById('upgradeOverlay').classList.remove('open'); }
 function selectUPlan(p) {
   selectedUPlan = p;
-  document.getElementById('uplan-credit').classList.toggle('sel', p === 'credit');
+  var creditEl = document.getElementById('uplan-credit');
+  if (creditEl) creditEl.classList.toggle('sel', p === 'credit');
   document.getElementById('uplan-pro').classList.toggle('sel', p === 'pro');
   document.getElementById('uplan-unlimited').classList.toggle('sel', p === 'unlimited');
 }
 function goToStripe() {
   const link = STRIPE_LINKS[selectedUPlan];
-  if (link.includes('ERSÄTT')) {
+  if (!link || link.includes('LINK')) {
     alert('Stripe-länkarna är inte konfigurerade ännu.\n\nSkapa produkter i ditt Stripe-konto och klistra in Payment Link-URL:erna i STRIPE_LINKS i koden.');
     return;
   }
