@@ -382,22 +382,10 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   /* App layout */
   .app-layout { grid-template-columns: 1fr; }
   .app-sidebar {
-    display: flex; flex-direction: row; flex-wrap: wrap;
-    width: 100%; border-right: none; border-bottom: 1px solid var(--border);
-    padding: 0.5rem 0.75rem; gap: 0.25rem; min-height: unset;
-    position: sticky; top: 65px; z-index: 40;
-  }
-  .app-sidebar { flex-direction: row !important; flex-wrap: wrap; gap: 0.4rem; }
-  .sidebar-item {
-    padding: 0.4rem 0.9rem !important; font-size: 0.8rem !important;
-    border-radius: 20px !important; border-left: none !important;
-    border: 1px solid var(--border) !important; flex: 0 0 auto;
-  }
-  .sidebar-item.active {
-    background: var(--ink) !important; color: var(--gold-light) !important;
-    border-color: var(--ink) !important;
+    display: none !important;
   }
   .quota-info { display: none; }
+  .app-page { padding-bottom: 80px; }
 
   /* App pages */
   .app-page { padding: 1.2rem 1rem; }
@@ -922,6 +910,10 @@ function updateUI(profile, used, total) {
     const banner = document.getElementById('upgradeBanner');
     if (banner) banner.style.display = 'none';
   }
+  
+  // Show mobile tab bar
+  const planName = profile?.plan === 'pro' ? 'Pro' : profile?.plan === 'unlimited' ? 'Unlimited' : profile?.plan === 'styck' ? 'Styck' : 'Gratis';
+  showMobileTabBar(true, planName, used, total);
 }
 
 function getMonthStart() {
@@ -1648,6 +1640,34 @@ async function deleteAccount() {
   }
 }
 
+function toggleAppMenu() {
+  const menu = document.getElementById('appMobileMenu');
+  const isOpen = menu.style.display === 'flex';
+  menu.style.display = isOpen ? 'none' : 'flex';
+}
+
+function updateMobileTabBar(page) {
+  ['generate','history','profile'].forEach(p => {
+    const btn = document.getElementById('mTab-' + p);
+    if (btn) btn.style.color = p === page ? 'var(--gold-light)' : '#888';
+  });
+}
+
+// Show/hide bottom tab bar based on login state
+function showMobileTabBar(show, plan, used, total) {
+  const bar = document.getElementById('mobileTabBar');
+  if (!bar) return;
+  if (window.innerWidth <= 768) {
+    bar.style.display = show ? 'block' : 'none';
+  }
+  if (show) {
+    const planEl = document.getElementById('appMenuPlanName');
+    const quotaEl = document.getElementById('appMenuQuotaText');
+    if (planEl) planEl.textContent = plan || 'Gratis';
+    if (quotaEl) quotaEl.textContent = used + ' / ' + total + ' denna månad';
+  }
+}
+
 init();
 </script>
 
@@ -1667,6 +1687,38 @@ init();
     </div>
     <div id="quoteDoc" style="padding:2rem 3rem"></div>
   </div>
+</div>
+
+<!-- Mobile bottom tab bar (only shown when logged in on mobile) -->
+<div id="mobileTabBar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--ink);border-top:1px solid #333;z-index:200;padding:0 0 env(safe-area-inset-bottom,0)">
+  <div style="display:flex;justify-content:space-around;align-items:center;padding:0.5rem 0">
+    <button onclick="showPage('generate')" id="mTab-generate" style="flex:1;background:none;border:none;color:#888;cursor:pointer;padding:0.5rem;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.6rem;font-family:DM Sans,sans-serif">
+      <span style="font-size:1.3rem">📄</span>Ny offert
+    </button>
+    <button onclick="showPage('history')" id="mTab-history" style="flex:1;background:none;border:none;color:#888;cursor:pointer;padding:0.5rem;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.6rem;font-family:DM Sans,sans-serif">
+      <span style="font-size:1.3rem">📋</span>Historik
+    </button>
+    <button onclick="showPage('profile')" id="mTab-profile" style="flex:1;background:none;border:none;color:#888;cursor:pointer;padding:0.5rem;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.6rem;font-family:DM Sans,sans-serif">
+      <span style="font-size:1.3rem">🏢</span>Profil
+    </button>
+    <button onclick="toggleAppMenu()" id="mTab-menu" style="flex:1;background:none;border:none;color:#888;cursor:pointer;padding:0.5rem;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.6rem;font-family:DM Sans,sans-serif">
+      <span style="font-size:1.3rem">☰</span>Mer
+    </button>
+  </div>
+</div>
+
+<!-- App mobile menu overlay -->
+<div id="appMobileMenu" style="display:none;position:fixed;bottom:65px;left:0;right:0;background:var(--ink);border-top:1px solid #333;z-index:199;padding:1.5rem 2rem;flex-direction:column;gap:0.8rem">
+  <div id="appMenuQuota" style="background:#1a1a18;border-radius:10px;padding:1rem;margin-bottom:0.5rem">
+    <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:0.3rem">Din plan</div>
+    <div style="display:flex;align-items:center;gap:0.6rem">
+      <span id="appMenuPlanName" style="font-family:Fraunces,serif;color:var(--gold-light);font-size:1rem">Gratis</span>
+      <span id="appMenuQuotaText" style="font-size:0.8rem;color:#aaa"></span>
+    </div>
+  </div>
+  <a href="/om-oss.html" style="color:#ccc;text-decoration:none;font-size:0.95rem;padding:0.5rem 0;border-bottom:1px solid #222;display:block">Om oss</a>
+  <a href="/kontakta-oss.html" style="color:#ccc;text-decoration:none;font-size:0.95rem;padding:0.5rem 0;border-bottom:1px solid #222;display:block">Kontakt</a>
+  <button onclick="signOut()" style="width:100%;padding:0.7rem;font-size:0.9rem;background:transparent;border:1.5px solid #555;color:#ccc;border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif;margin-top:0.3rem">Logga ut</button>
 </div>
 
 </body>
