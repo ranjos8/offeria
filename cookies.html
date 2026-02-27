@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookie-policy – Offeria</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink: #0d0d0b; --paper: #f7f4ee; --cream: #ede8db; --gold: #b8902e; --gold-light: #e8d5a0; --border: #ddd8cc; --muted: #7a7570; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 2rem; border-bottom: 1px solid var(--border); background: var(--ink); position: sticky; top: 0; z-index: 100; }
+    .nav-logo { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.3rem; color: var(--gold-light); text-decoration: none; }
+    .nav-back { font-size: 0.82rem; color: #aaa; text-decoration: none; }
+    .nav-back:hover { color: var(--gold-light); }
+    .hero { background: var(--ink); color: white; padding: 4rem 2rem 3rem; text-align: center; border-bottom: 3px solid var(--gold); }
+    .hero-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gold-light); margin-bottom: 1rem; }
+    .hero h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; line-height: 1.1; margin-bottom: 0.8rem; }
+    .hero p { font-size: 0.9rem; color: #aaa; }
+    .container { max-width: 720px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+    .doc-meta { background: var(--cream); border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 2.5rem; font-size: 0.82rem; color: var(--muted); display: flex; gap: 2rem; flex-wrap: wrap; }
+    .doc-meta strong { color: var(--ink); }
+    h2 { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; margin: 2.5rem 0 0.8rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+    p { font-size: 0.9rem; line-height: 1.75; color: #333; margin-bottom: 0.8rem; }
+    ul { padding-left: 1.5rem; margin-bottom: 0.8rem; }
+    li { font-size: 0.9rem; line-height: 1.75; color: #333; margin-bottom: 0.3rem; }
+    a { color: var(--gold); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .highlight-box { background: #fff8e8; border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0; padding: 1rem 1.2rem; margin: 1.5rem 0; font-size: 0.88rem; line-height: 1.7; }
+    table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.85rem; }
+    th { background: var(--ink); color: white; text-align: left; padding: 0.6rem 0.8rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    td { padding: 0.7rem 0.8rem; border-bottom: 1px solid var(--border); color: #333; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    footer { background: var(--ink); color: #888; text-align: center; padding: 2rem; font-size: 0.78rem; }
+    footer a { color: var(--gold-light); text-decoration: none; margin: 0 0.5rem; }
+    .footer-logo { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.1rem; color: var(--gold-light); display: block; margin-bottom: 0.8rem; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="https://offeria.se">Offeria</a>
+  <a class="nav-back" href="https://offeria.se">← Tillbaka till Offeria</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-label">Juridik & sekretess</div>
+  <h1>Cookie-policy</h1>
+  <p>Information om hur vi använder cookies på offeria.se</p>
+</div>
+
+<div class="container">
+
+  <div class="doc-meta">
+    <div><strong>Senast uppdaterad:</strong> 27 februari 2026</div>
+    <div><strong>Kontakt:</strong> info@offeria.se</div>
+  </div>
+
+  <div class="highlight-box">
+    Vi håller det enkelt: Offeria använder endast nödvändiga cookies för att du ska kunna logga in och använda tjänsten. Vi använder <strong>inga</strong> spårnings- eller reklamcookies.
+  </div>
+
+  <h2>Vad är cookies?</h2>
+  <p>Cookies är små textfiler som sparas i din webbläsare när du besöker en webbplats. De används för att webbplatsen ska kunna känna igen dig och komma ihåg dina inställningar.</p>
+
+  <h2>Cookies vi använder</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Cookie</th>
+        <th>Syfte</th>
+        <th>Typ</th>
+        <th>Giltighetstid</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>sb-*-auth-token</code></td>
+        <td>Håller dig inloggad. Sätts av Supabase när du loggar in.</td>
+        <td>Nödvändig</td>
+        <td>1 vecka</td>
+      </tr>
+      <tr>
+        <td><code>sb-*-auth-token-code-verifier</code></td>
+        <td>Säkerhetskontroll vid inloggning (PKCE-flöde).</td>
+        <td>Nödvändig</td>
+        <td>Session</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Cookies vi inte använder</h2>
+  <ul>
+    <li>Inga spårningscookies (Google Analytics, Facebook Pixel etc.)</li>
+    <li>Inga reklamcookies</li>
+    <li>Inga tredjepartscookies från sociala medier</li>
+  </ul>
+
+  <h2>Hantera cookies</h2>
+  <p>Eftersom vi endast använder nödvändiga cookies för inloggning kan du inte välja bort dem utan att tappa möjligheten att logga in. Du kan alltid rensa cookies i din webbläsare – men då loggas du ut.</p>
+  <p>Instruktioner för att hantera cookies i din webbläsare:</p>
+  <ul>
+    <li><a href="https://support.google.com/chrome/answer/95647" target="_blank">Google Chrome</a></li>
+    <li><a href="https://support.mozilla.org/sv/kb/cookies-information-websites-store-on-your-computer" target="_blank">Mozilla Firefox</a></li>
+    <li><a href="https://support.apple.com/sv-se/guide/safari/sfri11471/mac" target="_blank">Safari</a></li>
+    <li><a href="https://support.microsoft.com/sv-se/microsoft-edge/ta-bort-cookies-i-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" target="_blank">Microsoft Edge</a></li>
+  </ul>
+
+  <h2>Kontakt</h2>
+  <p>Frågor om vår cookie-användning? Kontakta oss på <a href="mailto:info@offeria.se">info@offeria.se</a>.</p>
+
+</div>
+
+<footer>
+  <span class="footer-logo">Offeria</span>
+  <div>
+    <a href="/integritetspolicy.html">Integritetspolicy</a>·
+    <a href="/anvandarvillkor.html">Användarvillkor</a>·
+    <a href="/cookies.html">Cookies</a>
+  </div>
+  <p style="margin-top:1rem">© 2026 Offeria · info@offeria.se</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Om oss – Offeria</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink: #0d0d0b; --paper: #f7f4ee; --cream: #ede8db; --gold: #b8902e; --gold-light: #e8d5a0; --border: #ddd8cc; --muted: #7a7570; --teal: #1d5c5c; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 2rem; background: var(--ink); position: sticky; top: 0; z-index: 100; }
+    .nav-logo { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.3rem; color: var(--gold-light); text-decoration: none; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { font-size: 0.82rem; color: #aaa; text-decoration: none; transition: color 0.15s; }
+    .nav-links a:hover { color: var(--gold-light); }
+    .nav-cta { background: var(--gold); color: white !important; padding: 0.4rem 1rem; border-radius: 6px; font-weight: 600 !important; }
+
+    .hero { background: var(--ink); color: white; padding: 6rem 2rem 5rem; text-align: center; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; top: -50%; left: -20%; width: 60%; height: 200%; background: radial-gradient(ellipse, rgba(184,144,46,0.12) 0%, transparent 70%); pointer-events: none; }
+    .hero-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gold); margin-bottom: 1.2rem; }
+    .hero h1 { font-family: 'Fraunces', serif; font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 700; line-height: 1.1; margin-bottom: 1.2rem; }
+    .hero h1 em { font-style: italic; color: var(--gold-light); }
+    .hero p { font-size: 1rem; color: #aaa; max-width: 540px; margin: 0 auto; line-height: 1.7; }
+
+    .container { max-width: 800px; margin: 0 auto; padding: 4rem 2rem 6rem; }
+
+    .story { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; margin-bottom: 5rem; }
+    .story-text h2 { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 700; line-height: 1.2; margin-bottom: 1.2rem; }
+    .story-text h2 em { font-style: italic; color: var(--gold); }
+    .story-text p { font-size: 0.95rem; line-height: 1.8; color: #444; margin-bottom: 1rem; }
+    .story-visual { background: var(--ink); border-radius: 16px; padding: 3rem 2rem; text-align: center; }
+    .story-stat { margin-bottom: 2rem; }
+    .story-stat-num { font-family: 'Fraunces', serif; font-size: 3rem; font-weight: 700; color: var(--gold-light); display: block; }
+    .story-stat-lbl { font-size: 0.82rem; color: #888; text-transform: uppercase; letter-spacing: 0.1em; }
+
+    .values { margin-bottom: 5rem; }
+    .values h2 { font-family: 'Fraunces', serif; font-size: 2rem; margin-bottom: 2.5rem; text-align: center; }
+    .values-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .value-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.8rem 1.5rem; }
+    .value-icon { font-size: 1.8rem; margin-bottom: 1rem; display: block; }
+    .value-title { font-family: 'Fraunces', serif; font-size: 1.1rem; margin-bottom: 0.6rem; }
+    .value-text { font-size: 0.85rem; line-height: 1.7; color: var(--muted); }
+
+    .custom-cta { background: var(--ink); border-radius: 16px; padding: 3.5rem; text-align: center; color: white; }
+    .custom-cta h2 { font-family: 'Fraunces', serif; font-size: 1.8rem; margin-bottom: 1rem; }
+    .custom-cta h2 em { font-style: italic; color: var(--gold-light); }
+    .custom-cta p { color: #aaa; margin-bottom: 2rem; font-size: 0.95rem; line-height: 1.7; max-width: 480px; margin-left: auto; margin-right: auto; }
+    .cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-gold { background: var(--gold); color: white; padding: 0.8rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: opacity 0.15s; }
+    .btn-gold:hover { opacity: 0.85; }
+    .btn-outline { border: 1px solid #555; color: #ccc; padding: 0.8rem 2rem; border-radius: 8px; text-decoration: none; font-size: 0.9rem; transition: border-color 0.15s; }
+    .btn-outline:hover { border-color: var(--gold-light); color: var(--gold-light); }
+
+    footer { background: var(--ink); color: #888; text-align: center; padding: 2rem; font-size: 0.78rem; }
+    footer a { color: var(--gold-light); text-decoration: none; margin: 0 0.5rem; }
+    .footer-logo { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.1rem; color: var(--gold-light); display: block; margin-bottom: 0.8rem; }
+
+    @media (max-width: 640px) {
+      .story { grid-template-columns: 1fr; gap: 2rem; }
+      .values-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">Offeria</a>
+  <div class="nav-links">
+    <a href="/om-oss.html">Om oss</a>
+    <a href="/kontakta-oss.html">Kontakt</a>
+    <a href="/" class="nav-cta">Kom igång gratis</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-label">Vårt uppdrag</div>
+  <h1>Byggt för dig som<br><em>gör jobbet</em></h1>
+  <p>Offeria skapades för att hantverkare ska kunna lägga sin tid på det de är bäst på – inte på att sitta och skriva offerter.</p>
+</div>
+
+<div class="container">
+
+  <div class="story">
+    <div class="story-text">
+      <h2>Varför vi<br><em>byggde Offeria</em></h2>
+      <p>Hantverkare är proffs på sitt hantverk – inte på att skriva offerter. Ändå lägger många timmar varje vecka på att formulera, prissätta och formatera offerter som ser professionella ut.</p>
+      <p>Offeria löser det problemet. Med hjälp av AI genererar du en komplett, branschanpassad offert på sekunder. Du granskar, justerar och skickar – klart.</p>
+      <p>Vi tror att ett bra verktyg ska vara enkelt nog att använda direkt, kraftfullt nog att faktiskt göra skillnad.</p>
+    </div>
+    <div class="story-visual">
+      <div class="story-stat">
+        <span class="story-stat-num">30 sek</span>
+        <span class="story-stat-lbl">Från idé till offert</span>
+      </div>
+      <div class="story-stat">
+        <span class="story-stat-num">10+</span>
+        <span class="story-stat-lbl">Branscher stöds</span>
+      </div>
+      <div class="story-stat" style="margin-bottom:0">
+        <span class="story-stat-num">100%</span>
+        <span class="story-stat-lbl">Redigerbart innehåll</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="values">
+    <h2>Vad vi tror på</h2>
+    <div class="values-grid">
+      <div class="value-card">
+        <span class="value-icon">⚡</span>
+        <div class="value-title">Enkelhet</div>
+        <p class="value-text">Ett bra verktyg ska inte kräva en manual. Offeria är byggt för att fungera direkt – utan inlärningskurva.</p>
+      </div>
+      <div class="value-card">
+        <span class="value-icon">🔒</span>
+        <div class="value-title">Integritet</div>
+        <p class="value-text">Dina uppgifter är dina. Vi säljer dem aldrig, delar dem aldrig och håller dem säkra.</p>
+      </div>
+      <div class="value-card">
+        <span class="value-icon">🎯</span>
+        <div class="value-title">Relevans</div>
+        <p class="value-text">AI:n är tränad att förstå svenska branscher och prissättning – inte bara generera generisk text.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="custom-cta">
+    <h2>Behöver du något<br><em>skräddarsytt?</em></h2>
+    <p>Har du specifika krav, vill integrera Offeria i ditt befintliga system, eller letar efter en anpassad lösning för ditt företag? Hör av dig – vi hjälper gärna till.</p>
+    <div class="cta-btns">
+      <a href="/kontakta-oss.html" class="btn-gold">Kontakta oss →</a>
+      <a href="/" class="btn-outline">Prova gratis</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span class="footer-logo">Offeria</span>
+  <div>
+    <a href="/integritetspolicy.html">Integritetspolicy</a>·
+    <a href="/anvandarvillkor.html">Användarvillkor</a>·
+    <a href="/cookies.html">Cookies</a>
+  </div>
+  <p style="margin-top:1rem">© 2026 Offeria · info@offeria.se</p>
+</footer>
+
+</body>
+</html>
