@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kontakta oss – Offeria</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>emailjs.init("iUGAEbeer-pOBR8tV");</script>
   <style>
     :root { --ink: #0d0d0b; --paper: #f7f4ee; --cream: #ede8db; --gold: #b8902e; --gold-light: #e8d5a0; --border: #ddd8cc; --muted: #7a7570; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -15,16 +17,13 @@
     .nav-links a { font-size: 0.82rem; color: #aaa; text-decoration: none; transition: color 0.15s; }
     .nav-links a:hover { color: var(--gold-light); }
     .nav-cta { background: var(--gold); color: white !important; padding: 0.4rem 1rem; border-radius: 6px; font-weight: 600 !important; }
-
     .hero { background: var(--ink); color: white; padding: 5rem 2rem 4rem; text-align: center; border-bottom: 3px solid var(--gold); }
     .hero-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gold); margin-bottom: 1rem; }
     .hero h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; line-height: 1.1; margin-bottom: 0.8rem; }
     .hero h1 em { font-style: italic; color: var(--gold-light); }
     .hero p { color: #aaa; font-size: 0.95rem; }
-
     .container { max-width: 900px; margin: 0 auto; padding: 4rem 2rem 6rem; }
     .grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 4rem; align-items: start; }
-
     .contact-info h2 { font-family: 'Fraunces', serif; font-size: 1.5rem; margin-bottom: 1.5rem; }
     .info-item { display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: flex-start; }
     .info-icon { width: 40px; height: 40px; background: var(--cream); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
@@ -33,12 +32,10 @@
     .info-value a { color: var(--ink); text-decoration: none; }
     .info-value a:hover { color: var(--gold); }
     .info-note { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
-
     .use-cases { margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--border); }
     .use-cases h3 { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 1rem; }
-    .use-case { display: flex; gap: 0.6rem; margin-bottom: 0.7rem; font-size: 0.88rem; color: #444; align-items: flex-start; }
+    .use-case { display: flex; gap: 0.6rem; margin-bottom: 0.7rem; font-size: 0.88rem; color: #444; }
     .use-case::before { content: '→'; color: var(--gold); font-weight: 700; flex-shrink: 0; }
-
     .contact-form { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; }
     .form-title { font-family: 'Fraunces', serif; font-size: 1.3rem; margin-bottom: 0.4rem; }
     .form-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; }
@@ -55,11 +52,9 @@
     .success-msg .icon { font-size: 3rem; margin-bottom: 1rem; }
     .success-msg h3 { font-family: 'Fraunces', serif; font-size: 1.3rem; margin-bottom: 0.5rem; }
     .success-msg p { color: var(--muted); font-size: 0.88rem; }
-
     footer { background: var(--ink); color: #888; text-align: center; padding: 2rem; font-size: 0.78rem; }
     footer a { color: var(--gold-light); text-decoration: none; margin: 0 0.5rem; }
     .footer-logo { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.1rem; color: var(--gold-light); display: block; margin-bottom: 0.8rem; }
-
     @media (max-width: 640px) {
       .grid { grid-template-columns: 1fr; gap: 2.5rem; }
       .field-row { grid-template-columns: 1fr; }
@@ -88,7 +83,6 @@
 
     <div class="contact-info">
       <h2>Kontaktuppgifter</h2>
-
       <div class="info-item">
         <div class="info-icon">✉️</div>
         <div>
@@ -97,7 +91,6 @@
           <div class="info-note">Svar inom 24 timmar</div>
         </div>
       </div>
-
       <div class="info-item">
         <div class="info-icon">🌐</div>
         <div>
@@ -106,7 +99,6 @@
           <div class="info-note">Prova gratis direkt</div>
         </div>
       </div>
-
       <div class="info-item">
         <div class="info-icon">📍</div>
         <div>
@@ -115,7 +107,6 @@
           <div class="info-note">Tjänsten finns även på offeria.de</div>
         </div>
       </div>
-
       <div class="use-cases">
         <h3>Vi hjälper dig med</h3>
         <div class="use-case">Skräddarsydda offertmallar för din bransch</div>
@@ -130,7 +121,6 @@
       <div id="formWrap">
         <div class="form-title">Skicka ett meddelande</div>
         <div class="form-sub">Beskriv vad du behöver hjälp med så hör vi av oss.</div>
-
         <div class="field-row">
           <div class="field">
             <label>Namn</label>
@@ -141,12 +131,10 @@
             <input type="text" id="cCompany" placeholder="Bygg AB">
           </div>
         </div>
-
         <div class="field">
           <label>E-post</label>
           <input type="email" id="cEmail" placeholder="anna@byggab.se">
         </div>
-
         <div class="field">
           <label>Ämne</label>
           <select id="cSubject">
@@ -159,15 +147,12 @@
             <option value="ovrigt">Övrigt</option>
           </select>
         </div>
-
         <div class="field">
           <label>Meddelande</label>
           <textarea id="cMessage" placeholder="Beskriv vad du behöver hjälp med..."></textarea>
         </div>
-
         <button class="submit-btn" id="submitBtn" onclick="sendContact()">Skicka meddelande →</button>
       </div>
-
       <div class="success-msg" id="successMsg">
         <div class="icon">✅</div>
         <h3>Meddelande skickat!</h3>
@@ -201,30 +186,32 @@ async function sendContact() {
     return;
   }
 
+  const subjectLabels = {
+    skraddarsydd: 'Skräddarsydd lösning',
+    integration: 'Integration / API',
+    support: 'Teknisk support',
+    pris: 'Fråga om priser',
+    samarbete: 'Samarbete / partnerskap',
+    ovrigt: 'Övrigt'
+  };
+
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
   btn.textContent = '⏳ Skickar...';
 
   try {
-    const res = await fetch('https://yfnmmcrvzcwcinwopnlj.supabase.co/functions/v1/send-contact', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmbm1tY3J2emN3Y2lud29wbmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MzY4NjQsImV4cCI6MjA4NzUxMjg2NH0.MpF3oRLWwXkmrjEGJ0Qqrsw_87FixbaNHmHmPxFyXKc',
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmbm1tY3J2emN3Y2lud29wbmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MzY4NjQsImV4cCI6MjA4NzUxMjg2NH0.MpF3oRLWwXkmrjEGJ0Qqrsw_87FixbaNHmHmPxFyXKc'
-      },
-      body: JSON.stringify({ name, email, subject, message, company })
+    await emailjs.send('service_f5de23t', 'template_fbh7cng', {
+      name: name,
+      email: email,
+      company: company || '–',
+      subject: subjectLabels[subject] || subject,
+      message: message
     });
-    const data = await res.json();
-    if (data.success) {
-      document.getElementById('confirmedEmail').textContent = email;
-      document.getElementById('formWrap').style.display = 'none';
-      document.getElementById('successMsg').style.display = 'block';
-    } else {
-      throw new Error(data.error || 'Okänt fel');
-    }
+    document.getElementById('confirmedEmail').textContent = email;
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
   } catch(err) {
-    alert('Något gick fel: ' + err.message + '\n\nSkicka mail direkt till info@offeria.se');
+    alert('Något gick fel. Skicka mail direkt till info@offeria.se');
     btn.disabled = false;
     btn.textContent = 'Skicka meddelande →';
   }
