@@ -31,6 +31,10 @@ nav {
 .nav-links-desktop a { font-size: 0.82rem; color: #aaa; text-decoration: none; }
 .nav-links-desktop a:hover { color: var(--gold-light); }
 .hamburger { display: none; background: none; border: none; color: #ccc; font-size: 1.4rem; cursor: pointer; padding: 0.2rem 0.5rem; }
+@media (max-width: 768px) {
+  #navLogoutBtn { display: none !important; }
+  #drawerToggle { display: block !important; }
+}
 @media (max-width: 640px) {
   .nav-links-desktop { display: none; }
   .hamburger { display: block; }
@@ -451,7 +455,8 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     <div id="navUserArea" style="display:none; align-items:center; gap:0.8rem;">
       <span class="nav-user" id="navUserName"></span>
       <span class="nav-plan-badge" id="navPlanBadge">Gratis</span>
-      <button class="btn-sm btn-outline" onclick="signOut()">Logga ut</button>
+      <button class="btn-sm btn-outline" id="navLogoutBtn" onclick="signOut()">Logga ut</button>
+      <button id="drawerToggle" onclick="openDrawer()" style="display:none;background:none;border:none;color:#ccc;cursor:pointer;padding:0.3rem 0.5rem;font-size:1.5rem;line-height:1">☰</button>
     </div>
     <div id="navAuthBtns">
       <div class="nav-links-desktop">
@@ -911,9 +916,10 @@ function updateUI(profile, used, total) {
     if (banner) banner.style.display = 'none';
   }
   
-  // Show mobile tab bar
+  // Show mobile hamburger drawer
   const planName = profile?.plan === 'pro' ? 'Pro' : profile?.plan === 'unlimited' ? 'Unlimited' : profile?.plan === 'styck' ? 'Styck' : 'Gratis';
-  showMobileTabBar(true, planName, used, total);
+  const drawerLimit = PLAN_LIMITS[profile?.plan || 'free'] === Infinity ? '∞' : PLAN_LIMITS[profile?.plan || 'free'];
+  showMobileTabBar(true, planName, used, drawerLimit);
 }
 
 function getMonthStart() {
@@ -1640,29 +1646,35 @@ async function deleteAccount() {
   }
 }
 
-function toggleAppMenu() {
-  const menu = document.getElementById('appMobileMenu');
-  const isOpen = menu.style.display === 'flex';
-  menu.style.display = isOpen ? 'none' : 'flex';
+function openDrawer() {
+  document.getElementById('leftDrawer').style.left = '0';
+  document.getElementById('drawerOverlay').style.display = 'block';
 }
 
-function updateMobileTabBar(page) {
+function closeDrawer() {
+  document.getElementById('leftDrawer').style.left = '-280px';
+  document.getElementById('drawerOverlay').style.display = 'none';
+}
+
+function updateDrawerActive(page) {
   ['generate','history','profile'].forEach(p => {
-    const btn = document.getElementById('mTab-' + p);
-    if (btn) btn.style.color = p === page ? 'var(--gold-light)' : '#888';
+    const btn = document.getElementById('dNav-' + p);
+    if (btn) btn.style.background = p === page ? 'rgba(184,144,46,0.15)' : '';
+    if (btn) btn.style.color = p === page ? 'var(--gold-light)' : '#ccc';
   });
 }
 
-// Show/hide bottom tab bar based on login state
 function showMobileTabBar(show, plan, used, total) {
-  const bar = document.getElementById('mobileTabBar');
-  if (!bar) return;
+  // Show/hide hamburger in nav
+  const toggle = document.getElementById('drawerToggle');
+  const logoutBtn = document.getElementById('navLogoutBtn');
   if (window.innerWidth <= 768) {
-    bar.style.display = show ? 'block' : 'none';
+    if (toggle) toggle.style.display = show ? 'block' : 'none';
+    if (logoutBtn) logoutBtn.style.display = show ? 'none' : '';
   }
   if (show) {
-    const planEl = document.getElementById('appMenuPlanName');
-    const quotaEl = document.getElementById('appMenuQuotaText');
+    const planEl = document.getElementById('drawerPlanName');
+    const quotaEl = document.getElementById('drawerQuotaText');
     if (planEl) planEl.textContent = plan || 'Gratis';
     if (quotaEl) quotaEl.textContent = used + ' / ' + total + ' denna månad';
   }
@@ -1689,36 +1701,51 @@ init();
   </div>
 </div>
 
-<!-- Mobile bottom tab bar (only shown when logged in on mobile) -->
-<div id="mobileTabBar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--ink);border-top:1px solid #333;z-index:200;padding:0 0 env(safe-area-inset-bottom,0)">
-  <div style="display:flex;justify-content:space-around;align-items:center;padding:0.5rem 0">
-    <button onclick="showPage('generate')" id="mTab-generate" style="flex:1;background:none;border:none;color:#888;cursor:pointer;padding:0.5rem;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.6rem;font-family:DM Sans,sans-serif">
-      <span style="font-size:1.3rem">📄</span>Ny offert
-    </button>
-    <button onclick="showPage('history')" id="mTab-history" style="flex:1;background:none;border:none;color:#888;cursor:pointer;padding:0.5rem;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.6rem;font-family:DM Sans,sans-serif">
-      <span style="font-size:1.3rem">📋</span>Historik
-    </button>
-    <button onclick="showPage('profile')" id="mTab-profile" style="flex:1;background:none;border:none;color:#888;cursor:pointer;padding:0.5rem;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.6rem;font-family:DM Sans,sans-serif">
-      <span style="font-size:1.3rem">🏢</span>Profil
-    </button>
-    <button onclick="toggleAppMenu()" id="mTab-menu" style="flex:1;background:none;border:none;color:#888;cursor:pointer;padding:0.5rem;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0.6rem;font-family:DM Sans,sans-serif">
-      <span style="font-size:1.3rem">☰</span>Mer
-    </button>
-  </div>
-</div>
+<!-- Left drawer overlay -->
+<div id="drawerOverlay" onclick="closeDrawer()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300"></div>
 
-<!-- App mobile menu overlay -->
-<div id="appMobileMenu" style="display:none;position:fixed;bottom:65px;left:0;right:0;background:var(--ink);border-top:1px solid #333;z-index:199;padding:1.5rem 2rem;flex-direction:column;gap:0.8rem">
-  <div id="appMenuQuota" style="background:#1a1a18;border-radius:10px;padding:1rem;margin-bottom:0.5rem">
-    <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:0.3rem">Din plan</div>
-    <div style="display:flex;align-items:center;gap:0.6rem">
-      <span id="appMenuPlanName" style="font-family:Fraunces,serif;color:var(--gold-light);font-size:1rem">Gratis</span>
-      <span id="appMenuQuotaText" style="font-size:0.8rem;color:#aaa"></span>
-    </div>
+<!-- Left drawer -->
+<div id="leftDrawer" style="position:fixed;top:0;left:-280px;width:280px;height:100%;background:var(--ink);z-index:301;transition:left 0.28s ease;display:flex;flex-direction:column;overflow-y:auto">
+  <!-- Drawer header -->
+  <div style="padding:1.2rem 1.5rem;border-bottom:1px solid #2a2a28;display:flex;align-items:center;justify-content:space-between">
+    <span style="font-family:Fraunces,serif;font-style:italic;font-size:1.2rem;color:var(--gold-light)">Offeria</span>
+    <button onclick="closeDrawer()" style="background:none;border:none;color:#888;font-size:1.4rem;cursor:pointer;padding:0.2rem">✕</button>
   </div>
-  <a href="/om-oss.html" style="color:#ccc;text-decoration:none;font-size:0.95rem;padding:0.5rem 0;border-bottom:1px solid #222;display:block">Om oss</a>
-  <a href="/kontakta-oss.html" style="color:#ccc;text-decoration:none;font-size:0.95rem;padding:0.5rem 0;border-bottom:1px solid #222;display:block">Kontakt</a>
-  <button onclick="signOut()" style="width:100%;padding:0.7rem;font-size:0.9rem;background:transparent;border:1.5px solid #555;color:#ccc;border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif;margin-top:0.3rem">Logga ut</button>
+  
+  <!-- Plan info -->
+  <div style="padding:1rem 1.5rem;background:#111;margin:1rem;border-radius:10px">
+    <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#666;margin-bottom:0.4rem">Din plan</div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <span id="drawerPlanName" style="font-family:Fraunces,serif;color:var(--gold-light);font-size:1.1rem">Gratis</span>
+      <span id="drawerQuotaText" style="font-size:0.78rem;color:#888"></span>
+    </div>
+    <button onclick="closeDrawer();showPage('generate');document.querySelector('.upgrade-btn')?.click()" style="margin-top:0.7rem;width:100%;padding:0.5rem;background:var(--gold);border:none;color:white;border-radius:6px;font-size:0.8rem;font-family:DM Sans,sans-serif;font-weight:600;cursor:pointer">↑ Uppgradera</button>
+  </div>
+
+  <!-- Nav items -->
+  <div style="padding:0 0.75rem;flex:1">
+    <button onclick="closeDrawer();showPage('generate')" id="dNav-generate" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
+      <span style="font-size:1.3rem">📄</span> Ny offert
+    </button>
+    <button onclick="closeDrawer();showPage('history')" id="dNav-history" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
+      <span style="font-size:1.3rem">📋</span> Historik
+    </button>
+    <button onclick="closeDrawer();showPage('profile')" id="dNav-profile" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
+      <span style="font-size:1.3rem">🏢</span> Företagsprofil
+    </button>
+    <div style="border-top:1px solid #222;margin:0.5rem 0.5rem"></div>
+    <a href="/om-oss.html" style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
+      <span style="font-size:1.1rem">ℹ️</span> Om oss
+    </a>
+    <a href="/kontakta-oss.html" style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
+      <span style="font-size:1.1rem">✉️</span> Kontakt
+    </a>
+  </div>
+
+  <!-- Logout -->
+  <div style="padding:1.5rem">
+    <button onclick="signOut()" style="width:100%;padding:0.75rem;background:transparent;border:1px solid #333;color:#888;border-radius:8px;font-size:0.88rem;font-family:DM Sans,sans-serif;cursor:pointer">Logga ut</button>
+  </div>
 </div>
 
 </body>
