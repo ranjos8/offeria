@@ -189,7 +189,7 @@
 </footer>
 
 <script>
-function sendContact() {
+async function sendContact() {
   const name = document.getElementById('cName').value.trim();
   const email = document.getElementById('cEmail').value.trim();
   const subject = document.getElementById('cSubject').value;
@@ -205,18 +205,25 @@ function sendContact() {
   btn.disabled = true;
   btn.textContent = '⏳ Skickar...';
 
-  // Open mailto with pre-filled content
-  const mailSubject = `Offeria kontaktformulär: ${subject} – ${name}${company ? ' (' + company + ')' : ''}`;
-  const mailBody = `Namn: ${name}\nFöretag: ${company || '–'}\nE-post: ${email}\nÄmne: ${subject}\n\nMeddelande:\n${message}`;
-  
-  window.location.href = 'mailto:info@offeria.se?subject=' + encodeURIComponent(mailSubject) + '&body=' + encodeURIComponent(mailBody);
-
-  // Show success message
-  setTimeout(() => {
-    document.getElementById('confirmedEmail').textContent = email;
-    document.getElementById('formWrap').style.display = 'none';
-    document.getElementById('successMsg').style.display = 'block';
-  }, 500);
+  try {
+    const res = await fetch('https://yfnmmcrvzcwcinwopnlj.supabase.co/functions/v1/send-contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, subject, message, company })
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('confirmedEmail').textContent = email;
+      document.getElementById('formWrap').style.display = 'none';
+      document.getElementById('successMsg').style.display = 'block';
+    } else {
+      throw new Error(data.error || 'Okänt fel');
+    }
+  } catch(err) {
+    alert('Något gick fel: ' + err.message + '\n\nSkicka mail direkt till info@offeria.se');
+    btn.disabled = false;
+    btn.textContent = 'Skicka meddelande →';
+  }
 }
 </script>
 
