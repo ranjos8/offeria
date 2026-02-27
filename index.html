@@ -479,10 +479,10 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
 <!-- Mobile menu -->
 <div id="mobileMenu" style="display:none;position:fixed;top:58px;left:0;right:0;background:var(--ink);z-index:999;padding:1.5rem 2rem;border-top:1px solid #333;flex-direction:column;gap:1rem">
-  <a href="/om-oss.html" style="color:#ccc;text-decoration:none;font-size:1rem;padding:0.5rem 0;border-bottom:1px solid #222">Om oss</a>
-  <a href="/kontakta-oss.html" style="color:#ccc;text-decoration:none;font-size:1rem;padding:0.5rem 0;border-bottom:1px solid #222">Kontakt</a>
-  <button class="btn-sm btn-outline" onclick="openModal('login');toggleMobileMenu()" style="width:100%;padding:0.7rem;font-size:0.9rem">Logga in</button>
-  <button class="btn-sm btn-dark" onclick="openModal('register');toggleMobileMenu()" style="width:100%;padding:0.7rem;font-size:0.9rem">Kom igång gratis</button>
+  <a href="/om-oss.html" style="color:#ccc;text-decoration:none;font-size:1rem;padding:0.5rem 0;border-bottom:1px solid #222;display:block">Om oss</a>
+  <a href="/kontakta-oss.html" style="color:#ccc;text-decoration:none;font-size:1rem;padding:0.5rem 0;border-bottom:1px solid #222;display:block">Kontakt</a>
+  <button onclick="openModal('login');toggleMobileMenu()" style="width:100%;padding:0.7rem;font-size:0.9rem;background:transparent;border:1.5px solid #aaa;color:#ccc;border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif">Logga in</button>
+  <button onclick="openModal('register');toggleMobileMenu()" style="width:100%;padding:0.7rem;font-size:0.9rem;background:var(--gold);border:none;color:white;border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif;font-weight:600">Kom igång gratis</button>
 </div>
 
 <!-- ===== LANDING VIEW ===== -->
@@ -886,6 +886,7 @@ function updateUI(profile, used, total) {
 
   document.getElementById('navUserArea').style.display = 'flex';
   document.getElementById('navAuthBtns').style.display = 'none';
+  document.getElementById('mobileMenu').style.display = 'none';
   document.getElementById('navUserName').textContent = profile?.full_name || profile?.email || '';
   document.getElementById('navPlanBadge').textContent = PLAN_LABELS[plan];
 
