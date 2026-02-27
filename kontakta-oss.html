@@ -208,7 +208,11 @@ async function sendContact() {
   try {
     const res = await fetch('https://yfnmmcrvzcwcinwopnlj.supabase.co/functions/v1/send-contact', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmbm1tY3J2emN3Y2lud29wbmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MzY4NjQsImV4cCI6MjA4NzUxMjg2NH0.MpF3oRLWwXkmrjEGJ0Qqrsw_87FixbaNHmHmPxFyXKc',
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmbm1tY3J2emN3Y2lud29wbmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MzY4NjQsImV4cCI6MjA4NzUxMjg2NH0.MpF3oRLWwXkmrjEGJ0Qqrsw_87FixbaNHmHmPxFyXKc'
+      },
       body: JSON.stringify({ name, email, subject, message, company })
     });
     const data = await res.json();
