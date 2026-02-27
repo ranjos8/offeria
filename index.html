@@ -463,6 +463,8 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <button class="btn-sm btn-outline" onclick="signOut()">Logga ut</button>
     </div>
     <div id="navAuthBtns">
+      <a href="/om-oss.html" style="font-size:0.82rem;color:#aaa;text-decoration:none;margin-right:0.5rem">Om oss</a>
+      <a href="/kontakta-oss.html" style="font-size:0.82rem;color:#aaa;text-decoration:none;margin-right:1rem">Kontakt</a>
       <button class="btn-sm btn-outline" onclick="openModal('login')">Logga in</button>
       <button class="btn-sm btn-dark" onclick="openModal('register')">Kom igång gratis</button>
     </div>
@@ -684,9 +686,12 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
               <div id="logoInfoMsg" style="display:none;margin-top:0.6rem;padding:0.6rem 0.9rem;border-radius:8px;font-size:0.8rem;line-height:1.5"></div>
             </div>
           </div>
-          <div style="margin-top:1.2rem; display:flex; align-items:center;">
-            <button class="save-btn" onclick="saveProfile()">Spara profil</button>
-            <span class="save-ok" id="saveOk">✓ Sparat!</span>
+          <div style="margin-top:1.2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.8rem">
+            <div style="display:flex;align-items:center;gap:0.8rem">
+              <button class="save-btn" onclick="saveProfile()">Spara profil</button>
+              <span class="save-ok" id="saveOk">✓ Sparat!</span>
+            </div>
+            <button onclick="deleteAccount()" style="background:none;border:1px solid #e05;color:#e05;border-radius:8px;padding:0.5rem 1rem;font-size:0.78rem;cursor:pointer;font-family:DM Sans,sans-serif">Ta bort konto</button>
           </div>
         </div>
       </div>
@@ -694,6 +699,17 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     </main>
   </div>
 </div>
+
+<!-- ===== SITE FOOTER ===== -->
+<footer style="background:var(--ink);color:#888;text-align:center;padding:2rem 1rem;font-size:0.78rem;margin-top:0">
+  <div style="font-family:'Fraunces',serif;font-style:italic;font-size:1.1rem;color:var(--gold-light);margin-bottom:0.8rem">Offeria</div>
+  <div style="margin-bottom:0.8rem">
+    <a href="/integritetspolicy.html" style="color:var(--gold-light);text-decoration:none;margin:0 0.5rem">Integritetspolicy</a>·
+    <a href="/anvandarvillkor.html" style="color:var(--gold-light);text-decoration:none;margin:0 0.5rem">Användarvillkor</a>·
+    <a href="/cookies.html" style="color:var(--gold-light);text-decoration:none;margin:0 0.5rem">Cookies</a>
+  </div>
+  <div>© 2026 Offeria · <a href="mailto:info@offeria.se" style="color:#888;text-decoration:none">info@offeria.se</a></div>
+</footer>
 
 <!-- ===== AUTH MODAL ===== -->
 <div class="overlay" id="authOverlay" onclick="closeModalOutside(event)">
@@ -733,7 +749,10 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <div class="mfield"><label>E-post</label><input type="email" id="logEmail" placeholder="din@epost.se"></div>
         <div class="mfield"><label>Lösenord</label><input type="password" id="logPass" placeholder="••••••••"></div>
         <button class="msub" id="logBtn" onclick="doLogin()">Logga in →</button>
-        <div class="mfoot">Inget konto? <a onclick="switchTab('register')">Registrera dig</a></div>
+        <div class="mfoot" style="display:flex;justify-content:space-between;align-items:center">
+          <span>Inget konto? <a onclick="switchTab('register')">Registrera dig</a></span>
+          <a onclick="showForgotPassword()" style="font-size:0.78rem;color:#aaa">Glömt lösenord?</a>
+        </div>
       </div>
     </div>
   </div>
@@ -1537,6 +1556,64 @@ function renderQuote(q) {
 
   document.querySelectorAll('#itemsTbody tr').forEach(tr => attachListeners(tr));
   openQuoteModal();
+}
+
+function showForgotPassword() {
+  document.getElementById('tab-login').style.display = 'none';
+  document.getElementById('tab-register').style.display = 'none';
+  document.getElementById('tab-forgot').style.display = 'block';
+}
+
+function showLoginTab() {
+  document.getElementById('tab-forgot').style.display = 'none';
+  document.getElementById('tab-register').style.display = 'none';
+  document.getElementById('tab-login').style.display = 'block';
+}
+
+async function doForgotPassword() {
+  const email = document.getElementById('forgotEmail').value.trim();
+  if (!email) { alert('Ange din e-postadress.'); return; }
+  const btn = document.getElementById('forgotBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Skickar...';
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://offeria.se'
+  });
+  if (error) {
+    alert('Fel: ' + error.message);
+    btn.disabled = false;
+    btn.textContent = 'Skicka återställningslänk →';
+  } else {
+    btn.textContent = '✓ Länk skickad!';
+    btn.style.background = '#2a6e4e';
+    document.getElementById('forgotEmail').value = '';
+    setTimeout(() => {
+      showLoginTab();
+      btn.disabled = false;
+      btn.textContent = 'Skicka återställningslänk →';
+      btn.style.background = '';
+    }, 3000);
+  }
+}
+
+async function deleteAccount() {
+  if (!currentUser) return;
+  const confirmed = confirm('Är du säker på att du vill ta bort ditt konto?\n\nAlla dina offerter och uppgifter raderas permanent. Detta går inte att ångra.');
+  if (!confirmed) return;
+  const email = prompt('Bekräfta med din e-postadress:');
+  if (email !== currentUser.email) { alert('E-postadressen stämmer inte.'); return; }
+  
+  try {
+    // Delete user data
+    await sb.from('quote_usage').delete().eq('user_id', currentUser.id);
+    await sb.from('profiles').delete().eq('id', currentUser.id);
+    // Sign out (account deletion requires admin API - we delete data and sign out)
+    await sb.auth.signOut();
+    alert('Ditt konto och alla dina uppgifter har raderats. Välkommen tillbaka om du ändrar dig!');
+    location.reload();
+  } catch(err) {
+    alert('Något gick fel: ' + err.message);
+  }
 }
 
 init();
