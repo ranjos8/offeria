@@ -441,11 +441,6 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 </head>
 <body>
 
-<!-- Loading screen while checking session -->
-<div id="loadingScreen" style="position:fixed;inset:0;background:#f7f4ee;z-index:9999;display:flex;align-items:center;justify-content:center">
-  <span style="font-family:'Fraunces',serif;font-style:italic;font-size:1.8rem;color:#b8902e">Offeria</span>
-</div>
-
 <!-- ===== NAV ===== -->
 <nav>
   <svg onclick="goHome()" style="cursor:pointer;display:block;flex-shrink:0" width="174" height="40" viewBox="0 0 174 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -492,7 +487,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 </div>
 
 <!-- ===== LANDING VIEW ===== -->
-<div class="view" id="viewLanding">
+<div class="view active" id="viewLanding">
 
   <section class="hero">
     <div class="hero-badge">✦ AI-driven offertgenerering · Offeria</div>
