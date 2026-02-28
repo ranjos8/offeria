@@ -14,6 +14,7 @@
   --gold: #b8902e; --gold-light: #e8d5a0; --border: #ddd8cc;
   --teal: #1d5c5c; --rust: #b84b24; --muted: #7a7570;
 }
+html, body { overflow-x: hidden; max-width: 100vw; }
 body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
 
 /* ===== VIEWS ===== */
@@ -384,23 +385,22 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   .plans { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 
   /* App layout */
-  .app-layout { grid-template-columns: 1fr; }
-  .app-sidebar {
-    display: none !important;
-  }
+  .app-layout { grid-template-columns: 1fr; width: 100%; overflow-x: hidden; }
+  .app-sidebar { display: none !important; }
   .quota-info { display: none; }
-  .app-page { padding-bottom: 80px; }
+  .app-page { padding-bottom: 20px; }
 
   /* App pages */
-  .app-page { padding: 1.2rem 1rem; }
-  .stats-row { grid-template-columns: repeat(3,1fr); gap: 0.5rem; }
-  .stat-card { padding: 0.8rem 0.5rem; }
+  .app-page { padding: 1.2rem 1rem; max-width: 100%; overflow-x: hidden; }
+  .stats-row { grid-template-columns: repeat(2,1fr); gap: 0.5rem; }
+  .stat-card { padding: 0.8rem 0.5rem; box-sizing: border-box; min-width: 0; }
   .stat-val { font-size: 1.4rem; }
 
   /* Gen card */
-  .gen-card { padding: 1.2rem; }
+  .gen-card { padding: 1.2rem; box-sizing: border-box; width: 100%; overflow: hidden; }
   .gen-row { flex-direction: column; gap: 0.5rem; }
-  .gen-row > * { width: 100%; }
+  .gen-row > * { width: 100%; max-width: 100%; }
+  select, input, textarea { max-width: 100%; }
 
   /* Quote */
   .quote-wrap { padding: 0; }
@@ -902,7 +902,7 @@ function updateUI(profile, used, total) {
     if (!banner) {
       banner = document.createElement('div');
       banner.id = 'upgradeBanner';
-      banner.style.cssText = 'background:linear-gradient(135deg,#0d0d0b,#1a1a18);color:white;padding:1rem 1.5rem;border-radius:12px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap';
+      banner.style.cssText = 'background:linear-gradient(135deg,#0d0d0b,#1a1a18);color:white;padding:1rem 1.5rem;border-radius:12px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;box-sizing:border-box;width:100%;overflow:hidden';
       banner.innerHTML = '<div><div style="font-family:Fraunces,serif;font-style:italic;font-size:1.1rem;color:#c4982e">Du har använt alla offerter denna månad</div><div style="font-size:0.82rem;color:#aaa;margin-top:0.2rem">Uppgradera till Pro för 99 kr/mån och få 10 offerter/månad</div></div><button onclick="openUpgradeModal()" style="background:#b8902e;color:white;border:none;padding:0.6rem 1.4rem;border-radius:8px;font-weight:700;font-size:0.9rem;cursor:pointer;white-space:nowrap">Uppgradera ✦</button>';
       const genCard = document.querySelector('.gen-card');
       if (genCard) genCard.parentNode.insertBefore(banner, genCard);
