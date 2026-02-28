@@ -66,11 +66,26 @@
 
 <nav>
   <a class="nav-logo" href="/">Offeria</a>
-  <div class="nav-links">
+  <div class="nav-links" id="navAuthBtns">
     <a href="/om-oss.html">Om oss</a>
     <a href="/kontakta-oss.html">Kontakt</a>
     <a href="/" class="nav-cta">Kom igång gratis</a>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const _sb = supabase.createClient('https://yfnmmcrvzcwcinwopnlj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmbm1tY3J2emN3Y2lud29wbmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MzY4NjQsImV4cCI6MjA4NzUxMjg2NH0.MpF3oRLWwXkmrjEGJ0Qqrsw_87FixbaNHmHmPxFyXKc');
+    (async () => {
+      const { data: { session } } = await _sb.auth.getSession();
+      if (session) {
+        const user = session.user;
+        const initials = (user.email || '').slice(0,2).toUpperCase();
+        document.getElementById('navAuthBtns').innerHTML = `
+          <span style="font-size:0.82rem;color:#aaa">${user.email}</span>
+          <a href="/" style="font-size:0.82rem;background:var(--gold);color:white;padding:0.4rem 1rem;border-radius:6px;text-decoration:none;font-weight:600">← Tillbaka till appen</a>
+        `;
+      }
+    })();
+  </script>
 </nav>
 
 <div class="hero">
