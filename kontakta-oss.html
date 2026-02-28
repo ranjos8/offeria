@@ -5,67 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kontakta oss – Offeria</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>emailjs.init("iUGAEbeer-pOBR8tV");</script>
   <style>
-    :root { --ink: #0d0d0b; --paper: #f7f4ee; --cream: #ede8db; --gold: #b8902e; --gold-light: #e8d5a0; --border: #ddd8cc; --muted: #7a7570; }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); }
-    nav { display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 2rem; background: var(--ink); position: sticky; top: 0; z-index: 100; }
-    .nav-logo { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.3rem; color: var(--gold-light); text-decoration: none; }
-    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
-    .nav-links a { font-size: 0.82rem; color: #aaa; text-decoration: none; transition: color 0.15s; }
-    .nav-links a:hover { color: var(--gold-light); }
-    .nav-cta { background: var(--gold); color: white !important; padding: 0.4rem 1rem; border-radius: 6px; font-weight: 600 !important; }
-    .hero { background: var(--ink); color: white; padding: 5rem 2rem 4rem; text-align: center; border-bottom: 3px solid var(--gold); }
-    .hero-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gold); margin-bottom: 1rem; }
-    .hero h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; line-height: 1.1; margin-bottom: 0.8rem; }
-    .hero h1 em { font-style: italic; color: var(--gold-light); }
-    .hero p { color: #aaa; font-size: 0.95rem; }
-    .container { max-width: 900px; margin: 0 auto; padding: 4rem 2rem 6rem; }
-    .grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 4rem; align-items: start; }
-    .contact-info h2 { font-family: 'Fraunces', serif; font-size: 1.5rem; margin-bottom: 1.5rem; }
-    .info-item { display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: flex-start; }
-    .info-icon { width: 40px; height: 40px; background: var(--cream); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
-    .info-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.2rem; }
-    .info-value { font-size: 0.9rem; font-weight: 500; }
-    .info-value a { color: var(--ink); text-decoration: none; }
-    .info-value a:hover { color: var(--gold); }
-    .info-note { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
-    .use-cases { margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--border); }
-    .use-cases h3 { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 1rem; }
-    .use-case { display: flex; gap: 0.6rem; margin-bottom: 0.7rem; font-size: 0.88rem; color: #444; }
-    .use-case::before { content: '→'; color: var(--gold); font-weight: 700; flex-shrink: 0; }
-    .contact-form { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; }
-    .form-title { font-family: 'Fraunces', serif; font-size: 1.3rem; margin-bottom: 0.4rem; }
-    .form-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 2rem; }
-    .field { margin-bottom: 1.2rem; }
-    .field label { display: block; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.4rem; }
-    .field input, .field select, .field textarea { width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; background: var(--paper); color: var(--ink); transition: border-color 0.15s; }
-    .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--gold); }
-    .field textarea { resize: vertical; min-height: 140px; }
-    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .submit-btn { width: 100%; padding: 0.9rem; background: var(--ink); color: white; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s; margin-top: 0.5rem; }
-    .submit-btn:hover { opacity: 0.85; }
-    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .success-msg { display: none; text-align: center; padding: 2rem; }
-    .success-msg .icon { font-size: 3rem; margin-bottom: 1rem; }
-    .success-msg h3 { font-family: 'Fraunces', serif; font-size: 1.3rem; margin-bottom: 0.5rem; }
-    .success-msg p { color: var(--muted); font-size: 0.88rem; }
-    footer { background: var(--ink); color: #888; text-align: center; padding: 2rem; font-size: 0.78rem; }
-    footer a { color: var(--gold-light); text-decoration: none; margin: 0 0.5rem; }
-    .footer-logo { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.1rem; color: var(--gold-light); display: block; margin-bottom: 0.8rem; }
-    @media (max-width: 640px) {
-      .grid { grid-template-columns: 1fr; gap: 2.5rem; }
-      .field-row { grid-template-columns: 1fr; }
-    }
+    :root{--ink:#0d0d0b;--paper:#f7f4ee;--cream:#ede8db;--gold:#b8902e;--gold-light:#e8d5a0;--border:#ddd8cc;--muted:#7a7570}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink)}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:0.9rem 2rem;background:var(--ink);position:sticky;top:0;z-index:100}
+    .nav-logo{font-family:'Fraunces',serif;font-style:italic;font-size:1.3rem;color:var(--gold-light);text-decoration:none}
+    .nav-links{display:flex;gap:1.5rem;align-items:center}
+    .nav-links a{font-size:0.82rem;color:#aaa;text-decoration:none}
+    .nav-links a:hover{color:var(--gold-light)}
+    .nav-cta{background:var(--gold);color:white!important;padding:0.4rem 1rem;border-radius:6px;font-weight:600!important}
+    .hero{background:var(--ink);color:white;padding:5rem 2rem 4rem;text-align:center;border-bottom:3px solid var(--gold)}
+    .hero-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:1rem}
+    .hero h1{font-family:'Fraunces',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:700;line-height:1.1;margin-bottom:0.8rem}
+    .hero h1 em{font-style:italic;color:var(--gold-light)}
+    .hero p{color:#aaa;font-size:0.95rem}
+    .container{max-width:900px;margin:0 auto;padding:4rem 2rem 6rem}
+    .grid{display:grid;grid-template-columns:1fr 1.6fr;gap:4rem;align-items:start}
+    .contact-info h2{font-family:'Fraunces',serif;font-size:1.5rem;margin-bottom:1.5rem}
+    .info-item{display:flex;gap:1rem;margin-bottom:1.5rem;align-items:flex-start}
+    .info-icon{width:40px;height:40px;background:var(--cream);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+    .info-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.2rem}
+    .info-value{font-size:0.9rem;font-weight:500}
+    .info-value a{color:var(--ink);text-decoration:none}
+    .use-cases{margin-top:2.5rem;padding-top:2rem;border-top:1px solid var(--border)}
+    .use-cases h3{font-size:0.85rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:1rem}
+    .use-case{display:flex;gap:0.6rem;margin-bottom:0.7rem;font-size:0.88rem;color:#444}
+    .use-case::before{content:'→';color:var(--gold);font-weight:700;flex-shrink:0}
+    .contact-form{background:white;border:1px solid var(--border);border-radius:16px;padding:2.5rem}
+    .form-title{font-family:'Fraunces',serif;font-size:1.3rem;margin-bottom:0.4rem}
+    .form-sub{font-size:0.85rem;color:var(--muted);margin-bottom:2rem}
+    .field{margin-bottom:1.2rem}
+    .field label{display:block;font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.4rem}
+    .field input,.field select,.field textarea{width:100%;padding:0.75rem 1rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;background:var(--paper);color:var(--ink);transition:border-color 0.15s}
+    .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold)}
+    .field textarea{resize:vertical;min-height:140px}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .submit-btn{width:100%;padding:0.9rem;background:var(--ink);color:white;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;margin-top:0.5rem}
+    .submit-btn:disabled{opacity:0.5;cursor:not-allowed}
+    .success-msg{display:none;text-align:center;padding:2rem}
+    .success-msg .icon{font-size:3rem;margin-bottom:1rem}
+    .success-msg h3{font-family:'Fraunces',serif;font-size:1.3rem;margin-bottom:0.5rem}
+    .success-msg p{color:var(--muted);font-size:0.88rem}
+    footer{background:var(--ink);color:#888;text-align:center;padding:2rem;font-size:0.78rem;width:100%}
+    footer a{color:var(--gold-light);text-decoration:none;margin:0 0.5rem}
+    .footer-logo{font-family:'Fraunces',serif;font-style:italic;font-size:1.1rem;color:var(--gold-light);display:block;margin-bottom:0.8rem}
+    @media(max-width:640px){.grid{grid-template-columns:1fr;gap:2.5rem}.field-row{grid-template-columns:1fr}nav{padding:0.9rem 1rem}}
   </style>
 </head>
 <body>
 
 <nav>
   <a class="nav-logo" href="/">Offeria</a>
-  <div class="nav-links">
+  <div class="nav-links" id="navAuthBtns">
     <a href="/om-oss.html">Om oss</a>
     <a href="/kontakta-oss.html">Kontakt</a>
     <a href="/" class="nav-cta">Kom igång gratis</a>
@@ -80,7 +75,6 @@
 
 <div class="container">
   <div class="grid">
-
     <div class="contact-info">
       <h2>Kontaktuppgifter</h2>
       <div class="info-item">
@@ -88,7 +82,7 @@
         <div>
           <div class="info-label">E-post</div>
           <div class="info-value"><a href="mailto:info@offeria.se">info@offeria.se</a></div>
-          <div class="info-note">Svar inom 24 timmar</div>
+          <div style="font-size:0.78rem;color:var(--muted);margin-top:0.1rem">Svar inom 24 timmar</div>
         </div>
       </div>
       <div class="info-item">
@@ -96,7 +90,7 @@
         <div>
           <div class="info-label">Webb</div>
           <div class="info-value"><a href="https://offeria.se">offeria.se</a></div>
-          <div class="info-note">Prova gratis direkt</div>
+          <div style="font-size:0.78rem;color:var(--muted);margin-top:0.1rem">Prova gratis direkt</div>
         </div>
       </div>
       <div class="info-item">
@@ -104,7 +98,7 @@
         <div>
           <div class="info-label">Plats</div>
           <div class="info-value">Sverige</div>
-          <div class="info-note">Tjänsten finns även på offeria.de</div>
+          <div style="font-size:0.78rem;color:var(--muted);margin-top:0.1rem">Tjänsten finns även på offeria.de</div>
         </div>
       </div>
       <div class="use-cases">
@@ -122,19 +116,10 @@
         <div class="form-title">Skicka ett meddelande</div>
         <div class="form-sub">Beskriv vad du behöver hjälp med så hör vi av oss.</div>
         <div class="field-row">
-          <div class="field">
-            <label>Namn</label>
-            <input type="text" id="cName" placeholder="Anna Andersson">
-          </div>
-          <div class="field">
-            <label>Företag</label>
-            <input type="text" id="cCompany" placeholder="Bygg AB">
-          </div>
+          <div class="field"><label>Namn</label><input type="text" id="cName" placeholder="Anna Andersson"></div>
+          <div class="field"><label>Företag</label><input type="text" id="cCompany" placeholder="Bygg AB"></div>
         </div>
-        <div class="field">
-          <label>E-post</label>
-          <input type="email" id="cEmail" placeholder="anna@byggab.se">
-        </div>
+        <div class="field"><label>E-post</label><input type="email" id="cEmail" placeholder="anna@byggab.se"></div>
         <div class="field">
           <label>Ämne</label>
           <select id="cSubject">
@@ -147,10 +132,7 @@
             <option value="ovrigt">Övrigt</option>
           </select>
         </div>
-        <div class="field">
-          <label>Meddelande</label>
-          <textarea id="cMessage" placeholder="Beskriv vad du behöver hjälp med..."></textarea>
-        </div>
+        <div class="field"><label>Meddelande</label><textarea id="cMessage" placeholder="Beskriv vad du behöver hjälp med..."></textarea></div>
         <button class="submit-btn" id="submitBtn" onclick="sendContact()">Skicka meddelande →</button>
       </div>
       <div class="success-msg" id="successMsg">
@@ -159,64 +141,51 @@
         <p>Tack för att du hörde av dig. Vi återkommer till dig på <strong id="confirmedEmail"></strong> inom 24 timmar.</p>
       </div>
     </div>
-
   </div>
 </div>
 
 <footer>
   <span class="footer-logo">Offeria</span>
   <div>
-    <a href="/integritetspolicy.html">Integritetspolicy</a>·
-    <a href="/anvandarvillkor.html">Användarvillkor</a>·
+    <a href="/integritetspolicy.html">Integritetspolicy</a> ·
+    <a href="/anvandarvillkor.html">Användarvillkor</a> ·
     <a href="/cookies.html">Cookies</a>
   </div>
   <p style="margin-top:1rem">© 2026 Offeria · info@offeria.se</p>
 </footer>
 
 <script>
+(async () => {
+  const _sb = supabase.createClient('https://yfnmmcrvzcwcinwopnlj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmbm1tY3J2emN3Y2lud29wbmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MzY4NjQsImV4cCI6MjA4NzUxMjg2NH0.MpF3oRLWwXkmrjEGJ0Qqrsw_87FixbaNHmHmPxFyXKc');
+  const { data: { session } } = await _sb.auth.getSession();
+  if (session) {
+    document.getElementById('navAuthBtns').innerHTML = `
+      <span style="font-size:0.82rem;color:#aaa">${session.user.email}</span>
+      <a href="/" style="background:var(--gold);color:white;padding:0.4rem 1rem;border-radius:6px;text-decoration:none;font-size:0.82rem;font-weight:600">← Tillbaka</a>
+    `;
+  }
+})();
+
 async function sendContact() {
   const name = document.getElementById('cName').value.trim();
   const email = document.getElementById('cEmail').value.trim();
   const subject = document.getElementById('cSubject').value;
   const message = document.getElementById('cMessage').value.trim();
   const company = document.getElementById('cCompany').value.trim();
-
-  if (!name || !email || !message || !subject) {
-    alert('Fyll i namn, e-post, ämne och meddelande.');
-    return;
-  }
-
-  const subjectLabels = {
-    skraddarsydd: 'Skräddarsydd lösning',
-    integration: 'Integration / API',
-    support: 'Teknisk support',
-    pris: 'Fråga om priser',
-    samarbete: 'Samarbete / partnerskap',
-    ovrigt: 'Övrigt'
-  };
-
+  if (!name || !email || !message || !subject) { alert('Fyll i namn, e-post, ämne och meddelande.'); return; }
+  const subjectLabels = { skraddarsydd:'Skräddarsydd lösning', integration:'Integration / API', support:'Teknisk support', pris:'Fråga om priser', samarbete:'Samarbete / partnerskap', ovrigt:'Övrigt' };
   const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Skickar...';
-
+  btn.disabled = true; btn.textContent = '⏳ Skickar...';
   try {
-    await emailjs.send('service_f5de23t', 'template_fbh7cng', {
-      name: name,
-      email: email,
-      company: company || '–',
-      subject: subjectLabels[subject] || subject,
-      message: message
-    });
+    await emailjs.send('service_f5de23t', 'template_fbh7cng', { name, email, company: company||'–', subject: subjectLabels[subject]||subject, message });
     document.getElementById('confirmedEmail').textContent = email;
     document.getElementById('formWrap').style.display = 'none';
     document.getElementById('successMsg').style.display = 'block';
   } catch(err) {
     alert('Något gick fel. Skicka mail direkt till info@offeria.se');
-    btn.disabled = false;
-    btn.textContent = 'Skicka meddelande →';
+    btn.disabled = false; btn.textContent = 'Skicka meddelande →';
   }
 }
 </script>
-
 </body>
 </html>
