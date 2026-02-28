@@ -398,9 +398,11 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
   /* Gen card */
   .gen-card { padding: 1.2rem; box-sizing: border-box; width: 100%; overflow: hidden; }
+  .grid3 { grid-template-columns: 1fr; gap: 0.6rem; }
   .gen-row { flex-direction: column; gap: 0.5rem; }
   .gen-row > * { width: 100%; max-width: 100%; }
-  select, input, textarea { max-width: 100%; }
+  select, input, textarea { max-width: 100%; box-sizing: border-box; }
+  .chips { flex-wrap: wrap; }
 
   /* Quote */
   .quote-wrap { padding: 0; }
