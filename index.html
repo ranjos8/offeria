@@ -844,6 +844,8 @@ async function init() {
   // Hide loading screen
   const ls = document.getElementById('loadingScreen');
   if (ls) ls.style.display = 'none';
+  // If not logged in, ensure landing is shown
+  if (!session) showView('landing');
   sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session) await onLogin(session.user);
     if (event === 'SIGNED_OUT') onLogout();
@@ -879,6 +881,13 @@ async function onLogin(user) {
 
 function onLogout() {
   currentUser = null; currentProfile = null; monthlyUsed = 0;
+  // Close drawer if open
+  closeDrawer();
+  // Hide mobile tab toggle
+  const toggle = document.getElementById('drawerToggle');
+  if (toggle) toggle.style.display = 'none';
+  const logoutBtn = document.getElementById('navLogoutBtn');
+  if (logoutBtn) logoutBtn.style.display = '';
   showView('landing');
   document.getElementById('navUserArea').style.display = 'none';
   document.getElementById('navAuthBtns').style.display = '';
@@ -987,12 +996,13 @@ async function doLogin() {
   if (!email || !pass) return showError('Fyll i e-post och lösenord.');
   const btn = document.getElementById('logBtn');
   btn.disabled = true; btn.textContent = 'Loggar in…';
-  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
   btn.disabled = false; btn.textContent = 'Logga in →';
   if (error) return showError('Fel e-post eller lösenord.');
+  if (data?.user) await onLogin(data.user);
 }
 
-async function signOut() { await sb.auth.signOut(); }
+async function signOut() { await sb.auth.signOut(); onLogout(); }
 
 // ===== VIEWS =====
 function showView(v) {
@@ -1747,10 +1757,10 @@ init();
       <span style="font-size:1.3rem">🏢</span> Företagsprofil
     </button>
     <div style="border-top:1px solid #222;margin:0.5rem 0.5rem"></div>
-    <a href="/om-oss.html" target="_blank" style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
+    <a href="/om-oss.html" style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
       <span style="font-size:1.1rem">ℹ️</span> Om oss
     </a>
-    <a href="/kontakta-oss.html" target="_blank" style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
+    <a href="/kontakta-oss.html" style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
       <span style="font-size:1.1rem">✉️</span> Kontakt
     </a>
   </div>
