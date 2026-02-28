@@ -1016,7 +1016,7 @@ function showView(v) {
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
   document.getElementById('view' + v.charAt(0).toUpperCase() + v.slice(1)).classList.add('active');
 }
-function goHome() { if (currentUser) showView('app'); else showView('landing'); }
+function goHome() { if (currentUser) { showView('app'); showPage('generate'); } else showView('landing'); }
 
 function showPage(p) {
   document.querySelectorAll('.app-page').forEach(el => el.classList.remove('active'));
@@ -1695,13 +1695,11 @@ function updateDrawerActive(page) {
 }
 
 function showMobileTabBar(show, plan, used, total) {
-  // Show/hide hamburger in nav
   const toggle = document.getElementById('drawerToggle');
   const logoutBtn = document.getElementById('navLogoutBtn');
-  if (window.innerWidth <= 768) {
-    if (toggle) toggle.style.display = show ? 'block' : 'none';
-    if (logoutBtn) logoutBtn.style.display = show ? 'none' : '';
-  }
+  const isMobile = window.innerWidth <= 768;
+  if (toggle) toggle.style.display = (show && isMobile) ? 'block' : 'none';
+  if (logoutBtn) logoutBtn.style.display = (show && isMobile) ? 'none' : (show ? '' : '');
   if (show) {
     const planEl = document.getElementById('drawerPlanName');
     const quotaEl = document.getElementById('drawerQuotaText');
@@ -1754,13 +1752,13 @@ init();
 
   <!-- Nav items -->
   <div style="padding:0 0.75rem;flex:1">
-    <button onclick="closeDrawer();showPage('generate')" id="dNav-generate" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
+    <button onclick="closeDrawer();showView('app');showPage('generate')" id="dNav-generate" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
       <span style="font-size:1.3rem">📄</span> Ny offert
     </button>
-    <button onclick="closeDrawer();showPage('history')" id="dNav-history" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
+    <button onclick="closeDrawer();showView('app');showPage('history')" id="dNav-history" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
       <span style="font-size:1.3rem">📋</span> Historik
     </button>
-    <button onclick="closeDrawer();showPage('profile')" id="dNav-profile" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
+    <button onclick="closeDrawer();showView('app');showPage('profile')" id="dNav-profile" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
       <span style="font-size:1.3rem">🏢</span> Företagsprofil
     </button>
     <div style="border-top:1px solid #222;margin:0.5rem 0.5rem"></div>
