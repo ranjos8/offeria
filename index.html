@@ -399,10 +399,12 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   /* Gen card */
   .gen-card { padding: 1.2rem; box-sizing: border-box; width: 100%; overflow: hidden; }
   .grid3 { grid-template-columns: 1fr; gap: 0.6rem; }
+  .grid2 { grid-template-columns: 1fr; gap: 0.6rem; }
   .gen-row { flex-direction: column; gap: 0.5rem; }
   .gen-row > * { width: 100%; max-width: 100%; }
-  select, input, textarea { max-width: 100%; box-sizing: border-box; }
+  select, input, textarea { max-width: 100%; box-sizing: border-box; width: 100%; }
   .chips { flex-wrap: wrap; }
+  .gen-card[style*="max-width"] { max-width: 100% !important; }
 
   /* Quote */
   .quote-wrap { padding: 0; }
@@ -416,6 +418,10 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
   /* History */
   .hist-item { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+  .history-table { font-size: 0.75rem; }
+  .history-table th, .history-table td { padding: 0.6rem 0.5rem; }
+  .history-table th:nth-child(3), .history-table td:nth-child(3) { display: none; }
+  .page-title { font-size: 1.4rem; }
 }
 
 @media (max-width: 400px) {
@@ -835,6 +841,9 @@ async function init() {
   if (session) {
     await onLogin(session.user);
   }
+  // Hide loading screen
+  const ls = document.getElementById('loadingScreen');
+  if (ls) ls.style.display = 'none';
   sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session) await onLogin(session.user);
     if (event === 'SIGNED_OUT') onLogout();
@@ -1738,10 +1747,10 @@ init();
       <span style="font-size:1.3rem">🏢</span> Företagsprofil
     </button>
     <div style="border-top:1px solid #222;margin:0.5rem 0.5rem"></div>
-    <a href="/om-oss.html" style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
+    <a href="/om-oss.html" target="_blank" style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
       <span style="font-size:1.1rem">ℹ️</span> Om oss
     </a>
-    <a href="/kontakta-oss.html" style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
+    <a href="/kontakta-oss.html" target="_blank" style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
       <span style="font-size:1.1rem">✉️</span> Kontakt
     </a>
   </div>
