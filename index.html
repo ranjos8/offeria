@@ -841,20 +841,24 @@ let currentProfile = null;
 let monthlyUsed = 0;
 
 // ===== INIT =====
+let _loginHandled = false;
+
 async function init() {
+  // Listen for auth changes first
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_OUT') { _loginHandled = false; onLogout(); }
+  });
+
   const { data: { session } } = await sb.auth.getSession();
+  const ls = document.getElementById('loadingScreen');
+
   if (session) {
     await onLogin(session.user);
+  } else {
+    showView('landing');
   }
-  // Hide loading screen
-  const ls = document.getElementById('loadingScreen');
+
   if (ls) ls.style.display = 'none';
-  // If not logged in, ensure landing is shown
-  if (!session) showView('landing');
-  sb.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session) await onLogin(session.user);
-    if (event === 'SIGNED_OUT') onLogout();
-  });
 }
 
 async function onLogin(user) {
@@ -1004,7 +1008,10 @@ async function doLogin() {
   const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
   btn.disabled = false; btn.textContent = 'Logga in →';
   if (error) return showError('Fel e-post eller lösenord.');
-  if (data?.user) await onLogin(data.user);
+  if (data?.user) {
+    _loginHandled = true;
+    await onLogin(data.user);
+  }
 }
 
 async function signOut() { await sb.auth.signOut(); onLogout(); }
