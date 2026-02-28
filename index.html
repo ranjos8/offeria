@@ -481,7 +481,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 </div>
 
 <!-- ===== LANDING VIEW ===== -->
-<div class="view active" id="viewLanding">
+<div class="view" id="viewLanding" style="display:none">
 
   <section class="hero">
     <div class="hero-badge">✦ AI-driven offertgenerering · Offeria</div>
@@ -832,7 +832,11 @@ let monthlyUsed = 0;
 // ===== INIT =====
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
-  if (session) await onLogin(session.user);
+  if (session) {
+    await onLogin(session.user);
+  } else {
+    showView('landing');
+  }
   sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session) await onLogin(session.user);
     if (event === 'SIGNED_OUT') onLogout();
@@ -862,6 +866,7 @@ async function onLogin(user) {
 
   updateUI(profile, monthlyUsed, total || 0);
   showView('app');
+  showPage('generate');
   fillProfileForm(profile);
 }
 
