@@ -1151,6 +1151,17 @@ async function loadHistory() {
 }
 
 // ===== HISTORY RENDER & FILTER =====
+function parseAmountFromHtml(html) {
+  if (!html) return '–';
+  // Find tot-final span in saved HTML
+  const match = html.match(/id="tot-final"[^>]*>([^<]+)</);
+  if (match) return match[1].trim();
+  // Fallback: find last bold kr amount
+  const amounts = [...html.matchAll(/>([\d\s]+)\s*kr</g)].map(m => m[1].replace(/\s/g,''));
+  if (amounts.length) return Number(amounts[amounts.length-1]).toLocaleString('sv-SE') + ' kr';
+  return '–';
+}
+
 function renderHistoryTable(data) {
   const el = document.getElementById('historyContent');
   if (!data || data.length === 0) {
@@ -1163,7 +1174,7 @@ function renderHistoryTable(data) {
       <td style="white-space:nowrap;color:#888;font-size:0.8rem">${new Date(r.created_at).toLocaleDateString('sv-SE')}</td>
       <td>${r.client_name || '–'}</td>
       <td>${r.title || '–'}</td>
-      <td style="text-align:right;font-weight:600;color:var(--ink)">${r.total_amount ? Number(r.total_amount).toLocaleString('sv-SE',{maximumFractionDigits:0})+' kr' : '–'}</td>
+      <td style="text-align:right;font-weight:600;color:var(--ink)">${parseAmountFromHtml(r.quote_html)}</td>
       <td style="display:flex;gap:0.4rem;flex-wrap:wrap">
         ${r.quote_html ? `<button class="btn-sm btn-outline" onclick="openHistoryQuote(${window._historyData.indexOf(r)})">Öppna</button>` : ''}
         ${r.quote_html ? `<button class="btn-sm btn-dark" onclick="printHistoryQuote(${window._historyData.indexOf(r)})">PDF</button>` : ''}
