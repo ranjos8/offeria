@@ -439,7 +439,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 }
 </style>
 </head>
-<body style="opacity:0;transition:opacity 0.2s">
+<body>
 
 <!-- ===== NAV ===== -->
 <nav>
@@ -843,14 +843,16 @@ async function init() {
     if (event === 'SIGNED_OUT') { _loginHandled = false; onLogout(); }
   });
 
-  const { data: { session } } = await sb.auth.getSession();
-
-  if (session) {
-    await onLogin(session.user);
-  } else {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      await onLogin(session.user);
+    } else {
+      showView('landing');
+    }
+  } catch(e) {
     showView('landing');
   }
-  document.body.style.opacity = '1';
 }
 
 async function onLogin(user) {
