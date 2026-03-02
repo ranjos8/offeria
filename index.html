@@ -439,7 +439,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 }
 </style>
 </head>
-<body>
+<body style="opacity:0;transition:opacity 0.2s">
 
 <!-- ===== NAV ===== -->
 <nav>
@@ -839,21 +839,18 @@ let monthlyUsed = 0;
 let _loginHandled = false;
 
 async function init() {
-  // Listen for auth changes first
   sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_OUT') { _loginHandled = false; onLogout(); }
   });
 
   const { data: { session } } = await sb.auth.getSession();
-  const ls = document.getElementById('loadingScreen');
 
   if (session) {
     await onLogin(session.user);
   } else {
     showView('landing');
   }
-
-  if (ls) ls.style.display = 'none';
+  document.body.style.opacity = '1';
 }
 
 async function onLogin(user) {
