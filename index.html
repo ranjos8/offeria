@@ -442,7 +442,15 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   .app-layout { display: block; }
   .app-page.active { padding: 0; }
   .quote-wrap { display: block !important; }
-  #quoteDoc { border: none; box-shadow: none; padding: 0; border-radius: 0; }
+  #quoteDoc { border: none; box-shadow: none; padding: 1rem; border-radius: 0; }
+  #quoteDoc .q-header { flex-direction: column; gap: 1rem; }
+  #quoteDoc .q-header-right { text-align: left; }
+  #quoteDoc table { font-size: 0.75rem; }
+  #quoteDoc table th, #quoteDoc table td { padding: 0.4rem 0.3rem; }
+  .q-totals { overflow-x: auto; }
+  .q-totals-box { min-width: unset; width: 100%; }
+  .quote-toolbar { flex-wrap: wrap; gap: 0.4rem; padding: 0.7rem; }
+  .qt-btn { font-size: 0.72rem; padding: 0.4rem 0.6rem; }
 }
 </style>
 </head>
@@ -1752,8 +1760,8 @@ init();
 </script>
 
 <!-- ===== QUOTE MODAL ===== -->
-<div class="overlay" id="quoteModalOverlay" style="align-items:flex-start;padding:1.5rem;overflow-y:auto" onclick="if(event.target===this)closeQuoteModal()">
-  <div style="background:white;border-radius:16px;width:100%;max-width:860px;margin:auto;overflow:hidden;box-shadow:0 20px 80px rgba(0,0,0,0.3)">
+<div class="overlay" id="quoteModalOverlay" style="align-items:flex-start;padding:0;overflow-y:auto" onclick="if(event.target===this)closeQuoteModal()">
+  <div id="quoteModalBox" style="background:white;border-radius:0;width:100%;max-width:860px;margin:auto;overflow:hidden;box-shadow:0 20px 80px rgba(0,0,0,0.3)">
     <div class="quote-toolbar" style="border-radius:0">
       <span class="qt-label">✦ Offert genererad</span>
       <div class="qt-btns">
