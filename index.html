@@ -1323,11 +1323,11 @@ function openHistoryQuote(i) {
 
   // Set currentInfo from the saved quote so recalc() works correctly
   try {
-    const vatMatch = r.quote_html.match(/moms[^0-9]*(\d+)\s*%/i);
+    const vatMatch = r.quote_html.match(/Moms\s*\((\d+)%\)/);
     const vatPct = vatMatch ? parseInt(vatMatch[1]) : 25;
-    const inclRot = r.quote_html.includes('ROT-avdrag');
+    const inclRot = r.quote_html.includes('tot-rot');
     currentInfo = { ...(currentInfo || {}), vatPct, inclRot };
-  } catch(e) {}
+  } catch(e) { currentInfo = { ...(currentInfo || {}), vatPct: 25, inclRot: false }; }
 
   // Recalc totals so they reflect current editable values
   recalc();
@@ -1546,8 +1546,8 @@ function buildRow(it) {
 }
 
 function recalc() {
-  const info = currentInfo;
-  const vatPct = parseFloat(info.vatPct)/100;
+  const info = currentInfo || {};
+  const vatPct = (parseFloat(info.vatPct) || 25) / 100;
   let sub = 0;
   document.querySelectorAll('#itemsTbody tr').forEach(row => {
     const pe = row.querySelector('.unit-price');
