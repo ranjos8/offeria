@@ -256,10 +256,12 @@ nav {
 .prompt-area::placeholder { color: #bbb; }
 .ex-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.8rem; }
 .ex-pill {
-  font-size: 0.76rem; padding: 0.3rem 0.75rem; border: 1px solid var(--border);
-  border-radius: 20px; cursor: pointer; background: white; color: #666; transition: all 0.15s;
+  font-size: 0.76rem; padding: 0.3rem 0.75rem; border: 1px solid #eee;
+  border-radius: 20px; cursor: pointer; background: #fafaf8; color: #bbb; transition: all 0.15s; font-style: italic;
 }
-.ex-pill:hover { border-color: var(--ink); color: var(--ink); }
+.ex-pill:hover { border-color: var(--gold-light); color: #888; background: #fffaee; }
+.ex-tip { font-size: 0.74rem; color: #aaa; margin-bottom: 0.6rem; line-height: 1.6; }
+.ex-tip strong { color: #888; }
 .gen-row { display: flex; align-items: center; gap: 1rem; margin-top: 0.8rem; }
 .gen-btn {
   background: var(--ink); color: var(--gold-light); border: none; border-radius: 10px;
@@ -649,13 +651,8 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
         <div class="gen-card">
           <div class="card-label">✍️ Beskriv uppdraget <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Skriv vad som ska utföras – oavsett bransch</span></div>
-          <div class="ex-pills">
-            <span class="ex-pill" onclick="setPrompt(this.textContent)">Bygga 20 kvm trädäck med räcke</span>
-            <span class="ex-pill" onclick="setPrompt(this.textContent)">Byta 5 eluttag i kök</span>
-            <span class="ex-pill" onclick="setPrompt(this.textContent)">Kontorsrengöring 400 kvm, varannan vecka</span>
-            <span class="ex-pill" onclick="setPrompt(this.textContent)">Måla om 3 rum, 80 kvm</span>
-            <span class="ex-pill" onclick="setPrompt(this.textContent)">Byta badrumsrör och ny dusch</span>
-          </div>
+                    <p class="ex-tip"><strong>Tips för bästa offert:</strong> Beskriv vad som ska göras, ungefär hur stort (kvm, antal rum, meter) och material. Ju mer info desto träffsäkrare priser.</p>
+          <div class="ex-pills" id="examplePills"></div>
           <textarea class="prompt-area" id="jobPrompt" placeholder="Beskriv vad som ska göras, ungefär hur stort, var…"></textarea>
           <div class="gen-row">
             <button class="gen-btn" id="genBtn" onclick="generateQuote()">✦ Generera offert</button>
@@ -943,6 +940,7 @@ async function onLogin(user) {
   showView('app');
   showPage('generate');
   fillProfileForm(profile);
+  renderExamplePills();
 }
 
 function onLogout() {
@@ -1094,6 +1092,7 @@ function showPage(p) {
   document.getElementById('sNav-' + p).classList.add('active');
   if (p === 'history') loadHistory();
   if (p === 'profile' && currentProfile?.logo_url) showLogoPreview(currentProfile.logo_url);
+  if (p === 'generate') renderExamplePills();
 }
 
 // ===== PROFILE =====
@@ -1483,6 +1482,9 @@ function toggleChip(id, cb) {
   document.getElementById(id).classList.toggle('on', cb.checked);
 }
 function setPrompt(t) { document.getElementById('jobPrompt').value = t; document.getElementById('jobPrompt').focus(); }
+var INDUSTRY_EXAMPLES = {'Bygg & Snickeri':['Bygga 20 kvm trädäck med räcke','Renovera källare 40 kvm','Sätta upp staket 30 meter','Bygga friggebod 15 kvm','Lägga nytt trägolv 60 kvm'],'El':['Byta elcentral i villa','Installera laddbox för elbil','Byta 8 eluttag och 4 strömbrytare','Dra el till nytt garage','LED-belysning i kontor'],'VVS':['Byta badrumsror och ny dusch','Installera ny varmvattenberedare','Byta radiatorer i 5 rum','Byta kran i kök','Golvvärme badrum 8 kvm'],'Städ':['Kontorsstädning 400 kvm varannan vecka','Storstädning villa 150 kvm','Fönsterputs 20 fönster','Trappstädning flerfamiljshus','Flyttstädning 3 rok'],'Mark & Trädgård':['Anlägga gräsmatta 200 kvm','Plantera häck 40 meter','Bygga altan 25 kvm','Fräsa tomt 500 kvm','Trädfällning och röjning'],'Måleri':['Måla om 3 rum 80 kvm','Tapetsera vardagsrum 30 kvm','Måla fasad villa','Lackera trägolv 70 kvm','Spackling efter vattenskada'],'Transport':['Flytt av 3 rok lägenhet','Transportera byggmaterial 2 ton','Kontorsflytt 500 kvm','Tömma och köra bort bohag','Möbeltransport'],'Konsult / IT':['Bygga webbplats för småföretag','IT-support och nätverk','Systemanalys och krav','Sociala medier 3 månader','Bokföring per kvartal']};
+var DEFAULT_EXAMPLES=['Bygga 20 kvm trädäck med räcke','Byta 5 eluttag i kök','Kontorsstädning 400 kvm','Måla om 3 rum 80 kvm','Byta badrumsror och ny dusch'];
+function renderExamplePills(){var el=document.getElementById('examplePills');if(!el)return;var ind=currentProfile&&currentProfile.industries?JSON.parse(currentProfile.industries):[];var ex=[];if(ind.length>0){ind.forEach(function(i){var e=INDUSTRY_EXAMPLES[i]||[];ex=ex.concat(e.slice(0,3));});ex=ex.slice(0,5);}else{ex=DEFAULT_EXAMPLES;}el.innerHTML=ex.map(function(e){return'<span class="ex-pill" onclick="setPrompt(this.textContent)">'+e+'</span>';}).join('');}
 
 let currentInfo = {};
 
@@ -1748,7 +1750,7 @@ function renderQuote(q) {
     <p style="font-size:0.82rem;color:#555;margin-bottom:1.5rem;font-style:italic">${q.closingNote}</p>
     <div class="q-footer">
       <div><strong>${info.company}</strong><br>${info.phone} ${info.email}${credentialsHtml ? `<br><span style='font-size:0.72rem;color:#aaa'>${credentialsHtml}</span>` : ''}</div>
-      <div class="sig-block"><div class="sig-line"></div><div style="font-size:0.73rem;color:#888">Underskrift & godkännande</div><div style="font-size:0.73rem;color:#888;margin-top:0.2rem">Datum: ___________</div></div>
+
     </div>
     ${currentProfile?.plan === 'free' ? '<div style="text-align:center;margin-top:1.2rem;padding-top:1rem;border-top:1px solid #f0ebe0"><span style="font-size:0.68rem;color:#ccc;letter-spacing:0.08em">Skapad med </span><a href="https://offeria.se" target="_blank" style="font-family:Fraunces,serif;font-style:italic;font-size:0.75rem;color:#b8902e;text-decoration:none;font-weight:700">Offeria</a></div>' : ''}`;
 
