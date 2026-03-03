@@ -700,6 +700,51 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <div class="field"><label>Adress</label><input id="pAddress" placeholder="Storgatan 1, 123 45 Stad"></div>
             <div class="field"><label>Bankgiro</label><input id="pBankgiro" placeholder="123-4567"></div>
           </div>
+
+          <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+            <div class="card-label">🏗 Bransch &amp; prissättning <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Förväljs automatiskt vid ny offert</span></div>
+            <div style="margin-bottom:1rem">
+              <label style="font-size:0.76rem;font-weight:600;color:#555;display:block;margin-bottom:0.5rem">Mina branscher (välj en eller flera)</label>
+              <div class="chips" id="profileIndustryChips">
+                <label class="chip" id="pchip-bygg"><input type="checkbox" value="Bygg &amp; Snickeri" onchange="toggleProfileChip('pchip-bygg',this)">🔨 Bygg &amp; Snickeri</label>
+                <label class="chip" id="pchip-el"><input type="checkbox" value="El" onchange="toggleProfileChip('pchip-el',this)">⚡ El</label>
+                <label class="chip" id="pchip-vvs"><input type="checkbox" value="VVS" onchange="toggleProfileChip('pchip-vvs',this)">🔧 VVS</label>
+                <label class="chip" id="pchip-stad"><input type="checkbox" value="Städ" onchange="toggleProfileChip('pchip-stad',this)">🧹 Städ</label>
+                <label class="chip" id="pchip-mark"><input type="checkbox" value="Mark &amp; Trädgård" onchange="toggleProfileChip('pchip-mark',this)">🌿 Mark &amp; Trädgård</label>
+                <label class="chip" id="pchip-maleri"><input type="checkbox" value="Måleri" onchange="toggleProfileChip('pchip-maleri',this)">🎨 Måleri</label>
+                <label class="chip" id="pchip-transport"><input type="checkbox" value="Transport" onchange="toggleProfileChip('pchip-transport',this)">🚚 Transport</label>
+                <label class="chip" id="pchip-konsult"><input type="checkbox" value="Konsult / IT" onchange="toggleProfileChip('pchip-konsult',this)">💼 Konsult / IT</label>
+              </div>
+            </div>
+            <div class="grid3">
+              <div class="field"><label>Timpris (exkl. moms)</label><input id="pHourlyRate" placeholder="650" type="number" min="0"></div>
+              <div class="field"><label>Resekostnad (exkl. moms)</label><input id="pTravelCost" placeholder="t.ex. 45 kr/mil"></div>
+              <div class="field"><label>Standardmoms</label>
+                <select id="pDefaultVat"><option value="">Välj moms</option><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
+              </div>
+            </div>
+            <div class="field" style="margin-bottom:1rem"><label>Betalningsvillkor (standard)</label>
+              <select id="pDefaultPayTerms"><option value="">Välj</option><option value="30 dagar netto">30 dagar netto</option><option value="14 dagar netto">14 dagar netto</option><option value="10 dagar netto">10 dagar netto</option><option value="Förskott 50%, resten vid leverans">Förskott 50%, resten vid leverans</option></select>
+            </div>
+          </div>
+
+          <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+            <div class="card-label">🛡 Certifieringar &amp; försäkring <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Visas i offertens footer</span></div>
+            <div class="grid2">
+              <div class="field"><label>F-skattebevis</label>
+                <select id="pFskatt"><option value="">Välj</option><option value="Innehar F-skattebevis">Ja – innehar F-skattebevis</option></select>
+              </div>
+              <div class="field"><label>Ansvarsförsäkring</label><input id="pInsurance" placeholder="t.ex. via Trygg-Hansa"></div>
+            </div>
+            <div class="field" style="margin-bottom:1rem"><label>Certifieringar (separera med komma)</label><input id="pCertifications" placeholder="t.ex. Behörig elinstallatör, Auktoriserad målare"></div>
+            <div class="field" style="margin-bottom:0.5rem"><label>Betalningssätt</label><input id="pPaymentMethods" placeholder="t.ex. Swish, Bankgiro, Faktura"></div>
+          </div>
+
+          <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+            <div class="card-label">📝 Standardgaranti <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Används om garanti är ikryssad</span></div>
+            <div class="field"><textarea id="pWarranty" style="height:70px;resize:none;border:1.5px solid var(--border);border-radius:8px;padding:0.6rem 0.85rem;font-family:DM Sans,sans-serif;font-size:0.88rem;outline:none;background:var(--paper);width:100%" placeholder="t.ex. 2 års garanti på allt utfört arbete enligt konsumenttjänstlagen."></textarea></div>
+          </div>
+
           <div style="margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid var(--border)">
             <div class="card-label">🖼 Logotyp</div>
             <div id="logoSection">
@@ -737,7 +782,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     <a href="/anvandarvillkor.html" style="color:var(--gold-light);text-decoration:none;margin:0 0.5rem">Användarvillkor</a>·
     <a href="/cookies.html" style="color:var(--gold-light);text-decoration:none;margin:0 0.5rem">Cookies</a>
   </div>
-  <div>© 2026 Offeria · <a href="mailto:info@offeria.se" style="color:#888;text-decoration:none">info@offeria.se</a></div>
+  <div>© 2026 Offeria · <a href="/cdn-cgi/l/email-protection#93fafdf5fcd3fcf5f5f6e1faf2bde0f6" style="color:#888;text-decoration:none"><span class="__cf_email__" data-cfemail="1a73747c755a757c7c7f68737b34697f">[email&#160;protected]</span></a></div>
 </footer>
 
 <!-- ===== AUTH MODAL ===== -->
@@ -827,7 +872,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ===== CONFIG =====
 const SUPABASE_URL = 'https://yfnmmcrvzcwcinwopnlj.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmbm1tY3J2emN3Y2lud29wbmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MzY4NjQsImV4cCI6MjA4NzUxMjg2NH0.MpF3oRLWwXkmrjEGJ0Qqrsw_87FixbaNHmHmPxFyXKc';
@@ -1061,12 +1106,40 @@ function fillProfileForm(profile) {
   document.getElementById('pWebsite').value = profile.website || '';
   document.getElementById('pAddress').value = profile.address || '';
   document.getElementById('pBankgiro').value = profile.bankgiro || '';
+  document.getElementById('pHourlyRate').value = profile.hourly_rate || '';
+  document.getElementById('pTravelCost').value = profile.travel_cost || '';
+  document.getElementById('pDefaultVat').value = profile.default_vat || '';
+  document.getElementById('pDefaultPayTerms').value = profile.default_pay_terms || '';
+  document.getElementById('pFskatt').value = profile.fskatt || '';
+  document.getElementById('pInsurance').value = profile.insurance || '';
+  document.getElementById('pCertifications').value = profile.certifications || '';
+  document.getElementById('pPaymentMethods').value = profile.payment_methods || '';
+  document.getElementById('pWarranty').value = profile.warranty_text || '';
+  // Fill industry chips
+  const industries = profile.industries ? JSON.parse(profile.industries) : [];
+  document.querySelectorAll('#profileIndustryChips input[type=checkbox]').forEach(cb => {
+    const on = industries.includes(cb.value);
+    cb.checked = on;
+    cb.closest('.chip').classList.toggle('on', on);
+  });
+  // Pre-select defaults on generate page
+  if (profile.default_vat) document.getElementById('vatRate').value = profile.default_vat;
+  if (profile.default_pay_terms) document.getElementById('payTerms').value = profile.default_pay_terms;
+  if (industries.length > 0) {
+    const sel = document.getElementById('industry');
+    if (sel && industries.includes(sel.value) === false) sel.value = industries[0];
+  }
+}
+
+function toggleProfileChip(id, cb) {
+  document.getElementById(id).classList.toggle('on', cb.checked);
 }
 
 async function saveProfile() {
   const btn = document.querySelector('.save-btn');
   btn.textContent = '⏳ Sparar...';
   btn.disabled = true;
+  const selectedIndustries = [...document.querySelectorAll('#profileIndustryChips input[type=checkbox]:checked')].map(cb => cb.value);
   const updates = {
     company_name: document.getElementById('pCompany').value.trim(),
     org_number: document.getElementById('pOrg').value.trim(),
@@ -1075,6 +1148,16 @@ async function saveProfile() {
     website: document.getElementById('pWebsite').value.trim(),
     address: document.getElementById('pAddress').value.trim(),
     bankgiro: document.getElementById('pBankgiro').value.trim(),
+    hourly_rate: document.getElementById('pHourlyRate').value.trim(),
+    travel_cost: document.getElementById('pTravelCost').value.trim(),
+    default_vat: document.getElementById('pDefaultVat').value,
+    default_pay_terms: document.getElementById('pDefaultPayTerms').value,
+    fskatt: document.getElementById('pFskatt').value,
+    insurance: document.getElementById('pInsurance').value.trim(),
+    certifications: document.getElementById('pCertifications').value.trim(),
+    payment_methods: document.getElementById('pPaymentMethods').value.trim(),
+    warranty_text: document.getElementById('pWarranty').value.trim(),
+    industries: JSON.stringify(selectedIndustries),
   };
   const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
   if (error) {
@@ -1436,7 +1519,7 @@ async function generateQuote() {
   const validStr = new Date(today.setDate(today.getDate()+30)).toLocaleDateString('sv-SE');
   const quoteNum = 'OFF-' + Math.floor(1000+Math.random()*9000);
 
-  currentInfo = { company, orgNum: p.org_number||'', vatNum: p.vat_number||'', phone: p.phone||'', email: p.email||'', website: p.website||'', address: p.address||'', bankgiro: p.bankgiro||'', vatPct, payterms, quoteNum, dateStr, validStr, inclRot };
+  currentInfo = { company, orgNum: p.org_number||'', vatNum: p.vat_number||'', phone: p.phone||'', email: p.email||'', website: p.website||'', address: p.address||'', bankgiro: p.bankgiro||'', vatPct, payterms, quoteNum, dateStr, validStr, inclRot, hourlyRate: p.hourly_rate||'', travelCost: p.travel_cost||'', fskatt: p.fskatt||'', insurance: p.insurance||'', certifications: p.certifications||'', paymentMethods: p.payment_methods||'', warrantyText: p.warranty_text||'' };
 
   // Check mismatch between industry and job
   const industryKeywords = {
@@ -1479,7 +1562,12 @@ async function generateQuote() {
         system: 'Du är expert på svenska offerter. Svara ALLTID med giltig JSON och inget annat. Basera prissättning på uppdraget, inte branschvalet.',
         messages: [{ role: 'user', content: `Skapa en komplett offert för:
 UPPDRAG: ${jobText}
-PRISSÄTTNINGSSTÖD (bransch): ${industry}
+BRANSCH: ${industry}
+\${currentInfo.hourlyRate ? 'TIMPRIS: ' + currentInfo.hourlyRate + ' kr/tim (exkl. moms) – använd detta för arbetstid' : ''}
+\${currentInfo.travelCost ? 'RESEKOSTNAD: ' + currentInfo.travelCost : ''}
+\${currentInfo.certifications ? 'CERTIFIERINGAR: ' + currentInfo.certifications : ''}
+\${currentInfo.warrantyText && inclWarranty ? 'GARANTITEXT: ' + currentInfo.warrantyText : ''}
+\${currentInfo.paymentMethods ? 'BETALNINGSSÄTT: ' + currentInfo.paymentMethods : ''}
 MOMSSATS: ${vatPct}%
 BETALNINGSVILLKOR: ${payterms}
 ROT: ${inclRot}, GARANTI: ${inclWarranty}, MATERIAL: ${inclMaterials}, TIDPLAN: ${inclTimeline}
@@ -1623,6 +1711,7 @@ function renderQuote(q) {
   const webInfo = info.website ? `<br>${info.website}` : '';
   const bankInfo = info.bankgiro ? `<br>BG: ${info.bankgiro}` : '';
   const rotRowHtml = info.inclRot&&q.rotAmount>0 ? `<div class="trow rot-row"><span>ROT-avdrag</span><span id="tot-rot">- ${fmtSEK(q.rotAmount)}</span></div>` : '';
+  const credentialsHtml = [info.fskatt, info.insurance ? 'Ansvarsförsäkring: '+info.insurance : '', info.certifications, info.paymentMethods ? 'Betalning: '+info.paymentMethods : ''].filter(Boolean).join(' · ');
   const finalTotal = info.inclRot&&q.rotAmount>0 ? q.totalAfterRot : q.totalInclVat;
   const finalLabel = info.inclRot&&q.rotAmount>0 ? 'ATT BETALA (efter ROT)' : 'ATT BETALA';
 
@@ -1658,7 +1747,7 @@ function renderQuote(q) {
     <div class="q-terms"><h4>📄 Villkor & betalning</h4><p>• Betalningsvillkor: ${info.payterms}</p>${q.warrantyText?`<p>• ${q.warrantyText}</p>`:''}<p>${q.terms}</p></div>
     <p style="font-size:0.82rem;color:#555;margin-bottom:1.5rem;font-style:italic">${q.closingNote}</p>
     <div class="q-footer">
-      <div><strong>${info.company}</strong><br>${info.phone} ${info.email}</div>
+      <div><strong>${info.company}</strong><br>${info.phone} ${info.email}${credentialsHtml ? `<br><span style='font-size:0.72rem;color:#aaa'>${credentialsHtml}</span>` : ''}</div>
       <div class="sig-block"><div class="sig-line"></div><div style="font-size:0.73rem;color:#888">Underskrift & godkännande</div><div style="font-size:0.73rem;color:#888;margin-top:0.2rem">Datum: ___________</div></div>
     </div>
     ${currentProfile?.plan === 'free' ? '<div style="text-align:center;margin-top:1.2rem;padding-top:1rem;border-top:1px solid #f0ebe0"><span style="font-size:0.68rem;color:#ccc;letter-spacing:0.08em">Skapad med </span><a href="https://offeria.se" target="_blank" style="font-family:Fraunces,serif;font-style:italic;font-size:0.75rem;color:#b8902e;text-decoration:none;font-weight:700">Offeria</a></div>' : ''}`;
@@ -1821,9 +1910,4 @@ init();
 
   <!-- Logout -->
   <div style="padding:1.5rem">
-    <button onclick="signOut()" style="width:100%;padding:0.75rem;background:transparent;border:1px solid #333;color:#888;border-radius:8px;font-size:0.88rem;font-family:DM Sans,sans-serif;cursor:pointer">Logga ut</button>
-  </div>
-</div>
-
-</body>
-</html>
+    <button onclick="
