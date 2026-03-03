@@ -818,7 +818,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
       <div id="formLogin" style="display:none">
         <div class="mfield"><label>E-post</label><input type="email" id="logEmail" placeholder="din@epost.se"></div>
-        <div class="mfield"><label>Lösenord</label><input type="password" id="logPass" placeholder="••••••••"></div>
+        <div class="mfield"><label>Lösenord</label><input type="password" id="logPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
         <button class="msub" id="logBtn" onclick="doLogin()">Logga in →</button>
         <div class="mfoot" style="display:flex;justify-content:space-between;align-items:center">
           <span>Inget konto? <a onclick="switchTab('register')">Registrera dig</a></span>
