@@ -177,9 +177,11 @@ async function load() {
     .from('quote_usage')
     .select('quote_html, title, shared_at')
     .eq('share_id', id)
-    .single();
+    .maybeSingle();
 
-  if (error || !data || !data.quote_html) { show('errorState'); return; }
+  console.log('Supabase result:', JSON.stringify({ error, hasData: !!data }));
+  if (error) { console.error('RLS/DB error:', error.message); show('errorState'); return; }
+  if (!data || !data.quote_html) { show('errorState'); return; }
 
   // Check if link has expired (30 days)
   if (data.shared_at) {
