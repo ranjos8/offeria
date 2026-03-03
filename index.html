@@ -443,9 +443,9 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   #quoteDoc { padding: 1rem !important; }
   #quoteDoc .q-header { flex-direction: row !important; flex-wrap: nowrap !important; gap: 0.5rem; align-items: flex-start; justify-content: space-between; }
   #quoteDoc .q-header > div:first-child { flex: 1; min-width: 0; }
-  #quoteDoc .q-header > img, #quoteDoc .q-header > svg { flex-shrink: 0; max-height: 55px; max-width: 90px; width: auto; }
-  #quoteDoc .q-logo-preview { max-height: 55px !important; max-width: 90px !important; }
-  #quoteDoc .q-company-name { font-size: 1rem; }
+  #quoteDoc .q-header > img, #quoteDoc .q-header > svg { flex-shrink: 0; max-height: 65px; max-width: 110px; width: auto; }
+  #quoteDoc .q-logo-preview { max-height: 65px !important; max-width: 110px !important; }
+  #quoteDoc .q-company-name { font-size: 0.88rem; }
   #quoteDoc .q-company-info { font-size: 0.7rem; line-height: 1.6; }
   #quoteDoc .q-meta-row { flex-direction: column; gap: 0.5rem; }
   #quoteDoc .q-meta { text-align: left; }
@@ -1745,7 +1745,7 @@ function attachListeners(tr) {
 function renderQuote(q) {
   const info = currentInfo;
   const p = currentProfile || {};
-  const offeriaSvgLogo = `<svg class="q-logo-preview" width="90" height="22" viewBox="0 0 174 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  const offeriaSvgLogo = `<svg class="q-logo-preview" width="100" height="24" viewBox="0 0 174 40" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="qlg" x1="46" y1="0" x2="174" y2="0" gradientUnits="userSpaceOnUse">
         <stop offset="0%" stop-color="#0d0d0b"/>
