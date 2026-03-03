@@ -441,8 +441,10 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   #quoteModalOverlay { align-items: flex-start !important; padding: 0 !important; }
   #quoteModalBox { max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; min-height: 100vh; }
   #quoteDoc { padding: 1rem !important; }
-  #quoteDoc .q-header { flex-direction: column; gap: 0.8rem; }
-  #quoteDoc .q-header-right { text-align: left; }
+  #quoteDoc .q-header { flex-direction: row; gap: 0.8rem; align-items: flex-start; }
+  #quoteDoc .q-header-right { text-align: right; }
+  #quoteDoc .q-logo-preview { max-height: 80px; max-width: 120px; }
+  #quoteDoc .q-company-name { font-size: 1.2rem; }
   #quoteDoc .q-meta-row { flex-direction: column; gap: 0.5rem; }
   #quoteDoc .q-meta { text-align: left; }
   #quoteDoc table.qt { font-size: 0.75rem; }
@@ -476,7 +478,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   .app-page.active { padding: 0; }
   .quote-wrap { display: block !important; }
   #quoteDoc { border: none; box-shadow: none; padding: 1rem; border-radius: 0; }
-  #quoteDoc .q-header { flex-direction: column; gap: 1rem; }
+  #quoteDoc .q-header { flex-direction: row; gap: 1rem; }
   #quoteDoc .q-header-right { text-align: left; }
   #quoteDoc table { font-size: 0.75rem; }
   #quoteDoc table th, #quoteDoc table td { padding: 0.4rem 0.3rem; }
