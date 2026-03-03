@@ -1361,7 +1361,7 @@ async function shareViaEmail() {
   window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
 }
 
-async async async function shareNative() {
+async function shareNative() {
   const { title, client, total } = getQuoteText();
   const shareUrl = window._currentShareId ? `https://offeria.se/offert.html?id=${window._currentShareId}` : 'https://offeria.se';
   const text = `${title}${client && client !== 'Kund' ? ' – ' + client : ''}${total ? ' – ' + total : ''}\n\nSe offerten här (giltig 30 dagar):\n${shareUrl}`;
