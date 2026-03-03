@@ -1321,6 +1321,7 @@ function printHistoryQuote(i) {
 function openHistoryQuote(i) {
   const r = window._historyData?.[i];
   if (!r?.quote_html) return;
+  window._currentShareId = r.share_id || null;
   showPage('generate');
   openQuoteModal();
   document.getElementById('quoteDoc').innerHTML = r.quote_html;
@@ -1352,29 +1353,25 @@ function getQuoteText() {
 }
 
 async function shareViaEmail() {
-  // First download PDF, then open mail
   const { title, client, total } = getQuoteText();
   const subject = `${title}${client && client !== 'Kund' ? ' – ' + client : ''}`;
-  const body = `Hej,\n\nBifogat finner du vår offert: ${title}${client && client !== 'Kund' ? ' till ' + client : ''}.${total ? '\nBelopp: ' + total : ''}\n\nMed vänliga hälsningar`;
-  // Download PDF first
-  downloadPDF();
-  // Small delay then open mail
-  setTimeout(() => {
-    window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-  }, 800);
+  const shareUrl = window._currentShareId ? `https://offeria.se/offert.html?id=${window._currentShareId}` : null;
+  const linkLine = shareUrl ? `\n\nSe offerten online (länken är giltig i 30 dagar):\n${shareUrl}` : '';
+  const body = `Hej,\n\nVänligen se vår offert: ${title}${client && client !== 'Kund' ? ' till ' + client : ''}.${total ? '\nBelopp: ' + total : ''}${linkLine}\n\nMed vänliga hälsningar`;
+  window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
 }
 
-async function shareNative() {
+async async function shareNative() {
   const { title, client, total } = getQuoteText();
-  const text = `${title}${client && client !== 'Kund' ? ' – ' + client : ''}${total ? ' – ' + total : ''}\n\nOffert skapad med Offeria: https://offeria.se`;
+  const shareUrl = window._currentShareId ? `https://offeria.se/offert.html?id=${window._currentShareId}` : 'https://offeria.se';
+  const text = `${title}${client && client !== 'Kund' ? ' – ' + client : ''}${total ? ' – ' + total : ''}\n\nSe offerten här (giltig 30 dagar):\n${shareUrl}`;
   if (navigator.share) {
     try {
-      await navigator.share({ title: title, text: text });
+      await navigator.share({ title: title, text: text, url: shareUrl });
     } catch(e) { /* user cancelled */ }
   } else {
-    // Fallback: copy to clipboard
-    navigator.clipboard.writeText(text).then(() => {
-      alert('Kopierat! Klistra in i SMS, mail eller annan app.');
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      alert('Länk kopierad! Klistra in i SMS, mail eller annan app.\n\nOBS: Länken är giltig i 30 dagar.');
     });
   }
 }
@@ -1517,13 +1514,17 @@ Rimliga svenska priser 2024. Minst 5 rader.` }]
     // Read edited client name from DOM (user may have changed it)
     const savedClientName = document.querySelector('#quoteDoc .q-client strong')?.textContent || q.clientName || '';
     const savedTitle = document.querySelector('#quoteDoc .q-offer-title')?.firstChild?.textContent?.trim() || q.title || 'Offert';
+    const shareId = crypto.randomUUID();
     await sb.from('quote_usage').insert({
       user_id: currentUser.id,
       title: savedTitle,
       client_name: savedClientName,
       total_amount: q.totalAfterRot || q.totalInclVat || 0,
-      quote_html: quoteHtml
+      quote_html: quoteHtml,
+      share_id: shareId,
+      shared_at: new Date().toISOString()
     });
+    window._currentShareId = shareId;
     monthlyUsed++;
     const { count: total } = await sb.from('quote_usage').select('*',{count:'exact',head:true}).eq('user_id',currentUser.id);
     updateUI(currentProfile, monthlyUsed, total||0);
