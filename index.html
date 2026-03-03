@@ -500,8 +500,13 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 <div id="mobileMenu" style="display:none;position:fixed;top:58px;left:0;right:0;background:var(--ink);z-index:999;padding:1.5rem 2rem;border-top:1px solid #333;flex-direction:column;gap:1rem">
   <a href="/om-oss.html" style="color:#ccc;text-decoration:none;font-size:1rem;padding:0.5rem 0;border-bottom:1px solid #222;display:block">Om oss</a>
   <a href="/kontakta-oss.html" style="color:#ccc;text-decoration:none;font-size:1rem;padding:0.5rem 0;border-bottom:1px solid #222;display:block">Kontakt</a>
-  <button onclick="openModal('login');toggleMobileMenu()" style="width:100%;padding:0.7rem;font-size:0.9rem;background:transparent;border:1.5px solid #aaa;color:#ccc;border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif">Logga in</button>
-  <button onclick="openModal('register');toggleMobileMenu()" style="width:100%;padding:0.7rem;font-size:0.9rem;background:var(--gold);border:none;color:white;border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif;font-weight:600">Kom igång gratis</button>
+  <div id="mobileLoggedOut">
+    <button onclick="openModal('login');toggleMobileMenu()" style="width:100%;padding:0.7rem;font-size:0.9rem;background:transparent;border:1.5px solid #aaa;color:#ccc;border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif;margin-bottom:0.5rem">Logga in</button>
+    <button onclick="openModal('register');toggleMobileMenu()" style="width:100%;padding:0.7rem;font-size:0.9rem;background:var(--gold);border:none;color:white;border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif;font-weight:600">Kom igång gratis</button>
+  </div>
+  <div id="mobileLoggedIn" style="display:none">
+    <button onclick="signOut();toggleMobileMenu()" style="width:100%;padding:0.7rem;font-size:0.9rem;background:transparent;border:1.5px solid #e05;color:#e05;border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif">Logga ut</button>
+  </div>
 </div>
 
 <!-- ===== LANDING VIEW ===== -->
@@ -948,6 +953,10 @@ async function onLogin(user) {
   showPage('generate');
   fillProfileForm(profile);
   renderExamplePills();
+  var _mli=document.getElementById('mobileLoggedIn');
+  var _mlo=document.getElementById('mobileLoggedOut');
+  if(_mli)_mli.style.display='block';
+  if(_mlo)_mlo.style.display='none';
 }
 
 function onLogout() {
@@ -962,6 +971,10 @@ function onLogout() {
   showView('landing');
   document.getElementById('navUserArea').style.display = 'none';
   document.getElementById('navAuthBtns').style.display = '';
+  var _mli2=document.getElementById('mobileLoggedIn');
+  var _mlo2=document.getElementById('mobileLoggedOut');
+  if(_mli2)_mli2.style.display='none';
+  if(_mlo2)_mlo2.style.display='block';
 }
 
 function updateUI(profile, used, total) {
