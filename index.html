@@ -301,7 +301,7 @@ nav {
 .q-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 1.5rem; border-bottom: 3px solid var(--ink); margin-bottom: 2rem; }
 .q-company-name { font-family: 'Fraunces', serif; font-size: 1.6rem; font-weight: 700; margin-bottom: 0.3rem; }
 .q-company-info { font-size: 0.8rem; color: #666; line-height: 1.8; }
-.q-logo-preview { max-height: 140px; max-width: 300px; object-fit: contain; }
+.q-logo-preview { max-height: 100px; max-width: 200px; object-fit: contain; }
 .q-logo-ph { width: 90px; height: 45px; background: var(--cream); border-radius: 6px; border: 1px dashed var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #bbb; }
 .q-meta-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
 .q-offer-title { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; }
@@ -441,10 +441,12 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   #quoteModalOverlay { align-items: flex-start !important; padding: 0 !important; }
   #quoteModalBox { max-width: 100% !important; margin: 0 !important; border-radius: 0 !important; min-height: 100vh; }
   #quoteDoc { padding: 1rem !important; }
-  #quoteDoc .q-header { flex-direction: row; gap: 0.8rem; align-items: flex-start; }
-  #quoteDoc .q-header-right { text-align: right; }
-  #quoteDoc .q-logo-preview { max-height: 80px; max-width: 120px; }
-  #quoteDoc .q-company-name { font-size: 1.2rem; }
+  #quoteDoc .q-header { flex-direction: row !important; flex-wrap: nowrap !important; gap: 0.5rem; align-items: flex-start; justify-content: space-between; }
+  #quoteDoc .q-header > div:first-child { flex: 1; min-width: 0; }
+  #quoteDoc .q-header > img, #quoteDoc .q-header > svg { flex-shrink: 0; max-height: 55px; max-width: 90px; width: auto; }
+  #quoteDoc .q-logo-preview { max-height: 55px !important; max-width: 90px !important; }
+  #quoteDoc .q-company-name { font-size: 1rem; }
+  #quoteDoc .q-company-info { font-size: 0.7rem; line-height: 1.6; }
   #quoteDoc .q-meta-row { flex-direction: column; gap: 0.5rem; }
   #quoteDoc .q-meta { text-align: left; }
   #quoteDoc table.qt { font-size: 0.75rem; }
@@ -1743,7 +1745,7 @@ function attachListeners(tr) {
 function renderQuote(q) {
   const info = currentInfo;
   const p = currentProfile || {};
-  const offeriaSvgLogo = `<svg width="120" height="28" viewBox="0 0 174 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  const offeriaSvgLogo = `<svg class="q-logo-preview" width="90" height="22" viewBox="0 0 174 40" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="qlg" x1="46" y1="0" x2="174" y2="0" gradientUnits="userSpaceOnUse">
         <stop offset="0%" stop-color="#0d0d0b"/>
