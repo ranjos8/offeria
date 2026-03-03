@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offert – Offeria</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #0d0d0b; --paper: #f7f4ee; --cream: #ede8db;
+  --gold: #b8902e; --gold-light: #e8d5a0; --border: #ddd8cc;
+  --teal: #1d5c5c; --rust: #b84b24; --muted: #7a7570;
+}
+body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+
+nav {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.9rem 2.5rem; border-bottom: 1px solid var(--border);
+  background: rgba(247,244,238,0.97); backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 50;
+}
+.brand { font-family: 'Fraunces', serif; font-size: 1.5rem; letter-spacing: -1px; }
+.brand span { color: var(--gold); }
+
+.share-bar {
+  background: var(--ink); color: white;
+  padding: 0.8rem 2.5rem; display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+}
+.share-bar-text { font-size: 0.82rem; color: #aaa; }
+.share-bar-text strong { color: var(--gold-light); }
+.pdf-btn {
+  background: var(--gold); color: var(--ink); border: none;
+  border-radius: 8px; padding: 0.55rem 1.4rem;
+  font-family: 'Fraunces', serif; font-size: 0.9rem; font-weight: 700;
+  cursor: pointer; transition: background 0.15s; white-space: nowrap;
+}
+.pdf-btn:hover { background: var(--gold-light); }
+
+.wrapper { max-width: 860px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+
+/* Loading / error states */
+.state { text-align: center; padding: 5rem 2rem; }
+.state .icon { font-size: 3rem; margin-bottom: 1rem; }
+.state h2 { font-family: 'Fraunces', serif; font-size: 1.6rem; margin-bottom: 0.5rem; }
+.state p { color: var(--muted); font-size: 0.9rem; }
+.spinner-wrap { display: flex; justify-content: center; padding: 5rem; }
+.spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--ink); border-radius: 50%; animation: spin 0.75s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Quote doc styles (mirrors app) */
+#quoteDoc {
+  background: white; border: 1px solid var(--border);
+  border-radius: 12px; padding: 3rem;
+  font-size: 0.87rem; line-height: 1.65;
+  box-shadow: 0 6px 40px rgba(0,0,0,0.06);
+}
+.q-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 1.5rem; border-bottom: 3px solid var(--ink); margin-bottom: 2rem; }
+.q-company-name { font-family: 'Fraunces', serif; font-size: 1.6rem; font-weight: 700; margin-bottom: 0.3rem; }
+.q-company-info { font-size: 0.8rem; color: #666; line-height: 1.8; }
+.q-logo-preview { max-height: 140px; max-width: 300px; object-fit: contain; }
+.q-meta-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
+.q-offer-title { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; }
+.q-meta { text-align: right; font-size: 0.8rem; color: #666; line-height: 1.9; }
+.q-meta strong { color: var(--ink); }
+.valid-badge { display: inline-block; background: var(--teal); color: white; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; padding: 0.18rem 0.6rem; border-radius: 20px; margin-left: 0.5rem; vertical-align: middle; }
+.q-client { background: var(--cream); border-left: 4px solid var(--gold); padding: 0.8rem 1.2rem; border-radius: 0 8px 8px 0; margin-bottom: 1.5rem; font-size: 0.84rem; }
+.q-client .lbl { font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.12em; color: #999; margin-bottom: 0.2rem; }
+.q-intro { font-size: 0.84rem; color: #444; margin-bottom: 1.5rem; padding: 0.9rem 1.1rem; background: #f8f8f6; border-radius: 8px; line-height: 1.75; }
+table.qt { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 0.83rem; }
+table.qt th { background: var(--ink); color: white; padding: 0.52rem 0.85rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500; text-align: left; }
+table.qt th:last-child { text-align: right; }
+table.qt td { padding: 0.62rem 0.85rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+table.qt td:last-child { text-align: right; font-weight: 500; }
+table.qt tr:nth-child(even) td { background: #fbfaf8; }
+.q-totals { display: flex; justify-content: flex-end; margin: 1rem 0 1.5rem; }
+.q-totals-box { min-width: 255px; }
+.trow { display: flex; justify-content: space-between; padding: 0.33rem 0; font-size: 0.83rem; border-bottom: 1px solid #eee; }
+.trow.rot-row { color: var(--rust); font-weight: 500; }
+.trow.final-row { font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; border-bottom: none; border-top: 2px solid var(--ink); padding-top: 0.65rem; margin-top: 0.2rem; color: var(--teal); }
+.q-terms { background: var(--cream); border-radius: 8px; padding: 1rem 1.2rem; font-size: 0.79rem; color: #666; margin-bottom: 1.5rem; }
+.q-terms h4 { font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.12em; color: #999; margin-bottom: 0.5rem; }
+.q-footer { display: flex; justify-content: space-between; align-items: flex-end; padding-top: 1.5rem; border-top: 1px solid var(--border); font-size: 0.78rem; color: #888; }
+.sig-block { text-align: right; }
+.sig-line { width: 155px; border-bottom: 1.5px solid #aaa; margin-left: auto; margin-bottom: 0.3rem; height: 30px; }
+
+/* Hide edit elements */
+.edit-hint, .add-row-btn, .del-row-btn { display: none !important; }
+[contenteditable] { pointer-events: none; }
+
+footer { background: var(--ink); color: #888; text-align: center; padding: 2rem 1rem; font-size: 0.78rem; }
+footer .brand-foot { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.1rem; color: var(--gold-light); margin-bottom: 0.5rem; }
+
+@media (max-width: 768px) {
+  nav { padding: 0.75rem 1rem; }
+  .share-bar { padding: 0.8rem 1rem; }
+  #quoteDoc { padding: 1.2rem; font-size: 0.82rem; }
+  .q-header { flex-direction: column; gap: 1rem; }
+  .q-totals-box { min-width: unset; width: 100%; }
+  .wrapper { padding: 0 0 3rem; }
+  #quoteDoc { border-radius: 0; border-left: none; border-right: none; }
+}
+
+@media print {
+  nav, .share-bar, footer { display: none !important; }
+  .wrapper { margin: 0; padding: 0; max-width: 100%; }
+  #quoteDoc { border: none; box-shadow: none; border-radius: 0; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" style="text-decoration:none;color:inherit">
+    <svg width="130" height="32" viewBox="0 0 174 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="lg" x1="46" y1="0" x2="174" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#0d0d0b"/><stop offset="100%" stop-color="#c4982e"/></linearGradient></defs>
+      <rect x="7" y="4" width="22" height="30" rx="2.5" fill="#e8d5a0" opacity="0.7"/>
+      <rect x="4" y="2" width="22" height="30" rx="2.5" fill="#f5f0e8" stroke="#d8d0c0" stroke-width="1"/>
+      <rect x="1" y="0" width="22" height="30" rx="2.5" fill="white" stroke="#c8c0b0" stroke-width="1"/>
+      <line x1="4.5" y1="8" x2="19.5" y2="8" stroke="#b8902e" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="4.5" y1="13" x2="19.5" y2="13" stroke="#ddd8cc" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="4.5" y1="18" x2="16" y2="18" stroke="#ddd8cc" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="4.5" y1="23" x2="18" y2="23" stroke="#ddd8cc" stroke-width="1.2" stroke-linecap="round"/>
+      <text x="31" y="29" font-family="Fraunces, serif" font-style="italic" font-weight="700" font-size="28" fill="url(#lg)" letter-spacing="-0.8">Offeria</text>
+    </svg>
+  </a>
+  <span style="font-size:0.8rem;color:var(--muted)">Offertvisning</span>
+</nav>
+
+<div class="share-bar" id="shareBar" style="display:none">
+  <span class="share-bar-text"><strong>⚠️ OBS:</strong> Länken är giltig i 30 dagar – detta är inte offertens giltighetstid</span>
+  <button class="pdf-btn" onclick="downloadPdf()">↓ Ladda ner PDF</button>
+</div>
+
+<div class="wrapper">
+  <div class="spinner-wrap" id="loadingState">
+    <div class="spinner"></div>
+  </div>
+  <div id="errorState" class="state" style="display:none">
+    <div class="icon">🔍</div>
+    <h2>Offerten hittades inte</h2>
+    <p>Länken kan ha gått ut eller vara felaktig.<br>Kontakta avsändaren för en ny länk.</p>
+  </div>
+  <div id="expiredState" class="state" style="display:none">
+    <div class="icon">⏰</div>
+    <h2>Länken har gått ut</h2>
+    <p>Denna länk var giltig i 30 dagar och har nu löpt ut.<br>Kontakta avsändaren för en ny länk.</p>
+  </div>
+  <div id="quoteDoc" style="display:none"></div>
+</div>
+
+<footer>
+  <div class="brand-foot">Offeria</div>
+  <div>Offert genererad med <a href="https://offeria.se" style="color:var(--gold-light);text-decoration:none">offeria.se</a></div>
+</footer>
+
+<script>
+const SUPABASE_URL = 'https://yfnmmcrvzcwcinwopnlj.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmbm1tY3J2emN3Y2lud29wbmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA5MDYyMzcsImV4cCI6MjA1NjQ4MjIzN30.LdwfmuPbJoHOe0F8KcBdHo0rLWCr5pEJBPsL2GzNLSE';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function show(id) {
+  ['loadingState','errorState','expiredState','quoteDoc'].forEach(i => {
+    document.getElementById(i).style.display = i === id ? (id === 'quoteDoc' ? 'block' : 'flex') : 'none';
+  });
+}
+
+async function load() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (!id) { show('errorState'); return; }
+
+  const { data, error } = await sb
+    .from('quote_usage')
+    .select('quote_html, title, shared_at')
+    .eq('share_id', id)
+    .single();
+
+  if (error || !data || !data.quote_html) { show('errorState'); return; }
+
+  // Check if link has expired (30 days)
+  if (data.shared_at) {
+    const sharedDate = new Date(data.shared_at);
+    const now = new Date();
+    const daysDiff = (now - sharedDate) / (1000 * 60 * 60 * 24);
+    if (daysDiff > 30) { show('expiredState'); return; }
+  }
+
+  // Strip edit UI from HTML
+  const div = document.createElement('div');
+  div.innerHTML = data.quote_html;
+  div.querySelectorAll('.edit-hint, .add-row-btn, .del-row-btn').forEach(el => el.remove());
+  div.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+
+  const quoteDoc = document.getElementById('quoteDoc');
+  quoteDoc.innerHTML = div.innerHTML;
+  show('quoteDoc');
+
+  // Show share bar and set page title
+  document.title = (data.title || 'Offert') + ' – Offeria';
+  document.getElementById('shareBar').style.display = 'flex';
+}
+
+function downloadPdf() {
+  const el = document.getElementById('quoteDoc');
+  const title = document.querySelector('.q-offer-title')?.firstChild?.textContent?.trim() || 'offert';
+  const opt = {
+    margin: [10, 10, 10, 10],
+    filename: title.substring(0, 50) + '.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  html2pdf().set(opt).from(el).save();
+}
+
+load();
+</script>
+</body>
+</html>
