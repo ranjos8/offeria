@@ -528,36 +528,26 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div><span class="plan-amount">0</span><span class="plan-period"> kr/mån</span></div>
           <ul class="plan-features">
             <li>2 offerter per månad</li>
-            <li>Alla branscher</li>
-            <li>PDF-export</li>
+            <li>Dela via länk</li>
+            <li>Dela via PDF</li>
             <li>Redigerbara rader</li>
+            <li style="color:#888;font-style:italic">Offeria-branding i offerten</li>
           </ul>
-          <button class="plan-cta" onclick="openModal('register')">Kom igång</button>
+          <button class="plan-cta" onclick="openModal('register')">Kom igång gratis</button>
         </div>
         <div class="plan">
-          <div class="plan-name">Styck</div>
-          <div class="plan-tagline">Betala per offert</div>
-          <div><span class="plan-amount">29</span><span class="plan-period"> kr/offert</span></div>
-          <ul class="plan-features">
-            <li>1 offert per köp</li>
-            <li>Alla funktioner</li>
-            <li>Egen logotyp</li>
-            <li>Offerthistorik</li>
-            <li>Ingen bindningstid</li>
-          </ul>
-          <button class="plan-cta" onclick="openModal('register')">Köp offert</button>
-        </div>
-        <div class="plan featured">
-          <div class="plan-badge">Mest populär</div>
           <div class="plan-name">Pro</div>
           <div class="plan-tagline">För aktiva hantverkare</div>
           <div><span class="plan-amount">99</span><span class="plan-period"> kr/mån</span></div>
           <ul class="plan-features">
             <li>10 offerter per månad</li>
+            <li>Fullständig företagsprofil</li>
             <li>Egen logotyp</li>
-            <li>ROT & RUT-beräkning</li>
+            <li>Timpris &amp; certifieringar</li>
+            <li>Dela via länk &amp; PDF</li>
             <li>Offerthistorik</li>
             <li>Redigerbara rader</li>
+            <li>Ingen bindningstid</li>
           </ul>
           <button class="plan-cta" onclick="openModal('register')">Välj Pro</button>
         </div>
@@ -567,12 +557,28 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div><span class="plan-amount">299</span><span class="plan-period"> kr/mån</span></div>
           <ul class="plan-features">
             <li>Obegränsade offerter</li>
-            <li>Eget företagstema</li>
+            <li>Fullständig företagsprofil</li>
+            <li>Egen logotyp</li>
+            <li>Timpris &amp; certifieringar</li>
+            <li>Dela via länk &amp; PDF</li>
             <li>Offerthistorik</li>
             <li>Redigerbara rader</li>
-            <li>Prioriterad AI</li>
+            <li>Ingen bindningstid</li>
           </ul>
           <button class="plan-cta" onclick="openModal('register')">Välj Obegränsat</button>
+        </div>
+        <div class="plan featured">
+          <div class="plan-name">Skräddarsydd</div>
+          <div class="plan-tagline">För företag med särskilda behov</div>
+          <div><span class="plan-amount" style="font-size:1.3rem;letter-spacing:-0.01em">Kontakta oss</span></div>
+          <ul class="plan-features">
+            <li>API-integration</li>
+            <li>Faktura istället för kort</li>
+            <li>Flera användare / team</li>
+            <li>Anpassad AI för er bransch</li>
+            <li>Telefonsupport</li>
+          </ul>
+          <button class="plan-cta" onclick="window.location.href='kontakta-oss.html'">Kontakta oss</button>
         </div>
       </div>
     </div>
@@ -780,7 +786,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     <a href="/anvandarvillkor.html" style="color:var(--gold-light);text-decoration:none;margin:0 0.5rem">Användarvillkor</a>·
     <a href="/cookies.html" style="color:var(--gold-light);text-decoration:none;margin:0 0.5rem">Cookies</a>
   </div>
-  <div>© 2026 Offeria · <span style="color:#888">info@offeria.se</span></div>
+  <div>© 2026 Offeria · <span style="color:#888"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a2cbccc4cde2cdc4c4c7d0cbc38cd1c7">[email&#160;protected]</a></span></div>
 </footer>
 
 <!-- ===== AUTH MODAL ===== -->
@@ -870,7 +876,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ===== CONFIG =====
 const SUPABASE_URL = 'https://yfnmmcrvzcwcinwopnlj.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmbm1tY3J2emN3Y2lud29wbmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MzY4NjQsImV4cCI6MjA4NzUxMjg2NH0.MpF3oRLWwXkmrjEGJ0Qqrsw_87FixbaNHmHmPxFyXKc';
@@ -885,7 +891,7 @@ const STRIPE_LINKS = {
 // 🤖 Anthropic API key – flytta till Supabase Edge Function i produktion!
 // API-nyckeln är nu säkert lagrad i Supabase Edge Function
 
-const PLAN_LIMITS = { free: 2, pro: 10, unlimited: Infinity, credit: Infinity };
+const PLAN_LIMITS = { free: 2, pro: 10, unlimited: Infinity };
 const PLAN_LABELS = { free: 'Gratis', pro: 'Pro', unlimited: 'Obegränsat', credit: 'Styck' };
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -1906,11 +1912,4 @@ init();
     <a href="/om-oss.html" style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
       <span style="font-size:1.1rem">ℹ️</span> Om oss
     </a>
-    <a href="/kontakta-oss.html" style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
-      <span style="font-size:1.1rem">✉️</span> Kontakt
-    </a>
-  </div>
-
-  <!-- Logout -->
-  <div style="padding:1.5rem">
-    <button onclick="
+    <a href="/kontakta-oss.html" style="display:flex;align-items:center;gap:0.8rem;color:#888;t
