@@ -616,7 +616,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div class="card-label">⚙️ AI-inställningar <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Styr hur AI:n genererar och prissätter</span></div>
           <div class="grid3">
             <div class="field"><label>Bransch</label>
-              <select id="industry">
+              <select id="industry" onchange="renderExamplePills(this.value)">
                 <option value="Bygg & Snickeri">🔨 Bygg & Snickeri</option>
                 <option value="El">⚡ El</option>
                 <option value="VVS">🔧 VVS</option>
@@ -1484,7 +1484,7 @@ function toggleChip(id, cb) {
 function setPrompt(t) { document.getElementById('jobPrompt').value = t; document.getElementById('jobPrompt').focus(); }
 var INDUSTRY_EXAMPLES = {'Bygg & Snickeri':['Bygga 20 kvm trädäck med räcke','Renovera källare 40 kvm','Sätta upp staket 30 meter','Bygga friggebod 15 kvm','Lägga nytt trägolv 60 kvm'],'El':['Byta elcentral i villa','Installera laddbox för elbil','Byta 8 eluttag och 4 strömbrytare','Dra el till nytt garage','LED-belysning i kontor'],'VVS':['Byta badrumsror och ny dusch','Installera ny varmvattenberedare','Byta radiatorer i 5 rum','Byta kran i kök','Golvvärme badrum 8 kvm'],'Städ':['Kontorsstädning 400 kvm varannan vecka','Storstädning villa 150 kvm','Fönsterputs 20 fönster','Trappstädning flerfamiljshus','Flyttstädning 3 rok'],'Mark & Trädgård':['Anlägga gräsmatta 200 kvm','Plantera häck 40 meter','Bygga altan 25 kvm','Fräsa tomt 500 kvm','Trädfällning och röjning'],'Måleri':['Måla om 3 rum 80 kvm','Tapetsera vardagsrum 30 kvm','Måla fasad villa','Lackera trägolv 70 kvm','Spackling efter vattenskada'],'Transport':['Flytt av 3 rok lägenhet','Transportera byggmaterial 2 ton','Kontorsflytt 500 kvm','Tömma och köra bort bohag','Möbeltransport'],'Konsult / IT':['Bygga webbplats för småföretag','IT-support och nätverk','Systemanalys och krav','Sociala medier 3 månader','Bokföring per kvartal']};
 var DEFAULT_EXAMPLES=['Bygga 20 kvm trädäck med räcke','Byta 5 eluttag i kök','Kontorsstädning 400 kvm','Måla om 3 rum 80 kvm','Byta badrumsror och ny dusch'];
-function renderExamplePills(){var el=document.getElementById('examplePills');if(!el)return;var ind=currentProfile&&currentProfile.industries?JSON.parse(currentProfile.industries):[];var ex=[];if(ind.length>0){ind.forEach(function(i){var e=INDUSTRY_EXAMPLES[i]||[];ex=ex.concat(e.slice(0,3));});ex=ex.slice(0,5);}else{ex=DEFAULT_EXAMPLES;}el.innerHTML=ex.map(function(e){return'<span class="ex-pill" onclick="setPrompt(this.textContent)">'+e+'</span>';}).join('');}
+function renderExamplePills(override){var el=document.getElementById('examplePills');if(!el)return;var ex=[];if(override&&override!==''){ex=(INDUSTRY_EXAMPLES[override]||DEFAULT_EXAMPLES).slice(0,5);}else{var ind=currentProfile&&currentProfile.industries?JSON.parse(currentProfile.industries):[];if(ind.length>0){ind.forEach(function(i){var e=INDUSTRY_EXAMPLES[i]||[];ex=ex.concat(e.slice(0,3));});ex=ex.slice(0,5);}else{ex=DEFAULT_EXAMPLES;}}el.innerHTML=ex.map(function(e){return'<span class="ex-pill" onclick="setPrompt(this.textContent)">'+e+'</span>';}).join('');}
 
 let currentInfo = {};
 
