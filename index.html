@@ -2275,7 +2275,7 @@ async function generateQuote() {
     openUpgradeModal(); return;
   }
   const jobText = document.getElementById('jobPrompt').value.trim();
-  if (!prompt) { alert('Beskriv uppdraget först!'); return; }
+  if (!jobText) { alert('Beskriv uppdraget först!'); return; }
 
   const btn = document.getElementById('genBtn');
   btn.disabled = true;
@@ -2334,30 +2334,62 @@ async function generateQuote() {
   try {
     const { data: { session } } = await sb.auth.getSession();
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    const timeoutId = setTimeout(() => controller.abort(), 45000);
     const res = await fetch('https://yfnmmcrvzcwcinwopnlj.supabase.co/functions/v1/super-task', {
       method: 'POST',
       signal: controller.signal,
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514', max_tokens: 1500,
-        system: 'Du är expert på svenska offerter. Svara ALLTID med giltig JSON och inget annat. Basera prissättning på uppdraget, inte branschvalet.',
+        model: 'claude-sonnet-4-20250514', max_tokens: 3000,
+        system: `Du är expert på svenska offerter för hantverkare och tjänsteföretag. Svara ALLTID med ENBART giltig JSON – ingen markdown, inga kommentarer, inget före eller efter JSON-objektet.
+
+PRISSÄTTNINGSREGLER:
+- Om TIMPRIS anges: använd EXAKT det timpriset för alla arbetstimmar. Beräkna timmar × timpris.
+- Om inget TIMPRIS anges: uppskatta rimliga timpriser för branschen.
+- Om RESEKOSTNAD anges: lägg till som en egen separat rad i items med "(arbete)" i beskrivningen.
+- Alla unitPrice och total i items ska vara exkl. moms och NUMERISKA (ej strängar).
+- Separera ALLTID arbete och material som tydliga rader. Skriv "(arbete)" efter arbetsrader och "(material)" efter materialrader. Detta är viktigt för korrekt ROT-beräkning.
+- subtotal = summan av ALLA items.total (kontrollera att det stämmer exakt)
+- vatAmount = subtotal × momssats (avrunda till heltal)
+- totalInclVat = subtotal + vatAmount
+- Om ROT=true: rotAmount = 30% av ENBART arbetsrader (ej material), max 50000 kr. totalAfterRot = totalInclVat - rotAmount
+- Om ROT=false: rotAmount = 0, totalAfterRot = totalInclVat
+- DUBBELKOLLA att all matematik stämmer innan du svarar.
+
+KUNDUPPGIFTER:
+- Om kunden nämner namn, adress eller kontaktuppgifter i uppdragsbeskrivningen, använd dem.
+- Om inte: sätt clientName till "Kundnamn" och clientAddress till "Adress" (användaren redigerar själv).
+
+KVALITET:
+- Skriv en professionell, specifik introduction som sammanfattar uppdraget (2-3 meningar, ej generisk).
+- Anpassa antal rader efter uppdragets komplexitet (3-10 rader). Enkla jobb = färre rader.
+- Villkor ska vara relevanta för branschen och uppdraget.
+- closingNote ska vara en vänlig, professionell avslutning.
+
+QTY-FORMAT:
+- qty MÅSTE alltid börja med siffran, sedan enhet. Exempel: "3 timmar", "1 st", "25 m2", "10 löpmeter".
+- Skriv ALDRIG "ca" eller annan text före siffran.
+
+TEXTKVALITET:
+- Varje item.description ska vara specifik och tydlig.
+- Använd inga citattecken inuti JSON-strängar som kan göra JSON ogiltig.`,
         messages: [{ role: 'user', content: `Skapa en komplett offert för:
 UPPDRAG: ${jobText}
 BRANSCH: ${industry}
-\${currentInfo.hourlyRate ? 'TIMPRIS: ' + currentInfo.hourlyRate + ' kr/tim (exkl. moms) – använd detta för arbetstid' : ''}
-\${currentInfo.travelCost ? 'RESEKOSTNAD: ' + currentInfo.travelCost : ''}
-\${currentInfo.certifications ? 'CERTIFIERINGAR: ' + currentInfo.certifications : ''}
-\${currentInfo.warrantyText && inclWarranty ? 'GARANTITEXT: ' + currentInfo.warrantyText : ''}
-\${currentInfo.paymentMethods ? 'BETALNINGSSÄTT: ' + currentInfo.paymentMethods : ''}
+${currentInfo.hourlyRate ? 'TIMPRIS: ' + currentInfo.hourlyRate + ' kr/tim (exkl. moms) – använd detta timpris för alla arbetstimmar' : ''}
+${currentInfo.travelCost ? 'RESEKOSTNAD: ' + currentInfo.travelCost : ''}
+${currentInfo.certifications ? 'CERTIFIERINGAR: ' + currentInfo.certifications : ''}
+${currentInfo.warrantyText && inclWarranty ? 'GARANTITEXT: ' + currentInfo.warrantyText : ''}
+${currentInfo.paymentMethods ? 'BETALNINGSSÄTT: ' + currentInfo.paymentMethods : ''}
 MOMSSATS: ${vatPct}%
 BETALNINGSVILLKOR: ${payterms}
-ROT: ${inclRot}, GARANTI: ${inclWarranty}, MATERIAL: ${inclMaterials}, TIDPLAN: ${inclTimeline}
+ROT: ${inclRot} (om true: rotAmount = 30% av ENBART arbetskostnad, max 50000. om false: rotAmount = 0)
+GARANTI: ${inclWarranty}, MATERIAL: ${inclMaterials}, TIDPLAN: ${inclTimeline}
 
-JSON-struktur:
-{"title":"Offert – [beskrivning]","clientName":"[namn]","clientAddress":"[adress]","introduction":"[2-3 meningar]","items":[{"description":"[rad]","qty":"[antal+enhet]","unitPrice":[pris],"total":[totalt]}],"subtotal":[netto],"vatAmount":[moms],"rotAmount":[rot eller 0],"totalInclVat":[inkl moms],"totalAfterRot":[efter rot],"terms":"[villkor]","timeline":${inclTimeline?'"[tidplan]"':'null'},"materials":${inclMaterials?'"[material]"':'null'},"warrantyText":${inclWarranty?'"[garanti]"':'null'},"closingNote":"[avslutning]"}
+Svara med exakt denna JSON-struktur:
+{"title":"Offert – [kort beskrivning]","clientName":"[kundnamn från text eller 'Kundnamn']","clientAddress":"[adress från text eller 'Adress']","introduction":"[professionell sammanfattning 2-3 meningar]","items":[{"description":"[tydlig beskrivning + (arbete) eller (material)]","qty":"[antal enhet, t.ex. '3 timmar' eller '1 st' eller '25 m²']","unitPrice":[pris exkl moms],"total":[qty×unitPrice]}],"subtotal":[summa items],"vatAmount":[moms],"rotAmount":[rot eller 0],"totalInclVat":[inkl moms],"totalAfterRot":[efter rot eller samma som totalInclVat],"terms":"[relevanta villkor]","timeline":${inclTimeline?'"[realistisk tidplan]"':'null'},"materials":${inclMaterials?'"[materiallista]"':'null'},"warrantyText":${inclWarranty?'"[garantivillkor]"':'null'},"closingNote":"[professionell avslutning]"}
 
-Rimliga svenska priser 2024. Minst 5 rader.` }]
+Rimliga svenska priser 2025.` }]
       })
     });
     clearTimeout(timeoutId);
@@ -2371,12 +2403,33 @@ Rimliga svenska priser 2024. Minst 5 rader.` }]
     if (start === -1 || end === -1) throw new Error('Ingen JSON hittades');
     const q = JSON.parse(rawText.slice(start, end + 1));
 
+    // Validate AI response
+    if (!q.items || !Array.isArray(q.items) || q.items.length === 0) throw new Error('Offerten saknar rader. Försök igen.');
+    q.items.forEach((it, i) => {
+      it.unitPrice = Number(it.unitPrice) || 0;
+      it.total = Number(it.total) || 0;
+      if (!it.description) it.description = 'Rad ' + (i+1);
+      if (!it.qty) it.qty = '1 st';
+    });
+    q.subtotal = Number(q.subtotal) || q.items.reduce((s,it) => s + it.total, 0);
+    q.vatAmount = Number(q.vatAmount) || Math.round(q.subtotal * (parseFloat(vatPct)/100));
+    q.totalInclVat = Number(q.totalInclVat) || (q.subtotal + q.vatAmount);
+    q.rotAmount = Number(q.rotAmount) || 0;
+    q.totalAfterRot = Number(q.totalAfterRot) || (q.totalInclVat - q.rotAmount);
+    if (!q.title) q.title = 'Offert';
+    if (!q.clientName) q.clientName = 'Kundnamn';
+    if (!q.clientAddress) q.clientAddress = 'Adress';
+    if (!q.introduction) q.introduction = '';
+    if (!q.terms) q.terms = '';
+    if (!q.closingNote) q.closingNote = '';
+
     clearInterval(interval);
     document.getElementById('statusBar').style.display = 'none';
     btn.disabled = false;
 
     // Render quote first so we can capture its HTML
     renderQuote(q);
+    recalc(); // Recalculate to fix any AI math errors
 
     // log usage + spara offert (after render so HTML is populated)
     await new Promise(r => setTimeout(r, 100)); // wait for DOM
@@ -2384,12 +2437,14 @@ Rimliga svenska priser 2024. Minst 5 rader.` }]
     // Read edited client name from DOM (user may have changed it)
     const savedClientName = document.querySelector('#quoteDoc .q-client strong')?.textContent || q.clientName || '';
     const savedTitle = document.querySelector('#quoteDoc .q-offer-title')?.firstChild?.textContent?.trim() || q.title || 'Offert';
+    const finalAmountText = document.getElementById('tot-final')?.textContent || '';
+    const finalAmount = parseSEK(finalAmountText) || q.totalAfterRot || q.totalInclVat || 0;
     const shareId = crypto.randomUUID();
     await sb.from('quote_usage').insert({
       user_id: currentUser.id,
       title: savedTitle,
       client_name: savedClientName,
-      total_amount: q.totalAfterRot || q.totalInclVat || 0,
+      total_amount: finalAmount,
       quote_html: quoteHtml,
       share_id: shareId,
       shared_at: new Date().toISOString()
@@ -2430,19 +2485,26 @@ function recalc() {
   const info = currentInfo || {};
   const vatPct = (parseFloat(info.vatPct) || 25) / 100;
   let sub = 0;
+  let arbeteSub = 0;
   document.querySelectorAll('#itemsTbody tr').forEach(row => {
     const pe = row.querySelector('.unit-price');
     const te = row.querySelector('.row-total');
     const qe = row.querySelector('td:nth-child(2) .editable');
+    const de = row.querySelector('td:first-child .editable');
     if (!pe||!te) return;
     const price = parseSEK(pe.textContent);
-    const qty = parseFloat((qe?qe.textContent:'1').replace(',','.')) || 1;
+    const qtyText = qe ? qe.textContent : '1';
+    const nums = qtyText.match(/[\d.,]+/);
+    const qty = nums ? parseFloat(nums[0].replace(',','.')) || 1 : 1;
     const tot = price*qty; te.textContent = fmtSEK(tot); sub+=tot;
+    // ROT only on arbete rows (rows NOT marked as material)
+    const desc = de ? de.textContent.toLowerCase() : '';
+    if (!desc.includes('(material)')) { arbeteSub += tot; }
   });
   const vat = sub*vatPct, incl = sub+vat;
   const rotEl = document.getElementById('tot-rot');
   let rot = 0;
-  if (rotEl && info.inclRot) { rot = Math.min(sub*0.3, 50000); rotEl.textContent = '- '+fmtSEK(rot); }
+  if (rotEl && info.inclRot) { rot = Math.min(arbeteSub*0.3, 50000); rotEl.textContent = '- '+fmtSEK(rot); }
   const final = info.inclRot && rot>0 ? incl-rot : incl;
   document.getElementById('tot-sub').textContent = fmtSEK(sub);
   document.getElementById('tot-vat').textContent = fmtSEK(vat);
