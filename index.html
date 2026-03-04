@@ -1591,7 +1591,7 @@ function buildInvoiceHtml(info, invoiceData) {
     </div>
     <div class="q-meta-row">
       <div class="q-offer-title" style="color:#1a1a18">FAKTURA – ${invoiceData.title}</div>
-      <div class="q-meta"><strong>Fakturanr:</strong> ${invoiceData.invoiceNumber}<br><strong>Datum:</strong> ${invoiceData.dateStr}<br><strong>Förfallodatum:</strong> ${invoiceData.dueStr}<br><strong>Betalningsvillkor:</strong> ${invoiceData.payTermsLabel}</div>
+      <div class="q-meta"><table style="border-collapse:collapse;font-size:0.8rem;text-align:left"><tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>Fakturanr:</strong></td><td style="white-space:nowrap">${invoiceData.invoiceNumber}</td></tr><tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>Datum:</strong></td><td style="white-space:nowrap">${invoiceData.dateStr}</td></tr><tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>Förfallodatum:</strong></td><td style="white-space:nowrap">${invoiceData.dueStr}</td></tr><tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>Betalningsvillkor:</strong></td><td style="white-space:nowrap">${invoiceData.payTermsLabel}</td></tr></table></div>
     </div>
     <div class="q-client"><div class="lbl">KUND</div><strong>${invoiceData.clientName}</strong><br>${invoiceData.clientAddress}</div>
     <table class="qt">
