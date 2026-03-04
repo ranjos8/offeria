@@ -341,6 +341,9 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .add-row-btn:hover { border-color: var(--gold); }
 .del-row-btn { background: none; border: none; color: #ccc; cursor: pointer; font-size: 1rem; padding: 0 0.3rem; transition: color 0.15s; }
 .del-row-btn:hover { color: var(--rust); }
+.row-type-select { font-size: 0.68rem; padding: 0.2rem 0.25rem; border: 1px solid #ddd; border-radius: 4px; background: white; font-family: inherit; cursor: pointer; color: #555; }
+.row-type-select:focus { border-color: var(--gold); outline: none; }
+.row-type-label { font-size: 0.65rem; color: #999; font-style: italic; }
 .q-totals { display: flex; justify-content: flex-end; margin: 1rem 0 1.5rem; }
 .q-totals-box { min-width: 255px; }
 .trow { display: flex; justify-content: space-between; padding: 0.33rem 0; font-size: 0.83rem; border-bottom: 1px solid #eee; }
@@ -505,6 +508,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   #quoteDoc .q-meta { text-align: left; }
   #quoteDoc table.qt { font-size: 0.75rem; }
   #quoteDoc table.qt th, #quoteDoc table.qt td { padding: 0.5rem 0.4rem; }
+  .row-type-select { font-size: 0.6rem; padding: 0.15rem 0.15rem; }
   #quoteDoc .q-totals { justify-content: stretch; }
   #quoteDoc .q-totals-box { width: 100%; min-width: unset; }
   #quoteDoc .q-footer { flex-direction: column; gap: 1rem; align-items: flex-start; }
@@ -2037,6 +2041,13 @@ function shareInvoiceEmail() {
 function getCleanQuoteHTML(html) {
   const div = document.createElement('div');
   div.innerHTML = html;
+  // Convert type selects to text labels for PDF
+  div.querySelectorAll('.row-type-select').forEach(sel => {
+    const label = document.createElement('span');
+    label.className = 'row-type-label';
+    label.textContent = sel.value === 'material' ? 'Material' : 'Arbete';
+    sel.parentNode.replaceChild(label, sel);
+  });
   // Remove edit UI elements
   div.querySelectorAll('.edit-hint, .add-row-btn, .del-row-btn, .quote-toolbar').forEach(el => el.remove());
   // Make contenteditable plain text
@@ -2346,13 +2357,13 @@ async function generateQuote() {
 PRISSÄTTNINGSREGLER:
 - Om TIMPRIS anges: använd EXAKT det timpriset för alla arbetstimmar. Beräkna timmar × timpris.
 - Om inget TIMPRIS anges: uppskatta rimliga timpriser för branschen.
-- Om RESEKOSTNAD anges: lägg till som en egen separat rad i items med "(arbete)" i beskrivningen.
+- Om RESEKOSTNAD anges: lägg till som en egen separat rad i items med type:"arbete".
 - Alla unitPrice och total i items ska vara exkl. moms och NUMERISKA (ej strängar).
-- Separera ALLTID arbete och material som tydliga rader. Skriv "(arbete)" efter arbetsrader och "(material)" efter materialrader. Detta är viktigt för korrekt ROT-beräkning.
+- Separera ALLTID arbete och material som tydliga rader. Varje item MÅSTE ha ett "type"-fält: "arbete" eller "material". Beskrivningen ska INTE innehålla "(arbete)" eller "(material)" – det hanteras av type-fältet.
 - subtotal = summan av ALLA items.total (kontrollera att det stämmer exakt)
 - vatAmount = subtotal × momssats (avrunda till heltal)
 - totalInclVat = subtotal + vatAmount
-- Om ROT=true: rotAmount = 30% av ENBART arbetsrader (ej material), max 50000 kr. totalAfterRot = totalInclVat - rotAmount
+- Om ROT=true: rotAmount = 30% av ENBART items med type:"arbete" (ej type:"material"), max 50000 kr. totalAfterRot = totalInclVat - rotAmount
 - Om ROT=false: rotAmount = 0, totalAfterRot = totalInclVat
 - DUBBELKOLLA att all matematik stämmer innan du svarar.
 
@@ -2387,7 +2398,7 @@ ROT: ${inclRot} (om true: rotAmount = 30% av ENBART arbetskostnad, max 50000. om
 GARANTI: ${inclWarranty}, MATERIAL: ${inclMaterials}, TIDPLAN: ${inclTimeline}
 
 Svara med exakt denna JSON-struktur:
-{"title":"Offert – [kort beskrivning]","clientName":"[kundnamn från text eller 'Kundnamn']","clientAddress":"[adress från text eller 'Adress']","introduction":"[professionell sammanfattning 2-3 meningar]","items":[{"description":"[tydlig beskrivning + (arbete) eller (material)]","qty":"[antal enhet, t.ex. '3 timmar' eller '1 st' eller '25 m²']","unitPrice":[pris exkl moms],"total":[qty×unitPrice]}],"subtotal":[summa items],"vatAmount":[moms],"rotAmount":[rot eller 0],"totalInclVat":[inkl moms],"totalAfterRot":[efter rot eller samma som totalInclVat],"terms":"[relevanta villkor]","timeline":${inclTimeline?'"[realistisk tidplan]"':'null'},"materials":${inclMaterials?'"[materiallista]"':'null'},"warrantyText":${inclWarranty?'"[garantivillkor]"':'null'},"closingNote":"[professionell avslutning]"}
+{"title":"Offert – [kort beskrivning]","clientName":"[kundnamn från text eller 'Kundnamn']","clientAddress":"[adress från text eller 'Adress']","introduction":"[professionell sammanfattning 2-3 meningar]","items":[{"description":"[tydlig beskrivning utan (arbete)/(material)-tagg]","type":"arbete eller material","qty":"[antal enhet, t.ex. '3 timmar' eller '1 st' eller '25 m2']","unitPrice":[pris exkl moms],"total":[qty×unitPrice]}],"subtotal":[summa items],"vatAmount":[moms],"rotAmount":[rot eller 0],"totalInclVat":[inkl moms],"totalAfterRot":[efter rot eller samma som totalInclVat],"terms":"[relevanta villkor]","timeline":${inclTimeline?'"[realistisk tidplan]"':'null'},"materials":${inclMaterials?'"[materiallista]"':'null'},"warrantyText":${inclWarranty?'"[garantivillkor]"':'null'},"closingNote":"[professionell avslutning]"}
 
 Rimliga svenska priser 2025.` }]
       })
@@ -2410,6 +2421,11 @@ Rimliga svenska priser 2025.` }]
       it.total = Number(it.total) || 0;
       if (!it.description) it.description = 'Rad ' + (i+1);
       if (!it.qty) it.qty = '1 st';
+      if (!it.type || (it.type !== 'arbete' && it.type !== 'material')) {
+        // Guess type from description if AI didn't set it
+        const dl = (it.description || '').toLowerCase();
+        it.type = (dl.includes('material') || dl.includes('produkt') || dl.includes('tillbehör') || dl.includes('utrustning')) ? 'material' : 'arbete';
+      }
     });
     q.subtotal = Number(q.subtotal) || q.items.reduce((s,it) => s + it.total, 0);
     q.vatAmount = Number(q.vatAmount) || Math.round(q.subtotal * (parseFloat(vatPct)/100));
@@ -2472,13 +2488,34 @@ function fmtSEK(n) { return Number(n).toLocaleString('sv-SE',{maximumFractionDig
 function parseSEK(s) { return parseFloat(String(s).replace(/\s|\u00a0/g,'').replace('kr','').replace(',','.')) || 0; }
 
 function buildRow(it) {
+  const rotActive = currentInfo?.inclRot;
+  // Determine type: from AI type field, or parse description, default arbete
+  const descLower = (it.description || '').toLowerCase();
+  const isMatFromDesc = descLower.includes('(material)');
+  const isMaterial = it.type === 'material' || (!it.type && isMatFromDesc);
+  // Clean description of (arbete)/(material) tags since we have the select
+  const cleanDesc = it.description.replace(/\s*\((arbete|material)\)\s*/gi, '').trim();
+  const typeCell = rotActive ? `<td style="text-align:center;padding:0.4rem 0.3rem"><select class="row-type-select" onchange="onTypeChange(this)">
+    <option value="arbete" ${!isMaterial ? 'selected' : ''}>Arbete</option>
+    <option value="material" ${isMaterial ? 'selected' : ''}>Material</option>
+  </select></td>` : '';
   return `<tr>
-    <td><span class="editable" contenteditable="true">${it.description}</span></td>
+    <td><span class="editable" contenteditable="true">${cleanDesc}</span></td>
     <td><span class="editable" contenteditable="true">${it.qty}</span></td>
     <td style="text-align:right"><span class="editable unit-price" contenteditable="true">${fmtSEK(it.unitPrice)}</span></td>
     <td style="text-align:right;font-weight:500"><span class="row-total">${fmtSEK(it.total)}</span></td>
+    ${typeCell}
     <td style="width:26px;padding:0 0.3rem"><button class="del-row-btn" onclick="delRow(this)">×</button></td>
   </tr>`;
+}
+
+function onTypeChange(sel) {
+  // Sync the selected attribute with the actual value so innerHTML captures the state
+  sel.querySelectorAll('option').forEach(o => {
+    if (o.value === sel.value) o.setAttribute('selected', '');
+    else o.removeAttribute('selected');
+  });
+  recalc();
 }
 
 function recalc() {
@@ -2497,14 +2534,24 @@ function recalc() {
     const nums = qtyText.match(/[\d.,]+/);
     const qty = nums ? parseFloat(nums[0].replace(',','.')) || 1 : 1;
     const tot = price*qty; te.textContent = fmtSEK(tot); sub+=tot;
-    // ROT only on arbete rows (rows NOT marked as material)
-    const desc = de ? de.textContent.toLowerCase() : '';
-    if (!desc.includes('(material)')) { arbeteSub += tot; }
+    // ROT: use type select if present, fallback to text parsing
+    const typeSelect = row.querySelector('.row-type-select');
+    if (typeSelect) {
+      if (typeSelect.value === 'arbete') arbeteSub += tot;
+    } else {
+      const desc = de ? de.textContent.toLowerCase() : '';
+      if (!desc.includes('(material)')) arbeteSub += tot;
+    }
   });
   const vat = sub*vatPct, incl = sub+vat;
   const rotEl = document.getElementById('tot-rot');
+  const rotRow = rotEl?.closest('.trow');
   let rot = 0;
-  if (rotEl && info.inclRot) { rot = Math.min(arbeteSub*0.3, 50000); rotEl.textContent = '- '+fmtSEK(rot); }
+  if (rotEl && info.inclRot) {
+    rot = Math.min(arbeteSub*0.3, 50000);
+    rotEl.textContent = '- '+fmtSEK(rot);
+    if (rotRow) rotRow.style.display = rot > 0 ? '' : 'none';
+  }
   const final = info.inclRot && rot>0 ? incl-rot : incl;
   document.getElementById('tot-sub').textContent = fmtSEK(sub);
   document.getElementById('tot-vat').textContent = fmtSEK(vat);
@@ -2516,8 +2563,10 @@ function recalc() {
 function delRow(btn) { btn.closest('tr').remove(); recalc(); }
 
 function addRow() {
+  const rotActive = currentInfo?.inclRot;
+  const typeCell = rotActive ? `<td style="text-align:center;padding:0.4rem 0.3rem"><select class="row-type-select" onchange="onTypeChange(this)"><option value="arbete" selected>Arbete</option><option value="material">Material</option></select></td>` : '';
   const tr = document.createElement('tr');
-  tr.innerHTML = `<td><span class="editable" contenteditable="true">Ny rad</span></td><td><span class="editable" contenteditable="true">1 st</span></td><td style="text-align:right"><span class="editable unit-price" contenteditable="true">${fmtSEK(0)}</span></td><td style="text-align:right;font-weight:500"><span class="row-total">${fmtSEK(0)}</span></td><td style="width:26px;padding:0 0.3rem"><button class="del-row-btn" onclick="delRow(this)">×</button></td>`;
+  tr.innerHTML = `<td><span class="editable" contenteditable="true">Ny rad</span></td><td><span class="editable" contenteditable="true">1 st</span></td><td style="text-align:right"><span class="editable unit-price" contenteditable="true">${fmtSEK(0)}</span></td><td style="text-align:right;font-weight:500"><span class="row-total">${fmtSEK(0)}</span></td>${typeCell}<td style="width:26px;padding:0 0.3rem"><button class="del-row-btn" onclick="delRow(this)">×</button></td>`;
   document.getElementById('itemsTbody').appendChild(tr);
   attachListeners(tr);
   tr.querySelector('.editable').focus();
@@ -2571,9 +2620,9 @@ function renderQuote(q) {
     </div>
     <div class="q-client"><div class="lbl">Kund</div><strong class="editable" contenteditable="true">${q.clientName}</strong><br><span class="editable" contenteditable="true">${q.clientAddress}</span></div>
     <div class="q-intro">${q.introduction}</div>
-    <div class="edit-hint">✏️ Klicka på rad för att redigera – summor räknas om automatiskt</div>
+    <div class="edit-hint">✏️ Klicka på rad för att redigera – summor räknas om automatiskt${info.inclRot ? '. Ändra Arbete/Material per rad för korrekt ROT-avdrag.' : ''}</div>
     <table class="qt">
-      <thead><tr><th style="width:44%">Beskrivning</th><th>Antal</th><th style="text-align:right">À-pris</th><th style="text-align:right">Summa</th><th style="width:26px"></th></tr></thead>
+      <thead><tr><th style="width:${info.inclRot?'38':'44'}%">Beskrivning</th><th>Antal</th><th style="text-align:right">À-pris</th><th style="text-align:right">Summa</th>${info.inclRot?'<th style="width:70px;text-align:center;font-size:0.62rem">Typ</th>':''}<th style="width:26px"></th></tr></thead>
       <tbody id="itemsTbody">${q.items.map(it=>buildRow(it)).join('')}</tbody>
     </table>
     <button class="add-row-btn" onclick="addRow()">+ Lägg till rad</button>
