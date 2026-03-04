@@ -344,11 +344,17 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .row-type-select { font-size: 0.68rem; padding: 0.2rem 0.25rem; border: 1px solid #ddd; border-radius: 4px; background: white; font-family: inherit; cursor: pointer; color: #555; }
 .row-type-select:focus { border-color: var(--gold); outline: none; }
 
+/* SVG icon system */
+.ico { display: inline-flex; width: 1em; height: 1em; vertical-align: -0.125em; flex-shrink: 0; }
+.ico svg { width: 100%; height: 100%; }
+.sidebar-item .ico, .nav-drawer-btn .ico { font-size: 1.15rem; opacity: 0.85; }
+
 /* mic button */
-.mic-btn { background: var(--cream); border: 1.5px solid var(--border); border-radius: 50%; width: 42px; height: 42px; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.mic-btn:hover { border-color: var(--gold); }
-.mic-btn.recording { background: #e05; border-color: #e05; animation: pulse-mic 1s infinite; }
+.mic-btn { background: var(--cream); border: 1.5px solid var(--border); border-radius: 10px; height: 42px; padding: 0 1rem; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; flex-shrink: 0; font-family: inherit; color: #555; }
+.mic-btn:hover { border-color: var(--gold); color: var(--gold); }
+.mic-btn.recording { background: #e05; border-color: #e05; color: white; animation: pulse-mic 1s infinite; }
 @keyframes pulse-mic { 0%,100%{opacity:1} 50%{opacity:0.6} }
+.mic-btn svg { width: 16px; height: 16px; }
 
 /* dashboard */
 .dash-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
@@ -374,6 +380,13 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .cust-name { font-weight: 700; font-size: 0.95rem; color: var(--ink); }
 .cust-info { font-size: 0.78rem; color: #888; margin-top: 0.2rem; }
 .cust-stats { font-size: 0.72rem; color: var(--gold); margin-top: 0.4rem; font-weight: 600; }
+
+/* customer dropdown */
+.cust-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); max-height: 200px; overflow-y: auto; z-index: 50; }
+.cust-dropdown-item { padding: 0.6rem 0.8rem; cursor: pointer; font-size: 0.85rem; border-bottom: 1px solid #f5f0e8; }
+.cust-dropdown-item:hover { background: var(--cream); }
+.cust-dropdown-item:last-child { border-bottom: none; }
+.cust-dropdown-item .cust-dd-sub { font-size: 0.72rem; color: #999; }
 .q-totals { display: flex; justify-content: flex-end; margin: 1rem 0 1.5rem; }
 .q-totals-box { min-width: 255px; }
 .trow { display: flex; justify-content: space-between; padding: 0.33rem 0; font-size: 0.83rem; border-bottom: 1px solid #eee; }
@@ -501,8 +514,10 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   .gen-card { padding: 1.2rem; box-sizing: border-box; width: 100%; overflow: hidden; }
   .grid3 { grid-template-columns: 1fr; gap: 0.6rem; }
   .grid2 { grid-template-columns: 1fr; gap: 0.6rem; }
-  .gen-row { flex-direction: column; gap: 0.5rem; }
-  .gen-row > * { width: 100%; max-width: 100%; }
+  .gen-row { flex-direction: row; flex-wrap: wrap; gap: 0.5rem; }
+  .gen-row > .gen-btn { flex: 1; min-width: 0; }
+  .gen-row > .mic-btn { flex: 0; width: auto; }
+  .gen-row > .quota-note { width: 100%; }
   select, input, textarea { max-width: 100%; box-sizing: border-box; width: 100%; }
   .chips { flex-wrap: wrap; }
   .gen-card[style*="max-width"] { max-width: 100% !important; }
@@ -541,7 +556,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   .row-type-select { font-size: 0.6rem; padding: 0.15rem 0.15rem; }
   .dash-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
   .dash-num { font-size: 1.1rem; }
-  .mic-btn { width: 38px; height: 38px; font-size: 1rem; }
+  .mic-btn { height: 38px; font-size: 0.75rem; padding: 0 0.8rem; }
   #quoteDoc .q-totals { justify-content: stretch; }
   #quoteDoc .q-totals-box { width: 100%; min-width: unset; }
   #quoteDoc .q-footer { flex-direction: column; gap: 1rem; align-items: flex-start; }
@@ -826,13 +841,13 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
     <!-- sidebar -->
     <aside class="app-sidebar">
-      <div class="sidebar-item active" id="sNav-generate" onclick="showPage('generate')">📄 Ny offert</div>
-      <div class="sidebar-item" id="sNav-history" onclick="showPage('history')">🗂 Offerthistorik</div>
-      <div class="sidebar-item" id="sNav-invoices" onclick="showPage('invoices')">📑 Fakturor</div>
-      <div class="sidebar-item" id="sNav-dashboard" onclick="showPage('dashboard')">📊 Dashboard</div>
-      <div class="sidebar-item" id="sNav-customers" onclick="showPage('customers')">👥 Kunder</div>
-      <div class="sidebar-item" id="sNav-articles" onclick="showPage('articles')">📦 Artiklar</div>
-      <div class="sidebar-item" id="sNav-profile" onclick="showPage('profile')">🏢 Företagsprofil</div>
+      <div class="sidebar-item active" id="sNav-generate" onclick="showPage('generate')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span> Ny offert</div>
+      <div class="sidebar-item" id="sNav-history" onclick="showPage('history')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></span> Offerthistorik</div>
+      <div class="sidebar-item" id="sNav-invoices" onclick="showPage('invoices')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> Fakturor</div>
+      <div class="sidebar-item" id="sNav-dashboard" onclick="showPage('dashboard')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Dashboard</div>
+      <div class="sidebar-item" id="sNav-customers" onclick="showPage('customers')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span> Kunder</div>
+      <div class="sidebar-item" id="sNav-articles" onclick="showPage('articles')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Artiklar</div>
+      <div class="sidebar-item" id="sNav-profile" onclick="showPage('profile')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/><path d="M9 22v-4h6v4"/></svg></span> Företagsprofil</div>
 
       <div class="quota-box">
         <div class="quota-label">Din plan</div>
@@ -855,7 +870,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <p>Du är redo att skapa din första offert. Här är tre snabba steg för att komma igång:</p>
             <div class="welcome-steps">
               <div class="welcome-step" onclick="dismissWelcome();showPage('profile')">
-                <div class="ws-icon">🏢</div>
+                <div class="ws-icon"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/><path d="M9 22v-4h6v4"/></svg></span></div>
                 <div class="ws-label">Fyll i företagsprofil</div>
               </div>
               <div class="welcome-step" onclick="dismissWelcome();document.getElementById('jobPrompt').focus()">
@@ -883,14 +898,14 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div class="grid3">
             <div class="field"><label>Bransch</label>
               <select id="industry" onchange="renderExamplePills(this.value)">
-                <option value="Bygg & Snickeri">🔨 Bygg & Snickeri</option>
-                <option value="El">⚡ El</option>
-                <option value="VVS">🔧 VVS</option>
-                <option value="Städ">🧹 Städ</option>
-                <option value="Mark & Trädgård">🌿 Mark & Trädgård</option>
-                <option value="Måleri">🎨 Måleri</option>
-                <option value="Transport">🚚 Transport</option>
-                <option value="Konsult / IT">💼 Konsult / IT</option>
+                <option value="Bygg & Snickeri">Bygg & Snickeri</option>
+                <option value="El"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span> El</option>
+                <option value="VVS"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></span> VVS</option>
+                <option value="Städ"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z"/></svg></span> Städ</option>
+                <option value="Mark & Trädgård">Mark & Trädgård</option>
+                <option value="Måleri"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.37 2.63L14 7l-1.59-1.59a2 2 0 00-2.82 0L8 7l9 9 1.59-1.59a2 2 0 000-2.82L17 10l4.37-4.37a2.12 2.12 0 10-3-3z"/><path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7"/></svg></span> Måleri</option>
+                <option value="Transport"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Transport</option>
+                <option value="Konsult / IT"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></span> Konsult / IT</option>
               </select>
             </div>
             <div class="field"><label>Momssats</label>
@@ -922,7 +937,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <textarea class="prompt-area" id="jobPrompt" placeholder="Beskriv vad som ska göras, ungefär hur stort, var…"></textarea>
           <div class="gen-row">
             <button class="gen-btn" id="genBtn" onclick="generateQuote()">✦ Generera offert</button>
-            <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="Prata in uppdragsbeskrivning">🎤</button>
+            <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="Prata in uppdragsbeskrivning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="1" width="6" height="11" rx="3"/><path d="M19 10v1a7 7 0 01-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg> Prata in</button>
             <span class="quota-note" id="quotaNote"></span>
           </div>
           <div class="status-bar" id="statusBar">
@@ -968,7 +983,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <button onclick="openNewInvoiceModal()" class="gen-btn" style="padding:0.6rem 1.2rem;font-size:0.85rem;white-space:nowrap">+ Ny faktura</button>
         </div>
 
-        <div id="invoiceContent"><div class="empty-state"><div class="big">📑</div><p>Inga fakturor ännu</p></div></div>
+        <div id="invoiceContent"><div class="empty-state"><div class="big"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span></div><p>Inga fakturor ännu</p></div></div>
       </div>
 
       <!-- PROFILE PAGE -->
@@ -976,7 +991,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <div class="page-title">Företagsprofil</div>
         <div class="page-sub">Sparas automatiskt i dina offerter</div>
         <div class="gen-card" style="max-width:600px">
-          <div class="card-label">📋 Företagsuppgifter</div>
+          <div class="card-label"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></span> Företagsuppgifter</div>
           <div class="grid2">
             <div class="field"><label>Företagsnamn</label><input id="pCompany" placeholder="Svenssons Bygg AB"></div>
             <div class="field"><label>Organisationsnummer</label><input id="pOrg" placeholder="556xxx-xxxx"></div>
@@ -992,18 +1007,18 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           </div>
 
           <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
-            <div class="card-label">🏗 Bransch &amp; prissättning <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Förväljs automatiskt vid ny offert</span></div>
+            <div class="card-label"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span> Bransch &amp; prissättning <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Förväljs automatiskt vid ny offert</span></div>
             <div style="margin-bottom:1rem">
               <label style="font-size:0.76rem;font-weight:600;color:#555;display:block;margin-bottom:0.5rem">Mina branscher (välj en eller flera)</label>
               <div class="chips" id="profileIndustryChips">
-                <label class="chip" id="pchip-bygg"><input type="checkbox" value="Bygg &amp; Snickeri" onchange="toggleProfileChip('pchip-bygg',this)">🔨 Bygg &amp; Snickeri</label>
-                <label class="chip" id="pchip-el"><input type="checkbox" value="El" onchange="toggleProfileChip('pchip-el',this)">⚡ El</label>
-                <label class="chip" id="pchip-vvs"><input type="checkbox" value="VVS" onchange="toggleProfileChip('pchip-vvs',this)">🔧 VVS</label>
-                <label class="chip" id="pchip-stad"><input type="checkbox" value="Städ" onchange="toggleProfileChip('pchip-stad',this)">🧹 Städ</label>
-                <label class="chip" id="pchip-mark"><input type="checkbox" value="Mark &amp; Trädgård" onchange="toggleProfileChip('pchip-mark',this)">🌿 Mark &amp; Trädgård</label>
-                <label class="chip" id="pchip-maleri"><input type="checkbox" value="Måleri" onchange="toggleProfileChip('pchip-maleri',this)">🎨 Måleri</label>
-                <label class="chip" id="pchip-transport"><input type="checkbox" value="Transport" onchange="toggleProfileChip('pchip-transport',this)">🚚 Transport</label>
-                <label class="chip" id="pchip-konsult"><input type="checkbox" value="Konsult / IT" onchange="toggleProfileChip('pchip-konsult',this)">💼 Konsult / IT</label>
+                <label class="chip" id="pchip-bygg"><input type="checkbox" value="Bygg &amp; Snickeri" onchange="toggleProfileChip('pchip-bygg',this)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/><path d="M9 22v-4h6v4"/></svg></span> Bygg &amp; Snickeri</label>
+                <label class="chip" id="pchip-el"><input type="checkbox" value="El" onchange="toggleProfileChip('pchip-el',this)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span> El</label>
+                <label class="chip" id="pchip-vvs"><input type="checkbox" value="VVS" onchange="toggleProfileChip('pchip-vvs',this)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></span> VVS</label>
+                <label class="chip" id="pchip-stad"><input type="checkbox" value="Städ" onchange="toggleProfileChip('pchip-stad',this)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z"/></svg></span> Städ</label>
+                <label class="chip" id="pchip-mark"><input type="checkbox" value="Mark &amp; Trädgård" onchange="toggleProfileChip('pchip-mark',this)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg></span> Mark &amp; Trädgård</label>
+                <label class="chip" id="pchip-maleri"><input type="checkbox" value="Måleri" onchange="toggleProfileChip('pchip-maleri',this)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.37 2.63L14 7l-1.59-1.59a2 2 0 00-2.82 0L8 7l9 9 1.59-1.59a2 2 0 000-2.82L17 10l4.37-4.37a2.12 2.12 0 10-3-3z"/><path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7"/></svg></span> Måleri</label>
+                <label class="chip" id="pchip-transport"><input type="checkbox" value="Transport" onchange="toggleProfileChip('pchip-transport',this)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Transport</label>
+                <label class="chip" id="pchip-konsult"><input type="checkbox" value="Konsult / IT" onchange="toggleProfileChip('pchip-konsult',this)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></span> Konsult / IT</label>
               </div>
             </div>
             <div class="grid3">
@@ -1022,7 +1037,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           </div>
 
           <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
-            <div class="card-label">🛡 Certifieringar &amp; försäkring <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Visas i offertens footer</span></div>
+            <div class="card-label"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span> Certifieringar &amp; försäkring <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Visas i offertens footer</span></div>
             <div class="grid2">
               <div class="field"><label>F-skattebevis</label>
                 <select id="pFskatt"><option value="">Välj</option><option value="Innehar F-skattebevis">Ja – innehar F-skattebevis</option></select>
@@ -1034,19 +1049,19 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           </div>
 
           <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
-            <div class="card-label">📝 Standardgaranti <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Används om garanti är ikryssad</span></div>
+            <div class="card-label"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></span> Standardgaranti <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Används om garanti är ikryssad</span></div>
             <div class="field"><textarea id="pWarranty" style="height:70px;resize:none;border:1.5px solid var(--border);border-radius:8px;padding:0.6rem 0.85rem;font-family:DM Sans,sans-serif;font-size:0.88rem;outline:none;background:var(--paper);width:100%" placeholder="t.ex. 2 års garanti på allt utfört arbete enligt konsumenttjänstlagen."></textarea></div>
           </div>
 
           <div style="margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid var(--border)">
-            <div class="card-label">🖼 Logotyp</div>
+            <div class="card-label"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span> Logotyp</div>
             <div id="logoSection">
               <div id="logoPreviewWrap" style="margin:0.8rem 0; display:none">
                 <img id="logoPreviewImg" style="max-height:70px;max-width:160px;object-fit:contain;border-radius:6px;border:1px solid var(--border);padding:6px;background:white">
                 <br><button onclick="removeLogo()" style="margin-top:0.5rem;font-size:0.75rem;color:#e05;background:none;border:none;cursor:pointer">× Ta bort logotyp</button>
               </div>
               <label id="logoUploadLabel" style="display:inline-flex;align-items:center;gap:0.5rem;cursor:pointer;background:var(--cream);border:1.5px dashed var(--border);border-radius:8px;padding:0.7rem 1.2rem;font-size:0.85rem;color:#666;transition:border-color 0.15s">
-                <span>📁</span> Välj logotyp (PNG, JPG, SVG)
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> Välj logotyp (PNG, JPG, SVG)
                 <input type="file" id="logoFileInput" accept="image/*" style="display:none" onchange="handleLogoUpload(event)">
               </label>
               <p style="font-size:0.72rem;color:#aaa;margin-top:0.5rem">Max 2 MB. Rekommenderas: bred bild med transparent bakgrund.</p>
@@ -1082,7 +1097,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div id="dashPending"><div class="empty-state" style="padding:2rem"><p>Laddar...</p></div></div>
         </div>
         <div style="margin-top:1.5rem">
-          <div class="card-label">🔴 Förfallna fakturor</div>
+          <div class="card-label"><span class="ico" style="color:#e05"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span> Förfallna fakturor</div>
           <div id="dashOverdue"><div class="empty-state" style="padding:2rem"><p>Laddar...</p></div></div>
         </div>
       </div>
@@ -1095,7 +1110,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <input id="customerSearch" type="text" placeholder="🔍 Sök kund..." oninput="filterCustomers()" style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit">
           <button onclick="openNewCustomerModal()" class="gen-btn" style="padding:0.6rem 1.2rem;font-size:0.85rem;white-space:nowrap">+ Ny kund</button>
         </div>
-        <div id="customerList"><div class="empty-state"><div class="big">👥</div><p>Inga kunder ännu. Kunder skapas automatiskt från offerter och fakturor, eller lägg till manuellt.</p></div></div>
+        <div id="customerList"><div class="empty-state"><div class="big"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span></div><p>Inga kunder ännu. Kunder skapas automatiskt från offerter och fakturor, eller lägg till manuellt.</p></div></div>
       </div>
 
       <!-- ARTICLES PAGE -->
@@ -1106,7 +1121,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <input id="articleSearch" type="text" placeholder="🔍 Sök artikel..." oninput="filterArticles()" style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit">
           <button onclick="openNewArticleModal()" class="gen-btn" style="padding:0.6rem 1.2rem;font-size:0.85rem;white-space:nowrap">+ Ny artikel</button>
         </div>
-        <div id="articleList"><div class="empty-state"><div class="big">📦</div><p>Inga artiklar ännu. Lägg till dina tjänster och material med fasta priser.</p></div></div>
+        <div id="articleList"><div class="empty-state"><div class="big"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span></div><p>Inga artiklar ännu. Lägg till dina tjänster och material med fasta priser.</p></div></div>
       </div>
 
     </main>
@@ -1761,7 +1776,7 @@ function updateInvoiceSummary() {
 function renderInvoiceList(data) {
   const el = document.getElementById('invoiceContent');
   if (!data || data.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="big">📑</div><p>Inga fakturor ännu</p></div>';
+    el.innerHTML = '<div class="empty-state"><div class="big"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span></div><p>Inga fakturor ännu</p></div>';
     return;
   }
   el.innerHTML = `<table class="history-table">
@@ -2141,6 +2156,8 @@ function getCleanQuoteHTML(html) {
   div.querySelectorAll('thead th').forEach(th => {
     if (th.textContent.trim() === 'Typ') th.remove();
   });
+  // Remove customer picker button from client section
+  div.querySelectorAll('.q-client button').forEach(el => el.remove());
   // Remove edit UI elements
   div.querySelectorAll('.edit-hint, .add-row-btn, .del-row-btn, .quote-toolbar').forEach(el => el.remove());
   // Make contenteditable plain text
@@ -2713,15 +2730,15 @@ function renderQuote(q) {
       <div class="q-offer-title">${q.title} <span class="valid-badge">Giltig 30 dagar</span></div>
       <div class="q-meta"><strong>Nr:</strong> ${info.quoteNum}<br><strong>Datum:</strong> ${info.dateStr}<br><strong>Giltig till:</strong> ${info.validStr}</div>
     </div>
-    <div class="q-client"><div class="lbl">Kund</div><strong class="editable" contenteditable="true">${q.clientName}</strong><br><span class="editable" contenteditable="true">${q.clientAddress}</span></div>
+    <div class="q-client"><div class="lbl">Kund <button onclick="openCustomerPickerForQuote()" style="font-size:0.65rem;background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:0.15rem 0.5rem;cursor:pointer;color:var(--gold);font-family:inherit;margin-left:0.5rem"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span> Välj kund</button></div><strong class="editable" contenteditable="true" id="quoteClientName">${q.clientName}</strong><br><span class="editable" contenteditable="true" id="quoteClientAddr">${q.clientAddress}</span></div>
     <div class="q-intro">${q.introduction}</div>
-    <div class="edit-hint">✏️ Klicka på rad för att redigera – summor räknas om automatiskt${info.inclRot ? '. Ändra Arbete/Material per rad för korrekt ROT-avdrag.' : ''}</div>
+    <div class="edit-hint"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></span> Klicka på rad för att redigera – summor räknas om automatiskt${info.inclRot ? '. Ändra Arbete/Material per rad för korrekt ROT-avdrag.' : ''}</div>
     <table class="qt">
       <thead><tr><th style="width:${info.inclRot?'38':'44'}%">Beskrivning</th><th>Antal</th><th style="text-align:right">À-pris</th><th style="text-align:right">Summa</th>${info.inclRot?'<th style="width:70px;text-align:center;font-size:0.62rem">Typ</th>':''}<th style="width:26px"></th></tr></thead>
       <tbody id="itemsTbody">${q.items.map(it=>buildRow(it)).join('')}</tbody>
     </table>
     <button class="add-row-btn" onclick="addRow()">+ Lägg till rad</button>
-    <button class="add-row-btn" onclick="openArticlePicker()" style="margin-left:0.5rem">📦 Välj från artiklar</button>
+    <button class="add-row-btn" onclick="openArticlePicker()" style="margin-left:0.5rem"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Välj från artiklar</button>
     <div class="q-totals">
       <div class="q-totals-box">
         <div class="trow"><span>Netto (exkl. moms)</span><span id="tot-sub">${fmtSEK(q.subtotal)}</span></div>
@@ -2731,9 +2748,9 @@ function renderQuote(q) {
         <div class="trow final-row"><span id="tot-final-lbl">${finalLabel}</span><span id="tot-final">${fmtSEK(finalTotal)}</span></div>
       </div>
     </div>
-    ${q.timeline?`<div class="q-terms" style="margin-bottom:1rem"><h4>📅 Tidplan</h4><p class="editable" contenteditable="true">${q.timeline}</p></div>`:''}
-    ${q.materials?`<div class="q-terms" style="margin-bottom:1rem"><h4>🔩 Material</h4><p class="editable" contenteditable="true">${q.materials}</p></div>`:''}
-    <div class="q-terms"><h4>📄 Villkor & betalning</h4><p class="editable" contenteditable="true">• Betalningsvillkor: ${info.payterms}${q.warrantyText ? '<br>• ' + q.warrantyText : ''}<br>${q.terms}</p></div>
+    ${q.timeline?`<div class="q-terms" style="margin-bottom:1rem"><h4><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> Tidplan</h4><p class="editable" contenteditable="true">${q.timeline}</p></div>`:''}
+    ${q.materials?`<div class="q-terms" style="margin-bottom:1rem"><h4><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Material</h4><p class="editable" contenteditable="true">${q.materials}</p></div>`:''}
+    <div class="q-terms"><h4><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span> Villkor & betalning</h4><p class="editable" contenteditable="true">• Betalningsvillkor: ${info.payterms}${q.warrantyText ? '<br>• ' + q.warrantyText : ''}<br>${q.terms}</p></div>
     <p class="editable" contenteditable="true" style="font-size:0.82rem;color:#555;margin-bottom:1.5rem;font-style:italic">${q.closingNote}</p>
     <div class="q-footer">
       <div><strong>${info.company}</strong><br>${info.phone} ${info.email}${credentialsHtml ? `<br><span style='font-size:0.72rem;color:#aaa'>${credentialsHtml}</span>` : ''}</div>
@@ -2844,6 +2861,7 @@ function showMobileTabBar(show, plan, used, total) {
 // ===== SPEECH TO TEXT =====
 let micRecognition = null;
 let micActive = false;
+const micSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><rect x="9" y="1" width="6" height="11" rx="3"/><path d="M19 10v1a7 7 0 01-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
 function toggleMic() {
   const btn = document.getElementById('micBtn');
   if (micActive && micRecognition) {
@@ -2858,22 +2876,20 @@ function toggleMic() {
   micRecognition = new SR();
   micRecognition.lang = 'sv-SE';
   micRecognition.interimResults = true;
-  micRecognition.continuous = true;
-  let finalText = document.getElementById('jobPrompt').value;
-  const startPos = finalText.length;
-  micRecognition.onstart = () => { micActive = true; btn.classList.add('recording'); btn.textContent = '⏹'; };
-  micRecognition.onend = () => { micActive = false; btn.classList.remove('recording'); btn.textContent = '🎤'; micRecognition = null; };
-  micRecognition.onerror = (e) => { if (e.error !== 'aborted') console.error('Mic error:', e.error); };
+  micRecognition.continuous = false; // Single utterance — stops after pause
+  const textBefore = document.getElementById('jobPrompt').value;
+  micRecognition.onstart = () => { micActive = true; btn.classList.add('recording'); btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><rect x="4" y="4" width="16" height="16" rx="2" fill="currentColor"/></svg> Stoppa'; };
+  micRecognition.onend = () => { micActive = false; btn.classList.remove('recording'); btn.innerHTML = micSvg + ' Prata in'; micRecognition = null; };
+  micRecognition.onerror = (e) => { if (e.error !== 'aborted' && e.error !== 'no-speech') console.error('Mic error:', e.error); };
   micRecognition.onresult = (e) => {
-    let interim = '', final = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) final += e.results[i][0].transcript;
-      else interim += e.results[i][0].transcript;
+    // Rebuild full transcript from all results
+    let transcript = '';
+    for (let i = 0; i < e.results.length; i++) {
+      transcript += e.results[i][0].transcript;
     }
     const ta = document.getElementById('jobPrompt');
-    const base = finalText;
-    if (final) { finalText = base + (base && !base.endsWith(' ') ? ' ' : '') + final; ta.value = finalText; }
-    else ta.value = finalText + (finalText && !finalText.endsWith(' ') ? ' ' : '') + interim;
+    const sep = textBefore && !textBefore.endsWith(' ') && !textBefore.endsWith('\n') ? ' ' : '';
+    ta.value = textBefore + sep + transcript;
   };
   micRecognition.start();
 }
@@ -2958,7 +2974,7 @@ async function loadCustomers() {
 function renderCustomers(list) {
   const el = document.getElementById('customerList');
   if (!list.length) {
-    el.innerHTML = '<div class="empty-state"><div class="big">👥</div><p>Inga kunder ännu. Lägg till manuellt eller så skapas de automatiskt.</p></div>';
+    el.innerHTML = '<div class="empty-state"><div class="big"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span></div><p>Inga kunder ännu. Lägg till manuellt eller så skapas de automatiskt.</p></div>';
     return;
   }
   el.innerHTML = list.map(c => `
@@ -2981,6 +2997,7 @@ function openNewCustomerModal() {
   document.getElementById('custPhone').value = '';
   document.getElementById('custAddress').value = '';
   document.getElementById('custNotes').value = '';
+  document.getElementById('custDeleteBtn').style.display = 'none';
   document.getElementById('customerModalOverlay').style.display = 'flex';
 }
 function editCustomer(id) {
@@ -2993,6 +3010,7 @@ function editCustomer(id) {
   document.getElementById('custPhone').value = c.phone || '';
   document.getElementById('custAddress').value = c.address || '';
   document.getElementById('custNotes').value = c.notes || '';
+  document.getElementById('custDeleteBtn').style.display = 'block';
   document.getElementById('customerModalOverlay').style.display = 'flex';
 }
 function closeCustomerModal() { document.getElementById('customerModalOverlay').style.display = 'none'; }
@@ -3018,6 +3036,71 @@ async function saveCustomer() {
   closeCustomerModal();
   loadCustomers();
 }
+async function deleteCustomer() {
+  const id = document.getElementById('custEditId').value;
+  if (!id) return;
+  if (!confirm('Ta bort denna kund?')) return;
+  const { error } = await sb.from('customers').delete().eq('id', id);
+  if (error) { alert('Fel: ' + error.message); return; }
+  closeCustomerModal();
+  loadCustomers();
+}
+
+// Customer picker / suggestions
+async function ensureCustomersLoaded() {
+  if (_customersData.length > 0) return;
+  try {
+    const { data } = await sb.from('customers').select('*').eq('user_id', currentUser.id).order('name');
+    _customersData = data || [];
+  } catch(e) { _customersData = []; }
+}
+
+function showCustomerSuggestions(input, dropdownId) {
+  ensureCustomersLoaded().then(() => {
+    const dd = document.getElementById(dropdownId);
+    const q = input.value.toLowerCase().trim();
+    const filtered = q ? _customersData.filter(c => (c.name||'').toLowerCase().includes(q)) : _customersData;
+    if (filtered.length === 0) { dd.style.display = 'none'; return; }
+    dd.innerHTML = filtered.slice(0, 8).map(c => `
+      <div class="cust-dropdown-item" onmousedown="selectCustomerSuggestion('${c.id}','${dropdownId}')">
+        <strong>${c.name}</strong>
+        ${c.address || c.email || c.phone ? `<div class="cust-dd-sub">${[c.address, c.email, c.phone].filter(Boolean).join(' · ')}</div>` : ''}
+      </div>
+    `).join('');
+    dd.style.display = 'block';
+  });
+}
+
+function selectCustomerSuggestion(custId, dropdownId) {
+  const c = _customersData.find(x => x.id === custId);
+  if (!c) return;
+  const dd = document.getElementById(dropdownId);
+  dd.style.display = 'none';
+  // Determine which context we're in
+  if (dropdownId === 'invCustDropdown') {
+    document.getElementById('invClient').value = c.name;
+    document.getElementById('invClientAddr').value = c.address || '';
+  }
+}
+
+function openCustomerPickerForQuote() {
+  ensureCustomersLoaded().then(() => {
+    if (_customersData.length === 0) { alert('Inga sparade kunder. Lägg till kunder under <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span> Kunder.'); return; }
+    const items = _customersData.map(c => `<div class="cust-dropdown-item" onclick="fillQuoteClient('${c.id}')" style="padding:0.8rem 1rem">${c.name}${c.address ? `<div class="cust-dd-sub">${c.address}</div>` : ''}</div>`).join('');
+    const dd = document.createElement('div');
+    dd.innerHTML = `<div class="overlay" onclick="if(event.target===this)this.remove()" style="z-index:600"><div class="modal" style="max-width:400px;max-height:60vh;overflow-y:auto"><h3 style="margin-bottom:0.8rem"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span> Välj kund</h3>${items}</div></div>`;
+    document.body.appendChild(dd.firstElementChild);
+  });
+}
+function fillQuoteClient(custId) {
+  const c = _customersData.find(x => x.id === custId);
+  if (!c) return;
+  const nameEl = document.getElementById('quoteClientName');
+  const addrEl = document.getElementById('quoteClientAddr');
+  if (nameEl) nameEl.textContent = c.name;
+  if (addrEl) addrEl.textContent = c.address || 'Adress';
+  document.querySelector('.overlay[style*="z-index:600"]')?.remove();
+}
 
 // ===== ARTICLES =====
 let _articlesData = [];
@@ -3035,7 +3118,7 @@ async function loadArticles() {
 function renderArticles(list) {
   const el = document.getElementById('articleList');
   if (!list.length) {
-    el.innerHTML = '<div class="empty-state"><div class="big">📦</div><p>Inga artiklar ännu. Lägg till dina tjänster och material med fasta priser.</p></div>';
+    el.innerHTML = '<div class="empty-state"><div class="big"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span></div><p>Inga artiklar ännu. Lägg till dina tjänster och material med fasta priser.</p></div>';
     return;
   }
   el.innerHTML = `<table class="art-table"><thead><tr><th>Artikel</th><th>Pris</th><th>Enhet</th><th>Typ</th><th style="width:80px"></th></tr></thead><tbody>${list.map(a => `
@@ -3044,7 +3127,7 @@ function renderArticles(list) {
       <td>${Number(a.price).toLocaleString('sv-SE')} kr</td>
       <td>${a.unit || 'st'}</td>
       <td><span class="art-badge ${a.type || 'arbete'}">${a.type === 'material' ? 'Material' : 'Arbete'}</span></td>
-      <td><button onclick="editArticle('${a.id}')" style="background:none;border:none;cursor:pointer;font-size:0.8rem;color:var(--gold)">✏️</button><button onclick="deleteArticle('${a.id}')" style="background:none;border:none;cursor:pointer;font-size:0.8rem;color:#e05;margin-left:0.3rem">×</button></td>
+      <td><button onclick="editArticle('${a.id}')" style="background:none;border:none;cursor:pointer;font-size:0.8rem;color:var(--gold)" title="Redigera"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></span></button><button onclick="deleteArticle('${a.id}')" style="background:none;border:none;cursor:pointer;font-size:0.8rem;color:#e05;margin-left:0.3rem">×</button></td>
     </tr>
   `).join('')}</tbody></table>`;
 }
@@ -3060,6 +3143,7 @@ function openNewArticleModal() {
   document.getElementById('artUnit').value = 'st';
   document.getElementById('artType').value = 'arbete';
   document.getElementById('artSku').value = '';
+  document.getElementById('artDeleteBtn').style.display = 'none';
   document.getElementById('articleModalOverlay').style.display = 'flex';
 }
 function editArticle(id) {
@@ -3072,6 +3156,7 @@ function editArticle(id) {
   document.getElementById('artUnit').value = a.unit || 'st';
   document.getElementById('artType').value = a.type || 'arbete';
   document.getElementById('artSku').value = a.sku || '';
+  document.getElementById('artDeleteBtn').style.display = 'block';
   document.getElementById('articleModalOverlay').style.display = 'flex';
 }
 function closeArticleModal() { document.getElementById('articleModalOverlay').style.display = 'none'; }
@@ -3103,10 +3188,21 @@ async function deleteArticle(id) {
   await sb.from('articles').delete().eq('id', id);
   loadArticles();
 }
+async function deleteArticleFromModal() {
+  const id = document.getElementById('artEditId').value;
+  if (!id) return;
+  if (!confirm('Ta bort denna artikel?')) return;
+  const { error } = await sb.from('articles').delete().eq('id', id);
+  if (error) { alert('Fel: ' + error.message); return; }
+  closeArticleModal();
+  loadArticles();
+}
 
 // ===== ARTICLE PICKER (for quote/invoice) =====
 let _pickerSelected = new Set();
+let _pickerMode = 'quote';
 function openArticlePicker() {
+  _pickerMode = 'quote';
   _pickerSelected = new Set();
   loadPickerArticles();
   document.getElementById('articlePickerOverlay').style.display = 'flex';
@@ -3125,7 +3221,7 @@ async function loadPickerArticles() {
 function renderPickerArticles(list) {
   const el = document.getElementById('pickerList');
   if (!list.length) {
-    el.innerHTML = '<div style="padding:2rem;text-align:center;color:#888">Inga artiklar. Lägg till artiklar under 📦 Artiklar först.</div>';
+    el.innerHTML = '<div style="padding:2rem;text-align:center;color:#888">Inga artiklar. Lägg till artiklar under <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Artiklar först.</div>';
     return;
   }
   el.innerHTML = list.map(a => `
@@ -3146,6 +3242,10 @@ function togglePickerItem(cb) {
 }
 function insertPickedArticles() {
   if (_pickerSelected.size === 0) { alert('Välj minst en artikel'); return; }
+  if (_pickerMode === 'invoice') {
+    insertPickedArticlesInvoice();
+    return;
+  }
   const tbody = document.getElementById('itemsTbody');
   if (!tbody) { closeArticlePicker(); return; }
   _pickerSelected.forEach(id => {
@@ -3162,6 +3262,36 @@ function insertPickedArticles() {
   closeArticlePicker();
 }
 
+function openArticlePickerForInvoice() {
+  _pickerMode = 'invoice';
+  _pickerSelected = new Set();
+  loadPickerArticles();
+  document.getElementById('articlePickerOverlay').style.display = 'flex';
+  document.getElementById('pickerSearch').value = '';
+}
+
+function insertPickedArticlesInvoice() {
+  const container = document.getElementById('invRows');
+  _pickerSelected.forEach(id => {
+    const a = _articlesData.find(x => x.id === id);
+    if (!a) return;
+    const qty = parseFloat(document.getElementById('pickerQty-' + id)?.value) || 1;
+    const row = document.createElement('div');
+    row.className = 'inv-row-entry';
+    row.style.cssText = 'display:grid;grid-template-columns:1.3fr 0.5fr 0.8fr auto;gap:0.4rem;margin-bottom:0.5rem;align-items:end';
+    row.innerHTML = `<div class="field" style="margin:0"><label style="font-size:0.7rem">Beskrivning</label><input class="inv-desc" value="${a.name}"></div><div class="field" style="margin:0"><label style="font-size:0.7rem">Antal</label><input class="inv-qty" type="number" value="${qty}" min="1"></div><div class="field" style="margin:0"><label style="font-size:0.7rem">À-pris</label><input class="inv-price" type="number" value="${a.price}"></div><button onclick="this.parentElement.remove()" style="background:none;border:none;color:#e05;cursor:pointer;font-size:1.1rem;padding:0 0.3rem;margin-bottom:0.3rem">×</button>`;
+    container.appendChild(row);
+  });
+  closeArticlePicker();
+}
+
+// Hide customer dropdown on click outside
+document.addEventListener('click', (e) => {
+  document.querySelectorAll('.cust-dropdown').forEach(dd => {
+    if (!dd.parentElement.contains(e.target)) dd.style.display = 'none';
+  });
+});
+
 init();
 </script>
 
@@ -3176,7 +3306,7 @@ init();
         <button class="qt-btn" onclick="shareViaEmail()">✉ E-post</button>
         <button class="qt-btn" onclick="shareNative()">↗ Dela</button>
         <button class="qt-btn" onclick="downloadPDF()">⬇ Ladda ner PDF</button>
-        <button class="qt-btn" onclick="createInvoiceFromQuote()" style="background:#2e7d32;color:white;border-color:#2e7d32">📑 Skapa faktura</button>
+        <button class="qt-btn" onclick="createInvoiceFromQuote()" style="background:#2e7d32;color:white;border-color:#2e7d32"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> Skapa faktura</button>
         <button class="qt-btn" onclick="closeQuoteModal()" style="margin-left:0.5rem">✕ Stäng</button>
       </div>
     </div>
@@ -3188,7 +3318,7 @@ init();
 <div class="overlay" id="invoiceModalOverlay" style="align-items:flex-start;padding:0;overflow-y:auto" onclick="if(event.target===this)closeInvoiceModal()">
   <div id="invoiceModalBox" style="background:white;border-radius:0;width:100%;max-width:860px;margin:auto;overflow:hidden;box-shadow:0 20px 80px rgba(0,0,0,0.3)">
     <div class="quote-toolbar" style="border-radius:0">
-      <span class="qt-label">📑 Faktura</span>
+      <span class="qt-label"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> Faktura</span>
       <div class="qt-btns">
         <button class="qt-btn" onclick="downloadInvoicePDF()">⬇ PDF</button>
         <button class="qt-btn" onclick="shareInvoiceEmail()">✉ E-post</button>
@@ -3211,7 +3341,12 @@ init();
       <p>Skapa en faktura manuellt</p>
     </div>
     <div style="padding:1.5rem 2rem">
-      <div class="field"><label>Kund / Företag</label><input id="invClient" placeholder="Kund AB"></div>
+      <div class="field"><label>Kund / Företag</label>
+        <div style="position:relative">
+          <input id="invClient" placeholder="Sök eller skriv kundnamn..." autocomplete="off" oninput="showCustomerSuggestions(this,'invCustDropdown')" onfocus="showCustomerSuggestions(this,'invCustDropdown')">
+          <div id="invCustDropdown" class="cust-dropdown" style="display:none"></div>
+        </div>
+      </div>
       <div class="field"><label>Kundadress</label><input id="invClientAddr" placeholder="Gatan 1, 123 45 Stad"></div>
       <div class="field"><label>Titel / Beskrivning</label><input id="invTitle" placeholder="t.ex. Renovering badrum"></div>
       <div class="field"><label>Betalningsvillkor</label>
@@ -3228,6 +3363,7 @@ init();
         </div>
       </div>
       <button onclick="addInvRow()" style="font-size:0.78rem;color:var(--gold);cursor:pointer;border:1px dashed var(--gold-light);background:#fffaee;border-radius:6px;padding:0.35rem 0.8rem;font-family:'DM Sans',sans-serif;margin-bottom:1rem">+ Lägg till rad</button>
+      <button onclick="openArticlePickerForInvoice()" style="font-size:0.78rem;color:var(--gold);cursor:pointer;border:1px dashed var(--gold-light);background:#fffaee;border-radius:6px;padding:0.35rem 0.8rem;font-family:'DM Sans',sans-serif;margin-bottom:1rem;margin-left:0.4rem"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Från artiklar</button>
       <div class="field"><label>Momssats</label>
         <select id="invVat"><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
       </div>
@@ -3240,16 +3376,21 @@ init();
 <!-- ===== CUSTOMER MODAL ===== -->
 <div class="overlay" id="customerModalOverlay" onclick="if(event.target===this)closeCustomerModal()">
   <div class="modal" style="max-width:480px">
-    <h3 style="margin-bottom:1rem" id="customerModalTitle">Ny kund</h3>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem">
+      <h3 style="margin:0" id="customerModalTitle">Ny kund</h3>
+      <button onclick="closeCustomerModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#999;padding:0 0.2rem">✕</button>
+    </div>
     <input type="hidden" id="custEditId" value="">
     <div class="field" style="margin-bottom:0.8rem"><label>Namn *</label><input id="custName" placeholder="Förnamn Efternamn / Företagsnamn"></div>
-    <div class="field" style="margin-bottom:0.8rem"><label>E-post</label><input id="custEmail" type="email" placeholder="kund@mail.se"></div>
-    <div class="field" style="margin-bottom:0.8rem"><label>Telefon</label><input id="custPhone" placeholder="070-000 00 00"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:0.8rem">
+      <div class="field" style="margin:0"><label>E-post</label><input id="custEmail" type="email" placeholder="kund@mail.se"></div>
+      <div class="field" style="margin:0"><label>Telefon</label><input id="custPhone" placeholder="070-000 00 00"></div>
+    </div>
     <div class="field" style="margin-bottom:0.8rem"><label>Adress</label><input id="custAddress" placeholder="Storgatan 1, 123 45 Stad"></div>
-    <div class="field" style="margin-bottom:1rem"><label>Anteckningar</label><textarea id="custNotes" style="height:50px;resize:none;border:1.5px solid var(--border);border-radius:8px;padding:0.5rem 0.8rem;font-family:inherit;font-size:0.88rem;width:100%;box-sizing:border-box" placeholder="Valfria anteckningar..."></textarea></div>
-    <div style="display:flex;gap:0.7rem">
+    <div class="field" style="margin-bottom:1.2rem"><label>Anteckningar</label><textarea id="custNotes" style="height:50px;resize:none;border:1.5px solid var(--border);border-radius:8px;padding:0.5rem 0.8rem;font-family:inherit;font-size:0.88rem;width:100%;box-sizing:border-box" placeholder="Valfria anteckningar..."></textarea></div>
+    <div style="display:flex;gap:0.7rem;align-items:center">
       <button onclick="saveCustomer()" class="gen-btn" style="flex:1">Spara kund</button>
-      <button onclick="closeCustomerModal()" style="flex:0;padding:0.6rem 1.2rem;background:#eee;border:none;border-radius:8px;cursor:pointer;font-family:inherit">Avbryt</button>
+      <button id="custDeleteBtn" onclick="deleteCustomer()" style="display:none;padding:0.6rem 1rem;background:none;border:1.5px solid #e05;color:#e05;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.85rem">Ta bort</button>
     </div>
   </div>
 </div>
@@ -3257,28 +3398,31 @@ init();
 <!-- ===== ARTICLE MODAL ===== -->
 <div class="overlay" id="articleModalOverlay" onclick="if(event.target===this)closeArticleModal()">
   <div class="modal" style="max-width:480px">
-    <h3 style="margin-bottom:1rem" id="articleModalTitle">Ny artikel</h3>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem">
+      <h3 style="margin:0" id="articleModalTitle">Ny artikel</h3>
+      <button onclick="closeArticleModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#999;padding:0 0.2rem">✕</button>
+    </div>
     <input type="hidden" id="artEditId" value="">
     <div class="field" style="margin-bottom:0.8rem"><label>Artikelnamn *</label><input id="artName" placeholder="t.ex. Kabeldragning per meter"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:0.8rem">
-      <div class="field"><label>Pris (exkl. moms) *</label><input id="artPrice" type="number" min="0" placeholder="650"></div>
-      <div class="field"><label>Enhet</label>
+      <div class="field" style="margin:0"><label>Pris (exkl. moms) *</label><input id="artPrice" type="number" min="0" placeholder="650"></div>
+      <div class="field" style="margin:0"><label>Enhet</label>
         <select id="artUnit" style="width:100%;padding:0.55rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
           <option value="st">st</option><option value="timmar">timmar</option><option value="m">meter</option><option value="m²">m²</option><option value="löpmeter">löpmeter</option><option value="kg">kg</option><option value="paket">paket</option>
         </select>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1rem">
-      <div class="field"><label>Typ</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1.2rem">
+      <div class="field" style="margin:0"><label>Typ</label>
         <select id="artType" style="width:100%;padding:0.55rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
           <option value="arbete">Arbete</option><option value="material">Material</option>
         </select>
       </div>
-      <div class="field"><label>Artikelnr</label><input id="artSku" placeholder="Valfritt"></div>
+      <div class="field" style="margin:0"><label>Artikelnr</label><input id="artSku" placeholder="Valfritt"></div>
     </div>
-    <div style="display:flex;gap:0.7rem">
+    <div style="display:flex;gap:0.7rem;align-items:center">
       <button onclick="saveArticle()" class="gen-btn" style="flex:1">Spara artikel</button>
-      <button onclick="closeArticleModal()" style="flex:0;padding:0.6rem 1.2rem;background:#eee;border:none;border-radius:8px;cursor:pointer;font-family:inherit">Avbryt</button>
+      <button id="artDeleteBtn" onclick="deleteArticleFromModal()" style="display:none;padding:0.6rem 1rem;background:none;border:1.5px solid #e05;color:#e05;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.85rem">Ta bort</button>
     </div>
   </div>
 </div>
@@ -3286,7 +3430,7 @@ init();
 <!-- ===== ARTICLE PICKER MODAL ===== -->
 <div class="overlay" id="articlePickerOverlay" onclick="if(event.target===this)closeArticlePicker()">
   <div class="modal" style="max-width:560px;max-height:80vh;overflow-y:auto">
-    <h3 style="margin-bottom:0.8rem">📦 Välj artiklar</h3>
+    <h3 style="margin-bottom:0.8rem"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Välj artiklar</h3>
     <input id="pickerSearch" type="text" placeholder="🔍 Sök artikel..." oninput="filterPickerArticles()" style="width:100%;box-sizing:border-box;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit;margin-bottom:0.8rem">
     <div id="pickerList" style="max-height:50vh;overflow-y:auto"></div>
     <div style="margin-top:1rem;display:flex;gap:0.7rem">
@@ -3319,39 +3463,39 @@ init();
   <!-- Nav items -->
   <div style="padding:0 0.75rem;flex:1">
     <button onclick="closeDrawer();showView('app');showPage('generate')" id="dNav-generate" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
-      <span style="font-size:1.3rem">📄</span> Ny offert
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span> Ny offert
     </button>
     <button onclick="closeDrawer();showView('app');showPage('history')" id="dNav-history" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
-      <span style="font-size:1.3rem">📋</span> Offerthistorik
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></span> Offerthistorik
     </button>
     <button onclick="closeDrawer();showView('app');showPage('invoices')" id="dNav-invoices" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
-      <span style="font-size:1.3rem">📑</span> Fakturor
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> Fakturor
     </button>
     <button onclick="closeDrawer();showView('app');showPage('dashboard')" id="dNav-dashboard" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
-      <span style="font-size:1.3rem">📊</span> Dashboard
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Dashboard
     </button>
     <button onclick="closeDrawer();showView('app');showPage('customers')" id="dNav-customers" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
-      <span style="font-size:1.3rem">👥</span> Kunder
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span> Kunder
     </button>
     <button onclick="closeDrawer();showView('app');showPage('articles')" id="dNav-articles" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
-      <span style="font-size:1.3rem">📦</span> Artiklar
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Artiklar
     </button>
     <button onclick="closeDrawer();showView('app');showPage('profile')" id="dNav-profile" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
-      <span style="font-size:1.3rem">🏢</span> Företagsprofil
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/><path d="M9 22v-4h6v4"/></svg></span> Företagsprofil
     </button>
     <div style="border-top:1px solid #222;margin:0.5rem 0.5rem"></div>
     <a href="/om-oss.html" style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
-      <span style="font-size:1.1rem">ℹ️</span> Om oss
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span> Om oss
     </a>
     <a href="/kontakta-oss.html" style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
-      <span style="font-size:1.1rem">✉️</span> Kontakta oss
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></span> Kontakta oss
     </a>
   </div>
 
   <!-- Logout button at bottom of drawer -->
   <div style="padding:1rem 1.5rem;border-top:1px solid #222;margin-top:auto">
     <button onclick="closeDrawer();signOut()" style="width:100%;padding:0.7rem;font-size:0.9rem;background:transparent;border:1.5px solid #e05;color:#e05;border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif;font-weight:600;display:flex;align-items:center;justify-content:center;gap:0.5rem">
-      ⎋ Logga ut
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span> Logga ut
     </button>
   </div>
 </div>
