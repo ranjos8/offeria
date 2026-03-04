@@ -343,7 +343,37 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .del-row-btn:hover { color: var(--rust); }
 .row-type-select { font-size: 0.68rem; padding: 0.2rem 0.25rem; border: 1px solid #ddd; border-radius: 4px; background: white; font-family: inherit; cursor: pointer; color: #555; }
 .row-type-select:focus { border-color: var(--gold); outline: none; }
-.row-type-label { font-size: 0.65rem; color: #999; font-style: italic; }
+
+/* mic button */
+.mic-btn { background: var(--cream); border: 1.5px solid var(--border); border-radius: 50%; width: 42px; height: 42px; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.mic-btn:hover { border-color: var(--gold); }
+.mic-btn.recording { background: #e05; border-color: #e05; animation: pulse-mic 1s infinite; }
+@keyframes pulse-mic { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+/* dashboard */
+.dash-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+.dash-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; text-align: center; }
+.dash-num { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 700; color: var(--ink); }
+.dash-label { font-size: 0.72rem; color: #888; margin-top: 0.3rem; }
+.dash-pending-item, .dash-overdue-item { display: flex; justify-content: space-between; align-items: center; padding: 0.7rem 1rem; background: white; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.5rem; font-size: 0.85rem; }
+.dash-pending-item .days-ago { color: #e05; font-weight: 600; font-size: 0.78rem; }
+
+/* articles table */
+.art-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.art-table th { background: var(--ink); color: white; padding: 0.6rem 1rem; text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; }
+.art-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); }
+.art-table tr:last-child td { border-bottom: none; }
+.art-table tr:hover td { background: #fafaf8; }
+.art-badge { font-size: 0.65rem; padding: 0.15rem 0.4rem; border-radius: 10px; font-weight: 600; }
+.art-badge.arbete { background: #e8f5e9; color: #2e7d32; }
+.art-badge.material { background: #fff8e1; color: #b8902e; }
+
+/* customer cards */
+.cust-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 0.7rem; cursor: pointer; transition: border-color 0.15s; }
+.cust-card:hover { border-color: var(--gold); }
+.cust-name { font-weight: 700; font-size: 0.95rem; color: var(--ink); }
+.cust-info { font-size: 0.78rem; color: #888; margin-top: 0.2rem; }
+.cust-stats { font-size: 0.72rem; color: var(--gold); margin-top: 0.4rem; font-weight: 600; }
 .q-totals { display: flex; justify-content: flex-end; margin: 1rem 0 1.5rem; }
 .q-totals-box { min-width: 255px; }
 .trow { display: flex; justify-content: space-between; padding: 0.33rem 0; font-size: 0.83rem; border-bottom: 1px solid #eee; }
@@ -509,6 +539,9 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   #quoteDoc table.qt { font-size: 0.75rem; }
   #quoteDoc table.qt th, #quoteDoc table.qt td { padding: 0.5rem 0.4rem; }
   .row-type-select { font-size: 0.6rem; padding: 0.15rem 0.15rem; }
+  .dash-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+  .dash-num { font-size: 1.1rem; }
+  .mic-btn { width: 38px; height: 38px; font-size: 1rem; }
   #quoteDoc .q-totals { justify-content: stretch; }
   #quoteDoc .q-totals-box { width: 100%; min-width: unset; }
   #quoteDoc .q-footer { flex-direction: column; gap: 1rem; align-items: flex-start; }
@@ -796,6 +829,9 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <div class="sidebar-item active" id="sNav-generate" onclick="showPage('generate')">📄 Ny offert</div>
       <div class="sidebar-item" id="sNav-history" onclick="showPage('history')">🗂 Offerthistorik</div>
       <div class="sidebar-item" id="sNav-invoices" onclick="showPage('invoices')">📑 Fakturor</div>
+      <div class="sidebar-item" id="sNav-dashboard" onclick="showPage('dashboard')">📊 Dashboard</div>
+      <div class="sidebar-item" id="sNav-customers" onclick="showPage('customers')">👥 Kunder</div>
+      <div class="sidebar-item" id="sNav-articles" onclick="showPage('articles')">📦 Artiklar</div>
       <div class="sidebar-item" id="sNav-profile" onclick="showPage('profile')">🏢 Företagsprofil</div>
 
       <div class="quota-box">
@@ -886,6 +922,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <textarea class="prompt-area" id="jobPrompt" placeholder="Beskriv vad som ska göras, ungefär hur stort, var…"></textarea>
           <div class="gen-row">
             <button class="gen-btn" id="genBtn" onclick="generateQuote()">✦ Generera offert</button>
+            <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="Prata in uppdragsbeskrivning">🎤</button>
             <span class="quota-note" id="quotaNote"></span>
           </div>
           <div class="status-bar" id="statusBar">
@@ -972,6 +1009,9 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <div class="grid3">
               <div class="field"><label>Timpris (exkl. moms)</label><input id="pHourlyRate" placeholder="650" type="number" min="0"></div>
               <div class="field"><label>Resekostnad (exkl. moms)</label><input id="pTravelCost" placeholder="t.ex. 45 kr/mil"></div>
+              <div class="field"><label>Standardpåslag (%)</label><input id="pMarkup" placeholder="t.ex. 15" type="number" min="0" max="100"><span style="font-size:0.65rem;color:#999">Läggs på material</span></div>
+            </div>
+            <div class="grid3">
               <div class="field"><label>Standardmoms</label>
                 <select id="pDefaultVat"><option value="">Välj moms</option><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
               </div>
@@ -1021,6 +1061,52 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <button onclick="deleteAccount()" style="background:none;border:1px solid #e05;color:#e05;border-radius:8px;padding:0.5rem 1rem;font-size:0.78rem;cursor:pointer;font-family:DM Sans,sans-serif">Ta bort konto</button>
           </div>
         </div>
+      </div>
+
+      <!-- DASHBOARD PAGE -->
+      <div class="app-page" id="page-dashboard">
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub">Översikt av din verksamhet</div>
+        <div class="dash-grid" id="dashGrid">
+          <div class="dash-card"><div class="dash-num" id="dashQuotes">0</div><div class="dash-label">Offerter totalt</div></div>
+          <div class="dash-card"><div class="dash-num" id="dashQuoteValue">0 kr</div><div class="dash-label">Offertvärde totalt</div></div>
+          <div class="dash-card"><div class="dash-num" id="dashInvoices">0</div><div class="dash-label">Fakturor totalt</div></div>
+          <div class="dash-card"><div class="dash-num" id="dashInvoiceValue">0 kr</div><div class="dash-label">Fakturerat totalt</div></div>
+          <div class="dash-card"><div class="dash-num" id="dashPaid">0 kr</div><div class="dash-label">Betalt</div></div>
+          <div class="dash-card"><div class="dash-num" id="dashUnpaid">0 kr</div><div class="dash-label">Obetalt</div></div>
+          <div class="dash-card"><div class="dash-num" id="dashWinRate">–</div><div class="dash-label">Win-rate (offert → faktura)</div></div>
+          <div class="dash-card"><div class="dash-num" id="dashMonthly">0 kr</div><div class="dash-label">Fakturerat denna månad</div></div>
+        </div>
+        <div style="margin-top:1.5rem">
+          <div class="card-label">⏳ Offerter som väntar på svar (äldre än 7 dagar)</div>
+          <div id="dashPending"><div class="empty-state" style="padding:2rem"><p>Laddar...</p></div></div>
+        </div>
+        <div style="margin-top:1.5rem">
+          <div class="card-label">🔴 Förfallna fakturor</div>
+          <div id="dashOverdue"><div class="empty-state" style="padding:2rem"><p>Laddar...</p></div></div>
+        </div>
+      </div>
+
+      <!-- CUSTOMERS PAGE -->
+      <div class="app-page" id="page-customers">
+        <div class="page-title">Kunder</div>
+        <div class="page-sub">Alla dina kunder samlade</div>
+        <div style="display:flex;gap:0.8rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
+          <input id="customerSearch" type="text" placeholder="🔍 Sök kund..." oninput="filterCustomers()" style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit">
+          <button onclick="openNewCustomerModal()" class="gen-btn" style="padding:0.6rem 1.2rem;font-size:0.85rem;white-space:nowrap">+ Ny kund</button>
+        </div>
+        <div id="customerList"><div class="empty-state"><div class="big">👥</div><p>Inga kunder ännu. Kunder skapas automatiskt från offerter och fakturor, eller lägg till manuellt.</p></div></div>
+      </div>
+
+      <!-- ARTICLES PAGE -->
+      <div class="app-page" id="page-articles">
+        <div class="page-title">Artiklar & Prislista</div>
+        <div class="page-sub">Dina egna priser – plocka enkelt in i offerter och fakturor</div>
+        <div style="display:flex;gap:0.8rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
+          <input id="articleSearch" type="text" placeholder="🔍 Sök artikel..." oninput="filterArticles()" style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit">
+          <button onclick="openNewArticleModal()" class="gen-btn" style="padding:0.6rem 1.2rem;font-size:0.85rem;white-space:nowrap">+ Ny artikel</button>
+        </div>
+        <div id="articleList"><div class="empty-state"><div class="big">📦</div><p>Inga artiklar ännu. Lägg till dina tjänster och material med fasta priser.</p></div></div>
       </div>
 
     </main>
@@ -1365,11 +1451,15 @@ function showPage(p) {
   document.querySelectorAll('.app-page').forEach(el => el.classList.remove('active'));
   document.getElementById('page-' + p).classList.add('active');
   document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
-  document.getElementById('sNav-' + p).classList.add('active');
+  document.getElementById('sNav-' + p)?.classList.add('active');
   if (p === 'history') loadHistory();
   if (p === 'invoices') loadInvoices();
   if (p === 'profile' && currentProfile?.logo_url) showLogoPreview(currentProfile.logo_url);
   if (p === 'generate') renderExamplePills();
+  if (p === 'dashboard') loadDashboard();
+  if (p === 'customers') loadCustomers();
+  if (p === 'articles') loadArticles();
+  updateDrawerActive(p);
 }
 
 // ===== PROFILE =====
@@ -1384,6 +1474,7 @@ function fillProfileForm(profile) {
   document.getElementById('pBankgiro').value = profile.bankgiro || '';
   document.getElementById('pHourlyRate').value = profile.hourly_rate || '';
   document.getElementById('pTravelCost').value = profile.travel_cost || '';
+  document.getElementById('pMarkup').value = profile.markup_pct || '';
   document.getElementById('pDefaultVat').value = profile.default_vat || '';
   document.getElementById('pDefaultPayTerms').value = profile.default_pay_terms || '';
   document.getElementById('pFskatt').value = profile.fskatt || '';
@@ -1426,6 +1517,7 @@ async function saveProfile() {
     bankgiro: document.getElementById('pBankgiro').value.trim(),
     hourly_rate: document.getElementById('pHourlyRate').value.trim(),
     travel_cost: document.getElementById('pTravelCost').value.trim(),
+    markup_pct: document.getElementById('pMarkup').value.trim(),
     default_vat: document.getElementById('pDefaultVat').value,
     default_pay_terms: document.getElementById('pDefaultPayTerms').value,
     fskatt: document.getElementById('pFskatt').value,
@@ -2041,12 +2133,13 @@ function shareInvoiceEmail() {
 function getCleanQuoteHTML(html) {
   const div = document.createElement('div');
   div.innerHTML = html;
-  // Convert type selects to text labels for PDF
+  // Remove type select cells and their header entirely for PDF/share
   div.querySelectorAll('.row-type-select').forEach(sel => {
-    const label = document.createElement('span');
-    label.className = 'row-type-label';
-    label.textContent = sel.value === 'material' ? 'Material' : 'Arbete';
-    sel.parentNode.replaceChild(label, sel);
+    sel.closest('td').remove();
+  });
+  // Remove the "Typ" header column if present
+  div.querySelectorAll('thead th').forEach(th => {
+    if (th.textContent.trim() === 'Typ') th.remove();
   });
   // Remove edit UI elements
   div.querySelectorAll('.edit-hint, .add-row-btn, .del-row-btn, .quote-toolbar').forEach(el => el.remove());
@@ -2112,7 +2205,7 @@ async function saveQuoteEdits() {
   btn.disabled = true;
 
   // Read current DOM values
-  const quoteHtml = document.getElementById('quoteDoc').innerHTML;
+  const quoteHtml = getCleanQuoteHTML(document.getElementById('quoteDoc').innerHTML);
   const title = document.querySelector('#quoteDoc .q-offer-title')?.firstChild?.textContent?.trim() || '';
   const clientName = document.querySelector('#quoteDoc .q-client strong')?.textContent?.trim() || '';
 
@@ -2312,7 +2405,7 @@ async function generateQuote() {
   const validStr = new Date(today.setDate(today.getDate()+30)).toLocaleDateString('sv-SE');
   const quoteNum = 'OFF-' + Math.floor(1000+Math.random()*9000);
 
-  currentInfo = { company, orgNum: p.org_number||'', vatNum: p.vat_number||'', phone: p.phone||'', email: p.email||'', website: p.website||'', address: p.address||'', bankgiro: p.bankgiro||'', vatPct, payterms, quoteNum, dateStr, validStr, inclRot, hourlyRate: p.hourly_rate||'', travelCost: p.travel_cost||'', fskatt: p.fskatt||'', insurance: p.insurance||'', certifications: p.certifications||'', paymentMethods: p.payment_methods||'', warrantyText: p.warranty_text||'' };
+  currentInfo = { company, orgNum: p.org_number||'', vatNum: p.vat_number||'', phone: p.phone||'', email: p.email||'', website: p.website||'', address: p.address||'', bankgiro: p.bankgiro||'', vatPct, payterms, quoteNum, dateStr, validStr, inclRot, hourlyRate: p.hourly_rate||'', travelCost: p.travel_cost||'', markupPct: p.markup_pct||'', fskatt: p.fskatt||'', insurance: p.insurance||'', certifications: p.certifications||'', paymentMethods: p.payment_methods||'', warrantyText: p.warranty_text||'' };
 
   // Check mismatch between industry and job
   const industryKeywords = {
@@ -2357,6 +2450,7 @@ async function generateQuote() {
 PRISSÄTTNINGSREGLER:
 - Om TIMPRIS anges: använd EXAKT det timpriset för alla arbetstimmar. Beräkna timmar × timpris.
 - Om inget TIMPRIS anges: uppskatta rimliga timpriser för branschen.
+- Om STANDARDPÅSLAG anges: lägg på detta procentuella påslag på alla materialpriser (unitPrice × (1 + påslag/100)).
 - Om RESEKOSTNAD anges: lägg till som en egen separat rad i items med type:"arbete".
 - Alla unitPrice och total i items ska vara exkl. moms och NUMERISKA (ej strängar).
 - Separera ALLTID arbete och material som tydliga rader. Varje item MÅSTE ha ett "type"-fält: "arbete" eller "material". Beskrivningen ska INTE innehålla "(arbete)" eller "(material)" – det hanteras av type-fältet.
@@ -2389,6 +2483,7 @@ UPPDRAG: ${jobText}
 BRANSCH: ${industry}
 ${currentInfo.hourlyRate ? 'TIMPRIS: ' + currentInfo.hourlyRate + ' kr/tim (exkl. moms) – använd detta timpris för alla arbetstimmar' : ''}
 ${currentInfo.travelCost ? 'RESEKOSTNAD: ' + currentInfo.travelCost : ''}
+${currentInfo.markupPct ? 'STANDARDPÅSLAG: ' + currentInfo.markupPct + '% (lägg på detta påslag på alla materialpriser)' : ''}
 ${currentInfo.certifications ? 'CERTIFIERINGAR: ' + currentInfo.certifications : ''}
 ${currentInfo.warrantyText && inclWarranty ? 'GARANTITEXT: ' + currentInfo.warrantyText : ''}
 ${currentInfo.paymentMethods ? 'BETALNINGSSÄTT: ' + currentInfo.paymentMethods : ''}
@@ -2449,7 +2544,7 @@ Rimliga svenska priser 2025.` }]
 
     // log usage + spara offert (after render so HTML is populated)
     await new Promise(r => setTimeout(r, 100)); // wait for DOM
-    const quoteHtml = document.getElementById('quoteDoc')?.innerHTML || '';
+    const quoteHtml = getCleanQuoteHTML(document.getElementById('quoteDoc')?.innerHTML || '');
     // Read edited client name from DOM (user may have changed it)
     const savedClientName = document.querySelector('#quoteDoc .q-client strong')?.textContent || q.clientName || '';
     const savedTitle = document.querySelector('#quoteDoc .q-offer-title')?.firstChild?.textContent?.trim() || q.title || 'Offert';
@@ -2626,6 +2721,7 @@ function renderQuote(q) {
       <tbody id="itemsTbody">${q.items.map(it=>buildRow(it)).join('')}</tbody>
     </table>
     <button class="add-row-btn" onclick="addRow()">+ Lägg till rad</button>
+    <button class="add-row-btn" onclick="openArticlePicker()" style="margin-left:0.5rem">📦 Välj från artiklar</button>
     <div class="q-totals">
       <div class="q-totals-box">
         <div class="trow"><span>Netto (exkl. moms)</span><span id="tot-sub">${fmtSEK(q.subtotal)}</span></div>
@@ -2635,10 +2731,10 @@ function renderQuote(q) {
         <div class="trow final-row"><span id="tot-final-lbl">${finalLabel}</span><span id="tot-final">${fmtSEK(finalTotal)}</span></div>
       </div>
     </div>
-    ${q.timeline?`<div class="q-terms" style="margin-bottom:1rem"><h4>📅 Tidplan</h4><p>${q.timeline}</p></div>`:''}
-    ${q.materials?`<div class="q-terms" style="margin-bottom:1rem"><h4>🔩 Material</h4><p>${q.materials}</p></div>`:''}
-    <div class="q-terms"><h4>📄 Villkor & betalning</h4><p>• Betalningsvillkor: ${info.payterms}</p>${q.warrantyText?`<p>• ${q.warrantyText}</p>`:''}<p>${q.terms}</p></div>
-    <p style="font-size:0.82rem;color:#555;margin-bottom:1.5rem;font-style:italic">${q.closingNote}</p>
+    ${q.timeline?`<div class="q-terms" style="margin-bottom:1rem"><h4>📅 Tidplan</h4><p class="editable" contenteditable="true">${q.timeline}</p></div>`:''}
+    ${q.materials?`<div class="q-terms" style="margin-bottom:1rem"><h4>🔩 Material</h4><p class="editable" contenteditable="true">${q.materials}</p></div>`:''}
+    <div class="q-terms"><h4>📄 Villkor & betalning</h4><p class="editable" contenteditable="true">• Betalningsvillkor: ${info.payterms}${q.warrantyText ? '<br>• ' + q.warrantyText : ''}<br>${q.terms}</p></div>
+    <p class="editable" contenteditable="true" style="font-size:0.82rem;color:#555;margin-bottom:1.5rem;font-style:italic">${q.closingNote}</p>
     <div class="q-footer">
       <div><strong>${info.company}</strong><br>${info.phone} ${info.email}${credentialsHtml ? `<br><span style='font-size:0.72rem;color:#aaa'>${credentialsHtml}</span>` : ''}</div>
 
@@ -2724,7 +2820,7 @@ function closeDrawer() {
 }
 
 function updateDrawerActive(page) {
-  ['generate','invoices','history','profile'].forEach(p => {
+  ['generate','invoices','history','profile','dashboard','customers','articles'].forEach(p => {
     const btn = document.getElementById('dNav-' + p);
     if (btn) btn.style.background = p === page ? 'rgba(184,144,46,0.15)' : '';
     if (btn) btn.style.color = p === page ? 'var(--gold-light)' : '#ccc';
@@ -2743,6 +2839,327 @@ function showMobileTabBar(show, plan, used, total) {
     if (planEl) planEl.textContent = plan || 'Gratis';
     if (quotaEl) quotaEl.textContent = used + ' / ' + total + ' denna månad';
   }
+}
+
+// ===== SPEECH TO TEXT =====
+let micRecognition = null;
+let micActive = false;
+function toggleMic() {
+  const btn = document.getElementById('micBtn');
+  if (micActive && micRecognition) {
+    micRecognition.stop();
+    return;
+  }
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('Din webbläsare stödjer inte taligenkänning. Testa Chrome eller Safari.');
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  micRecognition = new SR();
+  micRecognition.lang = 'sv-SE';
+  micRecognition.interimResults = true;
+  micRecognition.continuous = true;
+  let finalText = document.getElementById('jobPrompt').value;
+  const startPos = finalText.length;
+  micRecognition.onstart = () => { micActive = true; btn.classList.add('recording'); btn.textContent = '⏹'; };
+  micRecognition.onend = () => { micActive = false; btn.classList.remove('recording'); btn.textContent = '🎤'; micRecognition = null; };
+  micRecognition.onerror = (e) => { if (e.error !== 'aborted') console.error('Mic error:', e.error); };
+  micRecognition.onresult = (e) => {
+    let interim = '', final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    const ta = document.getElementById('jobPrompt');
+    const base = finalText;
+    if (final) { finalText = base + (base && !base.endsWith(' ') ? ' ' : '') + final; ta.value = finalText; }
+    else ta.value = finalText + (finalText && !finalText.endsWith(' ') ? ' ' : '') + interim;
+  };
+  micRecognition.start();
+}
+
+// ===== DASHBOARD =====
+async function loadDashboard() {
+  if (!currentUser) return;
+  const uid = currentUser.id;
+  try {
+    // Fetch quotes
+    const { data: quotes } = await sb.from('quote_usage').select('total_amount,created_at,title,client_name').eq('user_id', uid).order('created_at', { ascending: false });
+    // Fetch invoices
+    const { data: invoices } = await sb.from('invoices').select('total_amount,status,due_date,created_at,client_name,title').eq('user_id', uid).order('created_at', { ascending: false });
+    const q = quotes || [];
+    const inv = invoices || [];
+    const quoteTotal = q.reduce((s, r) => s + (parseFloat(r.total_amount) || 0), 0);
+    const invTotal = inv.reduce((s, r) => s + (parseFloat(r.total_amount) || 0), 0);
+    const paid = inv.filter(i => i.status === 'paid').reduce((s, r) => s + (parseFloat(r.total_amount) || 0), 0);
+    const unpaid = invTotal - paid;
+    // Win rate
+    const winRate = q.length > 0 ? Math.round((inv.length / q.length) * 100) : 0;
+    // This month
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const monthly = inv.filter(i => i.created_at >= monthStart).reduce((s, r) => s + (parseFloat(r.total_amount) || 0), 0);
+
+    const fmt = n => Number(n).toLocaleString('sv-SE', { maximumFractionDigits: 0 }) + ' kr';
+    document.getElementById('dashQuotes').textContent = q.length;
+    document.getElementById('dashQuoteValue').textContent = fmt(quoteTotal);
+    document.getElementById('dashInvoices').textContent = inv.length;
+    document.getElementById('dashInvoiceValue').textContent = fmt(invTotal);
+    document.getElementById('dashPaid').textContent = fmt(paid);
+    document.getElementById('dashPaid').style.color = '#2e7d32';
+    document.getElementById('dashUnpaid').textContent = fmt(unpaid);
+    document.getElementById('dashUnpaid').style.color = unpaid > 0 ? '#e05' : '#2e7d32';
+    document.getElementById('dashWinRate').textContent = q.length > 0 ? winRate + '%' : '–';
+    document.getElementById('dashMonthly').textContent = fmt(monthly);
+
+    // Pending quotes (older than 7 days, no invoice with same client+title)
+    const sevenDaysAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString();
+    const invClients = new Set(inv.map(i => (i.client_name || '').toLowerCase().trim()));
+    const pending = q.filter(r => r.created_at < sevenDaysAgo && !invClients.has((r.client_name || '').toLowerCase().trim()));
+    const pendEl = document.getElementById('dashPending');
+    if (pending.length === 0) {
+      pendEl.innerHTML = '<div style="padding:1rem;color:#888;font-size:0.85rem">Inga väntande offerter</div>';
+    } else {
+      pendEl.innerHTML = pending.slice(0, 10).map(r => {
+        const days = Math.floor((Date.now() - new Date(r.created_at)) / (1000*60*60*24));
+        return `<div class="dash-pending-item"><span>${r.client_name || 'Okänd kund'} – ${r.title || 'Offert'}</span><span class="days-ago">${days} dagar sedan</span></div>`;
+      }).join('');
+    }
+
+    // Overdue invoices
+    const today = new Date().toISOString().slice(0, 10);
+    const overdue = inv.filter(i => i.status !== 'paid' && i.due_date && i.due_date < today);
+    const overdueEl = document.getElementById('dashOverdue');
+    if (overdue.length === 0) {
+      overdueEl.innerHTML = '<div style="padding:1rem;color:#888;font-size:0.85rem">Inga förfallna fakturor</div>';
+    } else {
+      overdueEl.innerHTML = overdue.map(i => {
+        const days = Math.floor((Date.now() - new Date(i.due_date)) / (1000*60*60*24));
+        return `<div class="dash-pending-item"><span>${i.client_name || 'Okänd'} – ${fmt(i.total_amount)}</span><span class="days-ago">${days} dagar förfallen</span></div>`;
+      }).join('');
+    }
+  } catch(e) { console.error('Dashboard error:', e); }
+}
+
+// ===== CUSTOMERS =====
+let _customersData = [];
+async function loadCustomers() {
+  if (!currentUser) return;
+  try {
+    const { data: customers } = await sb.from('customers').select('*').eq('user_id', currentUser.id).order('name');
+    _customersData = customers || [];
+    renderCustomers(_customersData);
+  } catch(e) {
+    // If table doesn't exist yet, show empty
+    _customersData = [];
+    renderCustomers([]);
+  }
+}
+function renderCustomers(list) {
+  const el = document.getElementById('customerList');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="big">👥</div><p>Inga kunder ännu. Lägg till manuellt eller så skapas de automatiskt.</p></div>';
+    return;
+  }
+  el.innerHTML = list.map(c => `
+    <div class="cust-card" onclick="editCustomer('${c.id}')">
+      <div class="cust-name">${c.name}</div>
+      <div class="cust-info">${[c.email, c.phone, c.address].filter(Boolean).join(' · ') || 'Inga uppgifter'}</div>
+      ${c.notes ? `<div class="cust-info" style="font-style:italic;margin-top:0.2rem">${c.notes}</div>` : ''}
+    </div>
+  `).join('');
+}
+function filterCustomers() {
+  const q = document.getElementById('customerSearch').value.toLowerCase();
+  renderCustomers(_customersData.filter(c => (c.name||'').toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q) || (c.phone||'').includes(q)));
+}
+function openNewCustomerModal() {
+  document.getElementById('customerModalTitle').textContent = 'Ny kund';
+  document.getElementById('custEditId').value = '';
+  document.getElementById('custName').value = '';
+  document.getElementById('custEmail').value = '';
+  document.getElementById('custPhone').value = '';
+  document.getElementById('custAddress').value = '';
+  document.getElementById('custNotes').value = '';
+  document.getElementById('customerModalOverlay').style.display = 'flex';
+}
+function editCustomer(id) {
+  const c = _customersData.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('customerModalTitle').textContent = 'Redigera kund';
+  document.getElementById('custEditId').value = c.id;
+  document.getElementById('custName').value = c.name || '';
+  document.getElementById('custEmail').value = c.email || '';
+  document.getElementById('custPhone').value = c.phone || '';
+  document.getElementById('custAddress').value = c.address || '';
+  document.getElementById('custNotes').value = c.notes || '';
+  document.getElementById('customerModalOverlay').style.display = 'flex';
+}
+function closeCustomerModal() { document.getElementById('customerModalOverlay').style.display = 'none'; }
+async function saveCustomer() {
+  const name = document.getElementById('custName').value.trim();
+  if (!name) { alert('Ange kundnamn'); return; }
+  const data = {
+    user_id: currentUser.id,
+    name,
+    email: document.getElementById('custEmail').value.trim(),
+    phone: document.getElementById('custPhone').value.trim(),
+    address: document.getElementById('custAddress').value.trim(),
+    notes: document.getElementById('custNotes').value.trim()
+  };
+  const editId = document.getElementById('custEditId').value;
+  let error;
+  if (editId) {
+    ({ error } = await sb.from('customers').update(data).eq('id', editId));
+  } else {
+    ({ error } = await sb.from('customers').insert(data));
+  }
+  if (error) { alert('Fel: ' + error.message); return; }
+  closeCustomerModal();
+  loadCustomers();
+}
+
+// ===== ARTICLES =====
+let _articlesData = [];
+async function loadArticles() {
+  if (!currentUser) return;
+  try {
+    const { data: articles } = await sb.from('articles').select('*').eq('user_id', currentUser.id).order('name');
+    _articlesData = articles || [];
+    renderArticles(_articlesData);
+  } catch(e) {
+    _articlesData = [];
+    renderArticles([]);
+  }
+}
+function renderArticles(list) {
+  const el = document.getElementById('articleList');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="big">📦</div><p>Inga artiklar ännu. Lägg till dina tjänster och material med fasta priser.</p></div>';
+    return;
+  }
+  el.innerHTML = `<table class="art-table"><thead><tr><th>Artikel</th><th>Pris</th><th>Enhet</th><th>Typ</th><th style="width:80px"></th></tr></thead><tbody>${list.map(a => `
+    <tr>
+      <td><strong>${a.name}</strong>${a.sku ? `<br><span style="font-size:0.7rem;color:#999">${a.sku}</span>` : ''}</td>
+      <td>${Number(a.price).toLocaleString('sv-SE')} kr</td>
+      <td>${a.unit || 'st'}</td>
+      <td><span class="art-badge ${a.type || 'arbete'}">${a.type === 'material' ? 'Material' : 'Arbete'}</span></td>
+      <td><button onclick="editArticle('${a.id}')" style="background:none;border:none;cursor:pointer;font-size:0.8rem;color:var(--gold)">✏️</button><button onclick="deleteArticle('${a.id}')" style="background:none;border:none;cursor:pointer;font-size:0.8rem;color:#e05;margin-left:0.3rem">×</button></td>
+    </tr>
+  `).join('')}</tbody></table>`;
+}
+function filterArticles() {
+  const q = document.getElementById('articleSearch').value.toLowerCase();
+  renderArticles(_articlesData.filter(a => (a.name||'').toLowerCase().includes(q) || (a.sku||'').toLowerCase().includes(q)));
+}
+function openNewArticleModal() {
+  document.getElementById('articleModalTitle').textContent = 'Ny artikel';
+  document.getElementById('artEditId').value = '';
+  document.getElementById('artName').value = '';
+  document.getElementById('artPrice').value = '';
+  document.getElementById('artUnit').value = 'st';
+  document.getElementById('artType').value = 'arbete';
+  document.getElementById('artSku').value = '';
+  document.getElementById('articleModalOverlay').style.display = 'flex';
+}
+function editArticle(id) {
+  const a = _articlesData.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('articleModalTitle').textContent = 'Redigera artikel';
+  document.getElementById('artEditId').value = a.id;
+  document.getElementById('artName').value = a.name || '';
+  document.getElementById('artPrice').value = a.price || '';
+  document.getElementById('artUnit').value = a.unit || 'st';
+  document.getElementById('artType').value = a.type || 'arbete';
+  document.getElementById('artSku').value = a.sku || '';
+  document.getElementById('articleModalOverlay').style.display = 'flex';
+}
+function closeArticleModal() { document.getElementById('articleModalOverlay').style.display = 'none'; }
+async function saveArticle() {
+  const name = document.getElementById('artName').value.trim();
+  const price = parseFloat(document.getElementById('artPrice').value);
+  if (!name || isNaN(price)) { alert('Ange artikelnamn och pris'); return; }
+  const data = {
+    user_id: currentUser.id,
+    name,
+    price,
+    unit: document.getElementById('artUnit').value,
+    type: document.getElementById('artType').value,
+    sku: document.getElementById('artSku').value.trim()
+  };
+  const editId = document.getElementById('artEditId').value;
+  let error;
+  if (editId) {
+    ({ error } = await sb.from('articles').update(data).eq('id', editId));
+  } else {
+    ({ error } = await sb.from('articles').insert(data));
+  }
+  if (error) { alert('Fel: ' + error.message); return; }
+  closeArticleModal();
+  loadArticles();
+}
+async function deleteArticle(id) {
+  if (!confirm('Ta bort artikeln?')) return;
+  await sb.from('articles').delete().eq('id', id);
+  loadArticles();
+}
+
+// ===== ARTICLE PICKER (for quote/invoice) =====
+let _pickerSelected = new Set();
+function openArticlePicker() {
+  _pickerSelected = new Set();
+  loadPickerArticles();
+  document.getElementById('articlePickerOverlay').style.display = 'flex';
+  document.getElementById('pickerSearch').value = '';
+}
+function closeArticlePicker() { document.getElementById('articlePickerOverlay').style.display = 'none'; }
+async function loadPickerArticles() {
+  if (_articlesData.length === 0) {
+    try {
+      const { data } = await sb.from('articles').select('*').eq('user_id', currentUser.id).order('name');
+      _articlesData = data || [];
+    } catch(e) { _articlesData = []; }
+  }
+  renderPickerArticles(_articlesData);
+}
+function renderPickerArticles(list) {
+  const el = document.getElementById('pickerList');
+  if (!list.length) {
+    el.innerHTML = '<div style="padding:2rem;text-align:center;color:#888">Inga artiklar. Lägg till artiklar under 📦 Artiklar först.</div>';
+    return;
+  }
+  el.innerHTML = list.map(a => `
+    <label style="display:flex;align-items:center;gap:0.8rem;padding:0.7rem 0.8rem;border-bottom:1px solid #eee;cursor:pointer;font-size:0.88rem" onmouseover="this.style.background='#fafaf8'" onmouseout="this.style.background=''">
+      <input type="checkbox" value="${a.id}" onchange="togglePickerItem(this)" ${_pickerSelected.has(a.id)?'checked':''} style="width:18px;height:18px;accent-color:var(--gold)">
+      <div style="flex:1"><strong>${a.name}</strong><br><span style="font-size:0.75rem;color:#888">${Number(a.price).toLocaleString('sv-SE')} kr / ${a.unit || 'st'} · <span class="art-badge ${a.type||'arbete'}">${a.type==='material'?'Material':'Arbete'}</span></span></div>
+      <input type="number" min="1" value="1" id="pickerQty-${a.id}" style="width:50px;text-align:center;border:1px solid #ddd;border-radius:4px;padding:0.3rem;font-size:0.85rem" onclick="event.stopPropagation()">
+    </label>
+  `).join('');
+}
+function filterPickerArticles() {
+  const q = document.getElementById('pickerSearch').value.toLowerCase();
+  renderPickerArticles(_articlesData.filter(a => (a.name||'').toLowerCase().includes(q)));
+}
+function togglePickerItem(cb) {
+  if (cb.checked) _pickerSelected.add(cb.value);
+  else _pickerSelected.delete(cb.value);
+}
+function insertPickedArticles() {
+  if (_pickerSelected.size === 0) { alert('Välj minst en artikel'); return; }
+  const tbody = document.getElementById('itemsTbody');
+  if (!tbody) { closeArticlePicker(); return; }
+  _pickerSelected.forEach(id => {
+    const a = _articlesData.find(x => x.id === id);
+    if (!a) return;
+    const qty = parseFloat(document.getElementById('pickerQty-' + id)?.value) || 1;
+    const it = { description: a.name, type: a.type || 'arbete', qty: qty + ' ' + (a.unit || 'st'), unitPrice: a.price, total: a.price * qty };
+    const tmp = document.createElement('tbody');
+    tmp.innerHTML = buildRow(it);
+    const tr = tmp.querySelector('tr');
+    if (tr) { tbody.appendChild(tr); attachListeners(tr); }
+  });
+  recalc();
+  closeArticlePicker();
 }
 
 init();
@@ -2820,6 +3237,65 @@ init();
 </div>
 
 <!-- Left drawer overlay -->
+<!-- ===== CUSTOMER MODAL ===== -->
+<div class="overlay" id="customerModalOverlay" onclick="if(event.target===this)closeCustomerModal()">
+  <div class="modal" style="max-width:480px">
+    <h3 style="margin-bottom:1rem" id="customerModalTitle">Ny kund</h3>
+    <input type="hidden" id="custEditId" value="">
+    <div class="field" style="margin-bottom:0.8rem"><label>Namn *</label><input id="custName" placeholder="Förnamn Efternamn / Företagsnamn"></div>
+    <div class="field" style="margin-bottom:0.8rem"><label>E-post</label><input id="custEmail" type="email" placeholder="kund@mail.se"></div>
+    <div class="field" style="margin-bottom:0.8rem"><label>Telefon</label><input id="custPhone" placeholder="070-000 00 00"></div>
+    <div class="field" style="margin-bottom:0.8rem"><label>Adress</label><input id="custAddress" placeholder="Storgatan 1, 123 45 Stad"></div>
+    <div class="field" style="margin-bottom:1rem"><label>Anteckningar</label><textarea id="custNotes" style="height:50px;resize:none;border:1.5px solid var(--border);border-radius:8px;padding:0.5rem 0.8rem;font-family:inherit;font-size:0.88rem;width:100%;box-sizing:border-box" placeholder="Valfria anteckningar..."></textarea></div>
+    <div style="display:flex;gap:0.7rem">
+      <button onclick="saveCustomer()" class="gen-btn" style="flex:1">Spara kund</button>
+      <button onclick="closeCustomerModal()" style="flex:0;padding:0.6rem 1.2rem;background:#eee;border:none;border-radius:8px;cursor:pointer;font-family:inherit">Avbryt</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ARTICLE MODAL ===== -->
+<div class="overlay" id="articleModalOverlay" onclick="if(event.target===this)closeArticleModal()">
+  <div class="modal" style="max-width:480px">
+    <h3 style="margin-bottom:1rem" id="articleModalTitle">Ny artikel</h3>
+    <input type="hidden" id="artEditId" value="">
+    <div class="field" style="margin-bottom:0.8rem"><label>Artikelnamn *</label><input id="artName" placeholder="t.ex. Kabeldragning per meter"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:0.8rem">
+      <div class="field"><label>Pris (exkl. moms) *</label><input id="artPrice" type="number" min="0" placeholder="650"></div>
+      <div class="field"><label>Enhet</label>
+        <select id="artUnit" style="width:100%;padding:0.55rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
+          <option value="st">st</option><option value="timmar">timmar</option><option value="m">meter</option><option value="m²">m²</option><option value="löpmeter">löpmeter</option><option value="kg">kg</option><option value="paket">paket</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1rem">
+      <div class="field"><label>Typ</label>
+        <select id="artType" style="width:100%;padding:0.55rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
+          <option value="arbete">Arbete</option><option value="material">Material</option>
+        </select>
+      </div>
+      <div class="field"><label>Artikelnr</label><input id="artSku" placeholder="Valfritt"></div>
+    </div>
+    <div style="display:flex;gap:0.7rem">
+      <button onclick="saveArticle()" class="gen-btn" style="flex:1">Spara artikel</button>
+      <button onclick="closeArticleModal()" style="flex:0;padding:0.6rem 1.2rem;background:#eee;border:none;border-radius:8px;cursor:pointer;font-family:inherit">Avbryt</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ARTICLE PICKER MODAL ===== -->
+<div class="overlay" id="articlePickerOverlay" onclick="if(event.target===this)closeArticlePicker()">
+  <div class="modal" style="max-width:560px;max-height:80vh;overflow-y:auto">
+    <h3 style="margin-bottom:0.8rem">📦 Välj artiklar</h3>
+    <input id="pickerSearch" type="text" placeholder="🔍 Sök artikel..." oninput="filterPickerArticles()" style="width:100%;box-sizing:border-box;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit;margin-bottom:0.8rem">
+    <div id="pickerList" style="max-height:50vh;overflow-y:auto"></div>
+    <div style="margin-top:1rem;display:flex;gap:0.7rem">
+      <button onclick="insertPickedArticles()" class="gen-btn" style="flex:1">Lägg till valda</button>
+      <button onclick="closeArticlePicker()" style="flex:0;padding:0.6rem 1.2rem;background:#eee;border:none;border-radius:8px;cursor:pointer;font-family:inherit">Avbryt</button>
+    </div>
+  </div>
+</div>
+
 <div id="drawerOverlay" onclick="closeDrawer()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300"></div>
 
 <!-- Left drawer -->
@@ -2850,6 +3326,15 @@ init();
     </button>
     <button onclick="closeDrawer();showView('app');showPage('invoices')" id="dNav-invoices" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
       <span style="font-size:1.3rem">📑</span> Fakturor
+    </button>
+    <button onclick="closeDrawer();showView('app');showPage('dashboard')" id="dNav-dashboard" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
+      <span style="font-size:1.3rem">📊</span> Dashboard
+    </button>
+    <button onclick="closeDrawer();showView('app');showPage('customers')" id="dNav-customers" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
+      <span style="font-size:1.3rem">👥</span> Kunder
+    </button>
+    <button onclick="closeDrawer();showView('app');showPage('articles')" id="dNav-articles" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
+      <span style="font-size:1.3rem">📦</span> Artiklar
     </button>
     <button onclick="closeDrawer();showView('app');showPage('profile')" id="dNav-profile" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
       <span style="font-size:1.3rem">🏢</span> Företagsprofil
