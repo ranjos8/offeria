@@ -254,6 +254,7 @@ nav {
   border: 1.5px solid var(--border); border-radius: 8px;
   padding: 0.6rem 0.85rem; font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
   outline: none; background: var(--paper); transition: border-color 0.15s; color: var(--ink);
+  width: 100%; min-width: 0; box-sizing: border-box;
 }
 .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); background: white; }
 .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
@@ -381,7 +382,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .uplan.sel { border-color: var(--gold); background: #fffaee; }
 .uplan-name { font-family: 'Fraunces', serif; font-size: 1rem; margin-bottom: 0.2rem; }
 .uplan-price { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.6rem; }
-.uplan-features { font-size: 0.76rem; color: #666; line-height: 1.7; }
+.uplan-features { font-size: 0.72rem; color: #666; line-height: 1.6; }
 .stripe-note { padding: 0 2rem 1.5rem; font-size: 0.78rem; color: var(--muted); text-align: center; }
 .stripe-btn {
   display: block; margin: 0 2rem 1.5rem; padding: 0.85rem;
@@ -789,8 +790,8 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     <!-- sidebar -->
     <aside class="app-sidebar">
       <div class="sidebar-item active" id="sNav-generate" onclick="showPage('generate')">📄 Ny offert</div>
+      <div class="sidebar-item" id="sNav-history" onclick="showPage('history')">🗂 Offerthistorik</div>
       <div class="sidebar-item" id="sNav-invoices" onclick="showPage('invoices')">📑 Fakturor</div>
-      <div class="sidebar-item" id="sNav-history" onclick="showPage('history')">🗂 Historik</div>
       <div class="sidebar-item" id="sNav-profile" onclick="showPage('profile')">🏢 Företagsprofil</div>
 
       <div class="quota-box">
@@ -1107,12 +1108,12 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <div class="uplan sel" id="uplan-pro" onclick="selectUPlan('pro')">
         <div class="uplan-name">Pro</div>
         <div class="uplan-price">99 kr/mån</div>
-        <div class="uplan-features">10 offerter/månad<br>Egen logotyp<br>Offerthistorik</div>
+        <div class="uplan-features">10 offerter/månad<br>Fullständig företagsprofil<br>Egen logotyp<br>Timpris &amp; certifieringar<br>Dela via länk &amp; PDF<br>Offerthistorik<br>Ingen bindningstid</div>
       </div>
       <div class="uplan" id="uplan-unlimited" onclick="selectUPlan('unlimited')">
         <div class="uplan-name">Obegränsat</div>
         <div class="uplan-price">299 kr/mån</div>
-        <div class="uplan-features">Obegränsade offerter<br><strong>Fakturering ingår</strong><br>Eget tema</div>
+        <div class="uplan-features">Obegränsade offerter<br><strong>Fakturering ingår</strong><br>Fullständig företagsprofil<br>Egen logotyp<br>Timpris &amp; certifieringar<br>Dela via länk &amp; PDF<br>Offerthistorik<br>Ingen bindningstid</div>
       </div>
     </div>
     <div class="stripe-note">🔒 Betalning hanteras säkert av Stripe. Du kan avbryta när som helst.</div>
@@ -2733,11 +2734,11 @@ init();
     <button onclick="closeDrawer();showView('app');showPage('generate')" id="dNav-generate" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
       <span style="font-size:1.3rem">📄</span> Ny offert
     </button>
+    <button onclick="closeDrawer();showView('app');showPage('history')" id="dNav-history" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
+      <span style="font-size:1.3rem">📋</span> Offerthistorik
+    </button>
     <button onclick="closeDrawer();showView('app');showPage('invoices')" id="dNav-invoices" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
       <span style="font-size:1.3rem">📑</span> Fakturor
-    </button>
-    <button onclick="closeDrawer();showView('app');showPage('history')" id="dNav-history" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
-      <span style="font-size:1.3rem">📋</span> Historik
     </button>
     <button onclick="closeDrawer();showView('app');showPage('profile')" id="dNav-profile" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
       <span style="font-size:1.3rem">🏢</span> Företagsprofil
