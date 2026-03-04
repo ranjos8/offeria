@@ -627,6 +627,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div><span class="plan-amount">299</span><span class="plan-period"> kr/mån</span></div>
           <ul class="plan-features">
             <li>Obegränsade offerter</li>
+            <li><strong>Fakturering ingår</strong></li>
             <li>Fullständig företagsprofil</li>
             <li>Egen logotyp</li>
             <li>Timpris &amp; certifieringar</li>
@@ -645,8 +646,8 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <li>API-integration</li>
             <li>Faktura istället för kort</li>
             <li>Flera användare / team</li>
-            <li>Anpassad AI för er bransch</li>
-            <li>Telefonsupport</li>
+            <li>Export till CSV/Excel</li>
+            <li>Anpassningar efter era behov</li>
           </ul>
           <button class="plan-cta" onclick="window.location.href='kontakta-oss.html'">Kontakta oss</button>
         </div>
@@ -965,7 +966,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <div class="uplan" id="uplan-unlimited" onclick="selectUPlan('unlimited')">
         <div class="uplan-name">Obegränsat</div>
         <div class="uplan-price">299 kr/mån</div>
-        <div class="uplan-features">Obegränsade offerter<br>Eget tema<br>Prioriterad AI</div>
+        <div class="uplan-features">Obegränsade offerter<br><strong>Fakturering ingår</strong><br>Eget tema</div>
       </div>
     </div>
     <div class="stripe-note">🔒 Betalning hanteras säkert av Stripe. Du kan avbryta när som helst.</div>
@@ -989,6 +990,7 @@ const STRIPE_LINKS = {
 // API-nyckeln är nu säkert lagrad i Supabase Edge Function
 
 const PLAN_LIMITS = { free: 2, pro: 10, unlimited: Infinity };
+const INVOICE_LIMITS = { free: 0, pro: 0, unlimited: Infinity };
 const PLAN_LABELS = { free: 'Gratis', pro: 'Pro', unlimited: 'Obegränsat', credit: 'Styck' };
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -1407,6 +1409,32 @@ function filterHistory() {
 let _invoiceData = [];
 let _currentInvoice = null;
 
+async function getMonthlyInvoiceCount() {
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const { count } = await sb.from('invoices').select('*', { count: 'exact', head: true })
+    .eq('user_id', currentUser.id).gte('created_at', startOfMonth);
+  return count || 0;
+}
+
+async function checkInvoiceLimit() {
+  const plan = currentProfile?.plan || 'free';
+  const limit = INVOICE_LIMITS[plan];
+  if (limit === 0) {
+    alert('Fakturering ingår i planen Obegränsat (299 kr/mån).\n\nUppgradera för att skapa fakturor.');
+    openUpgradeModal();
+    return false;
+  }
+  if (limit === Infinity) return true;
+  const used = await getMonthlyInvoiceCount();
+  if (used >= limit) {
+    alert('Du har nått din gräns på ' + limit + ' fakturor denna månad.\n\nUppgradera din plan för att skapa fler.');
+    openUpgradeModal();
+    return false;
+  }
+  return true;
+}
+
 function getNextInvoiceNumber(invoices) {
   if (!invoices || invoices.length === 0) return 'FA-1001';
   const nums = invoices.map(i => {
@@ -1429,6 +1457,19 @@ function statusLabel(s) {
 }
 
 async function loadInvoices() {
+  const plan = currentProfile?.plan || 'free';
+  if (plan !== 'unlimited') {
+    document.getElementById('invSummary').style.display = 'none';
+    document.getElementById('invoiceContent').innerHTML = `
+      <div style="text-align:center;padding:3rem 1.5rem">
+        <div style="font-size:3rem;margin-bottom:1rem">🔒</div>
+        <div style="font-family:Fraunces,serif;font-size:1.3rem;margin-bottom:0.5rem">Fakturering ingår i Obegränsat</div>
+        <p style="color:#888;font-size:0.9rem;margin-bottom:1.5rem">Skapa, skicka och följ upp fakturor – uppgradera till Obegränsat för 299 kr/mån.</p>
+        <button onclick="openUpgradeModal()" class="gen-btn" style="padding:0.7rem 2rem;font-size:0.95rem">Uppgradera →</button>
+      </div>`;
+    return;
+  }
+  document.getElementById('invSummary').style.display = '';
   try {
     const { data, error } = await sb.from('invoices').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
     if (error) throw error;
@@ -1616,6 +1657,7 @@ function buildInvoiceHtml(info, invoiceData) {
 }
 
 async function createManualInvoice() {
+  if (!(await checkInvoiceLimit())) return;
   const client = document.getElementById('invClient').value.trim();
   const clientAddr = document.getElementById('invClientAddr').value.trim();
   const title = document.getElementById('invTitle').value.trim();
@@ -1681,6 +1723,7 @@ async function createManualInvoice() {
 }
 
 async function createInvoiceFromQuote() {
+  if (!(await checkInvoiceLimit())) return;
   const quoteDoc = document.getElementById('quoteDoc');
   if (!quoteDoc) return;
 
