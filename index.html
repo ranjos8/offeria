@@ -376,6 +376,17 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 }
 .stripe-btn:hover { background: #2a2a28; }
 
+/* FAQ */
+.faq-wrap { max-width: 720px; margin: 0 auto; padding: 4rem 2rem; }
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-q { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; cursor: pointer; font-size: 0.95rem; font-weight: 500; color: var(--ink); gap: 1rem; }
+.faq-q:hover { color: var(--gold); }
+.faq-icon { font-size: 1.3rem; color: #aaa; transition: transform 0.2s; flex-shrink: 0; }
+.faq-item.open .faq-icon { transform: rotate(45deg); }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; }
+.faq-item.open .faq-a { max-height: 300px; }
+.faq-a-inner { padding: 0 0 1.2rem; font-size: 0.88rem; color: #666; line-height: 1.7; }
+
 /* invoice */
 .inv-status { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.18rem 0.6rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.06em; }
 .inv-status.unpaid { background: #fff8e1; color: #b8902e; }
@@ -552,6 +563,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     <div id="navAuthBtns">
       <div class="nav-links-desktop">
         <a href="/om-oss.html">Om oss</a>
+        <a href="#" onclick="event.preventDefault();document.getElementById('faqSection').scrollIntoView({behavior:'smooth'})">FAQ</a>
         <a href="/kontakta-oss.html">Kontakt</a>
         <button class="btn-sm btn-outline" onclick="openModal('login')">Logga in</button>
         <button class="btn-sm btn-dark" onclick="openModal('register')">Kom igång gratis</button>
@@ -564,6 +576,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 <!-- Mobile menu -->
 <div id="mobileMenu" style="display:none;position:fixed;top:58px;left:0;right:0;background:var(--ink);z-index:999;padding:1.5rem 2rem;border-top:1px solid #333;flex-direction:column;gap:1rem">
   <a href="/om-oss.html" style="color:#ccc;text-decoration:none;font-size:1rem;padding:0.5rem 0;border-bottom:1px solid #222;display:block">Om oss</a>
+  <a href="#" onclick="event.preventDefault();toggleMobileMenu();document.getElementById('faqSection').scrollIntoView({behavior:'smooth'})" style="color:#ccc;text-decoration:none;font-size:1rem;padding:0.5rem 0;border-bottom:1px solid #222;display:block">FAQ</a>
   <a href="/kontakta-oss.html" style="color:#ccc;text-decoration:none;font-size:1rem;padding:0.5rem 0;border-bottom:1px solid #222;display:block">Kontakt</a>
   <div id="mobileLoggedOut">
     <button onclick="openModal('login');toggleMobileMenu()" style="width:100%;padding:0.7rem;font-size:0.9rem;background:transparent;border:1.5px solid #aaa;color:#ccc;border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif;margin-bottom:0.5rem">Logga in</button>
@@ -652,6 +665,61 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <button class="plan-cta" onclick="window.location.href='kontakta-oss.html'">Kontakta oss</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="faq-wrap" id="faqSection">
+    <div class="eyebrow">FAQ</div>
+    <div class="section-h" style="margin-bottom:2rem">Vanliga frågor</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Hur fungerar AI-genereringen?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Du beskriver uppdraget med egna ord — vad som ska göras, ungefär hur stort och vilket material. Vår AI analyserar beskrivningen och skapar en komplett offert med specificerade rader, priser och villkor på sekunder.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Stämmer priserna i offerten?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">AI:n baserar priserna på aktuella marknadspriser för material och arbete inom din bransch. Du kan enkelt justera alla rader, priser och antal innan du skickar offerten. Se det som ett genomarbetat förslag — du bestämmer alltid själv.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Kan jag skapa fakturor också?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Ja! På planen Obegränsat (299 kr/mån) ingår fakturering. Du kan skapa fakturor manuellt eller konvertera en offert till faktura med ett klick. Varje faktura har tydlig statushantering — markera som betald, se vilka som är förfallna och håll koll på allt.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Finns det bindningstid?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Nej, ingen bindningstid på någon plan. Du kan uppgradera, nedgradera eller avsluta när som helst. Betalning sker månadsvis via Stripe.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Sparas mina offerter?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Ja, alla offerter sparas i din historik. Du kan öppna, redigera och ladda ner dem som PDF när som helst. Dina uppgifter lagras säkert och är bara tillgängliga för dig.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Vilka branscher stöds?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Offeria fungerar för de flesta hantverks- och tjänstebranscher: bygg och snickeri, el, VVS, städ, mark och trädgård, måleri, transport samt konsult och IT. AI:n anpassar språk, priser och villkor efter din bransch.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Fungerar Offeria på mobilen?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Ja, Offeria är fullt mobilanpassat. Du kan skapa, redigera och skicka offerter direkt från telefonen — perfekt när du är ute på plats hos kund. Tips: spara Offeria på hemskärmen så fungerar den som en app, med snabb start och helskärmsläge.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Hur skickar jag offerten till kunden?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Du kan dela offerten på tre sätt: ladda ner som PDF, dela via en unik länk eller skicka direkt via e-post. Den unika länken är aktiv i 30 dagar, så kunden har gott om tid att granska offerten. Alla sätt ingår på samtliga planer.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Är mina uppgifter säkra?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">All data lagras krypterat och skyddas med säker inloggning. Dina offerter och kunduppgifter är bara tillgängliga för dig. Vi delar aldrig information med tredje part.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Beräknas ROT-avdrag automatiskt?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Ja, AI:n kan räkna in ROT-avdrag direkt i offerten. Kunden ser både totalpris och pris efter avdrag, vilket gör det enkelt att visa vad jobbet faktiskt kostar.</div></div>
     </div>
   </div>
 
@@ -1891,6 +1959,11 @@ function toggleMobileMenu() {
   const isOpen = menu.style.display === 'flex';
   menu.style.display = isOpen ? 'none' : 'flex';
   document.getElementById('hamburgerBtn').textContent = isOpen ? '☰' : '✕';
+}
+
+function toggleFaq(el) {
+  const item = el.parentElement;
+  item.classList.toggle('open');
 }
 
 function openQuoteModal() {
