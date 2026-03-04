@@ -3,7 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Offeria</title>
+<title>Offeria – Proffsiga offerter på sekunder med AI</title>
+<meta name="description" content="Skapa proffsiga offerter och fakturor på sekunder med AI. Beskriv jobbet med egna ord – få en komplett offert direkt. Perfekt för hantverkare och småföretag.">
+<meta name="keywords" content="offert, faktura, AI, hantverkare, offertgenerering, snickare, elektriker, VVS, målare, småföretag">
+<meta property="og:title" content="Offeria – Proffsiga offerter på sekunder med AI">
+<meta property="og:description" content="Beskriv jobbet med egna ord – få en komplett offert direkt. Perfekt för hantverkare och småföretag.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://offeria.se">
+<meta property="og:image" content="https://offeria.se/icon-512.png">
+<meta property="og:locale" content="sv_SE">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Offeria – Proffsiga offerter på sekunder">
+<meta name="twitter:description" content="AI-driven offertgenerering för hantverkare och småföretag.">
+<link rel="canonical" href="https://offeria.se">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0d0d0b">
 <meta name="mobile-web-app-capable" content="yes">
@@ -381,6 +393,18 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
 /* FAQ */
 .faq-wrap { max-width: 720px; margin: 0 auto; padding: 4rem 2rem; }
+
+/* Welcome banner */
+.welcome-banner { background: linear-gradient(135deg, #1a1a18, #2a2518); border: 1px solid var(--gold-light); border-radius: 14px; padding: 2rem; margin-bottom: 1.5rem; position: relative; overflow: hidden; }
+.welcome-banner::before { content: '✦'; position: absolute; right: 1.5rem; top: 1rem; font-size: 2.5rem; opacity: 0.1; color: var(--gold); }
+.welcome-banner h3 { font-family: 'Fraunces', serif; font-style: italic; color: var(--gold-light); font-size: 1.2rem; margin-bottom: 0.4rem; }
+.welcome-banner p { color: #bbb; font-size: 0.85rem; line-height: 1.6; margin-bottom: 1rem; }
+.welcome-steps { display: flex; gap: 1rem; flex-wrap: wrap; }
+.welcome-step { flex: 1; min-width: 140px; background: rgba(255,255,255,0.05); border-radius: 10px; padding: 1rem; text-align: center; cursor: pointer; transition: background 0.15s; }
+.welcome-step:hover { background: rgba(184,144,46,0.15); }
+.welcome-step .ws-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+.welcome-step .ws-label { color: #ccc; font-size: 0.78rem; font-weight: 600; }
+.welcome-close { position: absolute; top: 0.8rem; right: 0.8rem; background: none; border: none; color: #666; cursor: pointer; font-size: 1rem; }
 .faq-item { border-bottom: 1px solid var(--border); }
 .faq-q { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 0; cursor: pointer; font-size: 0.95rem; font-weight: 500; color: var(--ink); gap: 1rem; }
 .faq-q:hover { color: var(--gold); }
@@ -509,6 +533,13 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   #invoiceDoc .q-meta { text-align: left; }
   #invoiceDoc .q-totals-box { width: 100%; min-width: unset; }
   .history-table th:nth-child(5), .history-table td:nth-child(5) { display: none; }
+
+  /* Footer mobile */
+  footer > div:first-child { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
+
+  /* Welcome banner mobile */
+  .welcome-steps { flex-direction: column; }
+  .welcome-step { min-width: unset; }
 }
 
 @media (max-width: 400px) {
@@ -726,6 +757,29 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     </div>
   </div>
 
+  <footer style="background:var(--ink);padding:3rem 2rem 2rem;margin-top:3rem">
+    <div style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;font-size:0.82rem">
+      <div>
+        <div style="font-family:Fraunces,serif;font-style:italic;font-weight:700;font-size:1.1rem;color:var(--gold-light);margin-bottom:0.8rem">Offeria</div>
+        <p style="color:#888;line-height:1.7;margin:0">AI-driven offert- och fakturahantering för hantverkare och småföretag i Sverige.</p>
+      </div>
+      <div>
+        <div style="font-weight:600;color:#ccc;margin-bottom:0.8rem">Navigering</div>
+        <a href="#" onclick="event.preventDefault();document.getElementById('pricingSection').scrollIntoView({behavior:'smooth'})" style="display:block;color:#888;text-decoration:none;margin-bottom:0.4rem">Priser</a>
+        <a href="#" onclick="event.preventDefault();document.getElementById('faqSection').scrollIntoView({behavior:'smooth'})" style="display:block;color:#888;text-decoration:none;margin-bottom:0.4rem">FAQ</a>
+        <a href="/om-oss.html" style="display:block;color:#888;text-decoration:none;margin-bottom:0.4rem">Om oss</a>
+        <a href="/kontakta-oss.html" style="display:block;color:#888;text-decoration:none;margin-bottom:0.4rem">Kontakt</a>
+      </div>
+      <div>
+        <div style="font-weight:600;color:#ccc;margin-bottom:0.8rem">Juridiskt</div>
+        <a href="/anvandarvillkor.html" style="display:block;color:#888;text-decoration:none;margin-bottom:0.4rem">Användarvillkor</a>
+        <a href="/integritetspolicy.html" style="display:block;color:#888;text-decoration:none;margin-bottom:0.4rem">Integritetspolicy</a>
+        <a href="/cookies.html" style="display:block;color:#888;text-decoration:none;margin-bottom:0.4rem">Cookies</a>
+      </div>
+    </div>
+    <div style="max-width:900px;margin:1.5rem auto 0;padding-top:1.5rem;border-top:1px solid #222;text-align:center;color:#555;font-size:0.75rem">© 2025 Offeria. Alla rättigheter förbehållna.</div>
+  </footer>
+
 </div>
 
 <!-- ===== APP VIEW (logged in) ===== -->
@@ -753,6 +807,27 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
       <!-- GENERATE PAGE -->
       <div class="app-page active" id="page-generate">
+        <div id="welcomeBanner" style="display:none">
+          <div class="welcome-banner">
+            <button class="welcome-close" onclick="dismissWelcome()">✕</button>
+            <h3>Välkommen till Offeria!</h3>
+            <p>Du är redo att skapa din första offert. Här är tre snabba steg för att komma igång:</p>
+            <div class="welcome-steps">
+              <div class="welcome-step" onclick="dismissWelcome();showPage('profile')">
+                <div class="ws-icon">🏢</div>
+                <div class="ws-label">Fyll i företagsprofil</div>
+              </div>
+              <div class="welcome-step" onclick="dismissWelcome();document.getElementById('jobPrompt').focus()">
+                <div class="ws-icon">✍️</div>
+                <div class="ws-label">Skapa din första offert</div>
+              </div>
+              <div class="welcome-step" onclick="dismissWelcome();document.getElementById('pricingSection')?.scrollIntoView({behavior:'smooth'})||openUpgradeModal()">
+                <div class="ws-icon">⭐</div>
+                <div class="ws-label">Utforska planer</div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="page-title">Ny offert</div>
         <div class="page-sub">Beskriv uppdraget – AI:n skapar resten</div>
 
@@ -1118,6 +1193,17 @@ async function onLogin(user) {
   showPage('generate');
   fillProfileForm(profile);
   renderExamplePills();
+
+  // Welcome flow for new users
+  if ((total || 0) === 0 && !localStorage.getItem('offeria_welcomed_' + user.id)) {
+    document.getElementById('welcomeBanner').style.display = 'block';
+    // Send welcome email (only once)
+    if (!localStorage.getItem('offeria_welcome_sent_' + user.id)) {
+      sendWelcomeEmail(user.email, profile?.full_name || profile?.company_name || '');
+      localStorage.setItem('offeria_welcome_sent_' + user.id, '1');
+    }
+  }
+
   var _mli=document.getElementById('mobileLoggedIn');
   var _mlo=document.getElementById('mobileLoggedOut');
   if(_mli)_mli.style.display='block';
@@ -1967,6 +2053,37 @@ function toggleMobileMenu() {
 function toggleFaq(el) {
   const item = el.parentElement;
   item.classList.toggle('open');
+}
+
+function dismissWelcome() {
+  document.getElementById('welcomeBanner').style.display = 'none';
+  if (currentUser) localStorage.setItem('offeria_welcomed_' + currentUser.id, '1');
+}
+
+async function sendWelcomeEmail(toEmail, name) {
+  try {
+    // EmailJS - uppdatera med dina nycklar
+    const EMAILJS_SERVICE = 'service_f5de23t';
+    const EMAILJS_TEMPLATE = 'template_welcome';
+    const EMAILJS_KEY = 'iUGAEbeer-pOBR8tV';
+
+    if (EMAILJS_SERVICE === 'YOUR_SERVICE_ID') return; // Skip if not configured
+
+    await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        service_id: EMAILJS_SERVICE,
+        template_id: EMAILJS_TEMPLATE,
+        user_id: EMAILJS_KEY,
+        template_params: {
+          to_email: toEmail,
+          to_name: name || 'där',
+          from_name: 'Offeria'
+        }
+      })
+    });
+  } catch(e) { console.log('Welcome email skipped:', e); }
 }
 
 function openQuoteModal() {
