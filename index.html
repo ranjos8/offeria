@@ -1485,7 +1485,7 @@ function renderInvoiceList(data) {
         <td style="display:flex;gap:0.4rem;flex-wrap:wrap">
           <button class="btn-sm btn-outline" onclick="openInvoiceView(${i})">Öppna</button>
           ${status !== 'paid' ? `<button class="inv-mark-btn" onclick="markInvoicePaid(${i})">✓ Betald</button>` : `<button class="inv-mark-btn undo" onclick="markInvoiceUnpaid(${i})">↩ Ångra</button>`}
-          <button class="btn-sm" onclick="deleteInvoice(${i})" style="background:none;border:1px solid #e05;color:#e05;border-radius:6px;padding:0.25rem 0.5rem;cursor:pointer;font-size:0.72rem">🗑</button>
+          <button class="btn-sm" onclick="deleteInvoice(${i})" style="background:none;border:1px solid #ddd;color:#999;border-radius:6px;padding:0.25rem 0.6rem;cursor:pointer;font-size:0.75rem;font-family:DM Sans,sans-serif">Ta bort</button>
         </td>
       </tr>`;
     }).join('')}</tbody>
@@ -2424,7 +2424,7 @@ init();
         <button class="qt-btn" onclick="shareInvoiceEmail()">✉ E-post</button>
         <span id="invModalStatus"></span>
         <button class="qt-btn" id="invMarkPaidBtn" onclick="toggleInvoicePaid()">✓ Markera betald</button>
-        <button class="qt-btn" onclick="deleteCurrentInvoice()" style="color:#e05;border-color:#e05">🗑 Ta bort</button>
+        <button class="qt-btn" onclick="deleteCurrentInvoice()" style="color:#aaa;border-color:#555">✕ Ta bort</button>
         <button class="qt-btn" onclick="closeInvoiceModal()" style="margin-left:0.5rem">✕ Stäng</button>
       </div>
     </div>
