@@ -203,19 +203,20 @@ nav {
 .merror.show { display: block; }
 
 /* ===== APP (logged in) ===== */
-.app-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 65px); }
+.app-layout { display: grid; grid-template-columns: 230px 1fr; min-height: calc(100vh - 65px); }
 .app-sidebar {
-  background: var(--ink); color: white;
-  padding: 1.8rem 1.2rem; display: flex; flex-direction: column; gap: 0.3rem;
+  background: linear-gradient(180deg, #0d0d0b 0%, #161614 100%); color: white;
+  padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 0.2rem;
 }
 .sidebar-section-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: #555; padding: 0.8rem 0.6rem 0.3rem; }
 .sidebar-item {
   display: flex; align-items: center; gap: 0.7rem;
-  padding: 0.6rem 0.8rem; border-radius: 8px;
-  font-size: 0.85rem; color: #aaa; cursor: pointer; transition: all 0.15s;
+  padding: 0.65rem 1rem; border-radius: 10px;
+  font-size: 0.86rem; color: #999; cursor: pointer; transition: all 0.15s;
+  margin-bottom: 1px;
 }
-.sidebar-item:hover { background: #1a1a18; color: white; }
-.sidebar-item.active { background: #1a1a18; color: white; font-weight: 600; }
+.sidebar-item:hover { background: rgba(0,0,0,0.05); color: var(--ink); }
+.sidebar-item.active { background: var(--ink); color: var(--gold-light); font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 .quota-box {
   margin-top: auto; background: #1a1a18; border-radius: 10px; padding: 1rem;
 }
@@ -234,8 +235,8 @@ nav {
 /* app pages */
 .app-page { display: none; padding: 2.5rem 3rem; }
 .app-page.active { display: block; }
-.page-title { font-family: 'Fraunces', serif; font-size: 1.8rem; letter-spacing: -1px; margin-bottom: 0.3rem; }
-.page-sub { font-size: 0.88rem; color: var(--muted); margin-bottom: 2rem; }
+.page-title { font-family: 'Fraunces', serif; font-size: 1.6rem; letter-spacing: -0.8px; margin-bottom: 0.2rem; }
+.page-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.8rem; }
 
 /* stats row */
 .stats-row { display: grid; grid-template-columns: repeat(2,1fr); gap: 1rem; margin-bottom: 2rem; }
@@ -361,10 +362,11 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .mic-btn svg { width: 16px; height: 16px; }
 
 /* dashboard */
-.dash-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.dash-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; text-align: center; }
-.dash-num { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 700; color: var(--ink); }
-.dash-label { font-size: 0.72rem; color: #888; margin-top: 0.3rem; }
+.dash-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; }
+.dash-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1rem 0.8rem; text-align: center; transition: box-shadow 0.15s; }
+.dash-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+.dash-num { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; color: var(--ink); }
+.dash-label { font-size: 0.68rem; color: #999; margin-top: 0.15rem; }
 .dash-pending-item, .dash-overdue-item { display: flex; justify-content: space-between; align-items: center; padding: 0.7rem 1rem; background: white; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.5rem; font-size: 0.85rem; }
 .dash-pending-item .days-ago { color: #e05; font-weight: 600; font-size: 0.78rem; }
 
@@ -391,17 +393,23 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .tab-btn.active { color: var(--ink); border-bottom-color: var(--gold); font-weight: 600; }
 
 /* dashboard chart */
-.chart-container { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; margin-top: 1.5rem; }
-.chart-title { font-size: 0.78rem; font-weight: 600; color: #555; margin-bottom: 0.8rem; }
-.bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 140px; padding-top: 0.5rem; }
-.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; min-width: 0; }
-.bar-fill { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.3s; min-height: 2px; }
-.bar-fill.quote { background: var(--gold); }
-.bar-fill.invoice { background: var(--teal); }
-.bar-label { font-size: 0.6rem; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center; }
-.bar-value { font-size: 0.58rem; color: #555; font-weight: 600; }
-.chart-legend { display: flex; gap: 1.2rem; margin-top: 0.8rem; font-size: 0.72rem; color: #888; }
-.chart-legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 0.3rem; vertical-align: middle; }
+.dash-charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem; }
+.chart-container { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; }
+.chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
+.chart-title { font-size: 0.82rem; font-weight: 600; color: var(--ink); }
+.chart-nav { display: flex; align-items: center; gap: 0.4rem; }
+.chart-nav-btn { background: var(--cream); border: 1px solid var(--border); border-radius: 6px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; color: var(--ink); transition: all 0.15s; font-family: inherit; }
+.chart-nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+.chart-year-label { font-size: 0.82rem; font-weight: 700; color: var(--ink); min-width: 40px; text-align: center; }
+.chart-bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; }
+.chart-bar-value { font-size: 0.6rem; color: #888; font-weight: 600; height: 14px; display: flex; align-items: flex-end; }
+.chart-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 0; transition: height 0.4s ease; }
+.chart-bar.gold { background: var(--gold); }
+.chart-bar.teal { background: var(--teal); }
+.chart-bar.empty { background: var(--border); opacity: 0.4; }
+.chart-bar-label { font-size: 0.62rem; color: #999; text-align: center; margin-top: 2px; }
+.chart-legend { display: flex; gap: 1rem; font-size: 0.7rem; color: #888; }
+.chart-legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 0.25rem; vertical-align: middle; }
 
 /* customer dropdown */
 .cust-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); max-height: 200px; overflow-y: auto; z-index: 50; }
@@ -531,7 +539,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   .app-page { padding-bottom: 20px; }
 
   /* App pages */
-  .app-page { padding: 1.2rem 1rem; max-width: 100%; overflow-x: hidden; }
+  .app-page { padding: 1.4rem 1.1rem; max-width: 100%; overflow-x: hidden; }
   .stats-row { grid-template-columns: repeat(2,1fr); gap: 0.5rem; }
   .stat-card { padding: 0.8rem 0.5rem; box-sizing: border-box; min-width: 0; }
   .stat-val { font-size: 1.4rem; }
@@ -581,9 +589,9 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   #quoteDoc table.qt th, #quoteDoc table.qt td { padding: 0.5rem 0.4rem; }
   .row-type-select { font-size: 0.6rem; padding: 0.15rem 0.15rem; }
   .dash-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
-  .chart-container { margin-top: 1rem; }
-  #page-dashboard .chart-container { }
+  .dash-charts-row { grid-template-columns: 1fr; }
   #page-dashboard > div:last-child { grid-template-columns: 1fr !important; }
+  .chart-container { margin-top: 0; }
   .dash-num { font-size: 1.1rem; }
   .mic-btn { height: 38px; font-size: 0.75rem; padding: 0 0.8rem; }
   #quoteDoc .q-totals { justify-content: stretch; }
@@ -1118,34 +1126,47 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <div class="page-sub">Översikt av din verksamhet</div>
         <div class="dash-grid" id="dashGrid">
           <div class="dash-card"><div class="dash-num" id="dashQuotes">0</div><div class="dash-label">Offerter totalt</div></div>
-          <div class="dash-card"><div class="dash-num" id="dashQuoteValue">0 kr</div><div class="dash-label">Offertvärde totalt</div></div>
-          <div class="dash-card"><div class="dash-num" id="dashInvoices">0</div><div class="dash-label">Fakturor totalt</div></div>
-          <div class="dash-card"><div class="dash-num" id="dashInvoiceValue">0 kr</div><div class="dash-label">Fakturerat totalt</div></div>
+          <div class="dash-card"><div class="dash-num" id="dashQuoteValue">0 kr</div><div class="dash-label">Offertvärde</div></div>
+          <div class="dash-card"><div class="dash-num" id="dashInvoices">0</div><div class="dash-label">Fakturor</div></div>
+          <div class="dash-card"><div class="dash-num" id="dashInvoiceValue">0 kr</div><div class="dash-label">Fakturerat</div></div>
           <div class="dash-card"><div class="dash-num" id="dashPaid">0 kr</div><div class="dash-label">Betalt</div></div>
           <div class="dash-card"><div class="dash-num" id="dashUnpaid">0 kr</div><div class="dash-label">Obetalt</div></div>
-          <div class="dash-card"><div class="dash-num" id="dashWinRate">–</div><div class="dash-label">Win-rate (offert → faktura)</div></div>
-          <div class="dash-card"><div class="dash-num" id="dashMonthly">0 kr</div><div class="dash-label">Fakturerat denna månad</div></div>
+          <div class="dash-card"><div class="dash-num" id="dashWinRate">–</div><div class="dash-label">Win-rate</div></div>
+          <div class="dash-card"><div class="dash-num" id="dashMonthly">0 kr</div><div class="dash-label">Denna månad</div></div>
         </div>
-        <div style="margin-top:1.5rem">
-          <div class="card-label">⏳ Offerter som väntar på svar (äldre än 7 dagar)</div>
-          <div id="dashPending"><div class="empty-state" style="padding:2rem"><p>Laddar...</p></div></div>
-        </div>
-        <div style="margin-top:1.5rem">
-          <div class="card-label"><span class="ico" style="color:#e05"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span> Förfallna fakturor</div>
-          <div id="dashOverdue"><div class="empty-state" style="padding:2rem"><p>Laddar...</p></div></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+
+        <div class="dash-charts-row">
           <div class="chart-container">
-            <div class="chart-title">Fakturerat per månad (senaste 6 mån)</div>
-            <div class="bar-chart" id="chartInvoices"></div>
+            <div class="chart-header">
+              <div class="chart-title">Fakturerat per månad</div>
+              <div class="chart-nav">
+                <button onclick="changeChartYear(-1)" class="chart-nav-btn">‹</button>
+                <span id="chartYear" class="chart-year-label">2026</span>
+                <button onclick="changeChartYear(1)" class="chart-nav-btn">›</button>
+              </div>
+            </div>
+            <div id="chartInvoices" style="display:flex;align-items:flex-end;gap:6px;height:160px;padding:0.5rem 0"></div>
           </div>
           <div class="chart-container">
-            <div class="chart-title">Offerter vs Fakturor per månad</div>
-            <div class="bar-chart" id="chartQuotesVsInv"></div>
-            <div class="chart-legend">
-              <span><span class="chart-legend-dot" style="background:var(--gold)"></span> Offerter</span>
-              <span><span class="chart-legend-dot" style="background:var(--teal)"></span> Fakturor</span>
+            <div class="chart-header">
+              <div class="chart-title">Offerter vs Fakturor</div>
+              <div class="chart-legend">
+                <span><span class="chart-legend-dot" style="background:var(--gold)"></span>Offerter</span>
+                <span><span class="chart-legend-dot" style="background:var(--teal)"></span>Fakturor</span>
+              </div>
             </div>
+            <div id="chartQuotesVsInv" style="display:flex;align-items:flex-end;gap:6px;height:160px;padding:0.5rem 0"></div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem">
+          <div>
+            <div class="card-label">⏳ Väntande offerter (7+ dagar)</div>
+            <div id="dashPending"><div style="padding:1rem;color:#aaa;font-size:0.85rem">Laddar...</div></div>
+          </div>
+          <div>
+            <div class="card-label" style="color:#c62828">Förfallna fakturor</div>
+            <div id="dashOverdue"><div style="padding:1rem;color:#aaa;font-size:0.85rem">Laddar...</div></div>
           </div>
         </div>
       </div>
@@ -3249,50 +3270,70 @@ async function loadDashboard() {
     }
 
     // ===== CHARTS =====
-    const months = [];
-    const now2 = new Date();
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date(now2.getFullYear(), now2.getMonth() - i, 1);
-      months.push({ key: d.toISOString().slice(0,7), label: d.toLocaleDateString('sv-SE', { month: 'short' }) });
-    }
-
-    // Chart 1: Invoiced per month
-    const invByMonth = {};
-    months.forEach(m => invByMonth[m.key] = 0);
-    inv.filter(i => i.status !== 'draft' && i.status !== 'credit_note').forEach(i => {
-      const mk = (i.created_at || '').slice(0,7);
-      if (invByMonth[mk] !== undefined) invByMonth[mk] += Math.abs(parseFloat(i.total_amount)) || 0;
-    });
-    const maxInv = Math.max(...Object.values(invByMonth), 1);
-    document.getElementById('chartInvoices').innerHTML = months.map(m => {
-      const val = invByMonth[m.key];
-      const h = val > 0 ? Math.max((val / maxInv) * 120, 8) : 3;
-      const yr = m.key.slice(2,4);
-      return `<div class="bar-col"><div class="bar-value">${val > 0 ? Number(val).toLocaleString('sv-SE') : ''}</div><div class="bar-fill invoice" style="height:${h}px;opacity:${val > 0 ? 1 : 0.2}"></div><div class="bar-label">${m.label} '${yr}</div></div>`;
-    }).join('');
-
-    // Chart 2: Quotes vs Invoices per month
-    const qByMonth = {}, iByMonth = {};
-    months.forEach(m => { qByMonth[m.key] = 0; iByMonth[m.key] = 0; });
-    q.forEach(r => { const mk = (r.created_at||'').slice(0,7); if (qByMonth[mk] !== undefined) qByMonth[mk]++; });
-    inv.filter(i => i.status !== 'draft' && i.status !== 'credit_note').forEach(i => { const mk = (i.created_at||'').slice(0,7); if (iByMonth[mk] !== undefined) iByMonth[mk]++; });
-    const maxQI = Math.max(...Object.values(qByMonth), ...Object.values(iByMonth), 1);
-    document.getElementById('chartQuotesVsInv').innerHTML = months.map(m => {
-      const qv = qByMonth[m.key], iv = iByMonth[m.key];
-      const qh = qv > 0 ? Math.max((qv / maxQI) * 110, 8) : 3;
-      const ih = iv > 0 ? Math.max((iv / maxQI) * 110, 8) : 3;
-      const yr = m.key.slice(2,4);
-      return `<div class="bar-col" style="flex-direction:column;gap:0">
-        <div style="display:flex;gap:3px;align-items:flex-end;height:120px;width:100%">
-          <div class="bar-fill quote" style="height:${qh}px;flex:1;opacity:${qv > 0 ? 1 : 0.15}"></div>
-          <div class="bar-fill invoice" style="height:${ih}px;flex:1;opacity:${iv > 0 ? 1 : 0.15}"></div>
-        </div>
-        <div style="display:flex;gap:2px;font-size:0.55rem;color:#888;justify-content:center"><span>${qv}</span>/<span>${iv}</span></div>
-        <div class="bar-label">${m.label} '${yr}</div>
-      </div>`;
-    }).join('');
+    window._dashQuotes = q;
+    window._dashInvoices = inv;
+    window._chartYear = window._chartYear || new Date().getFullYear();
+    renderCharts();
 
   } catch(e) { console.error('Dashboard error:', e); }
+}
+
+let _chartYear = new Date().getFullYear();
+function changeChartYear(delta) {
+  _chartYear += delta;
+  if (_chartYear > new Date().getFullYear()) _chartYear = new Date().getFullYear();
+  if (_chartYear < 2024) _chartYear = 2024;
+  document.getElementById('chartYear').textContent = _chartYear;
+  renderCharts();
+}
+
+function renderCharts() {
+  const q = window._dashQuotes || [];
+  const inv = window._dashInvoices || [];
+  const year = _chartYear;
+  document.getElementById('chartYear').textContent = year;
+  const monthNames = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
+
+  // Chart 1: Fakturerat per månad
+  const invByMonth = Array(12).fill(0);
+  inv.filter(i => i.status !== 'draft' && i.status !== 'credit_note').forEach(i => {
+    const d = new Date(i.created_at);
+    if (d.getFullYear() === year) invByMonth[d.getMonth()] += Math.abs(parseFloat(i.total_amount)) || 0;
+  });
+  const maxInv = Math.max(...invByMonth, 1);
+  const el1 = document.getElementById('chartInvoices');
+  el1.innerHTML = invByMonth.map((val, i) => {
+    const pct = val > 0 ? Math.max((val / maxInv) * 100, 5) : 0;
+    const label = val > 0 ? (val >= 10000 ? Math.round(val/1000) + 'k' : Number(val).toLocaleString('sv-SE')) : '';
+    return `<div class="chart-bar-group">
+      <div class="chart-bar-value">${label}</div>
+      <div style="width:100%;height:130px;display:flex;align-items:flex-end">
+        <div class="chart-bar ${val > 0 ? 'teal' : 'empty'}" style="width:100%;height:${val > 0 ? pct + '%' : '3px'}"></div>
+      </div>
+      <div class="chart-bar-label">${monthNames[i]}</div>
+    </div>`;
+  }).join('');
+
+  // Chart 2: Offerter vs Fakturor per månad
+  const qByMonth = Array(12).fill(0);
+  const iByMonth = Array(12).fill(0);
+  q.forEach(r => { const d = new Date(r.created_at); if (d.getFullYear() === year) qByMonth[d.getMonth()]++; });
+  inv.filter(i => i.status !== 'draft' && i.status !== 'credit_note').forEach(i => { const d = new Date(i.created_at); if (d.getFullYear() === year) iByMonth[d.getMonth()]++; });
+  const maxQI = Math.max(...qByMonth, ...iByMonth, 1);
+  const el2 = document.getElementById('chartQuotesVsInv');
+  el2.innerHTML = Array(12).fill(0).map((_, i) => {
+    const qv = qByMonth[i], iv = iByMonth[i];
+    const qp = qv > 0 ? Math.max((qv / maxQI) * 100, 5) : 0;
+    const ip = iv > 0 ? Math.max((iv / maxQI) * 100, 5) : 0;
+    return `<div class="chart-bar-group">
+      <div class="chart-bar-value">${qv > 0 || iv > 0 ? qv + '/' + iv : ''}</div>
+      <div style="width:100%;height:130px;display:flex;align-items:flex-end;gap:2px">
+        <div class="chart-bar ${qv > 0 ? 'gold' : 'empty'}" style="flex:1;height:${qv > 0 ? qp + '%' : '3px'}"></div>
+        <div class="chart-bar ${iv > 0 ? 'teal' : 'empty'}" style="flex:1;height:${iv > 0 ? ip + '%' : '3px'}"></div>
+      </div>
+      <div class="chart-bar-label">${monthNames[i]}</div>
+    </div>`;
+  }).join('');
 }
 
 // ===== CUSTOMERS =====
