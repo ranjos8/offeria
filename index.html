@@ -385,6 +385,24 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .cust-info { font-size: 0.78rem; color: #888; margin-top: 0.2rem; }
 .cust-stats { font-size: 0.72rem; color: var(--gold); margin-top: 0.4rem; font-weight: 600; }
 
+/* tab bar */
+.tab-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 0.6rem 1.2rem; font-size: 0.88rem; font-family: inherit; cursor: pointer; color: #888; margin-bottom: -2px; transition: all 0.15s; }
+.tab-btn:hover { color: var(--ink); }
+.tab-btn.active { color: var(--ink); border-bottom-color: var(--gold); font-weight: 600; }
+
+/* dashboard chart */
+.chart-container { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; margin-top: 1.5rem; }
+.chart-title { font-size: 0.78rem; font-weight: 600; color: #555; margin-bottom: 0.8rem; }
+.bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 140px; padding-top: 0.5rem; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; min-width: 0; }
+.bar-fill { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.3s; min-height: 2px; }
+.bar-fill.quote { background: var(--gold); }
+.bar-fill.invoice { background: var(--teal); }
+.bar-label { font-size: 0.6rem; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center; }
+.bar-value { font-size: 0.58rem; color: #555; font-weight: 600; }
+.chart-legend { display: flex; gap: 1.2rem; margin-top: 0.8rem; font-size: 0.72rem; color: #888; }
+.chart-legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 0.3rem; vertical-align: middle; }
+
 /* customer dropdown */
 .cust-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); max-height: 200px; overflow-y: auto; z-index: 50; }
 .cust-dropdown-item { padding: 0.6rem 0.8rem; cursor: pointer; font-size: 0.85rem; border-bottom: 1px solid #f5f0e8; }
@@ -563,6 +581,9 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   #quoteDoc table.qt th, #quoteDoc table.qt td { padding: 0.5rem 0.4rem; }
   .row-type-select { font-size: 0.6rem; padding: 0.15rem 0.15rem; }
   .dash-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+  .chart-container { margin-top: 1rem; }
+  #page-dashboard .chart-container { }
+  #page-dashboard > div:last-child { grid-template-columns: 1fr !important; }
   .dash-num { font-size: 1.1rem; }
   .mic-btn { height: 38px; font-size: 0.75rem; padding: 0 0.8rem; }
   #quoteDoc .q-totals { justify-content: stretch; }
@@ -849,10 +870,9 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
     <!-- sidebar -->
     <aside class="app-sidebar">
-      <div class="sidebar-item active" id="sNav-generate" onclick="showPage('generate')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span> Ny offert</div>
-      <div class="sidebar-item" id="sNav-history" onclick="showPage('history')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></span> Offerthistorik</div>
+      <div class="sidebar-item active" id="sNav-dashboard" onclick="showPage('dashboard')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Dashboard</div>
+      <div class="sidebar-item" id="sNav-generate" onclick="showPage('generate')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span> Offerter</div>
       <div class="sidebar-item" id="sNav-invoices" onclick="showPage('invoices')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> Fakturor</div>
-      <div class="sidebar-item" id="sNav-dashboard" onclick="showPage('dashboard')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Dashboard</div>
       <div class="sidebar-item" id="sNav-customers" onclick="showPage('customers')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span> Kunder</div>
       <div class="sidebar-item" id="sNav-articles" onclick="showPage('articles')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Artiklar</div>
       <div class="sidebar-item" id="sNav-profile" onclick="showPage('profile')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/><path d="M9 22v-4h6v4"/></svg></span> Företagsprofil</div>
@@ -870,7 +890,13 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     <main>
 
       <!-- GENERATE PAGE -->
-      <div class="app-page active" id="page-generate">
+      <div class="app-page" id="page-generate">
+        <div class="page-title">Offerter</div>
+        <div class="tab-bar" style="display:flex;gap:0;margin-bottom:1.5rem;border-bottom:2px solid var(--border)">
+          <button class="tab-btn active" id="tabNewQuote" onclick="switchQuoteTab('new')">Ny offert</button>
+          <button class="tab-btn" id="tabHistory" onclick="switchQuoteTab('history')">Historik</button>
+        </div>
+        <div id="quoteTabNew">
         <div id="welcomeBanner" style="display:none">
           <div class="welcome-banner">
             <button class="welcome-close" onclick="dismissWelcome()">✕</button>
@@ -956,16 +982,14 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
         <!-- quote output -->
         <div class="quote-wrap" id="quoteWrap" style="display:none"></div>
-      </div>
+        </div><!-- end quoteTabNew -->
 
-      <!-- HISTORY PAGE -->
-      <div class="app-page" id="page-history">
-        <div class="page-title">Offerthistorik</div>
-        <div class="page-sub">Alla dina genererade offerter</div>
-        <div style="margin-bottom:1rem">
-          <input id="historySearch" type="text" placeholder="🔍 Sök på kund eller titel..." oninput="filterHistory()" style="width:100%;max-width:400px;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit">
+        <div id="quoteTabHistory" style="display:none">
+          <div style="margin-bottom:1rem">
+            <input id="historySearch" type="text" placeholder="Sök på kund eller titel..." oninput="filterHistory()" style="width:100%;max-width:400px;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit">
+          </div>
+          <div id="historyContent"><div class="empty-state"><p>Inga offerter ännu – generera din första!</p></div></div>
         </div>
-        <div id="historyContent"><div class="empty-state"><div class="big">📂</div><p>Inga offerter ännu – generera din första!</p></div></div>
       </div>
 
       <!-- INVOICES PAGE -->
@@ -1109,6 +1133,20 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <div style="margin-top:1.5rem">
           <div class="card-label"><span class="ico" style="color:#e05"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span> Förfallna fakturor</div>
           <div id="dashOverdue"><div class="empty-state" style="padding:2rem"><p>Laddar...</p></div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="chart-container">
+            <div class="chart-title">Fakturerat per månad (senaste 6 mån)</div>
+            <div class="bar-chart" id="chartInvoices"></div>
+          </div>
+          <div class="chart-container">
+            <div class="chart-title">Offerter vs Fakturor per månad</div>
+            <div class="bar-chart" id="chartQuotesVsInv"></div>
+            <div class="chart-legend">
+              <span><span class="chart-legend-dot" style="background:var(--gold)"></span> Offerter</span>
+              <span><span class="chart-legend-dot" style="background:var(--teal)"></span> Fakturor</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1272,7 +1310,7 @@ async function init() {
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
       showView('app');
-      showPage('generate');
+      showPage('dashboard');
       await onLogin(session.user);
     } else {
       showView('landing');
@@ -1306,7 +1344,7 @@ async function onLogin(user) {
 
   updateUI(profile, monthlyUsed, total || 0);
   showView('app');
-  showPage('generate');
+  showPage('dashboard');
   fillProfileForm(profile);
   renderExamplePills();
 
@@ -1470,14 +1508,15 @@ function showView(v) {
   el.style.display = 'block';
   el.classList.add('active');
 }
-function goHome() { if (currentUser) { showView('app'); showPage('generate'); } else showView('landing'); }
+function goHome() { if (currentUser) { showView('app'); showPage('dashboard'); } else showView('landing'); }
 
 function showPage(p) {
+  // Map old 'history' to generate page with history tab
+  if (p === 'history') { p = 'generate'; setTimeout(() => switchQuoteTab('history'), 50); }
   document.querySelectorAll('.app-page').forEach(el => el.classList.remove('active'));
-  document.getElementById('page-' + p).classList.add('active');
+  document.getElementById('page-' + p)?.classList.add('active');
   document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
   document.getElementById('sNav-' + p)?.classList.add('active');
-  if (p === 'history') loadHistory();
   if (p === 'invoices') loadInvoices();
   if (p === 'profile' && currentProfile?.logo_url) showLogoPreview(currentProfile.logo_url);
   if (p === 'generate') renderExamplePills();
@@ -1485,6 +1524,26 @@ function showPage(p) {
   if (p === 'customers') loadCustomers();
   if (p === 'articles') loadArticles();
   updateDrawerActive(p);
+}
+
+function switchQuoteTab(tab) {
+  const newEl = document.getElementById('quoteTabNew');
+  const histEl = document.getElementById('quoteTabHistory');
+  const btnNew = document.getElementById('tabNewQuote');
+  const btnHist = document.getElementById('tabHistory');
+  if (tab === 'history') {
+    newEl.style.display = 'none';
+    histEl.style.display = 'block';
+    btnNew.classList.remove('active');
+    btnHist.classList.add('active');
+    loadHistory();
+  } else {
+    newEl.style.display = 'block';
+    histEl.style.display = 'none';
+    btnNew.classList.add('active');
+    btnHist.classList.remove('active');
+    renderExamplePills();
+  }
 }
 
 // ===== PROFILE =====
@@ -2142,11 +2201,11 @@ function openInvoiceView(idx) {
   }
   if (['sent','overdue'].includes(status)) {
     btns += '<button class="qt-btn" id="invMarkPaidBtn" onclick="toggleInvoicePaid()" style="background:#e8f5e9;color:#2e7d32">✓ Markera betald</button>';
-    btns += `<button class="qt-btn" onclick="creditCurrentInvoice()" style="color:#6a1b9a;border-color:#6a1b9a">Kreditera</button>`;
+    btns += `<button class="qt-btn" onclick="creditCurrentInvoice()" style="background:#6a1b9a;color:white;border-color:#6a1b9a">Kreditera</button>`;
   }
   if (status === 'paid') {
     btns += '<button class="qt-btn" id="invMarkPaidBtn" onclick="toggleInvoicePaid()" style="background:#f5f5f5;color:#666">↩ Ångra betald</button>';
-    btns += `<button class="qt-btn" onclick="creditCurrentInvoice()" style="color:#6a1b9a;border-color:#6a1b9a">Kreditera</button>`;
+    btns += `<button class="qt-btn" onclick="creditCurrentInvoice()" style="background:#6a1b9a;color:white;border-color:#6a1b9a">Kreditera</button>`;
   }
   btns += '<button class="qt-btn" onclick="closeInvoiceModal()" style="margin-left:0.5rem">✕ Stäng</button>';
   btnsEl.innerHTML = btns;
@@ -2949,9 +3008,9 @@ function renderQuote(q) {
         <div class="trow final-row"><span id="tot-final-lbl">${finalLabel}</span><span id="tot-final">${fmtSEK(finalTotal)}</span></div>
       </div>
     </div>
-    ${q.timeline?`<div class="q-terms" style="margin-bottom:1rem"><h4><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> Tidplan</h4><p class="editable" contenteditable="true">${q.timeline}</p></div>`:''}
-    ${q.materials?`<div class="q-terms" style="margin-bottom:1rem"><h4><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Material</h4><p class="editable" contenteditable="true">${q.materials}</p></div>`:''}
-    <div class="q-terms"><h4><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span> Villkor & betalning</h4><p class="editable" contenteditable="true">• Betalningsvillkor: ${info.payterms}${q.warrantyText ? '<br>• ' + q.warrantyText : ''}<br>${q.terms}</p></div>
+    ${q.timeline?`<div class="q-terms" style="margin-bottom:1rem"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:0.85em;height:0.85em;vertical-align:-0.1em;display:inline-block"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Tidplan</h4><p class="editable" contenteditable="true">${q.timeline}</p></div>`:''}
+    ${q.materials?`<div class="q-terms" style="margin-bottom:1rem"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:0.85em;height:0.85em;vertical-align:-0.1em;display:inline-block"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Material</h4><p class="editable" contenteditable="true">${q.materials}</p></div>`:''}
+    <div class="q-terms"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:0.85em;height:0.85em;vertical-align:-0.1em;display:inline-block"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Villkor & betalning</h4><p class="editable" contenteditable="true">• Betalningsvillkor: ${info.payterms}${q.warrantyText ? '<br>• ' + q.warrantyText : ''}<br>${q.terms}</p></div>
     <p class="editable" contenteditable="true" style="font-size:0.82rem;color:#555;margin-bottom:1.5rem;font-style:italic">${q.closingNote}</p>
     <div class="q-footer">
       <div><strong>${info.company}</strong><br>${info.phone} ${info.email}${credentialsHtml ? `<br><span style='font-size:0.72rem;color:#aaa'>${credentialsHtml}</span>` : ''}</div>
@@ -3038,7 +3097,7 @@ function closeDrawer() {
 }
 
 function updateDrawerActive(page) {
-  ['generate','invoices','history','profile','dashboard','customers','articles'].forEach(p => {
+  ['generate','invoices','profile','dashboard','customers','articles'].forEach(p => {
     const sBtn = document.getElementById('sNav-' + p);
     if (sBtn) { sBtn.classList.toggle('active', p === page); }
     const dBtn = document.getElementById('dNav-' + p);
@@ -3159,6 +3218,48 @@ async function loadDashboard() {
         return `<div class="dash-pending-item"><span>${i.client_name || 'Okänd'} – ${fmt(i.total_amount)}</span><span class="days-ago">${days} dagar förfallen</span></div>`;
       }).join('');
     }
+
+    // ===== CHARTS =====
+    const months = [];
+    const now2 = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now2.getFullYear(), now2.getMonth() - i, 1);
+      months.push({ key: d.toISOString().slice(0,7), label: d.toLocaleDateString('sv-SE', { month: 'short' }) });
+    }
+
+    // Chart 1: Invoiced per month
+    const invByMonth = {};
+    months.forEach(m => invByMonth[m.key] = 0);
+    inv.filter(i => i.status !== 'draft' && i.status !== 'credit_note').forEach(i => {
+      const mk = (i.created_at || '').slice(0,7);
+      if (invByMonth[mk] !== undefined) invByMonth[mk] += Math.abs(parseFloat(i.total_amount)) || 0;
+    });
+    const maxInv = Math.max(...Object.values(invByMonth), 1);
+    document.getElementById('chartInvoices').innerHTML = months.map(m => {
+      const val = invByMonth[m.key];
+      const h = Math.max((val / maxInv) * 120, 2);
+      return `<div class="bar-col"><div class="bar-value">${val > 0 ? (val/1000).toFixed(0) + 'k' : ''}</div><div class="bar-fill invoice" style="height:${h}px"></div><div class="bar-label">${m.label}</div></div>`;
+    }).join('');
+
+    // Chart 2: Quotes vs Invoices per month
+    const qByMonth = {}, iByMonth = {};
+    months.forEach(m => { qByMonth[m.key] = 0; iByMonth[m.key] = 0; });
+    q.forEach(r => { const mk = (r.created_at||'').slice(0,7); if (qByMonth[mk] !== undefined) qByMonth[mk]++; });
+    inv.filter(i => i.status !== 'draft' && i.status !== 'credit_note').forEach(i => { const mk = (i.created_at||'').slice(0,7); if (iByMonth[mk] !== undefined) iByMonth[mk]++; });
+    const maxQI = Math.max(...Object.values(qByMonth), ...Object.values(iByMonth), 1);
+    document.getElementById('chartQuotesVsInv').innerHTML = months.map(m => {
+      const qv = qByMonth[m.key], iv = iByMonth[m.key];
+      const qh = Math.max((qv / maxQI) * 110, 2);
+      const ih = Math.max((iv / maxQI) * 110, 2);
+      return `<div class="bar-col" style="flex-direction:column;gap:0">
+        <div style="display:flex;gap:2px;align-items:flex-end;height:120px">
+          <div class="bar-fill quote" style="height:${qh}px;width:45%"></div>
+          <div class="bar-fill invoice" style="height:${ih}px;width:45%"></div>
+        </div>
+        <div class="bar-label">${m.label}</div>
+      </div>`;
+    }).join('');
+
   } catch(e) { console.error('Dashboard error:', e); }
 }
 
@@ -3290,11 +3391,15 @@ function selectCustomerSuggestion(custId, dropdownId) {
 
 function openCustomerPickerForQuote() {
   ensureCustomersLoaded().then(() => {
-    if (_customersData.length === 0) { alert('Inga sparade kunder. Lägg till kunder under <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span> Kunder.'); return; }
-    const items = _customersData.map(c => `<div class="cust-dropdown-item" onclick="fillQuoteClient('${c.id}')" style="padding:0.8rem 1rem">${c.name}${c.address ? `<div class="cust-dd-sub">${c.address}</div>` : ''}</div>`).join('');
-    const dd = document.createElement('div');
-    dd.innerHTML = `<div class="overlay" onclick="if(event.target===this)this.remove()" style="z-index:600"><div class="modal" style="max-width:400px;max-height:60vh;overflow-y:auto"><h3 style="margin-bottom:0.8rem"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span> Välj kund</h3>${items}</div></div>`;
-    document.body.appendChild(dd.firstElementChild);
+    if (_customersData.length === 0) { alert('Inga sparade kunder. Lägg till kunder under Kunder-sidan.'); return; }
+    const items = _customersData.map(c => `<div style="padding:0.8rem 1rem;border-bottom:1px solid #eee;cursor:pointer;font-size:0.9rem" onmouseover="this.style.background='#f5f0e8'" onmouseout="this.style.background=''" onclick="fillQuoteClient('${c.id}')">${c.name}${c.address ? '<div style=\"font-size:0.72rem;color:#999\">' + c.address + '</div>' : ''}</div>`).join('');
+    document.getElementById('custPickerOverlay')?.remove();
+    const overlay = document.createElement('div');
+    overlay.id = 'custPickerOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center';
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = '<div style="background:white;border-radius:12px;max-width:400px;width:90%;max-height:60vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)"><div style="padding:1.2rem 1.2rem 0.8rem;font-weight:700;font-size:1rem;border-bottom:1px solid #eee">Välj kund</div>' + items + '<div style="padding:0.8rem;text-align:center"><button onclick="document.getElementById(\'custPickerOverlay\').remove()" style="padding:0.5rem 1.5rem;background:#eee;border:none;border-radius:8px;cursor:pointer;font-family:inherit">Stäng</button></div></div>';
+    document.body.appendChild(overlay);
   });
 }
 function fillQuoteClient(custId) {
@@ -3304,7 +3409,7 @@ function fillQuoteClient(custId) {
   const addrEl = document.getElementById('quoteClientAddr');
   if (nameEl) nameEl.textContent = c.name;
   if (addrEl) addrEl.textContent = c.address || 'Adress';
-  document.querySelector('.overlay[style*="z-index:600"]')?.remove();
+  document.getElementById('custPickerOverlay')?.remove();
 }
 
 // ===== ARTICLES =====
@@ -3661,17 +3766,14 @@ init();
 
   <!-- Nav items -->
   <div style="padding:0 0.75rem;flex:1">
-    <button onclick="closeDrawer();showView('app');showPage('generate')" id="dNav-generate" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
-      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span> Ny offert
+    <button onclick="closeDrawer();showView('app');showPage('dashboard')" id="dNav-dashboard" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Dashboard
     </button>
-    <button onclick="closeDrawer();showView('app');showPage('history')" id="dNav-history" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
-      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></span> Offerthistorik
+    <button onclick="closeDrawer();showView('app');showPage('generate')" id="dNav-generate" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span> Offerter
     </button>
     <button onclick="closeDrawer();showView('app');showPage('invoices')" id="dNav-invoices" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
       <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> Fakturor
-    </button>
-    <button onclick="closeDrawer();showView('app');showPage('dashboard')" id="dNav-dashboard" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
-      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Dashboard
     </button>
     <button onclick="closeDrawer();showView('app');showPage('customers')" id="dNav-customers" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
       <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span> Kunder
