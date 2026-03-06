@@ -470,6 +470,10 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .inv-status.unpaid { background: #fff8e1; color: #b8902e; }
 .inv-status.overdue { background: #fce4ec; color: #c62828; }
 .inv-status.paid { background: #e8f5e9; color: #2e7d32; }
+.inv-status.draft { background: #f3f3f3; color: #888; }
+.inv-status.credited { background: #e3f2fd; color: #1565c0; }
+.inv-status.voided { background: #f5f5f5; color: #bbb; text-decoration: line-through; }
+.inv-status.credit-note { background: #ede7f6; color: #6a1b9a; }
 .inv-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 .inv-mark-btn { padding: 0.35rem 0.8rem; border-radius: 6px; border: 1.5px solid #2e7d32; background: #e8f5e9; color: #2e7d32; font-family: 'DM Sans',sans-serif; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
 .inv-mark-btn:hover { background: #2e7d32; color: white; }
@@ -980,9 +984,11 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <input id="invoiceSearch" type="text" placeholder="🔍 Sök faktura..." oninput="filterInvoices()" style="flex:1;min-width:200px;max-width:400px;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit">
           <select id="invoiceFilter" onchange="filterInvoices()" style="padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.85rem;font-family:inherit">
             <option value="all">Alla</option>
-            <option value="unpaid">Obetalda</option>
+            <option value="draft">Utkast</option>
+            <option value="sent">Skickade</option>
             <option value="overdue">Förfallna</option>
             <option value="paid">Betalda</option>
+            <option value="credited">Krediterade</option>
           </select>
           <button onclick="openNewInvoiceModal()" class="gen-btn" style="padding:0.6rem 1.2rem;font-size:0.85rem;white-space:nowrap">+ Ny faktura</button>
         </div>
@@ -1709,24 +1715,43 @@ async function checkInvoiceLimit() {
 }
 
 function getNextInvoiceNumber(invoices) {
-  if (!invoices || invoices.length === 0) return 'FA-1001';
-  const nums = invoices.map(i => {
+  const nums = (invoices || []).map(i => {
     const m = (i.invoice_number || '').match(/FA-(\d+)/);
     return m ? parseInt(m[1]) : 0;
   });
-  return 'FA-' + (Math.max(...nums) + 1);
+  return 'FA-' + (nums.length > 0 ? Math.max(...nums) + 1 : 1001);
+}
+function getNextCreditNumber(invoices) {
+  const nums = (invoices || []).map(i => {
+    const m = (i.invoice_number || '').match(/KF-(\d+)/);
+    return m ? parseInt(m[1]) : 0;
+  });
+  return 'KF-' + (nums.length > 0 ? Math.max(...nums) + 1 : 1001);
+}
+function computeVatNumber(orgNr) {
+  if (!orgNr) return '';
+  const clean = orgNr.replace(/\D/g, '');
+  return clean.length >= 10 ? 'SE' + clean + '01' : '';
 }
 
 function getInvoiceStatus(inv) {
+  if (inv.status === 'draft') return 'draft';
+  if (inv.status === 'credited') return 'credited';
+  if (inv.status === 'voided') return 'voided';
   if (inv.status === 'paid') return 'paid';
-  if (inv.due_date && new Date(inv.due_date) < new Date()) return 'overdue';
-  return 'unpaid';
+  if (inv.status === 'credit_note') return 'credit_note';
+  if (inv.due_date && new Date(inv.due_date) < new Date() && inv.status !== 'paid') return 'overdue';
+  return 'sent';
 }
 
 function statusLabel(s) {
   if (s === 'paid') return '<span class="inv-status paid">Betald</span>';
   if (s === 'overdue') return '<span class="inv-status overdue">Förfallen</span>';
-  return '<span class="inv-status unpaid">Obetald</span>';
+  if (s === 'draft') return '<span class="inv-status draft">Utkast</span>';
+  if (s === 'credited') return '<span class="inv-status credited">Krediterad</span>';
+  if (s === 'voided') return '<span class="inv-status voided">Makulerad</span>';
+  if (s === 'credit_note') return '<span class="inv-status credit-note">Kreditfaktura</span>';
+  return '<span class="inv-status unpaid">Skickad</span>';
 }
 
 async function loadInvoices() {
@@ -1748,10 +1773,11 @@ async function loadInvoices() {
     if (error) throw error;
     _invoiceData = data || [];
 
-  // Update overdue status
+  // Update overdue status (only for sent invoices, not drafts)
   for (const inv of _invoiceData) {
+    if (inv.status === 'draft' || inv.status === 'paid' || inv.status === 'credited' || inv.status === 'credit_note' || inv.status === 'voided') continue;
     const realStatus = getInvoiceStatus(inv);
-    if (realStatus === 'overdue' && inv.status !== 'paid' && inv.status !== 'overdue') {
+    if (realStatus === 'overdue' && inv.status !== 'overdue') {
       await sb.from('invoices').update({ status: 'overdue' }).eq('id', inv.id);
       inv.status = 'overdue';
     }
@@ -1768,11 +1794,12 @@ async function loadInvoices() {
 
 function updateInvoiceSummary() {
   const total = _invoiceData.length;
+  const drafts = _invoiceData.filter(i => i.status === 'draft').length;
   const paid = _invoiceData.filter(i => i.status === 'paid').length;
   const overdue = _invoiceData.filter(i => getInvoiceStatus(i) === 'overdue').length;
-  const unpaid = total - paid - overdue;
+  const sent = total - paid - overdue - drafts - _invoiceData.filter(i => ['credited','credit_note','voided'].includes(i.status)).length;
   document.getElementById('invTotal').textContent = total;
-  document.getElementById('invUnpaid').textContent = unpaid;
+  document.getElementById('invUnpaid').textContent = sent + drafts;
   document.getElementById('invOverdue').textContent = overdue;
   document.getElementById('invPaid').textContent = paid;
 }
@@ -1789,18 +1816,31 @@ function renderInvoiceList(data) {
       const status = getInvoiceStatus(inv);
       const due = inv.due_date ? new Date(inv.due_date).toLocaleDateString('sv-SE') : '–';
       const amount = inv.total_amount ? Number(inv.total_amount).toLocaleString('sv-SE') + ' kr' : '–';
-      return `<tr>
-        <td style="white-space:nowrap;font-weight:600;font-size:0.8rem">${inv.invoice_number || '–'}</td>
+      const isDraft = status === 'draft';
+      const isLocked = ['sent','paid','overdue','credited','credit_note'].includes(status);
+      const canCredit = ['sent','paid','overdue'].includes(status);
+      let btns = `<button class="btn-sm btn-outline" onclick="openInvoiceView(${i})">Öppna</button>`;
+      if (isDraft) {
+        btns += ` <button class="btn-sm btn-outline" style="background:#2e7d32;color:white;border-color:#2e7d32" onclick="confirmInvoice(${i})">Bekräfta</button>`;
+        btns += ` <button class="btn-sm" onclick="deleteInvoice(${i})" style="background:none;border:1px solid #ddd;color:#999;border-radius:6px;padding:0.25rem 0.6rem;cursor:pointer;font-size:0.75rem;font-family:DM Sans,sans-serif">Ta bort</button>`;
+      }
+      if (isLocked && status !== 'paid' && status !== 'credited' && status !== 'credit_note') {
+        btns += ` <button class="inv-mark-btn" onclick="markInvoicePaid(${i})">✓ Betald</button>`;
+      }
+      if (status === 'paid') {
+        btns += ` <button class="inv-mark-btn undo" onclick="markInvoiceUnpaid(${i})">↩ Ångra</button>`;
+      }
+      if (canCredit) {
+        btns += ` <button class="btn-sm" onclick="createCreditInvoice(${i})" style="background:none;border:1px solid #6a1b9a;color:#6a1b9a;border-radius:6px;padding:0.25rem 0.6rem;cursor:pointer;font-size:0.75rem;font-family:DM Sans,sans-serif">Kreditera</button>`;
+      }
+      return `<tr${status === 'voided' ? ' style="opacity:0.5"' : ''}>
+        <td style="white-space:nowrap;font-weight:600;font-size:0.8rem">${inv.invoice_number || 'UTKAST'}</td>
         <td>${inv.client_name || '–'}</td>
         <td>${inv.title || '–'}</td>
         <td style="text-align:right;font-weight:600">${amount}</td>
         <td style="white-space:nowrap;font-size:0.8rem;color:#888">${due}</td>
         <td>${statusLabel(status)}</td>
-        <td style="display:flex;gap:0.4rem;flex-wrap:wrap">
-          <button class="btn-sm btn-outline" onclick="openInvoiceView(${i})">Öppna</button>
-          ${status !== 'paid' ? `<button class="inv-mark-btn" onclick="markInvoicePaid(${i})">✓ Betald</button>` : `<button class="inv-mark-btn undo" onclick="markInvoiceUnpaid(${i})">↩ Ångra</button>`}
-          <button class="btn-sm" onclick="deleteInvoice(${i})" style="background:none;border:1px solid #ddd;color:#999;border-radius:6px;padding:0.25rem 0.6rem;cursor:pointer;font-size:0.75rem;font-family:DM Sans,sans-serif">Ta bort</button>
-        </td>
+        <td style="display:flex;gap:0.4rem;flex-wrap:wrap">${btns}</td>
       </tr>`;
     }).join('')}</tbody>
   </table>`;
@@ -1884,28 +1924,35 @@ function buildInvoiceHtml(info, invoiceData) {
     <text x="31" y="29" font-family="Fraunces, serif" font-style="italic" font-weight="700" font-size="28" fill="url(#ilg)" letter-spacing="-0.8">Offeria</text></svg>`;
 
   const vatRate = invoiceData.vatRate || 25;
-  const subtotal = invoiceData.items.reduce((s, it) => s + it.qty * it.price, 0);
-  const vatAmount = Math.round(subtotal * vatRate / 100);
+  const isCredit = invoiceData.isCredit || false;
+  const sign = isCredit ? -1 : 1;
+  const subtotal = invoiceData.items.reduce((s, it) => s + it.qty * it.price, 0) * sign;
+  const vatAmount = Math.round(Math.abs(subtotal) * vatRate / 100) * sign;
   const total = subtotal + vatAmount;
+  const vatNumber = info.vatNumber || computeVatNumber(info.orgNum);
+  const docType = isCredit ? 'KREDITFAKTURA' : (invoiceData.invoiceNumber === 'UTKAST' ? 'UTKAST – FAKTURA' : 'FAKTURA');
 
   const rowsHtml = invoiceData.items.map(it => `<tr>
     <td>${it.desc}</td><td>${it.qty} st</td>
-    <td style="text-align:right">${Number(it.price).toLocaleString('sv-SE')} kr</td>
-    <td style="text-align:right;font-weight:500">${Number(it.qty * it.price).toLocaleString('sv-SE')} kr</td>
+    <td style="text-align:right">${Number(it.price * sign).toLocaleString('sv-SE')} kr</td>
+    <td style="text-align:right;font-weight:500">${Number(it.qty * it.price * sign).toLocaleString('sv-SE')} kr</td>
   </tr>`).join('');
 
   const bankInfo = info.bankgiro ? `<br>BG: ${info.bankgiro}` : '';
   const webInfo = info.website ? `<br>${info.website}` : '';
+  const vatLine = vatNumber ? `<br>Momsreg.nr: ${vatNumber}` : '';
+  const creditRef = invoiceData.creditRef ? `<tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>Avser faktura:</strong></td><td style="white-space:nowrap">${invoiceData.creditRef}</td></tr>` : '';
+  const deliveryDate = invoiceData.deliveryDate ? `<tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>Leveransdatum:</strong></td><td style="white-space:nowrap">${invoiceData.deliveryDate}</td></tr>` : '';
 
   return `
     <div class="q-header">
       <div><div class="q-company-name">${info.company}</div>
-      <div class="q-company-info">Org.nr: ${info.orgNum}<br>${info.phone}${info.phone&&info.email?' | ':''}${info.email}${webInfo}<br>${info.address}${bankInfo}</div></div>
+      <div class="q-company-info">Org.nr: ${info.orgNum}${vatLine}<br>${info.phone}${info.phone&&info.email?' | ':''}${info.email}${webInfo}<br>${info.address}${bankInfo}</div></div>
       ${logoHtml}
     </div>
     <div class="q-meta-row">
-      <div class="q-offer-title" style="color:#1a1a18">FAKTURA – ${invoiceData.title}</div>
-      <div class="q-meta"><table style="border-collapse:collapse;font-size:0.8rem;text-align:left"><tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>Fakturanr:</strong></td><td style="white-space:nowrap">${invoiceData.invoiceNumber}</td></tr><tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>Datum:</strong></td><td style="white-space:nowrap">${invoiceData.dateStr}</td></tr><tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>Förfallodatum:</strong></td><td style="white-space:nowrap">${invoiceData.dueStr}</td></tr><tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>Betalningsvillkor:</strong></td><td style="white-space:nowrap">${invoiceData.payTermsLabel}</td></tr></table></div>
+      <div class="q-offer-title" style="color:${isCredit ? '#6a1b9a' : '#1a1a18'}">${docType} – ${invoiceData.title}</div>
+      <div class="q-meta"><table style="border-collapse:collapse;font-size:0.8rem;text-align:left"><tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>${isCredit ? 'Kreditnr:' : 'Fakturanr:'}</strong></td><td style="white-space:nowrap">${invoiceData.invoiceNumber}</td></tr><tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>Datum:</strong></td><td style="white-space:nowrap">${invoiceData.dateStr}</td></tr>${creditRef}${deliveryDate}${!isCredit ? `<tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>Förfallodatum:</strong></td><td style="white-space:nowrap">${invoiceData.dueStr}</td></tr><tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>Betalningsvillkor:</strong></td><td style="white-space:nowrap">${invoiceData.payTermsLabel}</td></tr>` : ''}</table></div>
     </div>
     <div class="q-client"><div class="lbl">KUND</div><strong>${invoiceData.clientName}</strong><br>${invoiceData.clientAddress}</div>
     <table class="qt">
@@ -1915,18 +1962,19 @@ function buildInvoiceHtml(info, invoiceData) {
     <div class="q-totals"><div class="q-totals-box">
       <div class="trow"><span>Netto (exkl. moms)</span><span>${Number(subtotal).toLocaleString('sv-SE')} kr</span></div>
       <div class="trow"><span>Moms (${vatRate}%)</span><span>${Number(vatAmount).toLocaleString('sv-SE')} kr</span></div>
-      <div class="trow final-row"><span>ATT BETALA</span><span>${Number(total).toLocaleString('sv-SE')} kr</span></div>
+      <div class="trow final-row"><span>${isCredit ? 'ER TILLGODO' : 'ATT BETALA'}</span><span>${Number(total).toLocaleString('sv-SE')} kr</span></div>
     </div></div>
-    <div class="q-terms"><h4>Betalningsinformation</h4>
+    ${!isCredit ? `<div class="q-terms"><h4>Betalningsinformation</h4>
       ${info.bankgiro ? `Bankgiro: <strong>${info.bankgiro}</strong><br>` : ''}
       Ange fakturanummer <strong>${invoiceData.invoiceNumber}</strong> som referens vid betalning.<br>
       Vid försenad betalning debiteras dröjsmålsränta enligt räntelagen.
-    </div>
+    </div>` : `<div class="q-terms"><h4>Kreditering</h4>Denna kreditfaktura avser faktura <strong>${invoiceData.creditRef}</strong>. Beloppet ${Number(Math.abs(total)).toLocaleString('sv-SE')} kr tillgodoförs kunden.</div>`}
     <div class="q-footer">
       <div><strong>${info.company}</strong><br>${info.address}</div>
       <div class="sig-block"><div class="sig-line"></div><div>Godkänd av</div></div>
     </div>
-    ${isFree ? '<div style="text-align:center;margin-top:1.2rem;padding-top:1rem;border-top:1px solid #f0ebe0"><span style="font-size:0.68rem;color:#ccc;letter-spacing:0.08em">Skapad med </span><a href="https://offeria.se" target="_blank" style="font-family:Fraunces,serif;font-style:italic;font-size:0.75rem;color:#b8902e;text-decoration:none;font-weight:700">Offeria</a></div>' : ''}`;
+    ${isFree ? '<div style="text-align:center;margin-top:1.2rem;padding-top:1rem;border-top:1px solid #f0ebe0"><span style="font-size:0.68rem;color:#ccc;letter-spacing:0.08em">Skapad med </span><a href="https://offeria.se" target="_blank" style="font-family:Fraunces,serif;font-style:italic;font-size:0.75rem;color:#b8902e;text-decoration:none;font-weight:700">Offeria</a></div>' : ''}`
+  ;
 }
 
 async function createManualInvoice() {
@@ -1954,12 +2002,12 @@ async function createManualInvoice() {
   const now = new Date();
   const due = new Date(now);
   due.setDate(due.getDate() + payDays);
-  const invoiceNumber = getNextInvoiceNumber(_invoiceData);
 
   const p = currentProfile || {};
   const info = {
     company: p.company_name || 'Ditt företag',
     orgNum: p.org_number || '',
+    vatNumber: computeVatNumber(p.org_number),
     phone: p.phone || '',
     email: p.email || '',
     website: p.website || '',
@@ -1969,7 +2017,7 @@ async function createManualInvoice() {
 
   const invoiceData = {
     title, clientName: client, clientAddress: clientAddr, items, vatRate,
-    invoiceNumber,
+    invoiceNumber: 'UTKAST',
     dateStr: now.toISOString().slice(0, 10),
     dueStr: due.toISOString().slice(0, 10),
     payTermsLabel: payDays + ' dagar netto'
@@ -1979,15 +2027,16 @@ async function createManualInvoice() {
 
   const { error } = await sb.from('invoices').insert({
     user_id: currentUser.id,
-    invoice_number: invoiceNumber,
+    invoice_number: null,
     client_name: client,
     title: title,
     total_amount: total,
     invoice_html: invoiceHtml,
-    status: 'unpaid',
+    status: 'draft',
     due_date: due.toISOString().slice(0, 10),
     payment_terms: payDays + ' dagar netto',
-    share_id: crypto.randomUUID()
+    share_id: crypto.randomUUID(),
+    invoice_data: JSON.stringify({ items, vatRate, clientAddr })
   });
 
   if (error) { console.error(error); return alert('Kunde inte spara faktura.'); }
@@ -2020,9 +2069,6 @@ async function createInvoiceFromQuote() {
 
   if (items.length === 0) return alert('Kunde inte läsa rader från offerten.');
 
-  // Load existing invoices to get next number
-  const { data: existingInv } = await sb.from('invoices').select('invoice_number').eq('user_id', currentUser.id);
-
   const payDays = 30;
   const vatRate = parseInt(document.getElementById('vatRate')?.value) || 25;
   const subtotal = items.reduce((s, it) => s + it.qty * it.price, 0);
@@ -2031,12 +2077,12 @@ async function createInvoiceFromQuote() {
   const now = new Date();
   const due = new Date(now);
   due.setDate(due.getDate() + payDays);
-  const invoiceNumber = getNextInvoiceNumber(existingInv || _invoiceData);
 
   const p = currentProfile || {};
   const info = {
     company: p.company_name || 'Ditt företag',
     orgNum: p.org_number || '',
+    vatNumber: computeVatNumber(p.org_number),
     phone: p.phone || '',
     email: p.email || '',
     website: p.website || '',
@@ -2046,7 +2092,7 @@ async function createInvoiceFromQuote() {
 
   const invoiceData = {
     title, clientName: client, clientAddress: clientAddr, items, vatRate,
-    invoiceNumber,
+    invoiceNumber: 'UTKAST',
     dateStr: now.toISOString().slice(0, 10),
     dueStr: due.toISOString().slice(0, 10),
     payTermsLabel: payDays + ' dagar netto'
@@ -2056,20 +2102,21 @@ async function createInvoiceFromQuote() {
 
   const { error } = await sb.from('invoices').insert({
     user_id: currentUser.id,
-    invoice_number: invoiceNumber,
+    invoice_number: null,
     client_name: client,
     title: title,
     total_amount: total,
     invoice_html: invoiceHtml,
-    status: 'unpaid',
+    status: 'draft',
     due_date: due.toISOString().slice(0, 10),
     payment_terms: payDays + ' dagar netto',
-    share_id: crypto.randomUUID()
+    share_id: crypto.randomUUID(),
+    invoice_data: JSON.stringify({ items, vatRate, clientAddr })
   });
 
   if (error) { console.error(error); return alert('Kunde inte skapa faktura: ' + error.message); }
   closeQuoteModal();
-  alert('✅ Faktura ' + invoiceNumber + ' skapad!');
+  alert('Fakturautkast skapat! Bekräfta det under Fakturor för att tilldela ett fakturanummer.');
   showPage('invoices');
 }
 
@@ -2081,15 +2128,43 @@ function openInvoiceView(idx) {
   document.getElementById('invoiceDoc').innerHTML = inv.invoice_html || '<p>Ingen fakturadata</p>';
   const status = getInvoiceStatus(inv);
   document.getElementById('invModalStatus').innerHTML = statusLabel(status);
-  const btn = document.getElementById('invMarkPaidBtn');
-  if (status === 'paid') {
-    btn.textContent = '↩ Ångra betald';
-    btn.style.background = '#f5f5f5'; btn.style.color = '#666';
-  } else {
-    btn.textContent = '✓ Markera betald';
-    btn.style.background = '#e8f5e9'; btn.style.color = '#2e7d32';
+  
+  // Dynamic toolbar buttons based on status
+  const btnsEl = document.getElementById('invModalBtns');
+  let btns = '';
+  if (status !== 'draft') {
+    btns += '<button class="qt-btn" onclick="downloadInvoicePDF()">⬇ PDF</button>';
+    btns += '<button class="qt-btn" onclick="shareInvoiceEmail()">✉ E-post</button>';
   }
+  if (status === 'draft') {
+    btns += `<button class="qt-btn" style="background:#2e7d32;color:white;border-color:#2e7d32" onclick="confirmCurrentInvoice()">✓ Bekräfta & skicka</button>`;
+    btns += `<button class="qt-btn" onclick="deleteCurrentInvoice()" style="color:#e05;border-color:#e05">✕ Ta bort utkast</button>`;
+  }
+  if (['sent','overdue'].includes(status)) {
+    btns += '<button class="qt-btn" id="invMarkPaidBtn" onclick="toggleInvoicePaid()" style="background:#e8f5e9;color:#2e7d32">✓ Markera betald</button>';
+    btns += `<button class="qt-btn" onclick="creditCurrentInvoice()" style="color:#6a1b9a;border-color:#6a1b9a">Kreditera</button>`;
+  }
+  if (status === 'paid') {
+    btns += '<button class="qt-btn" id="invMarkPaidBtn" onclick="toggleInvoicePaid()" style="background:#f5f5f5;color:#666">↩ Ångra betald</button>';
+    btns += `<button class="qt-btn" onclick="creditCurrentInvoice()" style="color:#6a1b9a;border-color:#6a1b9a">Kreditera</button>`;
+  }
+  btns += '<button class="qt-btn" onclick="closeInvoiceModal()" style="margin-left:0.5rem">✕ Stäng</button>';
+  btnsEl.innerHTML = btns;
+  
   document.getElementById('invoiceModalOverlay').classList.add('open');
+}
+
+function confirmCurrentInvoice() {
+  if (!_currentInvoice) return;
+  const idx = _invoiceData.indexOf(_currentInvoice);
+  closeInvoiceModal();
+  confirmInvoice(idx);
+}
+function creditCurrentInvoice() {
+  if (!_currentInvoice) return;
+  const idx = _invoiceData.indexOf(_currentInvoice);
+  closeInvoiceModal();
+  createCreditInvoice(idx);
 }
 
 function closeInvoiceModal() {
@@ -2112,7 +2187,8 @@ async function toggleInvoicePaid() {
 async function deleteInvoice(idx) {
   const inv = _invoiceData[idx];
   if (!inv) return;
-  const ok = confirm('Vill du ta bort faktura ' + (inv.invoice_number || '') + '?\n\nDetta går inte att ångra.');
+  if (inv.status !== 'draft') return alert('Bara utkast kan tas bort. Bekräftade fakturor måste krediteras.');
+  const ok = confirm('Vill du ta bort detta utkast?\n\nDetta går inte att ångra.');
   if (!ok) return;
   await sb.from('invoices').delete().eq('id', inv.id);
   _invoiceData.splice(idx, 1);
@@ -2122,14 +2198,135 @@ async function deleteInvoice(idx) {
 
 async function deleteCurrentInvoice() {
   if (!_currentInvoice) return;
+  if (_currentInvoice.status !== 'draft') return alert('Bara utkast kan tas bort. Bekräftade fakturor måste krediteras.');
   const idx = _invoiceData.indexOf(_currentInvoice);
-  const ok = confirm('Vill du ta bort faktura ' + (_currentInvoice.invoice_number || '') + '?\n\nDetta går inte att ångra.');
+  const ok = confirm('Vill du ta bort detta utkast?\n\nDetta går inte att ångra.');
   if (!ok) return;
   await sb.from('invoices').delete().eq('id', _currentInvoice.id);
   _invoiceData.splice(idx, 1);
   closeInvoiceModal();
   updateInvoiceSummary();
   filterInvoices();
+}
+
+async function confirmInvoice(idx) {
+  const inv = _invoiceData[idx];
+  if (!inv || inv.status !== 'draft') return;
+  if (!confirm('Bekräfta fakturan?\n\nFakturan får ett löpnummer och kan inte längre redigeras eller tas bort.')) return;
+  
+  // Assign next invoice number
+  const { data: allInv } = await sb.from('invoices').select('invoice_number').eq('user_id', currentUser.id);
+  const invoiceNumber = getNextInvoiceNumber(allInv || _invoiceData);
+  
+  // Rebuild HTML with real invoice number
+  const p = currentProfile || {};
+  let invoiceData;
+  try {
+    invoiceData = inv.invoice_data ? JSON.parse(inv.invoice_data) : null;
+  } catch(e) { invoiceData = null; }
+  
+  const info = {
+    company: p.company_name || 'Ditt företag',
+    orgNum: p.org_number || '',
+    vatNumber: computeVatNumber(p.org_number),
+    phone: p.phone || '', email: p.email || '',
+    website: p.website || '', address: p.address || '',
+    bankgiro: p.bankgiro || ''
+  };
+  
+  let newHtml = inv.invoice_html;
+  if (invoiceData && invoiceData.items) {
+    const invData = {
+      title: inv.title, clientName: inv.client_name, clientAddress: invoiceData.clientAddr || '',
+      items: invoiceData.items, vatRate: invoiceData.vatRate || 25,
+      invoiceNumber, dateStr: new Date().toISOString().slice(0, 10),
+      dueStr: inv.due_date, payTermsLabel: inv.payment_terms || '30 dagar netto'
+    };
+    newHtml = buildInvoiceHtml(info, invData);
+  } else {
+    // Fallback: replace UTKAST in HTML
+    newHtml = newHtml.replace(/UTKAST – FAKTURA/g, 'FAKTURA').replace(/UTKAST/g, invoiceNumber);
+  }
+  
+  const { error } = await sb.from('invoices').update({
+    invoice_number: invoiceNumber,
+    invoice_html: newHtml,
+    status: 'sent'
+  }).eq('id', inv.id);
+  
+  if (error) { alert('Fel: ' + error.message); return; }
+  alert('Faktura ' + invoiceNumber + ' bekräftad!');
+  showPage('invoices');
+}
+
+async function createCreditInvoice(idx) {
+  const inv = _invoiceData[idx];
+  if (!inv) return;
+  const status = getInvoiceStatus(inv);
+  if (!['sent','paid','overdue'].includes(status)) return alert('Bara skickade/betalda fakturor kan krediteras.');
+  if (!confirm('Skapa kreditfaktura för ' + (inv.invoice_number || '') + '?\n\nOriginalfakturan markeras som krediterad.')) return;
+  
+  // Parse original invoice data
+  let items = [], vatRate = 25, clientAddr = '';
+  try {
+    const d = inv.invoice_data ? JSON.parse(inv.invoice_data) : null;
+    if (d) { items = d.items || []; vatRate = d.vatRate || 25; clientAddr = d.clientAddr || ''; }
+  } catch(e) {}
+  
+  if (items.length === 0) {
+    // Fallback: create single-line credit
+    const sub = parseFloat(inv.total_amount) || 0;
+    const vatAmt = Math.round(sub * 0.2); // approximate
+    items = [{ desc: 'Kreditering av ' + (inv.invoice_number || 'faktura'), qty: 1, price: Math.round(sub / 1.25) }];
+  }
+  
+  const { data: allInv } = await sb.from('invoices').select('invoice_number').eq('user_id', currentUser.id);
+  const creditNumber = getNextCreditNumber(allInv || _invoiceData);
+  
+  const p = currentProfile || {};
+  const info = {
+    company: p.company_name || 'Ditt företag',
+    orgNum: p.org_number || '',
+    vatNumber: computeVatNumber(p.org_number),
+    phone: p.phone || '', email: p.email || '',
+    website: p.website || '', address: p.address || '',
+    bankgiro: p.bankgiro || ''
+  };
+  
+  const subtotal = items.reduce((s, it) => s + it.qty * it.price, 0);
+  const total = subtotal + Math.round(subtotal * vatRate / 100);
+  
+  const creditData = {
+    title: inv.title, clientName: inv.client_name, clientAddress: clientAddr,
+    items, vatRate, invoiceNumber: creditNumber,
+    dateStr: new Date().toISOString().slice(0, 10), dueStr: '', payTermsLabel: '',
+    isCredit: true, creditRef: inv.invoice_number
+  };
+  
+  const creditHtml = buildInvoiceHtml(info, creditData);
+  
+  // Insert credit note
+  const { error: err1 } = await sb.from('invoices').insert({
+    user_id: currentUser.id,
+    invoice_number: creditNumber,
+    client_name: inv.client_name,
+    title: 'Kreditering: ' + inv.title,
+    total_amount: -total,
+    invoice_html: creditHtml,
+    status: 'credit_note',
+    due_date: null,
+    payment_terms: null,
+    share_id: crypto.randomUUID(),
+    invoice_data: JSON.stringify({ items, vatRate, clientAddr, creditRef: inv.invoice_number })
+  });
+  
+  if (err1) { alert('Fel: ' + err1.message); return; }
+  
+  // Mark original as credited
+  await sb.from('invoices').update({ status: 'credited' }).eq('id', inv.id);
+  
+  alert('Kreditfaktura ' + creditNumber + ' skapad!');
+  showPage('invoices');
 }
 
 function downloadInvoicePDF() {
@@ -3327,14 +3524,8 @@ init();
   <div id="invoiceModalBox" style="background:white;border-radius:0;width:100%;max-width:860px;margin:auto;overflow:hidden;box-shadow:0 20px 80px rgba(0,0,0,0.3)">
     <div class="quote-toolbar" style="border-radius:0">
       <span class="qt-label"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> Faktura</span>
-      <div class="qt-btns">
-        <button class="qt-btn" onclick="downloadInvoicePDF()">⬇ PDF</button>
-        <button class="qt-btn" onclick="shareInvoiceEmail()">✉ E-post</button>
-        <span id="invModalStatus"></span>
-        <button class="qt-btn" id="invMarkPaidBtn" onclick="toggleInvoicePaid()">✓ Markera betald</button>
-        <button class="qt-btn" onclick="deleteCurrentInvoice()" style="color:#aaa;border-color:#555">✕ Ta bort</button>
-        <button class="qt-btn" onclick="closeInvoiceModal()" style="margin-left:0.5rem">✕ Stäng</button>
-      </div>
+      <span id="invModalStatus"></span>
+      <div class="qt-btns" id="invModalBtns"></div>
     </div>
     <div id="invoiceDoc" style="padding:2rem 3rem"></div>
   </div>
