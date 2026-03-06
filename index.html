@@ -708,8 +708,8 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
   <section class="hero">
     <div class="hero-badge">✦ AI-driven offertgenerering · Offeria</div>
-    <h1>Proffsiga offerter<br>på <em>sekunder</em></h1>
-    <p>Beskriv jobbet med egna ord – få en komplett klar-att-skicka offert direkt.</p>
+    <h1>Proffsiga offerter<br>& fakturor på <em>sekunder</em></h1>
+    <p>Beskriv jobbet med egna ord – få en komplett offert direkt. Skapa fakturor, följ upp betalningar och håll koll på din verksamhet.</p>
     <div class="hero-btns">
       <button class="btn-hero" onclick="openModal('register')">Kom igång gratis →</button>
       <button class="btn-hero-sec" onclick="document.getElementById('pricingSection').scrollIntoView({behavior:'smooth'})">Se priser</button>
@@ -753,7 +753,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <div class="plan">
           <div class="plan-name">Obegränsat</div>
           <div class="plan-tagline">För proffs med volym</div>
-          <div><span class="plan-amount">299</span><span class="plan-period"> kr/mån</span></div>
+          <div><span class="plan-amount">249</span><span class="plan-period"> kr/mån</span></div>
           <ul class="plan-features">
             <li>Obegränsade offerter</li>
             <li><strong>Fakturering ingår</strong></li>
@@ -800,7 +800,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">Kan jag skapa fakturor också?<span class="faq-icon">+</span></div>
-      <div class="faq-a"><div class="faq-a-inner">Ja! På planen Obegränsat (299 kr/mån) ingår fakturering. Du kan skapa fakturor manuellt eller konvertera en offert till faktura med ett klick. Varje faktura har tydlig statushantering — markera som betald, se vilka som är förfallna och håll koll på allt.</div></div>
+      <div class="faq-a"><div class="faq-a-inner">Ja! På planen Obegränsat (249 kr/mån) ingår fakturering. Du kan skapa fakturor manuellt eller konvertera en offert till faktura med ett klick. Varje faktura har tydlig statushantering — markera som betald, se vilka som är förfallna och håll koll på allt.</div></div>
     </div>
 
     <div class="faq-item">
@@ -1265,7 +1265,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       </div>
       <div class="uplan" id="uplan-unlimited" onclick="selectUPlan('unlimited')">
         <div class="uplan-name">Obegränsat</div>
-        <div class="uplan-price">299 kr/mån</div>
+        <div class="uplan-price">249 kr/mån</div>
         <div class="uplan-features">Obegränsade offerter<br><strong>Fakturering ingår</strong><br>Fullständig företagsprofil<br>Egen logotyp<br>Timpris &amp; certifieringar<br>Dela via länk &amp; PDF<br>Offerthistorik<br>Ingen bindningstid</div>
       </div>
     </div>
@@ -1759,7 +1759,7 @@ async function checkInvoiceLimit() {
   const plan = currentProfile?.plan || 'free';
   const limit = INVOICE_LIMITS[plan];
   if (limit === 0) {
-    alert('Fakturering ingår i planen Obegränsat (299 kr/mån).\n\nUppgradera för att skapa fakturor.');
+    alert('Fakturering ingår i planen Obegränsat (249 kr/mån).\n\nUppgradera för att skapa fakturor.');
     openUpgradeModal();
     return false;
   }
@@ -1821,7 +1821,7 @@ async function loadInvoices() {
       <div style="text-align:center;padding:3rem 1.5rem">
         <div style="font-size:3rem;margin-bottom:1rem">🔒</div>
         <div style="font-family:Fraunces,serif;font-size:1.3rem;margin-bottom:0.5rem">Fakturering ingår i Obegränsat</div>
-        <p style="color:#888;font-size:0.9rem;margin-bottom:1.5rem">Skapa, skicka och följ upp fakturor – uppgradera till Obegränsat för 299 kr/mån.</p>
+        <p style="color:#888;font-size:0.9rem;margin-bottom:1.5rem">Skapa, skicka och följ upp fakturor – uppgradera till Obegränsat för 249 kr/mån.</p>
         <button onclick="openUpgradeModal()" class="gen-btn" style="padding:0.7rem 2rem;font-size:0.95rem">Uppgradera →</button>
       </div>`;
     return;
@@ -1984,15 +1984,19 @@ function buildInvoiceHtml(info, invoiceData) {
 
   const vatRate = invoiceData.vatRate || 25;
   const isCredit = invoiceData.isCredit || false;
+  const inclRot = invoiceData.inclRot || false;
   const sign = isCredit ? -1 : 1;
   const subtotal = invoiceData.items.reduce((s, it) => s + it.qty * it.price, 0) * sign;
   const vatAmount = Math.round(Math.abs(subtotal) * vatRate / 100) * sign;
-  const total = subtotal + vatAmount;
+  const totalInclVat = subtotal + vatAmount;
+  const arbeteSub = invoiceData.items.filter(it => it.type !== 'material').reduce((s, it) => s + it.qty * it.price, 0) * sign;
+  const rotAmount = inclRot && !isCredit ? Math.min(Math.abs(arbeteSub) * 0.3, 50000) : 0;
+  const total = totalInclVat - rotAmount;
   const vatNumber = info.vatNumber || computeVatNumber(info.orgNum);
   const docType = isCredit ? 'KREDITFAKTURA' : (invoiceData.invoiceNumber === 'UTKAST' ? 'UTKAST – FAKTURA' : 'FAKTURA');
 
   const rowsHtml = invoiceData.items.map(it => `<tr>
-    <td>${it.desc}</td><td>${it.qty} st</td>
+    <td>${it.desc}${inclRot && it.type ? ' <span style="font-size:0.65rem;color:' + (it.type === 'material' ? '#b8902e' : '#2e7d32') + ';font-style:italic">(' + (it.type === 'material' ? 'material' : 'arbete') + ')</span>' : ''}</td><td>${it.qty} st</td>
     <td style="text-align:right">${Number(it.price * sign).toLocaleString('sv-SE')} kr</td>
     <td style="text-align:right;font-weight:500">${Number(it.qty * it.price * sign).toLocaleString('sv-SE')} kr</td>
   </tr>`).join('');
@@ -2021,7 +2025,8 @@ function buildInvoiceHtml(info, invoiceData) {
     <div class="q-totals"><div class="q-totals-box">
       <div class="trow"><span>Netto (exkl. moms)</span><span>${Number(subtotal).toLocaleString('sv-SE')} kr</span></div>
       <div class="trow"><span>Moms (${vatRate}%)</span><span>${Number(vatAmount).toLocaleString('sv-SE')} kr</span></div>
-      <div class="trow final-row"><span>${isCredit ? 'ER TILLGODO' : 'ATT BETALA'}</span><span>${Number(total).toLocaleString('sv-SE')} kr</span></div>
+      ${inclRot && rotAmount > 0 ? `<div class="trow"><span>Totalt (inkl. moms)</span><span>${Number(totalInclVat).toLocaleString('sv-SE')} kr</span></div><div class="trow rot-row"><span>ROT-avdrag (30% av arbete)</span><span>- ${Number(rotAmount).toLocaleString('sv-SE')} kr</span></div>` : ''}
+      <div class="trow final-row"><span>${isCredit ? 'ER TILLGODO' : (inclRot && rotAmount > 0 ? 'ATT BETALA (efter ROT)' : 'ATT BETALA')}</span><span>${Number(total).toLocaleString('sv-SE')} kr</span></div>
     </div></div>
     ${!isCredit ? `<div class="q-terms"><h4>Betalningsinformation</h4>
       ${info.bankgiro ? `Bankgiro: <strong>${info.bankgiro}</strong><br>` : ''}
@@ -2029,7 +2034,7 @@ function buildInvoiceHtml(info, invoiceData) {
       Vid försenad betalning debiteras dröjsmålsränta enligt räntelagen.
     </div>` : `<div class="q-terms"><h4>Kreditering</h4>Denna kreditfaktura avser faktura <strong>${invoiceData.creditRef}</strong>. Beloppet ${Number(Math.abs(total)).toLocaleString('sv-SE')} kr tillgodoförs kunden.</div>`}
     <div class="q-footer">
-      <div><strong>${info.company}</strong><br>${info.address}</div>
+      <div><strong>${info.company}</strong><br>${info.address}${p.fskatt ? '<br><span style="font-size:0.7rem;color:#888">' + p.fskatt + '</span>' : ''}</div>
       <div class="sig-block"><div class="sig-line"></div><div>Godkänd av</div></div>
     </div>
     ${isFree ? '<div style="text-align:center;margin-top:1.2rem;padding-top:1rem;border-top:1px solid #f0ebe0"><span style="font-size:0.68rem;color:#ccc;letter-spacing:0.08em">Skapad med </span><a href="https://offeria.se" target="_blank" style="font-family:Fraunces,serif;font-style:italic;font-size:0.75rem;color:#b8902e;text-decoration:none;font-weight:700">Offeria</a></div>' : ''}`
@@ -2055,8 +2060,11 @@ async function createManualInvoice() {
 
   const payDays = parseInt(document.getElementById('invPayTerms').value) || 30;
   const vatRate = parseInt(document.getElementById('invVat').value) || 25;
+  const inclRot = document.getElementById('invRot')?.value === '1';
   const subtotal = items.reduce((s, it) => s + it.qty * it.price, 0);
-  const total = subtotal + Math.round(subtotal * vatRate / 100);
+  const vatAmount = Math.round(subtotal * vatRate / 100);
+  const rotAmount = inclRot ? Math.min(subtotal * 0.3, 50000) : 0;
+  const total = subtotal + vatAmount - rotAmount;
 
   const now = new Date();
   const due = new Date(now);
@@ -2079,7 +2087,8 @@ async function createManualInvoice() {
     invoiceNumber: 'UTKAST',
     dateStr: now.toISOString().slice(0, 10),
     dueStr: due.toISOString().slice(0, 10),
-    payTermsLabel: payDays + ' dagar netto'
+    payTermsLabel: payDays + ' dagar netto',
+    inclRot
   };
 
   const invoiceHtml = buildInvoiceHtml(info, invoiceData);
@@ -2095,7 +2104,7 @@ async function createManualInvoice() {
     due_date: due.toISOString().slice(0, 10),
     payment_terms: payDays + ' dagar netto',
     share_id: crypto.randomUUID(),
-    invoice_data: JSON.stringify({ items, vatRate, clientAddr })
+    invoice_data: JSON.stringify({ items, vatRate, clientAddr, inclRot })
   });
 
   if (error) { console.error(error); return alert('Kunde inte spara faktura.'); }
@@ -2110,11 +2119,11 @@ async function createInvoiceFromQuote() {
 
   // Extract data from the quote DOM
   const client = quoteDoc.querySelector('.q-client strong')?.textContent || '';
-  const clientAddr = quoteDoc.querySelector('.q-client')?.textContent?.replace('KUND', '').replace(client, '').trim() || '';
+  const clientAddr = quoteDoc.querySelector('#quoteClientAddr')?.textContent?.trim() || quoteDoc.querySelector('.q-client span.editable')?.textContent?.trim() || '';
   const titleEl = quoteDoc.querySelector('.q-offer-title');
   const title = titleEl?.firstChild?.textContent?.trim() || 'Faktura';
 
-  // Extract items from table
+  // Extract items from table with type info for ROT
   const items = [];
   quoteDoc.querySelectorAll('#itemsTbody tr').forEach(tr => {
     const cells = tr.querySelectorAll('td');
@@ -2122,12 +2131,16 @@ async function createInvoiceFromQuote() {
       const desc = cells[0]?.textContent?.trim() || '';
       const qty = parseInt(cells[1]?.textContent) || 1;
       const price = parseFloat(cells[2]?.textContent?.replace(/[^\d]/g, '')) || 0;
-      if (desc && price > 0) items.push({ desc, qty, price });
+      const typeSelect = tr.querySelector('.row-type-select');
+      const type = typeSelect ? typeSelect.value : (desc.toLowerCase().includes('(material)') ? 'material' : 'arbete');
+      if (desc && price > 0) items.push({ desc, qty, price, type });
     }
   });
 
   if (items.length === 0) return alert('Kunde inte läsa rader från offerten.');
 
+  // Carry over ROT setting from quote
+  const inclRot = currentInfo?.inclRot || false;
   const payDays = 30;
   const vatRate = parseInt(document.getElementById('vatRate')?.value) || 25;
   const subtotal = items.reduce((s, it) => s + it.qty * it.price, 0);
@@ -2154,23 +2167,30 @@ async function createInvoiceFromQuote() {
     invoiceNumber: 'UTKAST',
     dateStr: now.toISOString().slice(0, 10),
     dueStr: due.toISOString().slice(0, 10),
-    payTermsLabel: payDays + ' dagar netto'
+    payTermsLabel: payDays + ' dagar netto',
+    inclRot
   };
 
   const invoiceHtml = buildInvoiceHtml(info, invoiceData);
+
+  // Calculate correct total (with ROT if applicable)
+  const arbeteSub = items.filter(it => it.type !== 'material').reduce((s, it) => s + it.qty * it.price, 0);
+  const rotAmount = inclRot ? Math.min(arbeteSub * 0.3, 50000) : 0;
+  const totalInclVat = subtotal + Math.round(subtotal * vatRate / 100);
+  const finalTotal = totalInclVat - rotAmount;
 
   const { error } = await sb.from('invoices').insert({
     user_id: currentUser.id,
     invoice_number: null,
     client_name: client,
     title: title,
-    total_amount: total,
+    total_amount: finalTotal,
     invoice_html: invoiceHtml,
     status: 'draft',
     due_date: due.toISOString().slice(0, 10),
     payment_terms: payDays + ' dagar netto',
     share_id: crypto.randomUUID(),
-    invoice_data: JSON.stringify({ items, vatRate, clientAddr })
+    invoice_data: JSON.stringify({ items, vatRate, clientAddr, inclRot })
   });
 
   if (error) { console.error(error); return alert('Kunde inte skapa faktura: ' + error.message); }
@@ -2299,7 +2319,8 @@ async function confirmInvoice(idx) {
       title: inv.title, clientName: inv.client_name, clientAddress: invoiceData.clientAddr || '',
       items: invoiceData.items, vatRate: invoiceData.vatRate || 25,
       invoiceNumber, dateStr: new Date().toISOString().slice(0, 10),
-      dueStr: inv.due_date, payTermsLabel: inv.payment_terms || '30 dagar netto'
+      dueStr: inv.due_date, payTermsLabel: inv.payment_terms || '30 dagar netto',
+      inclRot: invoiceData.inclRot || false
     };
     newHtml = buildInvoiceHtml(info, invData);
   } else {
@@ -2392,10 +2413,14 @@ function downloadInvoicePDF() {
   const box = document.getElementById('invoiceModalBox');
   const toolbar = box.querySelector('.quote-toolbar');
   toolbar.style.display = 'none';
+  // Add page break avoidance
+  const pdfStyle = document.createElement('style');
+  pdfStyle.textContent = '.q-terms, .q-totals, .q-footer, .q-client, .q-header, .q-meta-row, table.qt tr { page-break-inside: avoid !important; break-inside: avoid !important; }';
+  box.appendChild(pdfStyle);
   html2pdf().from(box).set({
     margin: 0, filename: (_currentInvoice?.invoice_number || 'faktura') + '.pdf',
     html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  }).save().then(() => { toolbar.style.display = ''; });
+  }).save().then(() => { toolbar.style.display = ''; pdfStyle.remove(); });
 }
 
 function shareInvoiceEmail() {
@@ -2536,6 +2561,10 @@ function downloadPDF(html, filename) {
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:9998;background:rgba(0,0,0,0.4);overflow:auto';
   const box = document.createElement('div');
   box.style.cssText = 'background:white;width:680px;padding:1.5rem 2rem;margin:20px auto;font-family:DM Sans,sans-serif;font-size:12px;line-height:1.6;color:#1a1a18';
+  // Prevent page breaks inside elements
+  const style = document.createElement('style');
+  style.textContent = '.q-terms, .q-totals, .q-footer, .q-client, .q-header, .q-meta-row, table.qt tr { page-break-inside: avoid !important; break-inside: avoid !important; } .q-terms { page-break-before: auto; } .q-totals { page-break-before: auto; }';
+  box.appendChild(style);
   box.innerHTML = cleanHtml;
   box.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
   overlay.appendChild(box);
@@ -3237,8 +3266,9 @@ async function loadDashboard() {
     const maxInv = Math.max(...Object.values(invByMonth), 1);
     document.getElementById('chartInvoices').innerHTML = months.map(m => {
       const val = invByMonth[m.key];
-      const h = Math.max((val / maxInv) * 120, 2);
-      return `<div class="bar-col"><div class="bar-value">${val > 0 ? (val/1000).toFixed(0) + 'k' : ''}</div><div class="bar-fill invoice" style="height:${h}px"></div><div class="bar-label">${m.label}</div></div>`;
+      const h = val > 0 ? Math.max((val / maxInv) * 120, 8) : 3;
+      const yr = m.key.slice(2,4);
+      return `<div class="bar-col"><div class="bar-value">${val > 0 ? Number(val).toLocaleString('sv-SE') : ''}</div><div class="bar-fill invoice" style="height:${h}px;opacity:${val > 0 ? 1 : 0.2}"></div><div class="bar-label">${m.label} '${yr}</div></div>`;
     }).join('');
 
     // Chart 2: Quotes vs Invoices per month
@@ -3249,14 +3279,16 @@ async function loadDashboard() {
     const maxQI = Math.max(...Object.values(qByMonth), ...Object.values(iByMonth), 1);
     document.getElementById('chartQuotesVsInv').innerHTML = months.map(m => {
       const qv = qByMonth[m.key], iv = iByMonth[m.key];
-      const qh = Math.max((qv / maxQI) * 110, 2);
-      const ih = Math.max((iv / maxQI) * 110, 2);
+      const qh = qv > 0 ? Math.max((qv / maxQI) * 110, 8) : 3;
+      const ih = iv > 0 ? Math.max((iv / maxQI) * 110, 8) : 3;
+      const yr = m.key.slice(2,4);
       return `<div class="bar-col" style="flex-direction:column;gap:0">
-        <div style="display:flex;gap:2px;align-items:flex-end;height:120px">
-          <div class="bar-fill quote" style="height:${qh}px;width:45%"></div>
-          <div class="bar-fill invoice" style="height:${ih}px;width:45%"></div>
+        <div style="display:flex;gap:3px;align-items:flex-end;height:120px;width:100%">
+          <div class="bar-fill quote" style="height:${qh}px;flex:1;opacity:${qv > 0 ? 1 : 0.15}"></div>
+          <div class="bar-fill invoice" style="height:${ih}px;flex:1;opacity:${iv > 0 ? 1 : 0.15}"></div>
         </div>
-        <div class="bar-label">${m.label}</div>
+        <div style="display:flex;gap:2px;font-size:0.55rem;color:#888;justify-content:center"><span>${qv}</span>/<span>${iv}</span></div>
+        <div class="bar-label">${m.label} '${yr}</div>
       </div>`;
     }).join('');
 
@@ -3668,8 +3700,13 @@ init();
       </div>
       <button onclick="addInvRow()" style="font-size:0.78rem;color:var(--gold);cursor:pointer;border:1px dashed var(--gold-light);background:#fffaee;border-radius:6px;padding:0.35rem 0.8rem;font-family:'DM Sans',sans-serif;margin-bottom:1rem">+ Lägg till rad</button>
       <button onclick="openArticlePickerForInvoice()" style="font-size:0.78rem;color:var(--gold);cursor:pointer;border:1px dashed var(--gold-light);background:#fffaee;border-radius:6px;padding:0.35rem 0.8rem;font-family:'DM Sans',sans-serif;margin-bottom:1rem;margin-left:0.4rem"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Från artiklar</button>
-      <div class="field"><label>Momssats</label>
-        <select id="invVat"><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
+        <div class="field" style="margin:0"><label>Momssats</label>
+          <select id="invVat"><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
+        </div>
+        <div class="field" style="margin:0"><label>ROT-avdrag</label>
+          <select id="invRot"><option value="0">Nej</option><option value="1">Ja (30% av arbete)</option></select>
+        </div>
       </div>
       <button onclick="createManualInvoice()" class="stripe-btn" style="margin:1rem 0 0;width:100%">Skapa faktura →</button>
     </div>
@@ -3679,7 +3716,7 @@ init();
 <!-- Left drawer overlay -->
 <!-- ===== CUSTOMER MODAL ===== -->
 <div class="overlay" id="customerModalOverlay" onclick="if(event.target===this)closeCustomerModal()">
-  <div class="modal" style="max-width:480px">
+  <div class="modal" style="max-width:520px;padding:1.8rem 2rem">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem">
       <h3 style="margin:0" id="customerModalTitle">Ny kund</h3>
       <button onclick="closeCustomerModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#999;padding:0 0.2rem">✕</button>
@@ -3701,7 +3738,7 @@ init();
 
 <!-- ===== ARTICLE MODAL ===== -->
 <div class="overlay" id="articleModalOverlay" onclick="if(event.target===this)closeArticleModal()">
-  <div class="modal" style="max-width:480px">
+  <div class="modal" style="max-width:520px;padding:1.8rem 2rem">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem">
       <h3 style="margin:0" id="articleModalTitle">Ny artikel</h3>
       <button onclick="closeArticleModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#999;padding:0 0.2rem">✕</button>
