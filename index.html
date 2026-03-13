@@ -4406,86 +4406,159 @@ async function onReceiptSelected(input) {
 function parseReceiptText(text) {
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
   const result = { date: '', amount: 0, vendor: '', description: '', vatPct: 25, category: 'material' };
+  const fullText = text;
 
-  // Extract vendor (usually first non-empty line or line with store name)
+  // ===== VENDOR DETECTION =====
   const knownStores = {
-    'bauhaus': 'material', 'jula': 'material', 'biltema': 'material', 'hornbach': 'material',
-    'clas ohlson': 'kontorsmaterial', 'kjell': 'kontorsmaterial',
-    'ica': 'material', 'willys': 'material', 'coop': 'material',
-    'circle k': 'drivmedel', 'preem': 'drivmedel', 'okq8': 'drivmedel', 'st1': 'drivmedel', 'shell': 'drivmedel', 'ingo': 'drivmedel',
-    'telia': 'telefon', 'tele2': 'telefon', 'tre': 'telefon', 'telenor': 'telefon', 'hallon': 'telefon',
-    'if ': 'forsakring', 'länsförsäkringar': 'forsakring', 'trygg-hansa': 'forsakring', 'folksam': 'forsakring',
-    'mekonomen': 'bil', 'autoexperten': 'bil', 'däckia': 'bil',
-    'elgiganten': 'kontorsmaterial', 'mediamarkt': 'kontorsmaterial', 'webhallen': 'kontorsmaterial',
-    'statoil': 'drivmedel', 'qstar': 'drivmedel'
+    'bauhaus': 'material', 'jula': 'material', 'biltema': 'material', 'hornbach': 'material', 'k-rauta': 'material', 'beijer': 'material', 'woody': 'material', 'xl-bygg': 'material', 'optimera': 'material', 'dahl': 'material', 'ahlsell': 'material',
+    'clas ohlson': 'kontorsmaterial', 'kjell': 'kontorsmaterial', 'elgiganten': 'kontorsmaterial', 'mediamarkt': 'kontorsmaterial', 'webhallen': 'kontorsmaterial', 'netonnet': 'kontorsmaterial', 'dustin': 'kontorsmaterial',
+    'ica': 'material', 'willys': 'material', 'coop': 'material', 'hemköp': 'material', 'lidl': 'material', 'netto': 'material',
+    'circle k': 'drivmedel', 'preem': 'drivmedel', 'okq8': 'drivmedel', 'ok/q8': 'drivmedel', 'st1': 'drivmedel', 'shell': 'drivmedel', 'ingo': 'drivmedel', 'statoil': 'drivmedel', 'qstar': 'drivmedel', 'tanka': 'drivmedel',
+    'telia': 'telefon', 'tele2': 'telefon', 'tre ': 'telefon', 'telenor': 'telefon', 'hallon': 'telefon', 'comviq': 'telefon',
+    'if ': 'forsakring', 'if\n': 'forsakring', 'länsförsäkringar': 'forsakring', 'trygg-hansa': 'forsakring', 'folksam': 'forsakring', 'gjensidige': 'forsakring',
+    'mekonomen': 'bil', 'autoexperten': 'bil', 'däckia': 'bil', 'midas': 'bil',
+    'akademibokhandeln': 'kontorsmaterial', 'panduro': 'material'
   };
 
-  // Find vendor from first lines
-  for (let i = 0; i < Math.min(lines.length, 5); i++) {
-    const line = lines[i].toLowerCase();
-    if (line.length > 2 && line.length < 50 && !/^\d+$/.test(line) && !/^(tel|org|box|adress|kvitto)/i.test(line)) {
-      if (!result.vendor) result.vendor = lines[i];
+  for (let i = 0; i < Math.min(lines.length, 6); i++) {
+    const line = lines[i].toLowerCase().replace(/[^a-zåäö0-9\s/-]/g, '');
+    if (line.length > 1 && line.length < 60 && !/^\d+$/.test(line.trim())) {
       for (const [store, cat] of Object.entries(knownStores)) {
-        if (line.includes(store)) { result.vendor = lines[i]; result.category = cat; break; }
+        if (line.includes(store.toLowerCase())) {
+          result.vendor = lines[i].replace(/[^a-zA-ZåäöÅÄÖ\s&/-]/g, '').trim();
+          result.category = cat;
+          break;
+        }
+      }
+      if (!result.vendor && !/^(tel|org|box|adress|kvitto|moms|datum|kassa)/i.test(lines[i])) {
+        result.vendor = lines[i].replace(/[^a-zA-ZåäöÅÄÖ\s&/-]/g, '').trim().substring(0, 40);
       }
     }
+    if (result.category !== 'material') break;
   }
 
-  // Extract date (YYYY-MM-DD or DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY)
-  const fullText = text;
+  // ===== DATE DETECTION =====
   const datePatterns = [
-    /(\d{4}[-/.]\d{2}[-/.]\d{2})/,           // 2026-03-13
-    /(\d{2}[-/.]\d{2}[-/.]\d{4})/,           // 13-03-2026
-    /(\d{2}[-/.]\d{2}[-/.]\d{2})\b/          // 13-03-26
+    /(\d{4})[-/.](\d{2})[-/.](\d{2})/,       // 2026-03-13
+    /(\d{2})[-/.](\d{2})[-/.](\d{4})/,       // 13-03-2026 or 13/03/2026
+    /(\d{2})[-/.](\d{2})[-/.](\d{2})\b/,     // 13-03-26
+    /(\d{2})(\d{2})(\d{2})\s/                 // 260313 (compact)
   ];
   for (const pat of datePatterns) {
     const m = fullText.match(pat);
     if (m) {
-      let d = m[1].replace(/[/.]/g, '-');
-      const parts = d.split('-');
-      if (parts[0].length === 2 && parts[2].length === 4) d = parts[2] + '-' + parts[1] + '-' + parts[0]; // DD-MM-YYYY → YYYY-MM-DD
-      if (parts[0].length === 2 && parts[2].length === 2) d = '20' + parts[2] + '-' + parts[1] + '-' + parts[0]; // DD-MM-YY → YYYY-MM-DD
-      if (/^\d{4}-\d{2}-\d{2}$/.test(d)) { result.date = d; break; }
+      let y = m[1], mo = m[2], d = m[3];
+      if (y.length === 2 && d.length === 4) { [y, d] = [d, y]; } // DD-MM-YYYY → swap
+      if (y.length === 2) y = '20' + y;
+      if (parseInt(mo) > 12 && parseInt(d) <= 12) { [mo, d] = [d, mo]; } // swap if month > 12
+      const dateStr = y + '-' + mo.padStart(2, '0') + '-' + d.padStart(2, '0');
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr) && parseInt(mo) <= 12 && parseInt(d) <= 31) {
+        result.date = dateStr;
+        break;
+      }
     }
   }
 
-  // Extract total amount — look for keywords like TOTALT, ATT BETALA, SUMMA, TOTAL
-  const amountPatterns = [
-    /(?:totalt|total|att betala|summa|belopp|kontokort|bankkort|kredit|debit)\s*:?\s*[\*\s]*(\d[\d\s]*[,.]?\d{0,2})\s*(?:kr|sek)?/i,
-    /(?:totalt|total|att betala|summa)\s+(\d[\d\s]*[,.]?\d{0,2})/i,
-    /(\d[\d\s]*[,.]\d{2})\s*(?:kr|sek)\s*$/im
+  // ===== AMOUNT DETECTION (most critical part) =====
+  // Strategy: scan every line, find amounts near total-keywords, pick the best one
+
+  // Helper: extract a number from a string, handling Swedish formats
+  function parseSwedishAmount(str) {
+    if (!str) return 0;
+    // Remove currency words and symbols
+    let s = str.replace(/kr|sek|:-|:—/gi, '').trim();
+    // Handle "1 234,50" or "1.234,50" or "1234,50" or "1234.50"
+    // First, remove thousand separators (space or dot before comma)
+    s = s.replace(/(\d)\s+(\d)/g, '$1$2');          // "1 234" → "1234"
+    s = s.replace(/(\d)\.(\d{3})/g, '$1$2');         // "1.234" → "1234" (thousand sep)
+    s = s.replace(',', '.');                          // Swedish comma → dot
+    // Remove any remaining non-numeric except dot
+    s = s.replace(/[^\d.]/g, '');
+    const val = parseFloat(s);
+    return isNaN(val) ? 0 : val;
+  }
+
+  // Score each line for being a "total" line
+  const totalKeywords = [
+    { re: /totalt?\b/i, score: 10 },
+    { re: /att\s*betala/i, score: 10 },
+    { re: /summa/i, score: 8 },
+    { re: /total\b/i, score: 8 },
+    { re: /kortbetalning/i, score: 7 },
+    { re: /kontokort/i, score: 7 },
+    { re: /bankkort/i, score: 7 },
+    { re: /kredit/i, score: 5 },
+    { re: /debit/i, score: 5 },
+    { re: /belopp/i, score: 5 },
+    { re: /inkl\s*moms/i, score: 6 },
+    { re: /betalt/i, score: 6 },
+    { re: /rounded/i, score: 4 },
+    { re: /öresavrund/i, score: 4 },
+    { re: /swish/i, score: 6 },
+    { re: /kontant/i, score: 5 },
+    { re: /mastercard/i, score: 6 },
+    { re: /visa\b/i, score: 6 }
   ];
-  let maxAmount = 0;
-  for (const pat of amountPatterns) {
-    const m = fullText.match(pat);
-    if (m) {
-      const numStr = m[1].replace(/\s/g, '').replace(',', '.');
-      const val = parseFloat(numStr);
-      if (val > maxAmount && val < 1000000) { maxAmount = val; }
-    }
-  }
-  // Fallback: find the largest number that looks like a price
-  if (maxAmount === 0) {
-    const allNums = fullText.match(/(\d[\d\s]*[,.]\d{2})/g) || [];
-    allNums.forEach(n => {
-      const val = parseFloat(n.replace(/\s/g, '').replace(',', '.'));
-      if (val > maxAmount && val < 1000000) maxAmount = val;
-    });
-  }
-  result.amount = maxAmount;
 
-  // Detect VAT
-  if (/moms\s*(?:6|6[,%])/i.test(fullText)) result.vatPct = 6;
-  else if (/moms\s*(?:12|12[,%])/i.test(fullText)) result.vatPct = 12;
+  let bestAmount = 0, bestScore = 0;
+  const amountRe = /(\d[\d\s.,]*\d)[,.](\d{2})\b|\b(\d+)\s*(?:kr|:-|:—|sek)/gi;
+
+  lines.forEach((line, idx) => {
+    let lineScore = 0;
+    totalKeywords.forEach(kw => { if (kw.re.test(line)) lineScore += kw.score; });
+    // Also boost lines near the bottom of receipt (totals usually at end)
+    if (idx > lines.length * 0.5) lineScore += 2;
+    if (idx > lines.length * 0.7) lineScore += 2;
+
+    // Find all amounts on this line
+    const amounts = [];
+    // Pattern 1: numbers with decimals like 1234,50 or 1 234,50
+    const p1 = line.match(/(\d[\d\s.]*\d?)[,.](\d{2})(?!\d)/g);
+    if (p1) p1.forEach(m => { const v = parseSwedishAmount(m); if (v > 0) amounts.push(v); });
+    // Pattern 2: whole numbers followed by kr
+    const p2 = line.match(/(\d[\d\s]*)\s*(?:kr|:-|:—|sek)/gi);
+    if (p2) p2.forEach(m => { const v = parseSwedishAmount(m); if (v > 0) amounts.push(v); });
+    // Pattern 3: standalone numbers that look like prices (at least 2 digits)
+    if (amounts.length === 0) {
+      const p3 = line.match(/\b(\d{2,}[,.]?\d{0,2})\b/g);
+      if (p3) p3.forEach(m => { const v = parseSwedishAmount(m); if (v > 1 && v < 500000) amounts.push(v); });
+    }
+
+    amounts.forEach(val => {
+      if (val > 0 && val < 500000) {
+        const score = lineScore + (val > bestAmount ? 1 : 0);
+        // Prefer amounts on total-keyword lines, or largest amount if no keywords found
+        if (score > bestScore || (score === bestScore && val > bestAmount)) {
+          bestAmount = val;
+          bestScore = score;
+        }
+      }
+    });
+  });
+
+  // Final fallback: if still 0, find the single largest amount in entire text
+  if (bestAmount === 0) {
+    const allAmounts = [];
+    const globalRe = /(\d[\d\s]*\d?)[,.](\d{2})/g;
+    let gm;
+    while ((gm = globalRe.exec(fullText)) !== null) {
+      const v = parseSwedishAmount(gm[0]);
+      if (v > 0 && v < 500000) allAmounts.push(v);
+    }
+    if (allAmounts.length > 0) bestAmount = Math.max(...allAmounts);
+  }
+
+  result.amount = Math.round(bestAmount * 100) / 100;
+
+  // ===== VAT DETECTION =====
+  if (/moms\s*6\s*%|6%\s*moms|moms\s*6[,.]00/i.test(fullText)) result.vatPct = 6;
+  else if (/moms\s*12\s*%|12%\s*moms|moms\s*12[,.]00/i.test(fullText)) result.vatPct = 12;
+  else if (/moms\s*0\s*%|momsfri/i.test(fullText)) result.vatPct = 0;
   else result.vatPct = 25;
 
-  // Description
-  result.description = result.category === 'drivmedel' ? 'Drivmedel' :
-    result.category === 'bil' ? 'Bilkostnad' :
-    result.category === 'telefon' ? 'Telefoni' :
-    result.category === 'forsakring' ? 'Försäkring' :
-    result.category === 'kontorsmaterial' ? 'Kontorsmaterial' :
-    'Inköp ' + (result.vendor || 'material');
+  // ===== DESCRIPTION =====
+  const catDesc = { drivmedel: 'Drivmedel', bil: 'Bilkostnad', telefon: 'Telefoni', forsakring: 'Försäkring', kontorsmaterial: 'Kontorsmaterial', hyra: 'Lokalhyra', underentreprenor: 'Underentreprenör', redovisning: 'Redovisning', bank: 'Bankkostnad' };
+  result.description = catDesc[result.category] || ('Inköp' + (result.vendor ? ' ' + result.vendor : ''));
 
   return result;
 }
