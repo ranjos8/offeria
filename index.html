@@ -1928,13 +1928,20 @@ function renderHistoryTable(data) {
     el.innerHTML = '<div class="empty-state"><p>Inga offerter hittades</p></div>';
     return;
   }
+  const sigBadge = (r) => {
+    if (r.signature_status === 'signed') return '<span style="font-size:0.68rem;background:#e8f5e9;color:#2e7d32;padding:0.15rem 0.5rem;border-radius:4px;font-weight:600;margin-left:0.4rem">Signerad</span>';
+    if (r.signature_status === 'declined') return '<span style="font-size:0.68rem;background:#fce4ec;color:#c62828;padding:0.15rem 0.5rem;border-radius:4px;font-weight:600;margin-left:0.4rem">Avböjd</span>';
+    if (r.share_id) return '<span style="font-size:0.68rem;background:var(--cream);color:var(--gold);padding:0.15rem 0.5rem;border-radius:4px;font-weight:600;margin-left:0.4rem">Väntande</span>';
+    return '';
+  };
   el.innerHTML = `<table class="history-table">
-    <thead><tr><th>Datum</th><th>Kund</th><th>Titel</th><th style="text-align:right">Belopp</th><th></th></tr></thead>
+    <thead><tr><th>Datum</th><th>Kund</th><th>Titel</th><th style="text-align:right">Belopp</th><th>Status</th><th></th></tr></thead>
     <tbody>${data.map((r,i) => `<tr>
       <td style="white-space:nowrap;color:#888;font-size:0.8rem">${new Date(r.created_at).toLocaleDateString('sv-SE')}</td>
       <td>${r.client_name || '–'}</td>
       <td>${r.title || '–'}</td>
       <td style="text-align:right;font-weight:600;color:var(--ink)">${parseAmountFromHtml(r.quote_html)}</td>
+      <td>${sigBadge(r)}</td>
       <td style="display:flex;gap:0.4rem;flex-wrap:wrap">
         ${r.quote_html ? `<button class="btn-sm btn-outline" onclick="openHistoryQuote(${window._historyData.indexOf(r)})">Öppna</button>` : ''}
         ${r.quote_html ? `<button class="btn-sm btn-dark" onclick="printHistoryQuote(${window._historyData.indexOf(r)})">PDF</button>` : ''}
