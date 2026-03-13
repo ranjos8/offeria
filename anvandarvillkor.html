@@ -1,146 +1,76 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Användarvillkor – Offeria</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --ink: #0d0d0b; --paper: #f7f4ee; --cream: #ede8db;
-      --gold: #b8902e; --gold-light: #e8d5a0; --border: #ddd8cc;
-      --muted: #7a7570;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
-    nav { display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 2rem; border-bottom: 1px solid var(--border); background: var(--ink); position: sticky; top: 0; z-index: 100; }
-    .nav-logo { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.3rem; color: var(--gold-light); text-decoration: none; }
-    .nav-back { font-size: 0.82rem; color: #aaa; text-decoration: none; transition: color 0.15s; }
-    .nav-back:hover { color: var(--gold-light); }
-    .hero { background: var(--ink); color: white; padding: 4rem 2rem 3rem; text-align: center; border-bottom: 3px solid var(--gold); }
-    .hero-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gold-light); margin-bottom: 1rem; }
-    .hero h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; line-height: 1.1; margin-bottom: 0.8rem; }
-    .hero p { font-size: 0.9rem; color: #aaa; }
-    .container { max-width: 720px; margin: 0 auto; padding: 3rem 2rem 5rem; }
-    .doc-meta { background: var(--cream); border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 2.5rem; font-size: 0.82rem; color: var(--muted); display: flex; gap: 2rem; flex-wrap: wrap; }
-    .doc-meta strong { color: var(--ink); }
-    h2 { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; margin: 2.5rem 0 0.8rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
-    h3 { font-size: 0.95rem; font-weight: 600; margin: 1.5rem 0 0.5rem; }
-    p { font-size: 0.9rem; line-height: 1.75; color: #333; margin-bottom: 0.8rem; }
-    ul { padding-left: 1.5rem; margin-bottom: 0.8rem; }
-    li { font-size: 0.9rem; line-height: 1.75; color: #333; margin-bottom: 0.3rem; }
-    a { color: var(--gold); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .highlight-box { background: #fff8e8; border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0; padding: 1rem 1.2rem; margin: 1.5rem 0; font-size: 0.88rem; line-height: 1.7; }
-    footer { background: var(--ink); color: #888; text-align: center; padding: 2rem; font-size: 0.78rem; }
-    footer a { color: var(--gold-light); text-decoration: none; margin: 0 0.5rem; }
-    footer a:hover { text-decoration: underline; }
-    .footer-logo { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.1rem; color: var(--gold-light); display: block; margin-bottom: 0.8rem; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Användarvillkor – Offeria</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --ink: #0d0d0b; --paper: #f7f4ee; --cream: #ede8db; --gold: #b8902e; --gold-light: #e8d5a0; --border: #ddd8cc; --muted: #7a7570; }
+body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+nav { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 2.5rem; border-bottom: 1px solid var(--border); background: rgba(247,244,238,0.97); }
+.brand { font-family: 'Fraunces', serif; font-size: 1.5rem; letter-spacing: -1px; text-decoration: none; color: var(--ink); }
+.brand span { color: var(--gold); }
+.nav-links a { font-size: 0.85rem; color: var(--muted); text-decoration: none; margin-left: 1.5rem; }
+.content { max-width: 700px; margin: 0 auto; padding: 3rem 2rem 4rem; }
+h1 { font-family: 'Fraunces', serif; font-size: 2rem; letter-spacing: -1px; margin-bottom: 0.3rem; }
+.updated { color: var(--muted); font-size: 0.82rem; margin-bottom: 2.5rem; }
+h2 { font-family: 'Fraunces', serif; font-size: 1.1rem; margin: 2rem 0 0.6rem; }
+p { font-size: 0.88rem; line-height: 1.8; color: #444; margin-bottom: 0.8rem; }
+footer { background: var(--ink); padding: 2rem; text-align: center; }
+footer a { color: var(--gold-light); text-decoration: none; font-family: 'Fraunces', serif; font-style: italic; font-weight: 700; }
+footer p { color: #555; font-size: 0.75rem; margin-top: 0.5rem; }
+@media (max-width: 640px) { nav { padding: 0.9rem 1.2rem; } .content { padding: 2rem 1.2rem; } h1 { font-size: 1.6rem; } }
+</style>
 </head>
 <body>
-
 <nav>
-  <a class="nav-logo" href="https://offeria.se">Offeria</a>
-  <a class="nav-back" href="https://offeria.se">← Tillbaka till Offeria</a>
+  <a href="/" class="brand">Offer<span>ia</span></a>
+  <div class="nav-links"><a href="/">Hem</a></div>
 </nav>
-
-<div class="hero">
-  <div class="hero-label">Juridik & avtal</div>
+<div class="content">
   <h1>Användarvillkor</h1>
-  <p>Villkor för användning av Offerias tjänster</p>
-</div>
+  <p class="updated">Senast uppdaterad: mars 2026</p>
 
-<div class="container">
+  <h2>1. Tjänsten</h2>
+  <p>Offeria ("Tjänsten") tillhandahålls av Offeria ("vi", "oss") och erbjuder AI-driven offertgenerering, fakturering, bokföring och relaterade verktyg för svenska företag. Genom att skapa ett konto godkänner du dessa villkor.</p>
 
-  <div class="doc-meta">
-    <div><strong>Senast uppdaterad:</strong> 27 februari 2026</div>
-    <div><strong>Gäller för:</strong> offeria.se</div>
-    <div><strong>Kontakt:</strong> info@offeria.se</div>
-  </div>
+  <h2>2. Konto och ansvar</h2>
+  <p>Du ansvarar för att hålla dina inloggningsuppgifter säkra. Du ansvarar för all aktivitet som sker under ditt konto. Du måste vara minst 18 år eller ha behörighet att företräda ett företag för att använda Tjänsten.</p>
 
-  <div class="highlight-box">
-    Genom att skapa ett konto och använda Offeria godkänner du dessa villkor. Läs igenom dem – de är skrivna på vanlig svenska utan onödig juridisk jargong.
-  </div>
-
-  <h2>1. Om tjänsten</h2>
-  <p>Offeria är ett AI-drivet verktyg som hjälper hantverkare och företagare att skapa professionella offerter. Tjänsten tillhandahålls av Offeria med kontakt via <a href="mailto:info@offeria.se">info@offeria.se</a>.</p>
-
-  <h2>2. Konto & åtkomst</h2>
-  <ul>
-    <li>Du måste vara minst 18 år och ha rätt att ingå avtal för att använda tjänsten.</li>
-    <li>Du ansvarar för att hålla dina inloggningsuppgifter hemliga.</li>
-    <li>Du får inte dela ditt konto med andra personer.</li>
-    <li>Vi förbehåller oss rätten att stänga konton som missbrukar tjänsten.</li>
-  </ul>
-
-  <h2>3. Användning av tjänsten</h2>
-  <h3>Tillåten användning</h3>
-  <ul>
-    <li>Skapa offerter för ditt eget företags verksamhet</li>
-    <li>Ladda ned och skicka offerter till dina kunder</li>
-    <li>Redigera och anpassa genererat innehåll</li>
-  </ul>
-  <h3>Förbjuden användning</h3>
-  <ul>
-    <li>Automatiserad massanvändning eller scraping av tjänsten</li>
-    <li>Vidareförsäljning av tjänsten till tredje part</li>
-    <li>Använda tjänsten för att skapa bedrägliga eller vilseledande offerter</li>
-    <li>Försök att kringgå kvotbegränsningar eller betalningssystem</li>
-  </ul>
+  <h2>3. Bokföring — ansvarsfriskrivning</h2>
+  <p>Offeria tillhandahåller bokföringsverktyg som hjälpmedel. Offeria är inte en redovisningsbyrå, auktoriserad revisor eller bokföringskonsult. Du som användare är alltid ytterst ansvarig för att din bokföring är korrekt och följer gällande lagstiftning, inklusive bokföringslagen (1999:1078).</p>
+  <p>Vi rekommenderar att du anlitar en auktoriserad redovisningskonsult för att granska din bokföring, särskilt vid bokslut och årsredovisning. Offeria ansvarar inte för eventuella fel i automatisk kontering, momsberäkning eller andra bokföringsåtgärder.</p>
 
   <h2>4. AI-genererat innehåll</h2>
-  <div class="highlight-box">
-    <strong>Viktigt:</strong> Offeria använder AI för att generera offerttext. Det AI-genererade innehållet är ett förslag – du ansvarar alltid för att granska och verifiera att priser, beskrivningar och villkor är korrekta innan du skickar en offert till en kund.
-  </div>
-  <p>Vi garanterar inte att AI-genererat innehåll alltid är korrekt, fullständigt eller lämpligt för ditt specifika uppdrag. Använd ditt eget omdöme.</p>
+  <p>Offerter genereras med hjälp av AI-teknik. Priser, beskrivningar och villkor är förslag baserade på branschdata och ska alltid granskas och godkännas av dig innan de skickas till kund. Offeria ansvarar inte för felaktiga priser eller innehåll i AI-genererade offerter.</p>
 
-  <h2>5. Priser & betalning</h2>
-  <ul>
-    <li><strong>Gratisplan</strong> – 2 offerter per månad utan kostnad.</li>
-    <li><strong>Styckpris</strong> – 29 kr per offert, betalas via Stripe.</li>
-    <li><strong>Pro</strong> – 99 kr/månad, faktureras månadsvis.</li>
-    <li><strong>Obegränsat</strong> – 299 kr/månad, faktureras månadsvis.</li>
-  </ul>
-  <p>Betalning hanteras av Stripe. Vi lagrar inga kortuppgifter. Priser anges inklusive moms om inget annat anges.</p>
-  <p>Abonnemang förnyas automatiskt och kan avslutas när som helst. Ingen återbetalning ges för påbörjad period.</p>
+  <h2>5. Data och lagring</h2>
+  <p>Din data lagras i EU (Frankfurt, Tyskland) med krypterad överföring och lagring. Bokföringsdata (verifikationer, fakturor, kvitton) sparas i minst 7 år i enlighet med bokföringslagen. Övrig data sparas så länge ditt konto är aktivt.</p>
+  <p>Du kan när som helst exportera din bokföring via SIE-fil och ladda ner dina fakturor och offerter som PDF.</p>
 
-  <h2>6. Äganderätt till innehåll</h2>
-  <p>Du äger allt innehåll du skapar med Offeria – dina offerter, din logotyp och dina företagsuppgifter tillhör dig. Offeria gör inga anspråk på äganderätt till ditt innehåll.</p>
-  <p>Offeria-plattformen, dess kod, design och varumärke ägs av Offeria och får inte kopieras eller reproduceras utan tillstånd.</p>
+  <h2>6. Betalning och planer</h2>
+  <p>Gratisplanen är kostnadsfri och kräver inget betalkort. Betalplaner faktureras månadsvis via Stripe. Det finns ingen bindningstid — du kan avsluta när som helst. Vid avslutning behåller du tillgång till och med den betalda periodens slut.</p>
 
-  <h2>7. Ansvarsbegränsning</h2>
-  <p>Offeria tillhandahålls i befintligt skick. Vi ansvarar inte för:</p>
-  <ul>
-    <li>Förluster som uppstår till följd av felaktigt AI-genererat innehåll</li>
-    <li>Avbrott i tjänsten på grund av underhåll eller tekniska problem</li>
-    <li>Tvister mellan dig och dina kunder rörande offerter skapade med Offeria</li>
-  </ul>
-  <p>Vårt totala ansvar gentemot dig är begränsat till vad du betalat till Offeria under de senaste 12 månaderna.</p>
+  <h2>7. Uppsägning och radering</h2>
+  <p>Du kan avsluta ditt konto när som helst via inställningarna. Vid kontoavslutning raderas personuppgifter inom 30 dagar. Bokföringsdata som omfattas av lagstadgad arkiveringsplikt (7 år) behålls i anonymiserad form enligt bokföringslagen.</p>
 
-  <h2>8. Ändringar av villkor</h2>
-  <p>Vi kan uppdatera dessa villkor. Vid väsentliga ändringar meddelas du via e-post minst 30 dagar i förväg. Fortsatt användning efter det datumet innebär att du accepterar de nya villkoren.</p>
+  <h2>8. Tillgänglighet</h2>
+  <p>Vi strävar efter hög tillgänglighet men garanterar inte 100% drifttid. Planerat underhåll meddelas i förväg. Vi ansvarar inte för skada som uppstår på grund av tillfällig otillgänglighet.</p>
 
-  <h2>9. Avsluta konto</h2>
-  <p>Du kan när som helst begära radering av ditt konto genom att kontakta oss på <a href="mailto:info@offeria.se">info@offeria.se</a>. Alla dina uppgifter raderas inom 30 dagar.</p>
+  <h2>9. Ändringar</h2>
+  <p>Vi kan uppdatera dessa villkor. Väsentliga ändringar meddelas via e-post eller i Tjänsten minst 30 dagar i förväg. Fortsatt användning efter ändring innebär godkännande.</p>
 
   <h2>10. Tillämplig lag</h2>
-  <p>Dessa villkor regleras av svensk rätt. Tvister ska i första hand lösas i samförstånd. I andra hand avgörs tvister av svensk allmän domstol.</p>
+  <p>Dessa villkor regleras av svensk lag. Eventuella tvister avgörs av svensk domstol.</p>
 
-  <h2>11. Kontakt</h2>
-  <p>Frågor om villkoren? Skriv till <a href="mailto:info@offeria.se">info@offeria.se</a>.</p>
-
+  <h2>Kontakt</h2>
+  <p>Frågor om villkoren? Kontakta oss på <a href="mailto:info@offeria.se" style="color:var(--gold)">info@offeria.se</a>.</p>
 </div>
-
 <footer>
-  <span class="footer-logo">Offeria</span>
-  <div>
-    <a href="/integritetspolicy.html">Integritetspolicy</a>·
-    <a href="/anvandarvillkor.html">Användarvillkor</a>·
-    <a href="/cookies.html">Cookies</a>
-  </div>
-  <p style="margin-top:1rem">© 2026 Offeria · info@offeria.se</p>
+  <a href="/">Offeria</a>
+  <p>© 2025–2026 Offeria. Alla rättigheter förbehållna.</p>
 </footer>
-
 </body>
 </html>
