@@ -489,8 +489,10 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .faq-icon { font-size: 1.3rem; color: #aaa; transition: transform 0.2s; flex-shrink: 0; }
 .faq-item.open .faq-icon { transform: rotate(45deg); }
 .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; }
-.faq-item.open .faq-a { max-height: 300px; }
+.faq-item.open .faq-a { max-height: 500px; }
 .faq-a-inner { padding: 0 0 1.2rem; font-size: 0.88rem; color: #666; line-height: 1.7; }
+.faq-category { font-family: 'Fraunces', serif; font-size: 1rem; color: var(--ink); margin: 2rem 0 0.8rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--gold-light); }
+.faq-category:first-child { margin-top: 0; }
 
 /* invoice */
 .inv-status { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.18rem 0.6rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -820,34 +822,22 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     <div class="eyebrow">FAQ</div>
     <div class="section-h" style="margin-bottom:2rem">Vanliga frågor</div>
 
+    <!-- OM OFFERIA -->
+    <div class="faq-category">Om Offeria</div>
+
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">Vad är Offeria?<span class="faq-icon">+</span></div>
       <div class="faq-a"><div class="faq-a-inner">Offeria är en komplett tjänst för svenska hantverkare och småföretag. Du skapar offerter med AI, fakturerar kunder, bokför utgifter och följer upp din verksamhet — allt från en plats. Beskriv jobbet med egna ord så skapar AI:n en komplett offert med rader, priser och villkor på sekunder.</div></div>
     </div>
 
     <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">Stämmer priserna som AI:n föreslår?<span class="faq-icon">+</span></div>
-      <div class="faq-a"><div class="faq-a-inner">AI:n baserar sina förslag på aktuella marknadspriser för material och arbete. Du kan alltid justera rader, priser och antal innan du skickar offerten. Ditt timpris, påslag och resekostnad från företagsprofilen används automatiskt.</div></div>
+      <div class="faq-q" onclick="toggleFaq(this)">Vilka branscher stöds?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Offeria fungerar för alla hantverks- och tjänstebranscher: bygg, snickeri, el, VVS, städ, mark och trädgård, måleri, plattsättning, golv, tak, transport, konsult och fler. AI:n anpassar språk, priser och villkor efter din bransch.</div></div>
     </div>
 
     <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">Hur fungerar bokföringen?<span class="faq-icon">+</span></div>
-      <div class="faq-a"><div class="faq-a-inner">Bokföringen följer bokföringslagen och använder BAS 2026-kontoplanen. Dina fakturor och betalningar bokförs automatiskt med ett klick. Du kan också fota kvitton med mobilen — systemet läser av belopp och butik och föreslår kontering. Resultaträkning, balansräkning och momsrapport genereras automatiskt. Du kan exportera SIE-filer till din revisor.</div></div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">Följer ni bokföringslagen?<span class="faq-icon">+</span></div>
-      <div class="faq-a"><div class="faq-a-inner">Ja. Verifikationer har löpnummer och sparas i registreringsordning. Låsta perioder kan inte ändras — rättelser sker via nya verifikationer. Kvitton och underlag arkiveras digitalt. All data sparas i minst 7 år enligt lag. BAS-kontoplanen 2026 används som standard.</div></div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">Kan jag importera bokföring från annat program?<span class="faq-icon">+</span></div>
-      <div class="faq-a"><div class="faq-a-inner">Ja, du kan importera SIE-filer från Fortnox, Bokio, Visma och andra bokföringsprogram. Konton och verifikationer läses in automatiskt. Du kan också exportera SIE-filer från Offeria för att skicka till din revisor eller flytta till ett annat program.</div></div>
-    </div>
-
-    <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">Beräknas ROT/RUT-avdrag automatiskt?<span class="faq-icon">+</span></div>
-      <div class="faq-a"><div class="faq-a-inner">Ja. Du aktiverar ROT eller RUT i offertinställningarna. AI:n beräknar avdraget automatiskt baserat på arbetskostnaden (30% ROT, 50% RUT, max 50 000 kr). Avdraget följer med till fakturan och bokförs korrekt.</div></div>
+      <div class="faq-q" onclick="toggleFaq(this)">Fungerar Offeria på mobilen?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Ja. Offeria är byggt för mobilen. Skapa offerter, fota kvitton, skicka fakturor och bokför — allt direkt i telefonen ute på bygget. Du kan spara Offeria på hemskärmen så fungerar den som en app med snabb start.</div></div>
     </div>
 
     <div class="faq-item">
@@ -856,19 +846,107 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     </div>
 
     <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">Fungerar Offeria på mobilen?<span class="faq-icon">+</span></div>
-      <div class="faq-a"><div class="faq-a-inner">Ja, Offeria är byggt för mobilen. Skapa offerter, fota kvitton, skicka fakturor och bokför — allt direkt i telefonen. Du kan spara Offeria på hemskärmen så fungerar den som en app.</div></div>
-    </div>
-
-    <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">Är mina uppgifter säkra?<span class="faq-icon">+</span></div>
-      <div class="faq-a"><div class="faq-a-inner">All data lagras krypterat i EU (Frankfurt) med bankgradig säkerhet. Varje användare ser bara sin egen data. Vi följer GDPR och delar aldrig information med tredje part. Bokföringsdata sparas i 7 år enligt lag.</div></div>
+      <div class="faq-a"><div class="faq-a-inner">All data lagras krypterat i EU (Frankfurt, Tyskland) med bankgradig säkerhet. Varje användare ser bara sin egen data tack vare radnivåsäkerhet i databasen. Vi följer GDPR och delar aldrig information med tredje part. Bokföringsdata sparas i 7 år enligt lag.</div></div>
+    </div>
+
+    <!-- OFFERTER -->
+    <div class="faq-category">Offerter</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Hur fungerar AI-genereringen?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Du beskriver jobbet med egna ord — vad som ska göras, ungefär hur stort och vilket material. Du kan även prata in beskrivningen med rösten. AI:n analyserar uppdraget och skapar en komplett offert med specificerade rader, priser och villkor på sekunder. Du kan redigera allt innan du skickar.</div></div>
     </div>
 
     <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">Vilka branscher stöds?<span class="faq-icon">+</span></div>
-      <div class="faq-a"><div class="faq-a-inner">Offeria fungerar för alla hantverks- och tjänstebranscher: bygg, snickeri, el, VVS, städ, mark och trädgård, måleri, transport, konsult och fler. AI:n anpassar språk, priser och villkor efter din bransch.</div></div>
+      <div class="faq-q" onclick="toggleFaq(this)">Stämmer priserna i offerten?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">AI:n baserar sina förslag på aktuella marknadspriser för material och arbete. Ditt timpris, standardpåslag och resekostnad från företagsprofilen används automatiskt. Du kan alltid justera alla rader, priser och antal innan du skickar. Se det som ett genomarbetat förslag — du bestämmer alltid själv.</div></div>
     </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Beräknas ROT/RUT-avdrag automatiskt?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Ja. Du aktiverar ROT eller RUT i offertinställningarna. AI:n beräknar avdraget automatiskt baserat på arbetskostnaden (30% ROT, 50% RUT, max 50 000 kr per person och år). Varje rad märks som arbete eller material. Avdraget följer med till fakturan och bokförs på rätt konto.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Hur skickar jag offerten till kunden?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Du kan dela offerten på tre sätt: ladda ner som PDF, dela via en unik länk eller skicka direkt via e-post. Länken är aktiv i 30 dagar. Du kan även använda telefonens dela-funktion för att skicka via SMS, WhatsApp eller andra appar.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Kan jag redigera en offert efter att den skapats?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Ja. Alla rader, priser, antal och texter är redigerbara direkt i offerten. Summorna räknas om automatiskt. Du kan även lägga till nya rader, ta bort befintliga eller plocka in artiklar från ditt artikelregister.</div></div>
+    </div>
+
+    <!-- FAKTUROR -->
+    <div class="faq-category">Fakturor</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Hur skapar jag en faktura?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Det finns två sätt: konvertera en offert till faktura med ett klick, eller skapa en faktura manuellt. Nya fakturor sparas som utkast. När du är nöjd bekräftar du fakturan — då tilldelas ett löpnummer (FA-1001, FA-1002 osv.) och statusen ändras till "Skickad".</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Kan jag kreditera en faktura?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Ja. Bekräftade fakturor kan krediteras med en kreditfaktura (KF-nummer) som refererar till originalfakturan. Det skapar automatiskt en kreditfaktura med negativa belopp och korrekt bokföring. Originalfakturans status ändras till "Krediterad".</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Följer fakturorna svenska regler?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Ja. Varje faktura innehåller alla uppgifter som krävs enligt mervärdesskattelagen och bokföringslagen: företagsnamn, org.nr, momsregistreringsnummer, fakturanummer, datum, förfallodatum, betalningsvillkor, specifikation per rad, moms och totalbelopp. F-skattebevis visas i sidfoten.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Hur följer jag upp betalningar?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">I fakturavyn ser du statusen på alla fakturor: utkast, skickad, betald, förfallen eller krediterad. Dashboarden visar obetalt belopp, förfallna fakturor och fakturerat per månad. Du markerar en faktura som betald med ett klick — betalningen bokförs automatiskt.</div></div>
+    </div>
+
+    <!-- BOKFÖRING -->
+    <div class="faq-category">Bokföring</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Hur fungerar bokföringen?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Bokföringen använder BAS 2026-kontoplanen och dubbel bokföring. Du behöver inte kunna bokföring — välj en kategori (t.ex. "Inköp material" eller "Drivmedel"), ange belopp och moms, så konteras det automatiskt på rätt konton. Du kan också fota kvitton med mobilen. Resultaträkning, balansräkning och momsrapport genereras automatiskt.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Följer ni bokföringslagen?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Ja. Verifikationer har löpnummer och sparas i registreringsordning (grundbok) och kontoordning (huvudbok). Låsta perioder kan inte ändras — rättelser sker via nya rättelseverifikationer. Kvitton och underlag arkiveras digitalt i 7 år. BAS-kontoplanen 2026 används som standard. All data lagras i EU.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Hur fungerar kvittoskanningen?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Tryck "Fota kvitto" — kameran öppnas på mobilen. Ta en bild på kvittot. Systemet läser av belopp, datum, butik och momssats automatiskt med lokal OCR-teknik (ingen data skickas till server). Granska resultatet, justera om något är fel, och klicka "Bokför kvitto". Kvittot sparas som underlag till verifikationen.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Kan jag importera bokföring från annat program?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Ja. Du kan importera SIE-filer från Fortnox, Bokio, Visma och andra bokföringsprogram. Konton och verifikationer läses in automatiskt. Du kan också exportera SIE-filer från Offeria för att skicka till din revisor eller flytta till ett annat system.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Är Offeria ett riktigt bokföringsprogram?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Offeria är ett bokföringsverktyg som följer bokföringslagen och god redovisningssed. Det hanterar verifikationer, kontoplan, grundbok, huvudbok, resultat- och balansräkning, momsrapport och SIE-export. Vi rekommenderar att du anlitar en auktoriserad redovisningskonsult för bokslut och årsredovisning.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Vad händer med min bokföring om jag avslutar kontot?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Exportera din bokföring som SIE-fil innan du avslutar — då kan du importera den i valfritt annat program. Bokföringsdata som omfattas av lagstadgad arkiveringsplikt (7 år) behålls enligt bokföringslagen, även efter kontoavslutning.</div></div>
+    </div>
+
+    <!-- KONTO & BETALNING -->
+    <div class="faq-category">Konto och betalning</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Vad kostar Offeria?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Gratisplanen ger dig 2 AI-offerter per månad utan kostnad. Pro (99 kr/mån) ger 10 offerter, företagsprofil och egen logotyp. Komplett (249 kr/mån) inkluderar obegränsade offerter, fakturering, bokföring, kvittoskanning, momsrapport och SIE-export. Ingen bindningstid på någon plan.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Kan jag byta plan?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Ja, du kan uppgradera eller nedgradera när som helst. Uppgraderingen aktiveras direkt. Vid nedgradering behåller du tillgång till den betalda periodens slut. All din data finns kvar oavsett plan.</div></div>
+    </div>
+
   </div>
 
   <footer style="background:var(--ink);padding:3rem 2rem 2rem;margin-top:3rem">
