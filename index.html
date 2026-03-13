@@ -172,6 +172,7 @@ nav {
   animation: modalUp 0.25s ease both; overflow: hidden; position: relative;
 }
 @keyframes modalUp { from { opacity:0; transform: translateY(20px) scale(0.97); } to { opacity:1; transform: none; } }
+@keyframes spin { to { transform: rotate(360deg); } }
 .modal-head { background: var(--ink); padding: 1.6rem 2rem 1.3rem; text-align: center; }
 .modal-head .brand { font-size: 1.3rem; color: var(--gold-light); }
 .modal-head p { font-size: 0.8rem; color: #888; margin-top: 0.3rem; }
@@ -1242,6 +1243,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
               <option value="10">Oktober</option><option value="11">November</option><option value="12">December</option>
             </select>
             <button onclick="openNewVerification()" class="gen-btn" style="padding:0.5rem 1.2rem;font-size:0.85rem">+ Ny verifikation</button>
+            <button onclick="openReceiptScan()" class="gen-btn" style="padding:0.5rem 1rem;font-size:0.85rem;background:#2e7d32;border-color:#2e7d32">📸 Fota kvitto</button>
             <button onclick="autoBookInvoices()" class="gen-btn" style="padding:0.5rem 1rem;font-size:0.8rem;background:var(--teal);border-color:var(--teal)" title="Bokför automatiskt alla obokförda fakturor och betalningar">⚡ Autobokför</button>
           </div>
           <div id="grundbokContent"><div style="padding:2rem;text-align:center;color:#aaa">Laddar...</div></div>
@@ -4332,6 +4334,218 @@ function renderKontoplan() {
   document.getElementById('kontoplanContent').innerHTML = html || '<div style="padding:2rem;text-align:center;color:#aaa">Inga konton matchar sökningen.</div>';
 }
 
+// ===== RECEIPT SCAN (Tesseract.js - FREE OCR) =====
+let _receiptFile = null;
+let _tesseractLoaded = false;
+
+function openReceiptScan() {
+  document.getElementById('receiptPreview').style.display = 'none';
+  document.getElementById('receiptUploadArea').style.display = 'block';
+  document.getElementById('receiptAnalyzing').style.display = 'none';
+  document.getElementById('receiptResult').style.display = 'none';
+  document.getElementById('receiptFileInput').value = '';
+  _receiptFile = null;
+  document.getElementById('receiptScanOverlay').style.display = 'flex';
+  // Preload Tesseract
+  if (!_tesseractLoaded && !window.Tesseract) {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    s.onload = () => { _tesseractLoaded = true; };
+    document.head.appendChild(s);
+  }
+}
+function closeReceiptScan() { document.getElementById('receiptScanOverlay').style.display = 'none'; }
+
+async function onReceiptSelected(input) {
+  if (!input.files || !input.files[0]) return;
+  _receiptFile = input.files[0];
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    document.getElementById('receiptImg').src = e.target.result;
+    document.getElementById('receiptPreview').style.display = 'block';
+    document.getElementById('receiptUploadArea').style.display = 'none';
+    document.getElementById('receiptAnalyzing').style.display = 'block';
+
+    try {
+      // Wait for Tesseract to load
+      let attempts = 0;
+      while (!window.Tesseract && attempts < 50) { await new Promise(r => setTimeout(r, 200)); attempts++; }
+      if (!window.Tesseract) throw new Error('Tesseract kunde inte laddas');
+
+      // Run OCR
+      const { data: { text } } = await Tesseract.recognize(e.target.result, 'swe+eng', {
+        logger: m => {
+          if (m.status === 'recognizing text') {
+            const pct = Math.round((m.progress || 0) * 100);
+            const statusEl = document.getElementById('receiptStatusText');
+            if (statusEl) statusEl.textContent = `Läser kvitto... ${pct}%`;
+          }
+        }
+      });
+
+      // Parse receipt text with regex
+      const parsed = parseReceiptText(text);
+      document.getElementById('rcptDate').value = parsed.date || new Date().toISOString().slice(0, 10);
+      document.getElementById('rcptAmount').value = parsed.amount || '';
+      document.getElementById('rcptVendor').value = parsed.vendor || '';
+      document.getElementById('rcptDesc').value = parsed.description || '';
+      document.getElementById('rcptVat').value = String(parsed.vatPct || 25);
+      document.getElementById('rcptCategory').value = parsed.category || 'material';
+    } catch (err) {
+      console.error('OCR error:', err);
+      document.getElementById('rcptDate').value = new Date().toISOString().slice(0, 10);
+    }
+
+    document.getElementById('receiptAnalyzing').style.display = 'none';
+    document.getElementById('receiptResult').style.display = 'block';
+  };
+  reader.readAsDataURL(_receiptFile);
+}
+
+function parseReceiptText(text) {
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const result = { date: '', amount: 0, vendor: '', description: '', vatPct: 25, category: 'material' };
+
+  // Extract vendor (usually first non-empty line or line with store name)
+  const knownStores = {
+    'bauhaus': 'material', 'jula': 'material', 'biltema': 'material', 'hornbach': 'material',
+    'clas ohlson': 'kontorsmaterial', 'kjell': 'kontorsmaterial',
+    'ica': 'material', 'willys': 'material', 'coop': 'material',
+    'circle k': 'drivmedel', 'preem': 'drivmedel', 'okq8': 'drivmedel', 'st1': 'drivmedel', 'shell': 'drivmedel', 'ingo': 'drivmedel',
+    'telia': 'telefon', 'tele2': 'telefon', 'tre': 'telefon', 'telenor': 'telefon', 'hallon': 'telefon',
+    'if ': 'forsakring', 'länsförsäkringar': 'forsakring', 'trygg-hansa': 'forsakring', 'folksam': 'forsakring',
+    'mekonomen': 'bil', 'autoexperten': 'bil', 'däckia': 'bil',
+    'elgiganten': 'kontorsmaterial', 'mediamarkt': 'kontorsmaterial', 'webhallen': 'kontorsmaterial',
+    'statoil': 'drivmedel', 'qstar': 'drivmedel'
+  };
+
+  // Find vendor from first lines
+  for (let i = 0; i < Math.min(lines.length, 5); i++) {
+    const line = lines[i].toLowerCase();
+    if (line.length > 2 && line.length < 50 && !/^\d+$/.test(line) && !/^(tel|org|box|adress|kvitto)/i.test(line)) {
+      if (!result.vendor) result.vendor = lines[i];
+      for (const [store, cat] of Object.entries(knownStores)) {
+        if (line.includes(store)) { result.vendor = lines[i]; result.category = cat; break; }
+      }
+    }
+  }
+
+  // Extract date (YYYY-MM-DD or DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY)
+  const fullText = text;
+  const datePatterns = [
+    /(\d{4}[-/.]\d{2}[-/.]\d{2})/,           // 2026-03-13
+    /(\d{2}[-/.]\d{2}[-/.]\d{4})/,           // 13-03-2026
+    /(\d{2}[-/.]\d{2}[-/.]\d{2})\b/          // 13-03-26
+  ];
+  for (const pat of datePatterns) {
+    const m = fullText.match(pat);
+    if (m) {
+      let d = m[1].replace(/[/.]/g, '-');
+      const parts = d.split('-');
+      if (parts[0].length === 2 && parts[2].length === 4) d = parts[2] + '-' + parts[1] + '-' + parts[0]; // DD-MM-YYYY → YYYY-MM-DD
+      if (parts[0].length === 2 && parts[2].length === 2) d = '20' + parts[2] + '-' + parts[1] + '-' + parts[0]; // DD-MM-YY → YYYY-MM-DD
+      if (/^\d{4}-\d{2}-\d{2}$/.test(d)) { result.date = d; break; }
+    }
+  }
+
+  // Extract total amount — look for keywords like TOTALT, ATT BETALA, SUMMA, TOTAL
+  const amountPatterns = [
+    /(?:totalt|total|att betala|summa|belopp|kontokort|bankkort|kredit|debit)\s*:?\s*[\*\s]*(\d[\d\s]*[,.]?\d{0,2})\s*(?:kr|sek)?/i,
+    /(?:totalt|total|att betala|summa)\s+(\d[\d\s]*[,.]?\d{0,2})/i,
+    /(\d[\d\s]*[,.]\d{2})\s*(?:kr|sek)\s*$/im
+  ];
+  let maxAmount = 0;
+  for (const pat of amountPatterns) {
+    const m = fullText.match(pat);
+    if (m) {
+      const numStr = m[1].replace(/\s/g, '').replace(',', '.');
+      const val = parseFloat(numStr);
+      if (val > maxAmount && val < 1000000) { maxAmount = val; }
+    }
+  }
+  // Fallback: find the largest number that looks like a price
+  if (maxAmount === 0) {
+    const allNums = fullText.match(/(\d[\d\s]*[,.]\d{2})/g) || [];
+    allNums.forEach(n => {
+      const val = parseFloat(n.replace(/\s/g, '').replace(',', '.'));
+      if (val > maxAmount && val < 1000000) maxAmount = val;
+    });
+  }
+  result.amount = maxAmount;
+
+  // Detect VAT
+  if (/moms\s*(?:6|6[,%])/i.test(fullText)) result.vatPct = 6;
+  else if (/moms\s*(?:12|12[,%])/i.test(fullText)) result.vatPct = 12;
+  else result.vatPct = 25;
+
+  // Description
+  result.description = result.category === 'drivmedel' ? 'Drivmedel' :
+    result.category === 'bil' ? 'Bilkostnad' :
+    result.category === 'telefon' ? 'Telefoni' :
+    result.category === 'forsakring' ? 'Försäkring' :
+    result.category === 'kontorsmaterial' ? 'Kontorsmaterial' :
+    'Inköp ' + (result.vendor || 'material');
+
+  return result;
+}
+
+async function saveReceiptVerification() {
+  const date = document.getElementById('rcptDate').value;
+  const amount = parseFloat(document.getElementById('rcptAmount').value);
+  const vendor = document.getElementById('rcptVendor').value.trim();
+  const desc = document.getElementById('rcptDesc').value.trim() || vendor || 'Kvitto';
+  const cat = document.getElementById('rcptCategory').value;
+  const vatPct = parseInt(document.getElementById('rcptVat').value) || 25;
+
+  if (!date || !amount || amount <= 0) return alert('Ange datum och belopp.');
+
+  const cm = CATEGORY_MAP[cat];
+  if (!cm) return alert('Ogiltig kategori.');
+
+  const netto = Math.round(amount / (1 + vatPct / 100) * 100) / 100;
+  const moms = Math.round((amount - netto) * 100) / 100;
+
+  const rows = [
+    { account_number: cm.debit, debit: netto, credit: 0 },
+    { account_number: '2640', debit: moms, credit: 0 },
+    { account_number: '1930', debit: 0, credit: amount }
+  ];
+
+  const yr = parseInt(date.slice(0, 4));
+  const { data: numD } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: yr });
+  const verNum = numD || 1;
+
+  let attachmentUrl = null;
+  if (_receiptFile) {
+    const path = `${currentUser.id}/V${verNum}_${_receiptFile.name}`;
+    const { error: upErr } = await sb.storage.from('receipts').upload(path, _receiptFile);
+    if (!upErr) attachmentUrl = path;
+  }
+
+  const fullDesc = vendor ? `${desc} – ${vendor}` : desc;
+  const { data: ver, error: verErr } = await sb.from('verifications').insert({
+    user_id: currentUser.id, verification_number: verNum, verification_date: date,
+    description: fullDesc, source_type: 'receipt', attachment_url: attachmentUrl,
+    created_by: currentUser.email
+  }).select().single();
+
+  if (verErr) return alert('Fel: ' + verErr.message);
+
+  await sb.from('verification_rows').insert(rows.map(r => ({
+    verification_id: ver.id, user_id: currentUser.id, ...r
+  })));
+
+  await sb.from('bookkeeping_audit_log').insert({
+    user_id: currentUser.id, action: 'create', entity_type: 'verification',
+    entity_id: ver.id, details: { verification_number: verNum, source: 'receipt_scan', vendor }
+  });
+
+  closeReceiptScan();
+  loadBookkeeping();
+  alert(`✓ Verifikation V${verNum} skapad från kvitto!`);
+}
+
 init();
 </script>
 
@@ -4475,6 +4689,66 @@ init();
     <div style="margin-top:1rem;display:flex;gap:0.7rem">
       <button onclick="insertPickedArticles()" class="gen-btn" style="flex:1">Lägg till valda</button>
       <button onclick="closeArticlePicker()" style="flex:0;padding:0.6rem 1.2rem;background:#eee;border:none;border-radius:8px;cursor:pointer;font-family:inherit">Avbryt</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RECEIPT SCAN MODAL ===== -->
+<div class="overlay" id="receiptScanOverlay" onclick="if(event.target===this)closeReceiptScan()">
+  <div class="modal" style="max-width:500px;padding:1.8rem 2rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h3 style="margin:0">📸 Fota kvitto</h3>
+      <button onclick="closeReceiptScan()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#999">✕</button>
+    </div>
+    <p style="font-size:0.85rem;color:#888;margin-bottom:1rem">Ta en bild på kvittot — AI:n läser av belopp, datum, butik och moms automatiskt.</p>
+
+    <div id="receiptPreview" style="display:none;margin-bottom:1rem;text-align:center">
+      <img id="receiptImg" style="max-width:100%;max-height:300px;border-radius:8px;border:1px solid var(--border)">
+    </div>
+
+    <div id="receiptUploadArea" style="border:2px dashed var(--border);border-radius:12px;padding:2rem;text-align:center;cursor:pointer;margin-bottom:1rem;transition:border-color 0.15s" onclick="document.getElementById('receiptFileInput').click()" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:2rem;margin-bottom:0.5rem">📷</div>
+      <div style="font-size:0.9rem;font-weight:600">Tryck för att ta bild eller välja fil</div>
+      <div style="font-size:0.78rem;color:#999;margin-top:0.3rem">Kamera öppnas på mobilen</div>
+      <input id="receiptFileInput" type="file" accept="image/*" capture="environment" onchange="onReceiptSelected(this)" style="display:none">
+    </div>
+
+    <div id="receiptAnalyzing" style="display:none;text-align:center;padding:1.5rem">
+      <div style="display:inline-block;width:24px;height:24px;border:3px solid var(--border);border-top:3px solid var(--gold);border-radius:50%;animation:spin 0.8s linear infinite"></div>
+      <div id="receiptStatusText" style="margin-top:0.8rem;font-size:0.9rem;color:var(--gold);font-weight:600">Läser kvitto...</div>
+      <div style="font-size:0.78rem;color:#999;margin-top:0.3rem">OCR körs lokalt — ingen data skickas till server</div>
+    </div>
+
+    <div id="receiptResult" style="display:none">
+      <div style="font-weight:600;font-size:0.88rem;margin-bottom:0.8rem;color:#2e7d32">✓ Kvitto analyserat</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:0.8rem">
+        <div class="field" style="margin:0"><label>Datum</label><input id="rcptDate" type="date"></div>
+        <div class="field" style="margin:0"><label>Belopp (inkl moms)</label><input id="rcptAmount" type="number" step="0.01"></div>
+      </div>
+      <div class="field" style="margin-bottom:0.8rem"><label>Butik / Leverantör</label><input id="rcptVendor" placeholder="T.ex. Bauhaus, Jula"></div>
+      <div class="field" style="margin-bottom:0.8rem"><label>Beskrivning</label><input id="rcptDesc" placeholder="T.ex. Inköp byggmaterial"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1rem">
+        <div class="field" style="margin:0"><label>Kategori</label>
+          <select id="rcptCategory" style="width:100%;padding:0.55rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
+            <option value="material">📦 Material</option>
+            <option value="drivmedel">⛽ Drivmedel</option>
+            <option value="bil">🚗 Bilkostnad</option>
+            <option value="telefon">📱 Telefon/Internet</option>
+            <option value="kontorsmaterial">📎 Kontorsmaterial</option>
+            <option value="forsakring">🛡️ Försäkring</option>
+            <option value="hyra">🏢 Lokalhyra</option>
+            <option value="underentreprenor">🔧 Underentreprenör</option>
+            <option value="redovisning">📊 Redovisning</option>
+            <option value="bank">🏦 Bankkostnad</option>
+          </select>
+        </div>
+        <div class="field" style="margin:0"><label>Moms</label>
+          <select id="rcptVat" style="width:100%;padding:0.55rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
+            <option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option>
+          </select>
+        </div>
+      </div>
+      <button onclick="saveReceiptVerification()" class="stripe-btn" style="width:100%">Bokför kvitto →</button>
     </div>
   </div>
 </div>
