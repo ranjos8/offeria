@@ -1,172 +1,111 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Integritetspolicy – Offeria</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --ink: #0d0d0b; --paper: #f7f4ee; --cream: #ede8db;
-      --gold: #b8902e; --gold-light: #e8d5a0; --border: #ddd8cc;
-      --muted: #7a7570;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
-
-    nav {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.9rem 2rem; border-bottom: 1px solid var(--border);
-      background: var(--ink); position: sticky; top: 0; z-index: 100;
-    }
-    .nav-logo { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.3rem; color: var(--gold-light); text-decoration: none; }
-    .nav-back { font-size: 0.82rem; color: #aaa; text-decoration: none; transition: color 0.15s; }
-    .nav-back:hover { color: var(--gold-light); }
-
-    .hero {
-      background: var(--ink); color: white;
-      padding: 4rem 2rem 3rem;
-      text-align: center;
-      border-bottom: 3px solid var(--gold);
-    }
-    .hero-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gold-light); margin-bottom: 1rem; }
-    .hero h1 { font-family: 'Fraunces', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; line-height: 1.1; margin-bottom: 0.8rem; }
-    .hero p { font-size: 0.9rem; color: #aaa; }
-
-    .container { max-width: 720px; margin: 0 auto; padding: 3rem 2rem 5rem; }
-
-    .doc-meta { background: var(--cream); border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 2.5rem; font-size: 0.82rem; color: var(--muted); display: flex; gap: 2rem; flex-wrap: wrap; }
-    .doc-meta strong { color: var(--ink); }
-
-    h2 { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; margin: 2.5rem 0 0.8rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
-    h3 { font-size: 0.95rem; font-weight: 600; margin: 1.5rem 0 0.5rem; color: var(--ink); }
-    p { font-size: 0.9rem; line-height: 1.75; color: #333; margin-bottom: 0.8rem; }
-    ul { padding-left: 1.5rem; margin-bottom: 0.8rem; }
-    li { font-size: 0.9rem; line-height: 1.75; color: #333; margin-bottom: 0.3rem; }
-    a { color: var(--gold); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    .highlight-box { background: #fff8e8; border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0; padding: 1rem 1.2rem; margin: 1.5rem 0; font-size: 0.88rem; line-height: 1.7; }
-
-    footer {
-      background: var(--ink); color: #888;
-      text-align: center; padding: 2rem;
-      font-size: 0.78rem;
-    }
-    footer a { color: var(--gold-light); text-decoration: none; margin: 0 0.5rem; }
-    footer a:hover { text-decoration: underline; }
-    .footer-logo { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.1rem; color: var(--gold-light); display: block; margin-bottom: 0.8rem; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Integritetspolicy – Offeria</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --ink: #0d0d0b; --paper: #f7f4ee; --cream: #ede8db; --gold: #b8902e; --gold-light: #e8d5a0; --border: #ddd8cc; --muted: #7a7570; }
+body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+nav { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 2.5rem; border-bottom: 1px solid var(--border); background: rgba(247,244,238,0.97); }
+.brand { font-family: 'Fraunces', serif; font-size: 1.5rem; letter-spacing: -1px; text-decoration: none; color: var(--ink); }
+.brand span { color: var(--gold); }
+.nav-links a { font-size: 0.85rem; color: var(--muted); text-decoration: none; margin-left: 1.5rem; }
+.content { max-width: 700px; margin: 0 auto; padding: 3rem 2rem 4rem; }
+h1 { font-family: 'Fraunces', serif; font-size: 2rem; letter-spacing: -1px; margin-bottom: 0.3rem; }
+.updated { color: var(--muted); font-size: 0.82rem; margin-bottom: 2.5rem; }
+h2 { font-family: 'Fraunces', serif; font-size: 1.1rem; margin: 2rem 0 0.6rem; }
+p { font-size: 0.88rem; line-height: 1.8; color: #444; margin-bottom: 0.8rem; }
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.84rem; }
+th, td { text-align: left; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--border); }
+th { font-weight: 600; color: var(--ink); background: var(--cream); }
+footer { background: var(--ink); padding: 2rem; text-align: center; }
+footer a { color: var(--gold-light); text-decoration: none; font-family: 'Fraunces', serif; font-style: italic; font-weight: 700; }
+footer p { color: #555; font-size: 0.75rem; margin-top: 0.5rem; }
+@media (max-width: 640px) { nav { padding: 0.9rem 1.2rem; } .content { padding: 2rem 1.2rem; } h1 { font-size: 1.6rem; } table { font-size: 0.78rem; } }
+</style>
 </head>
 <body>
-
 <nav>
-  <a class="nav-logo" href="https://offeria.se">Offeria</a>
-  <a class="nav-back" href="https://offeria.se">← Tillbaka till Offeria</a>
+  <a href="/" class="brand">Offer<span>ia</span></a>
+  <div class="nav-links"><a href="/">Hem</a></div>
 </nav>
-
-<div class="hero">
-  <div class="hero-label">Juridik & sekretess</div>
+<div class="content">
   <h1>Integritetspolicy</h1>
-  <p>Hur vi samlar in, använder och skyddar dina personuppgifter</p>
-</div>
+  <p class="updated">Senast uppdaterad: mars 2026</p>
 
-<div class="container">
+  <h2>1. Personuppgiftsansvarig</h2>
+  <p>Offeria ("vi", "oss") är personuppgiftsansvarig för behandlingen av dina personuppgifter som sker i samband med att du använder vår tjänst. Kontakta oss på <a href="mailto:info@offeria.se" style="color:var(--gold)">info@offeria.se</a> vid frågor.</p>
 
-  <div class="doc-meta">
-    <div><strong>Senast uppdaterad:</strong> 27 februari 2026</div>
-    <div><strong>Gäller för:</strong> offeria.se</div>
-    <div><strong>Kontakt:</strong> info@offeria.se</div>
-  </div>
+  <h2>2. Vilka uppgifter vi samlar in</h2>
+  <table>
+    <tr><th>Uppgiftstyp</th><th>Exempel</th><th>Ändamål</th></tr>
+    <tr><td>Kontouppgifter</td><td>E-post, lösenord (krypterat)</td><td>Inloggning, kontoadministration</td></tr>
+    <tr><td>Företagsuppgifter</td><td>Företagsnamn, org.nr, adress, telefon, bankgiro</td><td>Visas i offerter och fakturor</td></tr>
+    <tr><td>Offertdata</td><td>Beskrivningar, priser, kundnamn</td><td>Generera och spara offerter</td></tr>
+    <tr><td>Fakturadata</td><td>Fakturanummer, belopp, kunduppgifter</td><td>Fakturering och betaluppföljning</td></tr>
+    <tr><td>Bokföringsdata</td><td>Verifikationer, konteringar, kvittobilder</td><td>Bokföring enligt bokföringslagen</td></tr>
+    <tr><td>Kundregister</td><td>Dina kunders namn, e-post, adress</td><td>Hantera kundrelationer</td></tr>
+    <tr><td>Tekniska uppgifter</td><td>IP-adress, webbläsartyp</td><td>Säkerhet och felsökning</td></tr>
+  </table>
 
-  <div class="highlight-box">
-    Vi värnar om din integritet. Den här policyn förklarar på ett tydligt sätt vilka uppgifter vi samlar in, varför vi gör det och vilka rättigheter du har. Vi säljer aldrig dina uppgifter till tredje part.
-  </div>
+  <h2>3. Rättslig grund</h2>
+  <p>Vi behandlar dina uppgifter baserat på:</p>
+  <p><strong>Avtal</strong> (GDPR Art. 6.1b) — nödvändigt för att tillhandahålla Tjänsten.</p>
+  <p><strong>Rättslig förpliktelse</strong> (GDPR Art. 6.1c) — bokföringsdata sparas i 7 år enligt bokföringslagen (1999:1078, 7 kap. 2§).</p>
+  <p><strong>Berättigat intresse</strong> (GDPR Art. 6.1f) — tekniska uppgifter för säkerhet och drift.</p>
 
-  <h2>1. Vem är personuppgiftsansvarig?</h2>
-  <p>Offeria, med e-postadress <a href="mailto:info@offeria.se">info@offeria.se</a>, är personuppgiftsansvarig för behandlingen av dina personuppgifter. Vi behandlar uppgifter i enlighet med Dataskyddsförordningen (GDPR) och tillämplig svensk lagstiftning.</p>
+  <h2>4. Var lagras data?</h2>
+  <p>All data lagras inom EU (Frankfurt, Tyskland) via Supabase, som är vår teknikleverantör och databehandlare. Data överförs aldrig till länder utanför EU/EES. Supabase har ett giltigt databehandlaravtal (DPA) som uppfyller GDPR:s krav.</p>
 
-  <h2>2. Vilka uppgifter samlar vi in?</h2>
-  <h3>När du skapar ett konto</h3>
-  <ul>
-    <li>E-postadress</li>
-    <li>Lösenord (krypterat, vi ser det aldrig i klartext)</li>
-  </ul>
-
-  <h3>När du använder tjänsten</h3>
-  <ul>
-    <li>Företagsnamn, organisationsnummer, telefon, webbplats, adress, bankgiro</li>
-    <li>Företagslogotyp (om du laddar upp en)</li>
-    <li>Offertinnehåll som du genererar – uppdragsbeskrivningar, kundnamn, priser</li>
-    <li>Statistik om din användning – antal offerter, datum</li>
-  </ul>
-
-  <h3>Teknisk information</h3>
-  <ul>
-    <li>IP-adress och webbläsartyp (via Supabase sessionshantering)</li>
-    <li>Inloggningsdatum och -tid</li>
-  </ul>
-
-  <h2>3. Varför behandlar vi dina uppgifter?</h2>
-  <ul>
-    <li><strong>Tillhandahålla tjänsten</strong> – för att du ska kunna logga in, spara och generera offerter</li>
-    <li><strong>Förbättra tjänsten</strong> – aggregerad, anonym användningsstatistik</li>
-    <li><strong>Kommunikation</strong> – svara på supportfrågor du skickar till oss</li>
-    <li><strong>Fakturering</strong> – om du väljer en betald plan hanteras betalning via Stripe</li>
-  </ul>
-  <p>Den rättsliga grunden är <strong>avtal</strong> (fullgörande av tjänsten du beställt) och <strong>berättigat intresse</strong> (förbättring av tjänsten).</p>
-
-  <h2>4. Tredjepartsleverantörer</h2>
-  <p>Vi använder följande underleverantörer för att driva tjänsten:</p>
-  <ul>
-    <li><strong>Supabase</strong> (supabase.com) – databas och autentisering. Servrar inom EU/EES.</li>
-    <li><strong>Anthropic</strong> (anthropic.com) – AI-modell för att generera offerttext. Data skickas till deras API. Se <a href="https://www.anthropic.com/privacy" target="_blank">Anthropics integritetspolicy</a>.</li>
-    <li><strong>Stripe</strong> (stripe.com) – betalningshantering för betalda planer. Se <a href="https://stripe.com/en-se/privacy" target="_blank">Stripes integritetspolicy</a>.</li>
-    <li><strong>GitHub Pages</strong> – webbhosting för statiska filer.</li>
-  </ul>
-  <p>Vi ingår personuppgiftsbiträdesavtal (DPA) med samtliga leverantörer som behandlar personuppgifter på våra vägnar.</p>
-
-  <h2>5. Hur länge sparar vi dina uppgifter?</h2>
-  <ul>
-    <li>Kontouppgifter och offerter sparas så länge ditt konto är aktivt</li>
-    <li>Vid radering av konto raderas alla uppgifter inom 30 dagar</li>
-    <li>Anonymiserad statistik kan bevaras längre för verksamhetsutveckling</li>
-  </ul>
+  <h2>5. Hur länge sparas data?</h2>
+  <table>
+    <tr><th>Datatyp</th><th>Lagringstid</th><th>Anledning</th></tr>
+    <tr><td>Kontouppgifter</td><td>Så länge kontot är aktivt + 30 dagar</td><td>Tillhandahålla tjänsten</td></tr>
+    <tr><td>Offerter</td><td>Så länge kontot är aktivt</td><td>Historik och referens</td></tr>
+    <tr><td>Fakturor</td><td>7 år efter räkenskapsårets slut</td><td>Bokföringslagen</td></tr>
+    <tr><td>Verifikationer &amp; kvitton</td><td>7 år efter räkenskapsårets slut</td><td>Bokföringslagen</td></tr>
+    <tr><td>Tekniska loggar</td><td>90 dagar</td><td>Säkerhet och felsökning</td></tr>
+  </table>
 
   <h2>6. Dina rättigheter</h2>
   <p>Enligt GDPR har du rätt att:</p>
-  <ul>
-    <li><strong>Tillgång</strong> – begära ett utdrag av dina uppgifter</li>
-    <li><strong>Rättelse</strong> – korrigera felaktiga uppgifter</li>
-    <li><strong>Radering</strong> – begära att ditt konto och alla uppgifter raderas</li>
-    <li><strong>Dataportabilitet</strong> – få ut dina uppgifter i ett maskinläsbart format</li>
-    <li><strong>Invändning</strong> – invända mot viss behandling</li>
-  </ul>
-  <p>Kontakta oss på <a href="mailto:info@offeria.se">info@offeria.se</a> för att utöva dina rättigheter. Du har också rätt att lämna klagomål till <a href="https://www.imy.se" target="_blank">Integritetsskyddsmyndigheten (IMY)</a>.</p>
+  <p><strong>Få tillgång</strong> till dina personuppgifter — du kan exportera all data via SIE-fil och PDF-nedladdning.</p>
+  <p><strong>Rätta</strong> felaktiga uppgifter — redigera i Företagsprofil eller kontakta oss.</p>
+  <p><strong>Radera</strong> dina uppgifter — du kan avsluta ditt konto. Observera att bokföringsdata som omfattas av lagstadgad arkiveringsplikt (7 år) inte kan raderas före lagringstidens slut (GDPR Art. 17.3b).</p>
+  <p><strong>Invända</strong> mot behandling — kontakta oss.</p>
+  <p><strong>Dataportabilitet</strong> — exportera din bokföring som SIE-fil, ladda ner offerter och fakturor som PDF.</p>
 
-  <h2>7. Cookies</h2>
-  <p>Vi använder nödvändiga cookies för att hantera din inloggningssession. Vi använder inga spårningscookies eller reklamcookies. Se vår <a href="/cookies.html">cookie-policy</a> för mer information.</p>
+  <h2>7. Bokföring och personuppgifter</h2>
+  <p>När du använder bokföringsfunktionen i Offeria agerar du som personuppgiftsansvarig för de personuppgifter som förekommer i dina verifikationer, fakturor och kundregister. Offeria agerar som databehandlare och behandlar dessa uppgifter enbart enligt dina instruktioner och för att tillhandahålla Tjänsten.</p>
+  <p>Kvittobilder som du laddar upp lagras krypterat i en privat lagringsbucket. Varje användare har bara åtkomst till sina egna filer.</p>
 
-  <h2>8. Säkerhet</h2>
-  <p>Alla uppgifter överförs krypterat via HTTPS. Lösenord lagras aldrig i klartext. Vi vidtar lämpliga tekniska och organisatoriska åtgärder för att skydda dina uppgifter mot obehörig åtkomst.</p>
+  <h2>8. Tredjepartsleverantörer</h2>
+  <table>
+    <tr><th>Leverantör</th><th>Ändamål</th><th>Plats</th></tr>
+    <tr><td>Supabase</td><td>Databas, autentisering, fillagring</td><td>EU (Frankfurt)</td></tr>
+    <tr><td>Cloudflare</td><td>Webbhosting, CDN, DDoS-skydd</td><td>Globalt CDN, ingen datalagring</td></tr>
+    <tr><td>Stripe</td><td>Betalningshantering</td><td>EU/USA (PCI DSS-certifierat)</td></tr>
+    <tr><td>Anthropic (Claude)</td><td>AI-offertgenerering</td><td>USA (inga personuppgifter sparas)</td></tr>
+  </table>
 
-  <h2>9. Ändringar</h2>
-  <p>Vi kan uppdatera denna policy. Vid väsentliga ändringar meddelas du via e-post eller vid nästa inloggning. Senaste version finns alltid på denna sida.</p>
+  <h2>9. Säkerhet</h2>
+  <p>Vi skyddar din data med krypterad överföring (HTTPS/TLS), krypterad lagring, radnivåsäkerhet (RLS) i databasen så att varje användare bara ser sin egen data, och säker autentisering med krypterade lösenord.</p>
 
-  <h2>10. Kontakt</h2>
-  <p>Har du frågor om hur vi hanterar dina personuppgifter? Kontakta oss på <a href="mailto:info@offeria.se">info@offeria.se</a>.</p>
+  <h2>10. Cookies</h2>
+  <p>Offeria använder funktionella cookies som är nödvändiga för inloggning och sessionhantering. Vi använder inga spårnings- eller marknadsföringscookies. Se vår <a href="/cookies.html" style="color:var(--gold)">cookiepolicy</a> för detaljer.</p>
 
+  <h2>11. Ändringar</h2>
+  <p>Vi kan uppdatera denna policy. Väsentliga ändringar meddelas via e-post eller i Tjänsten.</p>
+
+  <h2>12. Kontakt och klagomål</h2>
+  <p>Kontakta oss på <a href="mailto:info@offeria.se" style="color:var(--gold)">info@offeria.se</a>. Du har också rätt att lämna klagomål till Integritetsskyddsmyndigheten (IMY), <a href="https://www.imy.se" style="color:var(--gold)" target="_blank">imy.se</a>.</p>
 </div>
-
 <footer>
-  <span class="footer-logo">Offeria</span>
-  <div>
-    <a href="/integritetspolicy.html">Integritetspolicy</a>·
-    <a href="/anvandarvillkor.html">Användarvillkor</a>·
-    <a href="/cookies.html">Cookies</a>
-  </div>
-  <p style="margin-top:1rem">© 2026 Offeria · info@offeria.se</p>
+  <a href="/">Offeria</a>
+  <p>© 2025–2026 Offeria. Alla rättigheter förbehållna.</p>
 </footer>
-
 </body>
 </html>
