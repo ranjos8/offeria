@@ -705,7 +705,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <span class="nav-user" id="navUserName"></span>
       <span class="nav-plan-badge" id="navPlanBadge">Gratis</span>
       <button class="btn-sm btn-outline" id="navLogoutBtn" onclick="signOut()">Logga ut</button>
-      <button id="drawerToggle" onclick="openDrawer()" style="display:none;background:none;border:none;color:#ccc;cursor:pointer;padding:0.3rem 0.5rem;font-size:1.5rem;line-height:1">☰</button>
+      <button id="drawerToggle" onclick="openDrawer()" style="display:none;background:none;border:none;color:#ccc;cursor:pointer;padding:0.3rem 0.5rem;font-size:1.5rem;line-height:1"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></span></button>
     </div>
     <div id="navAuthBtns">
       <div class="nav-links-desktop">
@@ -715,7 +715,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <button class="btn-sm btn-outline" onclick="openModal('login')">Logga in</button>
         <button class="btn-sm btn-dark" onclick="openModal('register')">Kom igång gratis</button>
       </div>
-      <button class="hamburger" onclick="toggleMobileMenu()" id="hamburgerBtn">☰</button>
+      <button class="hamburger" onclick="toggleMobileMenu()" id="hamburgerBtn"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></span></button>
     </div>
   </div>
 </nav>
@@ -738,7 +738,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 <div class="view active" id="viewLanding" style="display:none">
 
   <section class="hero">
-    <div class="hero-badge">✦ AI-driven offertgenerering · Offeria</div>
+    <div class="hero-badge"><span class="ico"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.09 6.26L20.18 9.27l-5.09 3.88L16.18 20 12 16.77 7.82 20l1.09-6.85L3.82 9.27l6.09-1.01z"/></svg></span> AI-driven offertgenerering · Offeria</div>
     <h1>Proffsiga offerter<br>& fakturor på <em>sekunder</em></h1>
     <p>Beskriv jobbet med egna ord – få en komplett offert direkt. Skapa fakturor, följ upp betalningar och håll koll på din verksamhet.</p>
     <div class="hero-btns">
@@ -940,7 +940,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
                 <div class="ws-label">Fyll i företagsprofil</div>
               </div>
               <div class="welcome-step" onclick="dismissWelcome();document.getElementById('jobPrompt').focus()">
-                <div class="ws-icon">✍️</div>
+                <div class="ws-icon"><span class="ico" style="font-size:1.5rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></span></div>
                 <div class="ws-label">Skapa din första offert</div>
               </div>
               <div class="welcome-step" onclick="dismissWelcome();document.getElementById('pricingSection')?.scrollIntoView({behavior:'smooth'})||openUpgradeModal()">
@@ -960,7 +960,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
         <!-- Company settings (collapsible) -->
         <div class="gen-card">
-          <div class="card-label">⚙️ AI-inställningar <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Styr hur AI:n genererar och prissätter</span></div>
+          <div class="card-label"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span> AI-inställningar <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Styr hur AI:n genererar och prissätter</span></div>
           <div class="grid3">
             <div class="field"><label>Bransch</label>
               <select id="industry" onchange="renderExamplePills(this.value)">
@@ -997,12 +997,12 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         </div>
 
         <div class="gen-card">
-          <div class="card-label">✍️ Beskriv uppdraget <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Skriv vad som ska utföras – oavsett bransch</span></div>
+          <div class="card-label"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></span> Beskriv uppdraget <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Skriv vad som ska utföras – oavsett bransch</span></div>
                     <p class="ex-tip"><strong>Tips för bästa offert:</strong> Beskriv vad som ska göras, ungefär hur stort (kvm, antal rum, meter) och material. Ju mer info desto träffsäkrare priser.</p>
           <div class="ex-pills" id="examplePills"></div>
           <textarea class="prompt-area" id="jobPrompt" placeholder="Beskriv vad som ska göras, ungefär hur stort, var…"></textarea>
           <div class="gen-row">
-            <button class="gen-btn" id="genBtn" onclick="generateQuote()">✦ Generera offert</button>
+            <button class="gen-btn" id="genBtn" onclick="generateQuote()"><span class="ico"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.09 6.26L20.18 9.27l-5.09 3.88L16.18 20 12 16.77 7.82 20l1.09-6.85L3.82 9.27l6.09-1.01z"/></svg></span> Generera offert</button>
             <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="Prata in uppdragsbeskrivning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="1" width="6" height="11" rx="3"/><path d="M19 10v1a7 7 0 01-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg> Prata in</button>
             <span class="quota-note" id="quotaNote"></span>
           </div>
@@ -1037,7 +1037,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         </div>
 
         <div style="display:flex;gap:0.8rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center">
-          <input id="invoiceSearch" type="text" placeholder="🔍 Sök faktura..." oninput="filterInvoices()" style="flex:1;min-width:200px;max-width:400px;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit">
+          <input id="invoiceSearch" type="text" placeholder="Sök faktura..." oninput="filterInvoices()" style="flex:1;min-width:200px;max-width:400px;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit">
           <select id="invoiceFilter" onchange="filterInvoices()" style="padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.85rem;font-family:inherit">
             <option value="all">Alla</option>
             <option value="draft">Utkast</option>
@@ -1185,7 +1185,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem">
           <div>
-            <div class="card-label">⏳ Väntande offerter (7+ dagar)</div>
+            <div class="card-label">Väntande offerter (7+ dagar)</div>
             <div id="dashPending"><div style="padding:1rem;color:#aaa;font-size:0.85rem">Laddar...</div></div>
           </div>
           <div>
@@ -1200,7 +1200,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <div class="page-title">Kunder</div>
         <div class="page-sub">Alla dina kunder samlade</div>
         <div style="display:flex;gap:0.8rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
-          <input id="customerSearch" type="text" placeholder="🔍 Sök kund..." oninput="filterCustomers()" style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit">
+          <input id="customerSearch" type="text" placeholder="Sök kund..." oninput="filterCustomers()" style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit">
           <button onclick="openNewCustomerModal()" class="gen-btn" style="padding:0.6rem 1.2rem;font-size:0.85rem;white-space:nowrap">+ Ny kund</button>
         </div>
         <div id="customerList"><div class="empty-state"><div class="big"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span></div><p>Inga kunder ännu. Kunder skapas automatiskt från offerter och fakturor, eller lägg till manuellt.</p></div></div>
@@ -1211,7 +1211,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <div class="page-title">Artiklar & Prislista</div>
         <div class="page-sub">Dina egna priser – plocka enkelt in i offerter och fakturor</div>
         <div style="display:flex;gap:0.8rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
-          <input id="articleSearch" type="text" placeholder="🔍 Sök artikel..." oninput="filterArticles()" style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit">
+          <input id="articleSearch" type="text" placeholder="Sök artikel..." oninput="filterArticles()" style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit">
           <button onclick="openNewArticleModal()" class="gen-btn" style="padding:0.6rem 1.2rem;font-size:0.85rem;white-space:nowrap">+ Ny artikel</button>
         </div>
         <div id="articleList"><div class="empty-state"><div class="big"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span></div><p>Inga artiklar ännu. Lägg till dina tjänster och material med fasta priser.</p></div></div>
@@ -1243,8 +1243,12 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
               <option value="10">Oktober</option><option value="11">November</option><option value="12">December</option>
             </select>
             <button onclick="openNewVerification()" class="gen-btn" style="padding:0.5rem 1.2rem;font-size:0.85rem">+ Ny verifikation</button>
-            <button onclick="openReceiptScan()" class="gen-btn" style="padding:0.5rem 1rem;font-size:0.85rem;background:#2e7d32;border-color:#2e7d32">📸 Fota kvitto</button>
-            <button onclick="autoBookInvoices()" class="gen-btn" style="padding:0.5rem 1rem;font-size:0.8rem;background:var(--teal);border-color:var(--teal)" title="Bokför automatiskt alla obokförda fakturor och betalningar">⚡ Autobokför</button>
+            <button onclick="openReceiptScan()" class="gen-btn" style="padding:0.5rem 1rem;font-size:0.85rem;background:#2e7d32;border-color:#2e7d32"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></span> Fota kvitto</button>
+            <button onclick="autoBookInvoices()" class="gen-btn" style="padding:0.5rem 1rem;font-size:0.8rem;background:var(--teal);border-color:var(--teal)" title="Bokför automatiskt alla obokförda fakturor och betalningar"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span> Autobokför</button>
+            <div style="margin-left:auto;display:flex;gap:0.4rem">
+              <button onclick="exportSIE4()" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem" title="Exportera SIE4-fil för revisor eller annat bokföringsprogram"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> SIE-export</button>
+              <button onclick="importSIE4()" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem" title="Importera SIE-fil från annat bokföringsprogram"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> SIE-import</button>
+            </div>
           </div>
           <div id="grundbokContent"><div style="padding:2rem;text-align:center;color:#aaa">Laddar...</div></div>
         </div>
@@ -1357,7 +1361,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       </div>
       <div id="formForgot" style="display:none">
         <div style="text-align:center;margin-bottom:1.2rem">
-          <div style="font-size:1.5rem;margin-bottom:0.5rem">🔑</div>
+          <div style="font-size:1.5rem;margin-bottom:0.5rem"></div>
           <div style="font-family:Fraunces,serif;font-size:1.1rem;margin-bottom:0.3rem">Glömt lösenord?</div>
           <div style="font-size:0.82rem;color:#888">Ange din e-post så skickar vi en återställningslänk</div>
         </div>
@@ -1394,7 +1398,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <div class="uplan-features">Obegränsade offerter<br><strong>Fakturering &amp; kreditfaktura</strong><br>Dashboard &amp; statistik<br>Kund- &amp; artikelregister<br>ROT/RUT-avdrag<br>Fullständig företagsprofil<br>Egen logotyp<br>Dela via länk &amp; PDF<br>Ingen bindningstid</div>
       </div>
     </div>
-    <div class="stripe-note">🔒 Betalning hanteras säkert av Stripe. Du kan avbryta när som helst.</div>
+    <div class="stripe-note">Betalning hanteras säkert av Stripe. Du kan avbryta när som helst.</div>
     <button class="stripe-btn" onclick="goToStripe()">Betala via Stripe →</button>
   </div>
 </div>
@@ -1404,14 +1408,14 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 const SUPABASE_URL = 'https://yfnmmcrvzcwcinwopnlj.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmbm1tY3J2emN3Y2lud29wbmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MzY4NjQsImV4cCI6MjA4NzUxMjg2NH0.MpF3oRLWwXkmrjEGJ0Qqrsw_87FixbaNHmHmPxFyXKc';
 
-// 🔑 Stripe payment links – ersätt med dina riktiga länkar från Stripe Dashboard
+//  Stripe payment links – ersätt med dina riktiga länkar från Stripe Dashboard
 const STRIPE_LINKS = {
   credit:    'https://buy.stripe.com/CREDIT_LINK',
   pro:       'https://buy.stripe.com/PRO_LINK',
   unlimited: 'https://buy.stripe.com/UNLIMITED_LINK'
 };
 
-// 🤖 Anthropic API key – flytta till Supabase Edge Function i produktion!
+// Anthropic API key – flytta till Supabase Edge Function i produktion!
 // API-nyckeln är nu säkert lagrad i Supabase Edge Function
 
 const PLAN_LIMITS = { free: 2, pro: 10, unlimited: Infinity };
@@ -1529,7 +1533,7 @@ function updateUI(profile, used, total) {
 
   const qNote = document.getElementById('quotaNote');
   if (plan !== 'unlimited' && used >= limit) {
-    qNote.innerHTML = '🚫 Veckogränsen nådd! <a onclick="openUpgradeModal()" style="color:var(--gold);font-weight:700;cursor:pointer;text-decoration:underline">Uppgradera nu →</a>';
+    qNote.innerHTML = 'Veckogränsen nådd! <a onclick="openUpgradeModal()" style="color:var(--gold);font-weight:700;cursor:pointer;text-decoration:underline">Uppgradera nu →</a>';
     qNote.className = 'quota-note warn';
     document.getElementById('genBtn').disabled = true;
     // Show upgrade banner
@@ -1714,7 +1718,7 @@ function toggleProfileChip(id, cb) {
 
 async function saveProfile() {
   const btn = document.querySelector('.save-btn');
-  btn.textContent = '⏳ Sparar...';
+  btn.textContent = 'Sparar...';
   btn.disabled = true;
   const selectedIndustries = [...document.querySelectorAll('#profileIndustryChips input[type=checkbox]:checked')].map(cb => cb.value);
   const updates = {
@@ -1762,7 +1766,7 @@ async function handleLogoUpload(e) {
   // Show loading state
   const label = document.getElementById('logoUploadLabel');
   const origText = label.innerHTML;
-  label.innerHTML = '<span>⏳ Laddar upp...</span>';
+  label.innerHTML = '<span>Laddar upp...</span>';
   label.style.pointerEvents = 'none';
   const reader = new FileReader();
   reader.onload = async (ev) => {
@@ -1819,7 +1823,7 @@ async function loadHistory() {
   const { data } = await sb.from('quote_usage').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
   const el = document.getElementById('historyContent');
   if (!data || data.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="big">📂</div><p>Inga offerter ännu</p></div>';
+    el.innerHTML = '<div class="empty-state"><p>Inga offerter ännu</p></div>';
     return;
   }
   window._historyData = data;
@@ -1841,7 +1845,7 @@ function parseAmountFromHtml(html) {
 function renderHistoryTable(data) {
   const el = document.getElementById('historyContent');
   if (!data || data.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="big">📂</div><p>Inga offerter hittades</p></div>';
+    el.innerHTML = '<div class="empty-state"><p>Inga offerter hittades</p></div>';
     return;
   }
   el.innerHTML = `<table class="history-table">
@@ -1945,7 +1949,7 @@ async function loadInvoices() {
     document.getElementById('invSummary').style.display = 'none';
     document.getElementById('invoiceContent').innerHTML = `
       <div style="text-align:center;padding:3rem 1.5rem">
-        <div style="font-size:3rem;margin-bottom:1rem">🔒</div>
+        <div style="margin-bottom:1rem"><span class="ico" style="font-size:2rem;color:var(--gold)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span></div>
         <div style="font-family:Fraunces,serif;font-size:1.3rem;margin-bottom:0.5rem">Fakturering ingår i Obegränsat</div>
         <p style="color:#888;font-size:0.9rem;margin-bottom:1.5rem">Skapa, skicka och följ upp fakturor – uppgradera till Obegränsat för 249 kr/mån.</p>
         <button onclick="openUpgradeModal()" class="gen-btn" style="padding:0.7rem 2rem;font-size:0.95rem">Uppgradera →</button>
@@ -2355,8 +2359,8 @@ function openInvoiceView(idx) {
   const btnsEl = document.getElementById('invModalBtns');
   let btns = '';
   if (status !== 'draft') {
-    btns += '<button class="qt-btn" onclick="downloadInvoicePDF()">⬇ PDF</button>';
-    btns += '<button class="qt-btn" onclick="shareInvoiceEmail()">✉ E-post</button>';
+    btns += '<button class="qt-btn" onclick="downloadInvoicePDF()">PDF</button>';
+    btns += '<button class="qt-btn" onclick="shareInvoiceEmail()"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></span> E-post</button>';
   }
   if (status === 'draft') {
     btns += `<button class="qt-btn" style="background:#2e7d32;color:white;border-color:#2e7d32" onclick="confirmCurrentInvoice()">✓ Bekräfta & skicka</button>`;
@@ -2597,7 +2601,7 @@ function toggleMobileMenu() {
   const menu = document.getElementById('mobileMenu');
   const isOpen = menu.style.display === 'flex';
   menu.style.display = isOpen ? 'none' : 'flex';
-  document.getElementById('hamburgerBtn').textContent = isOpen ? '☰' : '✕';
+  document.getElementById('hamburgerBtn').innerHTML = isOpen ? '<span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></span>' : '✕';
 }
 
 function toggleFaq(el) {
@@ -2646,7 +2650,7 @@ function closeQuoteModal() {
 async function saveQuoteEdits() {
   if (!currentUser) return;
   const btn = document.getElementById('saveEditsBtn');
-  btn.textContent = '⏳ Sparar...';
+  btn.textContent = 'Sparar...';
   btn.disabled = true;
 
   // Read current DOM values
@@ -2670,7 +2674,7 @@ async function saveQuoteEdits() {
     }).eq('id', data[0].id);
     if (updateError) {
       alert('Fel vid sparande: ' + updateError.message);
-      btn.textContent = '💾 Spara ändringar';
+      btn.textContent = 'Spara ändringar';
       btn.disabled = false;
       return;
     }
@@ -2682,7 +2686,7 @@ async function saveQuoteEdits() {
   // Reload history cache so next open shows updated data
   await loadHistory();
   setTimeout(() => {
-    btn.textContent = '💾 Spara ändringar';
+    btn.textContent = 'Spara ändringar';
     btn.style.background = '';
     btn.style.color = '';
     btn.disabled = false;
@@ -2875,7 +2879,7 @@ async function generateQuote() {
   );
   const matchesCurrent = selectedKws.some(kw => jobLower.includes(kw));
   if (matchesOther && !matchesCurrent) {
-    const confirmed = confirm('⚠️ Uppdraget verkar inte stämma med vald bransch "' + industry + '". Vill du ändå fortsätta, eller byta bransch?');
+    const confirmed = confirm('OBS! Uppdraget verkar inte stämma med vald bransch "' + industry + '". Vill du ändå fortsätta, eller byta bransch?');
     if (!confirmed) {
       clearInterval(interval);
       document.getElementById('statusBar').style.display = 'none';
@@ -3211,7 +3215,7 @@ async function doForgotPassword() {
   if (!email) { alert('Ange din e-postadress.'); return; }
   const btn = document.getElementById('forgotBtn');
   btn.disabled = true;
-  btn.textContent = '⏳ Skickar...';
+  btn.textContent = 'Skickar...';
   const { error } = await sb.auth.resetPasswordForEmail(email, {
     redirectTo: 'https://offeria.se'
   });
@@ -3864,7 +3868,7 @@ async function loadBookkeeping() {
 function renderGrundbok() {
   const el = document.getElementById('grundbokContent');
   if (_bkVerifications.length === 0) {
-    el.innerHTML = '<div style="padding:2rem;text-align:center;color:#aaa"><p style="font-size:1.5rem;margin-bottom:0.5rem">📒</p><p>Inga verifikationer ännu.</p><p style="font-size:0.8rem;margin-top:0.3rem">Klicka <strong>+ Ny verifikation</strong> för att börja bokföra eller <strong>⚡ Autobokför</strong> för att bokföra dina fakturor automatiskt.</p></div>';
+    el.innerHTML = '<div style="padding:2rem;text-align:center;color:#aaa"><div style="margin-bottom:0.5rem"><span class="ico" style="font-size:1.5rem;color:var(--gold)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span></div><p>Inga verifikationer ännu.</p><p style="font-size:0.8rem;margin-top:0.3rem">Klicka <strong>+ Ny verifikation</strong> för att börja bokföra eller <strong><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span> Autobokför</strong> för att bokföra dina fakturor automatiskt.</p></div>';
     return;
   }
   const fmt = n => Number(n).toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -3876,7 +3880,7 @@ function renderGrundbok() {
     html += `<tr style="background:${isLocked ? '#f9f9f7' : 'white'}">
       <td style="font-weight:700;font-size:0.8rem;white-space:nowrap">V${v.verification_number}</td>
       <td style="white-space:nowrap;font-size:0.8rem">${v.verification_date}</td>
-      <td>${v.description}${v.source_type !== 'manual' ? ' <span style="font-size:0.65rem;background:var(--cream);padding:0.1rem 0.4rem;border-radius:4px;color:var(--gold)">' + v.source_type + '</span>' : ''}${isLocked ? ' 🔒' : ''}</td>
+      <td>${v.description}${v.source_type !== 'manual' ? ' <span style="font-size:0.65rem;background:var(--cream);padding:0.1rem 0.4rem;border-radius:4px;color:var(--gold)">' + v.source_type + '</span>' : ''}${isLocked ? ' <span class="ico" style="font-size:0.7em;color:#999"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>' : ''}</td>
       <td style="text-align:right;font-size:0.82rem">${fmt(totalDebet)}</td>
       <td style="text-align:right;font-size:0.82rem">${fmt(totalDebet)}</td>
       <td><button onclick="viewVerification('${v.id}')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:0.2rem 0.5rem;cursor:pointer;font-size:0.72rem;font-family:inherit;color:var(--gold)">Visa</button></td>
@@ -4071,10 +4075,10 @@ function viewVerification(id) {
   popup.onclick = (e) => { if (e.target === popup) popup.remove(); };
   popup.innerHTML = `<div style="background:white;border-radius:12px;max-width:500px;width:90%;padding:1.5rem;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem"><h3 style="margin:0">V${v.verification_number}</h3><button onclick="this.closest('[style*=position]').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer">✕</button></div>
-    <div style="font-size:0.85rem;color:#888;margin-bottom:0.3rem">${v.verification_date} · ${v.source_type}${v.is_locked ? ' · 🔒 Låst' : ''}</div>
+    <div style="font-size:0.85rem;color:#888;margin-bottom:0.3rem">${v.verification_date} · ${v.source_type}${v.is_locked ? ' · Låst' : ''}</div>
     <div style="font-size:0.95rem;margin-bottom:1rem">${v.description}</div>
     <table style="width:100%;border-collapse:collapse;font-size:0.85rem"><thead><tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:0.4rem">Konto</th><th style="text-align:right;padding:0.4rem">Debet</th><th style="text-align:right;padding:0.4rem">Kredit</th></tr></thead><tbody>${rowsHtml}</tbody></table>
-    ${v.attachment_url ? '<div style="margin-top:1rem"><a href="#" onclick="downloadReceipt(\'' + v.attachment_url + '\');return false" style="color:var(--gold);font-size:0.85rem">📎 Visa kvitto</a></div>' : ''}
+    ${v.attachment_url ? '<div style="margin-top:1rem"><a href="#" onclick="downloadReceipt(\'' + v.attachment_url + '\');return false" style="color:var(--gold);font-size:0.85rem">Visa kvitto</a></div>' : ''}
   </div>`;
   document.body.appendChild(popup);
 }
@@ -4619,6 +4623,198 @@ async function saveReceiptVerification() {
   alert(`✓ Verifikation V${verNum} skapad från kvitto!`);
 }
 
+// ===== SIE4 EXPORT =====
+async function exportSIE4() {
+  if (!currentUser || !currentProfile) return alert('Logga in och fyll i företagsprofil först.');
+  const yr = document.getElementById('bkYear')?.value || new Date().getFullYear();
+  const p = currentProfile;
+
+  // Fetch all verifications + rows for the year
+  const { data: vers } = await sb.from('verifications').select('*').eq('user_id', currentUser.id)
+    .gte('verification_date', yr + '-01-01').lte('verification_date', yr + '-12-31').order('verification_number');
+  const verIds = (vers || []).map(v => v.id);
+  let rows = [];
+  if (verIds.length > 0) {
+    const { data } = await sb.from('verification_rows').select('*').eq('user_id', currentUser.id).in('verification_id', verIds);
+    rows = data || [];
+  }
+
+  // Build SIE4 file
+  let sie = '';
+  sie += '#FLAGGA 0\n';
+  sie += '#FORMAT PC8\n';
+  sie += '#SIETYP 4\n';
+  sie += '#PROGRAM "Offeria" "1.0"\n';
+  sie += `#GEN ${new Date().toISOString().slice(0, 10).replace(/-/g, '')}\n`;
+  sie += `#FNAMN "${(p.company_name || 'Företag').replace(/"/g, "''")}"\n`;
+  if (p.org_number) sie += `#ORGNR ${p.org_number.replace('-', '')}\n`;
+  if (p.address) sie += `#ADRESS "" "${p.address}" "" ""\n`;
+  sie += `#RAR 0 ${yr}0101 ${yr}1231\n`;
+  sie += `#TAXAR ${parseInt(yr) + 1}\n`;
+  sie += '#KPTYP BAS2026\n';
+
+  // Accounts
+  _bkAccounts.filter(a => a.is_active).forEach(a => {
+    sie += `#KONTO ${a.account_number} "${a.account_name}"\n`;
+  });
+
+  // Account balances (opening = 0 for first year, or calculate from previous)
+  const saldoByAccount = {};
+  rows.forEach(r => {
+    if (!saldoByAccount[r.account_number]) saldoByAccount[r.account_number] = { debit: 0, credit: 0 };
+    saldoByAccount[r.account_number].debit += parseFloat(r.debit) || 0;
+    saldoByAccount[r.account_number].credit += parseFloat(r.credit) || 0;
+  });
+
+  // Opening balances (IB) - for first year, all zero
+  _bkAccounts.filter(a => a.is_active && a.account_class <= 2).forEach(a => {
+    sie += `#IB 0 ${a.account_number} 0.00\n`;
+  });
+
+  // Closing balances (UB)
+  _bkAccounts.filter(a => a.is_active && a.account_class <= 2).forEach(a => {
+    const s = saldoByAccount[a.account_number];
+    const val = s ? (s.debit - s.credit) : 0;
+    if (val !== 0) sie += `#UB 0 ${a.account_number} ${val.toFixed(2)}\n`;
+  });
+
+  // Result account balances (RES)
+  _bkAccounts.filter(a => a.is_active && a.account_class >= 3).forEach(a => {
+    const s = saldoByAccount[a.account_number];
+    const val = s ? (s.debit - s.credit) : 0;
+    if (val !== 0) sie += `#RES 0 ${a.account_number} ${val.toFixed(2)}\n`;
+  });
+
+  // Verifications
+  (vers || []).forEach(v => {
+    const vRows = rows.filter(r => r.verification_id === v.id);
+    const dateStr = (v.verification_date || '').replace(/-/g, '');
+    const regDate = (v.registration_date || v.created_at || '').slice(0, 10).replace(/-/g, '');
+    sie += `#VER "" ${v.verification_number} ${dateStr} "${(v.description || '').replace(/"/g, "''")}"\n`;
+    sie += '{\n';
+    vRows.forEach(r => {
+      const d = parseFloat(r.debit) || 0;
+      const c = parseFloat(r.credit) || 0;
+      const amount = d > 0 ? d : -c;
+      sie += `  #TRANS ${r.account_number} {} ${amount.toFixed(2)} ${dateStr} "${(r.description || '').replace(/"/g, "''")}"\n`;
+    });
+    sie += '}\n';
+  });
+
+  // Download
+  const blob = new Blob([sie], { type: 'text/plain;charset=cp437' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `offeria_sie4_${yr}.se`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===== SIE4 IMPORT =====
+async function importSIE4() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.se,.si,.sie';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const text = await file.text();
+    if (!confirm(`Importera bokföring från "${file.name}"?\n\nDetta lägger till konton och verifikationer. Befintlig data påverkas inte.`)) return;
+
+    const lines = text.split('\n');
+    let accounts = [];
+    let currentVer = null;
+    let verifications = [];
+    let companyName = '';
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+
+      // Company name
+      const fnamnMatch = line.match(/^#FNAMN\s+"(.+)"/);
+      if (fnamnMatch) companyName = fnamnMatch[1];
+
+      // Accounts
+      const kontoMatch = line.match(/^#KONTO\s+(\d{4})\s+"(.+)"/);
+      if (kontoMatch) accounts.push({ number: kontoMatch[1], name: kontoMatch[2] });
+
+      // Verifications
+      const verMatch = line.match(/^#VER\s+"[^"]*"\s+(\d+)\s+(\d{8})\s+"(.*)"/);
+      if (verMatch) {
+        currentVer = {
+          number: parseInt(verMatch[1]),
+          date: verMatch[2].slice(0,4) + '-' + verMatch[2].slice(4,6) + '-' + verMatch[2].slice(6,8),
+          description: verMatch[3],
+          rows: []
+        };
+      }
+
+      // Transaction rows
+      const transMatch = line.match(/^#TRANS\s+(\d{4})\s+\{[^}]*\}\s+([-\d.]+)/);
+      if (transMatch && currentVer) {
+        const amount = parseFloat(transMatch[2]);
+        currentVer.rows.push({
+          account_number: transMatch[1],
+          debit: amount > 0 ? amount : 0,
+          credit: amount < 0 ? Math.abs(amount) : 0
+        });
+      }
+
+      // End of verification block
+      if (line === '}' && currentVer) {
+        if (currentVer.rows.length > 0) verifications.push(currentVer);
+        currentVer = null;
+      }
+    }
+
+    // Ensure accounts exist
+    for (const acc of accounts) {
+      const existing = _bkAccounts.find(a => a.account_number === acc.number);
+      if (!existing) {
+        const cls = parseInt(acc.number[0]);
+        const type = cls === 1 ? 'tillgang' : cls === 2 ? 'skuld' : cls >= 3 && cls <= 3 ? 'intakt' : 'kostnad';
+        await sb.from('chart_of_accounts').insert({
+          user_id: currentUser.id, account_number: acc.number, account_name: acc.name,
+          account_class: cls, account_type: type, sort_order: parseInt(acc.number)
+        }).onConflict('user_id,account_number').ignore();
+      }
+    }
+
+    // Import verifications
+    let imported = 0;
+    for (const v of verifications) {
+      const yr = parseInt(v.date.slice(0, 4));
+      // Ensure fiscal year
+      await sb.from('fiscal_years').insert({
+        user_id: currentUser.id, start_date: yr + '-01-01', end_date: yr + '-12-31'
+      }).onConflict('user_id,start_date').ignore();
+
+      const { data: numD } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: yr });
+      const verNum = numD || 1;
+
+      const { data: ver, error } = await sb.from('verifications').insert({
+        user_id: currentUser.id, verification_number: verNum, verification_date: v.date,
+        description: v.description || 'Importerad verifikation', source_type: 'import',
+        created_by: 'SIE-import'
+      }).select().single();
+
+      if (ver && !error) {
+        await sb.from('verification_rows').insert(v.rows.map(r => ({
+          verification_id: ver.id, user_id: currentUser.id, ...r
+        })));
+        imported++;
+      }
+    }
+
+    // Reload
+    _bkInitialized = false;
+    await initBookkeeping();
+    alert(`Import klar!\n\n${accounts.length} konton\n${imported} verifikationer\n\nFrån: ${companyName || file.name}`);
+  };
+  input.click();
+}
+
 init();
 </script>
 
@@ -4626,13 +4822,13 @@ init();
 <div class="overlay" id="quoteModalOverlay" style="align-items:flex-start;padding:0;overflow-y:auto" onclick="if(event.target===this)closeQuoteModal()">
   <div id="quoteModalBox" style="background:white;border-radius:0;width:100%;max-width:860px;margin:auto;overflow:hidden;box-shadow:0 20px 80px rgba(0,0,0,0.3)">
     <div class="quote-toolbar" style="border-radius:0">
-      <span class="qt-label">✦ Offert genererad</span>
+      <span class="qt-label"><span class="ico"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.09 6.26L20.18 9.27l-5.09 3.88L16.18 20 12 16.77 7.82 20l1.09-6.85L3.82 9.27l6.09-1.01z"/></svg></span> Offert genererad</span>
       <div class="qt-btns">
         <button class="qt-btn" onclick="generateQuote()">↻ Generera om</button>
-        <button class="qt-btn" onclick="saveQuoteEdits()" id="saveEditsBtn">💾 Spara ändringar</button>
-        <button class="qt-btn" onclick="shareViaEmail()">✉ E-post</button>
+        <button class="qt-btn" onclick="saveQuoteEdits()" id="saveEditsBtn">Spara ändringar</button>
+        <button class="qt-btn" onclick="shareViaEmail()"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></span> E-post</button>
         <button class="qt-btn" onclick="shareNative()">↗ Dela</button>
-        <button class="qt-btn" onclick="downloadPDF()">⬇ Ladda ner PDF</button>
+        <button class="qt-btn" onclick="downloadPDF()"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> Ladda ner PDF</button>
         <button class="qt-btn" onclick="createInvoiceFromQuote()" style="background:#2e7d32;color:white;border-color:#2e7d32"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> Skapa faktura</button>
         <button class="qt-btn" onclick="closeQuoteModal()" style="margin-left:0.5rem">✕ Stäng</button>
       </div>
@@ -4757,7 +4953,7 @@ init();
 <div class="overlay" id="articlePickerOverlay" onclick="if(event.target===this)closeArticlePicker()">
   <div class="modal" style="max-width:560px;max-height:80vh;overflow-y:auto">
     <h3 style="margin-bottom:0.8rem"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Välj artiklar</h3>
-    <input id="pickerSearch" type="text" placeholder="🔍 Sök artikel..." oninput="filterPickerArticles()" style="width:100%;box-sizing:border-box;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit;margin-bottom:0.8rem">
+    <input id="pickerSearch" type="text" placeholder="Sök artikel..." oninput="filterPickerArticles()" style="width:100%;box-sizing:border-box;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit;margin-bottom:0.8rem">
     <div id="pickerList" style="max-height:50vh;overflow-y:auto"></div>
     <div style="margin-top:1rem;display:flex;gap:0.7rem">
       <button onclick="insertPickedArticles()" class="gen-btn" style="flex:1">Lägg till valda</button>
@@ -4770,7 +4966,7 @@ init();
 <div class="overlay" id="receiptScanOverlay" onclick="if(event.target===this)closeReceiptScan()">
   <div class="modal" style="max-width:500px;padding:1.8rem 2rem">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-      <h3 style="margin:0">📸 Fota kvitto</h3>
+      <h3 style="margin:0"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></span> Fota kvitto</h3>
       <button onclick="closeReceiptScan()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#999">✕</button>
     </div>
     <p style="font-size:0.85rem;color:#888;margin-bottom:1rem">Ta en bild på kvittot — AI:n läser av belopp, datum, butik och moms automatiskt.</p>
@@ -4780,7 +4976,7 @@ init();
     </div>
 
     <div id="receiptUploadArea" style="border:2px dashed var(--border);border-radius:12px;padding:2rem;text-align:center;cursor:pointer;margin-bottom:1rem;transition:border-color 0.15s" onclick="document.getElementById('receiptFileInput').click()" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
-      <div style="font-size:2rem;margin-bottom:0.5rem">📷</div>
+      <div style="font-size:1.5rem;margin-bottom:0.5rem;color:var(--gold)"><span class="ico" style="font-size:2rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></span></div>
       <div style="font-size:0.9rem;font-weight:600">Tryck för att ta bild eller välja fil</div>
       <div style="font-size:0.78rem;color:#999;margin-top:0.3rem">Kamera öppnas på mobilen</div>
       <input id="receiptFileInput" type="file" accept="image/*" capture="environment" onchange="onReceiptSelected(this)" style="display:none">
@@ -4803,16 +4999,16 @@ init();
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1rem">
         <div class="field" style="margin:0"><label>Kategori</label>
           <select id="rcptCategory" style="width:100%;padding:0.55rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
-            <option value="material">📦 Material</option>
-            <option value="drivmedel">⛽ Drivmedel</option>
-            <option value="bil">🚗 Bilkostnad</option>
-            <option value="telefon">📱 Telefon/Internet</option>
-            <option value="kontorsmaterial">📎 Kontorsmaterial</option>
-            <option value="forsakring">🛡️ Försäkring</option>
-            <option value="hyra">🏢 Lokalhyra</option>
-            <option value="underentreprenor">🔧 Underentreprenör</option>
-            <option value="redovisning">📊 Redovisning</option>
-            <option value="bank">🏦 Bankkostnad</option>
+            <option value="material">Material</option>
+            <option value="drivmedel">Drivmedel</option>
+            <option value="bil">Bilkostnad</option>
+            <option value="telefon">Telefon/Internet</option>
+            <option value="kontorsmaterial">Kontorsmaterial</option>
+            <option value="forsakring">Försäkring</option>
+            <option value="hyra">Lokalhyra</option>
+            <option value="underentreprenor">Underentreprenör</option>
+            <option value="redovisning">Redovisning</option>
+            <option value="bank">Bankkostnad</option>
           </select>
         </div>
         <div class="field" style="margin:0"><label>Moms</label>
@@ -4839,20 +5035,20 @@ init();
       <div class="field" style="margin:0"><label>Kategori</label>
         <select id="verCategory" onchange="applyVerCategory()" style="width:100%;padding:0.55rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
           <option value="">– Välj kategori –</option>
-          <option value="material">📦 Inköp material</option>
-          <option value="bil">🚗 Bilkostnad</option>
-          <option value="telefon">📱 Telefon/Internet</option>
-          <option value="forsakring">🛡️ Försäkring</option>
-          <option value="hyra">🏢 Lokalhyra</option>
-          <option value="kontorsmaterial">📎 Kontorsmaterial</option>
-          <option value="drivmedel">⛽ Drivmedel</option>
-          <option value="underentreprenor">🔧 Underentreprenör</option>
-          <option value="redovisning">📊 Redovisning/Revision</option>
-          <option value="bank">🏦 Bankkostnad</option>
-          <option value="egen_insattning">💰 Egen insättning</option>
-          <option value="eget_uttag">💸 Eget uttag</option>
-          <option value="lon">👤 Lön</option>
-          <option value="custom">✏️ Ange konton manuellt</option>
+          <option value="material">Inköp material</option>
+          <option value="bil">Bilkostnad</option>
+          <option value="telefon">Telefon/Internet</option>
+          <option value="forsakring">Försäkring</option>
+          <option value="hyra">Lokalhyra</option>
+          <option value="kontorsmaterial">Kontorsmaterial</option>
+          <option value="drivmedel">Drivmedel</option>
+          <option value="underentreprenor">Underentreprenör</option>
+          <option value="redovisning">Redovisning/Revision</option>
+          <option value="bank">Bankkostnad</option>
+          <option value="egen_insattning">Egen insättning</option>
+          <option value="eget_uttag">Eget uttag</option>
+          <option value="lon">Lön</option>
+          <option value="custom">Ange konton manuellt</option>
         </select>
       </div>
     </div>
