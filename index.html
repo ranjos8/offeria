@@ -1247,6 +1247,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <button onclick="autoBookInvoices()" class="gen-btn" style="padding:0.5rem 1rem;font-size:0.8rem;background:var(--teal);border-color:var(--teal)" title="Bokför automatiskt alla obokförda fakturor och betalningar"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span> Autobokför</button>
             <div style="margin-left:auto;display:flex;gap:0.4rem">
               <button onclick="exportSIE4()" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem" title="Exportera SIE4-fil för revisor eller annat bokföringsprogram"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> SIE-export</button>
+              <button onclick="lockCurrentPeriod()" id="bkLockBtn" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem;display:none" title="Lås vald period — förhindrar ändringar"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span> Lås period</button>
               <button onclick="importSIE4()" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem" title="Importera SIE-fil från annat bokföringsprogram"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> SIE-import</button>
             </div>
           </div>
@@ -3809,6 +3810,14 @@ let _bkInitialized = false;
 
 async function initBookkeeping() {
   if (!currentUser) return;
+  // Preload Tesseract in background for faster receipt scanning
+  if (!window.Tesseract && !window._tesseractLoading) {
+    window._tesseractLoading = true;
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    s.onload = () => { window._tesseractLoaded = true; };
+    document.head.appendChild(s);
+  }
   // Initialize chart of accounts if first time
   if (!_bkInitialized) {
     const { data: accounts } = await sb.from('chart_of_accounts').select('*').eq('user_id', currentUser.id).order('sort_order');
@@ -3853,6 +3862,23 @@ async function loadBookkeeping() {
   let startDate = yr + '-01-01', endDate = yr + '-12-31';
   if (mo !== 'all') { startDate = yr + '-' + mo + '-01'; const d = new Date(parseInt(yr), parseInt(mo), 0); endDate = yr + '-' + mo + '-' + String(d.getDate()).padStart(2, '0'); }
 
+  // Check if period is locked
+  const periodKey = mo !== 'all' ? yr + '-' + mo : null;
+  const lockBtn = document.getElementById('bkLockBtn');
+  if (periodKey && lockBtn) {
+    lockBtn.style.display = 'inline-flex';
+    const { data: lockData } = await sb.from('locked_periods').select('*').eq('user_id', currentUser.id).eq('period', periodKey);
+    if (lockData && lockData.length > 0) {
+      lockBtn.innerHTML = '<span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span> Period låst';
+      lockBtn.style.background = '#e8f5e9'; lockBtn.style.color = '#2e7d32'; lockBtn.style.borderColor = '#2e7d32';
+      lockBtn.onclick = null; lockBtn.title = 'Denna period är låst';
+    } else {
+      lockBtn.innerHTML = '<span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span> Lås period';
+      lockBtn.style.background = ''; lockBtn.style.color = ''; lockBtn.style.borderColor = '';
+      lockBtn.onclick = lockCurrentPeriod;
+    }
+  } else if (lockBtn) { lockBtn.style.display = 'none'; }
+
   const { data: vers } = await sb.from('verifications').select('*').eq('user_id', currentUser.id)
     .gte('verification_date', startDate).lte('verification_date', endDate).order('verification_number');
   _bkVerifications = vers || [];
@@ -3863,6 +3889,43 @@ async function loadBookkeeping() {
     _bkRows = rows || [];
   } else { _bkRows = []; }
   renderGrundbok();
+}
+
+async function lockCurrentPeriod() {
+  const yr = document.getElementById('bkYear')?.value;
+  const mo = document.getElementById('bkMonth')?.value;
+  if (!yr || mo === 'all') return alert('Välj en specifik månad att låsa.');
+  const periodKey = yr + '-' + mo;
+  const monthNames = ['','Januari','Februari','Mars','April','Maj','Juni','Juli','Augusti','September','Oktober','November','December'];
+  const monthName = monthNames[parseInt(mo)] || mo;
+
+  if (!confirm(`Lås ${monthName} ${yr}?\n\nAlla verifikationer i perioden blir låsta och kan inte ändras. Rättelser sker via nya rättelseverifikationer.\n\nDetta kan inte ångras.`)) return;
+
+  // Lock all verifications in the period
+  const startDate = yr + '-' + mo + '-01';
+  const d = new Date(parseInt(yr), parseInt(mo), 0);
+  const endDate = yr + '-' + mo + '-' + String(d.getDate()).padStart(2, '0');
+
+  const { error: lockErr } = await sb.from('locked_periods').insert({
+    user_id: currentUser.id, period: periodKey, locked_by: currentUser.email
+  });
+
+  if (lockErr) { alert('Kunde inte låsa period: ' + lockErr.message); return; }
+
+  // Mark all verifications as locked
+  await sb.from('verifications').update({ is_locked: true })
+    .eq('user_id', currentUser.id)
+    .gte('verification_date', startDate)
+    .lte('verification_date', endDate);
+
+  // Audit log
+  await sb.from('bookkeeping_audit_log').insert({
+    user_id: currentUser.id, action: 'lock', entity_type: 'period',
+    details: { period: periodKey }
+  });
+
+  alert(`${monthName} ${yr} är nu låst.`);
+  loadBookkeeping();
 }
 
 function renderGrundbok() {
@@ -4080,7 +4143,9 @@ async function saveVerification() {
   let attachmentUrl = null;
   const fileInput = document.getElementById('verFile');
   if (fileInput.files.length > 0) {
-    const file = fileInput.files[0];
+    let file = fileInput.files[0];
+    if (file.size > 5 * 1024 * 1024) { alert('Filen är för stor (max 5 MB). Välj en mindre fil.'); return; }
+    if (file.type.startsWith('image/')) file = await compressImageForStorage(file, 200);
     const path = `${currentUser.id}/V${verNum}_${file.name}`;
     const { error: uploadErr } = await sb.storage.from('receipts').upload(path, file);
     if (!uploadErr) attachmentUrl = path;
@@ -4156,11 +4221,28 @@ async function autoBookInvoices() {
   for (const i of inv) {
     // Book invoice creation (if not already booked)
     if (!bookedIds.has(i.id + '_invoice') && i.status !== 'draft') {
-      const total = Math.abs(parseFloat(i.total_amount)) || 0;
       const invData = i.invoice_data ? JSON.parse(i.invoice_data) : {};
       const vatPct = invData.vatRate || 25;
-      const netto = Math.round(total / (1 + vatPct / 100) * 100) / 100;
-      const moms = Math.round((total - netto) * 100) / 100;
+      const inclRot = invData.inclRot || false;
+      // Calculate from items if available, otherwise from total
+      let subtotalExVat = 0, totalInklMoms = 0;
+      if (invData.items && invData.items.length > 0) {
+        subtotalExVat = invData.items.reduce((s, it) => s + (it.qty || 1) * (it.price || 0), 0);
+        totalInklMoms = subtotalExVat + Math.round(subtotalExVat * vatPct / 100);
+      } else {
+        totalInklMoms = Math.abs(parseFloat(i.total_amount)) || 0;
+        if (inclRot) {
+          // total_amount is after ROT deduction, we need pre-ROT for correct moms
+          const arbete = invData.items ? invData.items.filter(it => it.type !== 'material').reduce((s, it) => s + (it.qty||1)*(it.price||0), 0) : totalInklMoms * 0.7;
+          const rotAmount = Math.min(arbete * 0.3, 50000);
+          totalInklMoms = totalInklMoms + rotAmount;
+        }
+        subtotalExVat = Math.round(totalInklMoms / (1 + vatPct / 100) * 100) / 100;
+      }
+      const netto = subtotalExVat;
+      const moms = Math.round(netto * vatPct / 100);
+      const total = netto + moms;
+      const rotAmount = inclRot ? Math.min((invData.items || []).filter(it => it.type !== 'material').reduce((s, it) => s + (it.qty||1)*(it.price||0), 0) * 0.3, 50000) : 0;
       const yr = new Date(i.created_at).getFullYear();
       const { data: numD } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: yr });
       const verNum = numD || 1;
@@ -4175,10 +4257,13 @@ async function autoBookInvoices() {
         ];
       } else {
         rows = [
-          { account_number: '1510', debit: total, credit: 0 },
+          { account_number: '1510', debit: total - rotAmount, credit: 0 },
           { account_number: '3010', debit: 0, credit: netto },
           { account_number: '2610', debit: 0, credit: moms }
         ];
+        if (rotAmount > 0) {
+          rows.push({ account_number: '1580', debit: rotAmount, credit: 0 }); // Fordran ROT-avdrag
+        }
       }
 
       const { data: ver } = await sb.from('verifications').insert({
@@ -4415,6 +4500,7 @@ function closeReceiptScan() { document.getElementById('receiptScanOverlay').styl
 async function onReceiptSelected(input) {
   if (!input.files || !input.files[0]) return;
   _receiptFile = input.files[0];
+  if (_receiptFile.size > 5 * 1024 * 1024) { alert('Bilden är för stor (max 5 MB). Försök med lägre upplösning.'); return; }
 
   const reader = new FileReader();
   reader.onload = async (e) => {
@@ -4492,6 +4578,46 @@ function resizeImageForOCR(dataUrl, maxWidth) {
       resolve(canvas.toDataURL('image/jpeg', 0.92));
     };
     img.src = dataUrl;
+  });
+}
+
+// Compress image for storage (target ~200KB to save space — 7 years of receipts add up)
+function compressImageForStorage(file, maxKB) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 1000; // Max dimension
+        let w = img.width, h = img.height;
+        if (w > maxDim || h > maxDim) {
+          const scale = maxDim / Math.max(w, h);
+          w = Math.round(w * scale);
+          h = Math.round(h * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        // Try different quality levels to hit target size
+        let quality = 0.7;
+        let blob;
+        canvas.toBlob((b) => {
+          if (b.size > (maxKB || 200) * 1024 && quality > 0.3) {
+            // Retry with lower quality
+            canvas.toBlob((b2) => {
+              resolve(new File([b2], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
+            }, 'image/jpeg', 0.4);
+          } else {
+            resolve(new File([b], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
+          }
+        }, 'image/jpeg', quality);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
   });
 }
 
@@ -4684,8 +4810,9 @@ async function saveReceiptVerification() {
 
   let attachmentUrl = null;
   if (_receiptFile) {
-    const path = `${currentUser.id}/V${verNum}_${_receiptFile.name}`;
-    const { error: upErr } = await sb.storage.from('receipts').upload(path, _receiptFile);
+    const compressed = await compressImageForStorage(_receiptFile, 200);
+    const path = `${currentUser.id}/V${verNum}_${compressed.name}`;
+    const { error: upErr } = await sb.storage.from('receipts').upload(path, compressed);
     if (!upErr) attachmentUrl = path;
   }
 
