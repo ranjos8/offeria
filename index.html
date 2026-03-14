@@ -499,15 +499,17 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .bk-card {
   background: white; border: 1px solid var(--border); border-radius: 10px;
   padding: 0.8rem 1rem; cursor: pointer; transition: border-color 0.15s;
+  box-sizing: border-box; width: 100%; overflow: hidden;
 }
 .bk-card:active { border-color: var(--gold); }
 .bk-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
 .bk-card-nr { font-weight: 700; font-size: 0.85rem; color: var(--ink); }
 .bk-card-date { font-size: 0.75rem; color: #999; }
-.bk-card-desc { font-size: 0.82rem; color: #555; margin-bottom: 0.5rem; line-height: 1.4; }
+.bk-card-desc { font-size: 0.82rem; color: #555; margin-bottom: 0.5rem; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; }
 .bk-card-rows { border-top: 1px solid #f0ede6; padding-top: 0.4rem; }
-.bk-card-row { display: flex; justify-content: space-between; font-size: 0.74rem; color: #888; padding: 0.15rem 0; }
-.bk-card-row span:last-child { font-family: monospace; white-space: nowrap; }
+.bk-card-row { display: flex; justify-content: space-between; font-size: 0.74rem; color: #888; padding: 0.15rem 0; gap: 0.5rem; }
+.bk-card-row span:first-child { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bk-card-row span:last-child { flex-shrink: 0; text-align: right; font-size: 0.72rem; }
 .bk-card-total { display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; padding-top: 0.4rem; margin-top: 0.3rem; border-top: 1px solid var(--border); color: var(--ink); }
 
 /* ===== DEMO SECTION ===== */
@@ -760,22 +762,30 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   .tab-btn { font-size: 0.78rem; padding: 0.5rem 0.8rem; white-space: nowrap; flex-shrink: 0; }
 
   /* Bookkeeping page mobile */
-  #page-bookkeeping { overflow-x: hidden !important; }
+  #page-bookkeeping { overflow: hidden !important; max-width: 100vw !important; box-sizing: border-box !important; }
   #page-bookkeeping .gen-btn { font-size: 0.72rem !important; padding: 0.35rem 0.6rem !important; white-space: nowrap; }
   #page-bookkeeping .btn-sm { font-size: 0.68rem !important; padding: 0.25rem 0.45rem !important; white-space: nowrap; }
 
-  /* Grundbok toolbar: selects side by side, buttons wrap */
+  /* All bk containers within bounds */
+  #bkGrundbok, #bkHuvudbok, #bkResultat, #bkBalans, #bkMoms, #bkKonton,
+  #grundbokContent, .bk-mobile-cards {
+    width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; overflow: hidden !important;
+  }
+
+  /* Grundbok toolbar: selects side by side */
+  #bkGrundbok > div:first-child { width: 100% !important; box-sizing: border-box !important; }
   #bkGrundbok > div:first-child > div { margin-left: 0 !important; width: 100% !important; display: flex !important; gap: 0.4rem !important; flex-wrap: wrap !important; }
-  #bkGrundbok > div:first-child > select { width: calc(50% - 0.4rem) !important; }
+  #bkGrundbok > div:first-child > select { width: calc(50% - 0.4rem) !important; box-sizing: border-box !important; }
 
   /* Desktop table hidden, mobile cards shown */
   .bk-desktop-table { display: none !important; }
   .bk-mobile-cards { display: flex !important; }
+  .bk-card { max-width: 100% !important; }
 
   /* Other bk tabs */
   #bkHuvudbok select { max-width: 60vw !important; }
   #huvudbokContent { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  #resultatContent > div, #momsContent > div { max-width: 100% !important; box-sizing: border-box; }
+  #resultatContent > div, #momsContent > div { max-width: 100% !important; box-sizing: border-box !important; }
   #balansContent > div { grid-template-columns: 1fr !important; }
   #kontoplanContent { overflow-x: auto; }
 
@@ -784,7 +794,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   .ver-amount-line input, .ver-amount-line select { font-size: 0.78rem !important; padding: 0.4rem !important; }
 
   /* All pages - prevent horizontal overflow */
-  .app-page { overflow-x: hidden !important; }
+  .app-page { overflow: hidden !important; max-width: 100vw !important; box-sizing: border-box !important; }
 
   /* Invoice list - card layout on mobile */
   #invoiceContent .history-table { display: none !important; }
@@ -4512,10 +4522,11 @@ function renderGrundbok() {
       const accName = _bkAccounts.find(a => a.account_number === r.account_number)?.account_name || '';
       const d = parseFloat(r.debit) || 0;
       const c = parseFloat(r.credit) || 0;
-      html += `<div class="bk-card-row"><span>${r.account_number} ${accName}</span><span>${d > 0 ? fmt(d) + ' D' : fmt(c) + ' K'}</span></div>`;
+      const fmtShort = n => Number(n).toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      html += `<div class="bk-card-row"><span>${r.account_number} ${accName}</span><span>${d > 0 ? fmtShort(d) + ' D' : fmtShort(c) + ' K'}</span></div>`;
     });
     html += `</div>
-      <div class="bk-card-total"><span>Summa</span><span>${fmt(totalDebet)} kr</span></div>
+      <div class="bk-card-total"><span>Summa</span><span>${Number(totalDebet).toLocaleString('sv-SE', {minimumFractionDigits:0, maximumFractionDigits:0})} kr</span></div>
     </div>`;
   });
   html += '</div>';
