@@ -2327,21 +2327,43 @@ async function createManualInvoice() {
 
   const invoiceHtml = buildInvoiceHtml(info, invoiceData);
 
-  const { error } = await sb.from('invoices').insert({
-    user_id: currentUser.id,
-    invoice_number: null,
-    client_name: client,
-    title: title,
-    total_amount: total,
-    invoice_html: invoiceHtml,
-    status: 'draft',
-    due_date: due.toISOString().slice(0, 10),
-    payment_terms: payDays + ' dagar netto',
-    share_id: crypto.randomUUID(),
-    invoice_data: JSON.stringify({ items, vatRate, clientAddr, inclRot })
-  });
+  // Check if we're editing an existing draft
+  const editDraftId = document.getElementById('invEditDraftId')?.value;
 
-  if (error) { console.error(error); return alert('Kunde inte spara faktura.'); }
+  if (editDraftId) {
+    // Update existing draft
+    const { error } = await sb.from('invoices').update({
+      client_name: client,
+      title: title,
+      total_amount: total,
+      invoice_html: invoiceHtml,
+      due_date: due.toISOString().slice(0, 10),
+      payment_terms: payDays + ' dagar netto',
+      invoice_data: JSON.stringify({ items, vatRate, clientAddr, inclRot })
+    }).eq('id', editDraftId);
+    if (error) { console.error(error); return alert('Kunde inte uppdatera utkast.'); }
+    // Clean up
+    document.getElementById('invEditDraftId').value = '';
+    const submitBtn = document.querySelector('#newInvoiceModal .stripe-btn');
+    if (submitBtn) submitBtn.textContent = 'Skapa faktura →';
+  } else {
+    // Create new draft
+    const { error } = await sb.from('invoices').insert({
+      user_id: currentUser.id,
+      invoice_number: null,
+      client_name: client,
+      title: title,
+      total_amount: total,
+      invoice_html: invoiceHtml,
+      status: 'draft',
+      due_date: due.toISOString().slice(0, 10),
+      payment_terms: payDays + ' dagar netto',
+      share_id: crypto.randomUUID(),
+      invoice_data: JSON.stringify({ items, vatRate, clientAddr, inclRot })
+    });
+    if (error) { console.error(error); return alert('Kunde inte spara faktura.'); }
+  }
+
   closeNewInvoiceModal();
   showPage('invoices');
 }
@@ -2450,6 +2472,7 @@ function openInvoiceView(idx) {
     btns += '<button class="qt-btn" onclick="shareInvoiceEmail()"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></span> E-post</button>';
   }
   if (status === 'draft') {
+    btns += `<button class="qt-btn" onclick="editCurrentDraft()" style="background:var(--gold);color:white;border-color:var(--gold)">Redigera</button>`;
     btns += `<button class="qt-btn" style="background:#2e7d32;color:white;border-color:#2e7d32" onclick="confirmCurrentInvoice()">✓ Bekräfta & skicka</button>`;
     btns += `<button class="qt-btn" onclick="deleteCurrentInvoice()" style="color:#e05;border-color:#e05">✕ Ta bort utkast</button>`;
   }
@@ -2483,6 +2506,63 @@ function creditCurrentInvoice() {
 function closeInvoiceModal() {
   document.getElementById('invoiceModalOverlay').classList.remove('open');
   _currentInvoice = null;
+}
+
+async function editCurrentDraft() {
+  if (!_currentInvoice || _currentInvoice.status !== 'draft') return;
+  const inv = _currentInvoice;
+  closeInvoiceModal();
+
+  let invData = {};
+  try { invData = inv.invoice_data ? JSON.parse(inv.invoice_data) : {}; } catch(e) {}
+
+  openNewInvoiceModal();
+
+  // Fill in fields
+  document.getElementById('invClient').value = inv.client_name || '';
+  document.getElementById('invClientAddr').value = invData.clientAddr || '';
+  document.getElementById('invTitle').value = inv.title || '';
+  document.getElementById('invVat').value = String(invData.vatRate || 25);
+
+  const rotSelect = document.getElementById('invRot');
+  if (rotSelect) rotSelect.value = invData.inclRot ? '1' : '0';
+
+  const payTerms = inv.payment_terms || '30 dagar netto';
+  const daysMatch = payTerms.match(/(\d+)/);
+  if (daysMatch) {
+    const paySelect = document.getElementById('invPayTerms');
+    if (paySelect) paySelect.value = daysMatch[1];
+  }
+
+  // Populate rows using correct structure
+  const rowsContainer = document.getElementById('invRows');
+  if (rowsContainer && invData.items && invData.items.length > 0) {
+    rowsContainer.innerHTML = '';
+    invData.items.forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = 'inv-row-entry';
+      row.style.cssText = 'display:grid;grid-template-columns:2fr 0.7fr 1fr 30px;gap:0.5rem;margin-bottom:0.5rem;align-items:end';
+      row.innerHTML = `<div class="field" style="margin:0">${idx === 0 ? '<label style="font-size:0.7rem">Beskrivning</label>' : ''}<input class="inv-desc" value="${(item.desc || '').replace(/"/g, '&quot;')}" placeholder="Arbete..."></div>
+        <div class="field" style="margin:0">${idx === 0 ? '<label style="font-size:0.7rem">Antal</label>' : ''}<input class="inv-qty" type="number" value="${item.qty || 1}" min="1"></div>
+        <div class="field" style="margin:0">${idx === 0 ? '<label style="font-size:0.7rem">À-pris (kr)</label>' : ''}<input class="inv-price" type="number" value="${item.price || 0}" placeholder="0"></div>
+        ${idx > 0 ? '<button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:#c62828;font-size:1rem;padding-bottom:0.5rem">×</button>' : '<span></span>'}`;
+      rowsContainer.appendChild(row);
+    });
+  }
+
+  // Store draft ID for update instead of insert
+  let hiddenId = document.getElementById('invEditDraftId');
+  if (!hiddenId) {
+    hiddenId = document.createElement('input');
+    hiddenId.type = 'hidden';
+    hiddenId.id = 'invEditDraftId';
+    document.getElementById('newInvoiceModal').appendChild(hiddenId);
+  }
+  hiddenId.value = inv.id;
+
+  // Change button text
+  const submitBtn = document.querySelector('#newInvoiceModal .stripe-btn');
+  if (submitBtn) submitBtn.textContent = 'Spara utkast →';
 }
 
 async function toggleInvoicePaid() {
@@ -2842,7 +2922,7 @@ function openHistoryQuote(i) {
   try {
     const vatMatch = r.quote_html.match(/Moms\s*\((\d+)%\)/);
     const vatPct = vatMatch ? parseInt(vatMatch[1]) : 25;
-    const inclRot = r.quote_html.includes('tot-rot');
+    const inclRot = r.quote_html.includes('tot-rot') || r.quote_html.includes('rot-row') || r.quote_html.includes('ROT-avdrag');
     currentInfo = { ...(currentInfo || {}), vatPct, inclRot };
   } catch(e) { currentInfo = { ...(currentInfo || {}), vatPct: 25, inclRot: false }; }
 
