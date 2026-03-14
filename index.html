@@ -216,8 +216,8 @@ nav {
   font-size: 0.86rem; color: #999; cursor: pointer; transition: all 0.15s;
   margin-bottom: 1px;
 }
-.sidebar-item:hover { background: rgba(0,0,0,0.05); color: var(--ink); }
-.sidebar-item.active { background: var(--ink); color: var(--gold-light); font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.sidebar-item:hover { background: rgba(255,255,255,0.08); color: var(--gold-light); }
+.sidebar-item.active { background: rgba(184,144,46,0.15); color: var(--gold-light); font-weight: 600; border-left: 3px solid var(--gold); }
 .quota-box {
   margin-top: auto; background: #1a1a18; border-radius: 10px; padding: 1rem;
 }
@@ -618,6 +618,28 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   .history-table td:last-child .btn-sm,
   .history-table td:last-child .inv-mark-btn { font-size: 0.65rem !important; padding: 0.2rem 0.4rem !important; }
   .page-title { font-size: 1.4rem; }
+
+  /* Tabs on mobile - horizontal scroll */
+  .tab-bar { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap !important; }
+  .tab-btn { font-size: 0.78rem; padding: 0.5rem 0.8rem; white-space: nowrap; flex-shrink: 0; }
+
+  /* Bookkeeping page mobile */
+  #page-bookkeeping select { font-size: 0.8rem; padding: 0.4rem 0.5rem; min-width: 0; }
+  #page-bookkeeping .gen-btn { font-size: 0.75rem !important; padding: 0.4rem 0.7rem !important; }
+  #page-bookkeeping .btn-sm { font-size: 0.7rem !important; padding: 0.3rem 0.5rem !important; }
+  #bkGrundbok > div:first-child { gap: 0.4rem !important; }
+  #bkGrundbok .history-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #bkHuvudbok .history-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .chart-header { flex-direction: column; gap: 0.3rem; align-items: flex-start; }
+  #bkResultat > div, #bkBalans > div { overflow-x: auto; }
+  #bkBalans > div > div { grid-template-columns: 1fr !important; }
+
+  /* Verification modal mobile */
+  .ver-amount-line { grid-template-columns: 1fr 70px 60px 24px !important; gap: 0.3rem !important; }
+  .ver-amount-line input, .ver-amount-line select { font-size: 0.78rem !important; padding: 0.4rem !important; }
+
+  /* All pages - prevent horizontal overflow */
+  .app-page { overflow-x: hidden; }
 
   /* Invoice list - card layout on mobile */
   #invoiceContent .history-table { display: none !important; }
