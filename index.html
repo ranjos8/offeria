@@ -494,6 +494,124 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .faq-category { font-family: 'Fraunces', serif; font-size: 1rem; color: var(--ink); margin: 2rem 0 0.8rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--gold-light); }
 .faq-category:first-child { margin-top: 0; }
 
+/* ===== DEMO SECTION ===== */
+.demo-wrap { padding: 4rem 2rem; text-align: center; background: var(--cream); }
+.demo-phone {
+  max-width: 320px; margin: 2.5rem auto 0; background: var(--ink); border-radius: 32px;
+  padding: 12px; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+}
+.demo-notch {
+  width: 100px; height: 24px; background: var(--ink); border-radius: 0 0 14px 14px;
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 2;
+}
+.demo-screen {
+  background: white; border-radius: 22px; min-height: 380px; overflow: hidden;
+  position: relative;
+}
+.demo-step {
+  position: absolute; inset: 0; padding: 2.2rem 1.5rem 1.5rem;
+  display: flex; flex-direction: column; align-items: center;
+  opacity: 0; transform: translateX(40px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+  pointer-events: none;
+}
+.demo-step.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
+.demo-step.exit { opacity: 0; transform: translateX(-40px); }
+.ds-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gold); font-weight: 600; margin-bottom: 0.3rem; }
+.ds-title { font-family: 'Fraunces', serif; font-size: 1.05rem; margin-bottom: 1.2rem; color: var(--ink); }
+.ds-mockup { width: 100%; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+/* Step 1 - typing */
+.ds-input-mock {
+  width: 100%; background: var(--paper); border: 1.5px solid var(--border); border-radius: 10px;
+  padding: 0.9rem 1rem; text-align: left; font-size: 0.82rem; color: var(--ink);
+  min-height: 70px; margin-bottom: 0.8rem; position: relative; line-height: 1.6;
+}
+.ds-cursor { border-right: 2px solid var(--gold); animation: blink 0.8s step-end infinite; }
+@keyframes blink { 50% { border-color: transparent; } }
+.ds-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
+.ds-chip { font-size: 0.68rem; padding: 0.3rem 0.7rem; border-radius: 20px; background: white; border: 1px solid var(--border); color: #888; }
+.ds-chip.sel { background: var(--gold); color: white; border-color: var(--gold); }
+
+/* Step 2 - document */
+.ds-doc { width: 100%; background: white; border: 1px solid var(--border); border-radius: 10px; padding: 1rem; text-align: left; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.ds-doc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--gold-light); }
+.ds-doc-logo { width: 32px; height: 32px; border-radius: 6px; background: var(--cream); }
+.ds-doc-title-bar { width: 100px; height: 10px; background: var(--cream); border-radius: 4px; }
+.ds-doc-rows { margin-bottom: 0.8rem; }
+.ds-doc-row { display: flex; justify-content: space-between; padding: 0.45rem 0; border-bottom: 1px solid #f0ede6; }
+.ds-doc-row span:first-child { width: 60%; height: 8px; background: #e8e4da; border-radius: 3px; }
+.ds-doc-row span:last-child { width: 50px; height: 8px; background: #e8e4da; border-radius: 3px; }
+.ds-doc-row.reveal span { animation: rowReveal 0.4s ease forwards; }
+@keyframes rowReveal { from { width: 0; opacity: 0; } to { opacity: 1; } }
+.ds-doc-total { display: flex; justify-content: space-between; padding-top: 0.6rem; border-top: 2px solid var(--ink); font-size: 0.75rem; font-weight: 700; }
+.ds-amount { color: var(--gold); font-family: 'Fraunces', serif; font-size: 0.95rem; }
+
+/* Step 3 - share */
+.ds-share-btns { display: flex; gap: 0.8rem; }
+.ds-share-btn {
+  width: 72px; height: 72px; border-radius: 14px; background: var(--paper); border: 1.5px solid var(--border);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.3rem;
+  transition: transform 0.2s, border-color 0.2s;
+}
+.ds-share-btn svg { width: 22px; height: 22px; stroke: var(--ink); }
+.ds-share-btn span { font-size: 0.62rem; color: #888; }
+.ds-share-btn.pulse { transform: scale(1.08); border-color: var(--gold); }
+
+/* Step 4 - signature */
+.ds-sign-mock { text-align: center; }
+.ds-sign-check {
+  width: 52px; height: 52px; border-radius: 50%; background: #e8f5e9; color: #2e7d32;
+  display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700;
+  margin: 0 auto 0.8rem; opacity: 0; transform: scale(0.5);
+}
+.ds-sign-check.pop { animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+@keyframes popIn { to { opacity: 1; transform: scale(1); } }
+.ds-sign-text { font-weight: 700; color: #2e7d32; font-size: 0.9rem; margin-bottom: 0.5rem; }
+.ds-sign-name { font-size: 0.82rem; color: #555; }
+.ds-sign-date { font-size: 0.72rem; color: #999; margin-top: 0.15rem; }
+
+/* Step 5 - invoice */
+.ds-invoice-mock { width: 100%; text-align: left; }
+.ds-inv-badge {
+  display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.25rem 0.7rem;
+  background: var(--ink); color: white; border-radius: 5px; margin-bottom: 0.8rem;
+}
+.ds-inv-row { display: flex; justify-content: space-between; font-size: 0.78rem; padding: 0.4rem 0; border-bottom: 1px solid #f0ede6; color: #555; }
+.ds-inv-total { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; padding-top: 0.6rem; margin-top: 0.3rem; border-top: 2px solid var(--ink); }
+.ds-inv-status {
+  display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.6rem;
+  background: #e3f2fd; color: #1565c0; border-radius: 4px; margin-top: 0.7rem;
+}
+
+/* Step 6 - receipt */
+.ds-receipt-mock { display: flex; align-items: center; gap: 0.6rem; width: 100%; }
+.ds-receipt-img {
+  width: 60px; height: 72px; background: #f5f5f5; border-radius: 8px; border: 1px solid #ddd;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.ds-receipt-img svg { width: 26px; height: 26px; stroke: #999; }
+.ds-receipt-arrow { font-size: 1.2rem; color: var(--gold); font-weight: 700; flex-shrink: 0; }
+.ds-receipt-entry { flex: 1; text-align: left; }
+.ds-re-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: #2e7d32; font-weight: 600; margin-bottom: 0.4rem; }
+.ds-re-row { display: flex; gap: 0.5rem; font-size: 0.72rem; padding: 0.25rem 0; color: #555; }
+.ds-re-row span:first-child { font-weight: 700; color: var(--ink); min-width: 30px; }
+.ds-re-row span:last-child { margin-left: auto; font-weight: 600; }
+
+/* Demo dots */
+.demo-dots { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem; padding-bottom: 0.3rem; }
+.demo-dot {
+  width: 10px; height: 10px; border-radius: 50%; background: #555; cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.demo-dot.active { background: var(--gold); transform: scale(1.3); }
+
+@media (max-width: 640px) {
+  .demo-phone { max-width: 280px; }
+  .demo-screen { min-height: 340px; }
+  .ds-title { font-size: 0.95rem; }
+}
+
 /* invoice */
 .inv-status { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.18rem 0.6rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.06em; }
 .inv-status.unpaid { background: #fff8e1; color: #b8902e; }
@@ -770,6 +888,117 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <button class="btn-hero-sec" onclick="document.getElementById('pricingSection').scrollIntoView({behavior:'smooth'})">Se priser</button>
     </div>
   </section>
+
+  <!-- ANIMATED DEMO -->
+  <div class="demo-wrap" id="demoSection">
+    <div class="eyebrow">Så fungerar det</div>
+    <div class="section-h">Från jobbeskrivning till bokfört — på sekunder</div>
+    <div class="demo-phone">
+      <div class="demo-notch"></div>
+      <div class="demo-screen" id="demoScreen">
+        <!-- Step 1: Describe job -->
+        <div class="demo-step active" id="ds1">
+          <div class="ds-label">Steg 1</div>
+          <div class="ds-title">Beskriv jobbet</div>
+          <div class="ds-mockup">
+            <div class="ds-input-mock">
+              <span class="ds-cursor" id="dsCursor1"></span>
+            </div>
+            <div class="ds-chips">
+              <span class="ds-chip">Bygg &amp; snickeri</span>
+              <span class="ds-chip sel">VVS</span>
+              <span class="ds-chip">El</span>
+            </div>
+          </div>
+        </div>
+        <!-- Step 2: AI generates -->
+        <div class="demo-step" id="ds2">
+          <div class="ds-label">Steg 2</div>
+          <div class="ds-title">AI skapar offerten</div>
+          <div class="ds-mockup">
+            <div class="ds-doc">
+              <div class="ds-doc-header">
+                <div class="ds-doc-logo"></div>
+                <div class="ds-doc-title-bar"></div>
+              </div>
+              <div class="ds-doc-rows">
+                <div class="ds-doc-row"><span></span><span></span></div>
+                <div class="ds-doc-row"><span></span><span></span></div>
+                <div class="ds-doc-row"><span></span><span></span></div>
+              </div>
+              <div class="ds-doc-total"><span>Totalt inkl. moms</span><span class="ds-amount">24 800 kr</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- Step 3: Send -->
+        <div class="demo-step" id="ds3">
+          <div class="ds-label">Steg 3</div>
+          <div class="ds-title">Skicka till kund</div>
+          <div class="ds-mockup">
+            <div class="ds-share-btns">
+              <div class="ds-share-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg><span>E-post</span></div>
+              <div class="ds-share-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg><span>Länk</span></div>
+              <div class="ds-share-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>PDF</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- Step 4: Customer signs -->
+        <div class="demo-step" id="ds4">
+          <div class="ds-label">Steg 4</div>
+          <div class="ds-title">Kund signerar</div>
+          <div class="ds-mockup">
+            <div class="ds-sign-mock">
+              <div class="ds-sign-check">✓</div>
+              <div class="ds-sign-text">Offerten godkänd</div>
+              <div class="ds-sign-name">Erik Svensson</div>
+              <div class="ds-sign-date">14 mars 2026, 10:32</div>
+            </div>
+          </div>
+        </div>
+        <!-- Step 5: Invoice -->
+        <div class="demo-step" id="ds5">
+          <div class="ds-label">Steg 5</div>
+          <div class="ds-title">Fakturera med ett klick</div>
+          <div class="ds-mockup">
+            <div class="ds-invoice-mock">
+              <div class="ds-inv-badge">FA-1024</div>
+              <div class="ds-inv-row"><span>Byte av blandare kök</span><span>4 200 kr</span></div>
+              <div class="ds-inv-row"><span>Material (Mora MMIX)</span><span>3 800 kr</span></div>
+              <div class="ds-inv-total"><span>Att betala</span><span>10 000 kr</span></div>
+              <div class="ds-inv-status">Skickad</div>
+            </div>
+          </div>
+        </div>
+        <!-- Step 6: Receipt & bookkeeping -->
+        <div class="demo-step" id="ds6">
+          <div class="ds-label">Steg 6</div>
+          <div class="ds-title">Fota kvitto — bokfört</div>
+          <div class="ds-mockup">
+            <div class="ds-receipt-mock">
+              <div class="ds-receipt-img">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+              <div class="ds-receipt-arrow">→</div>
+              <div class="ds-receipt-entry">
+                <div class="ds-re-label">Automatiskt bokförd</div>
+                <div class="ds-re-row"><span>5010</span><span>Material</span><span>3 040 kr</span></div>
+                <div class="ds-re-row"><span>2640</span><span>Moms</span><span>760 kr</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Progress dots -->
+      <div class="demo-dots">
+        <span class="demo-dot active" onclick="goDemo(0)"></span>
+        <span class="demo-dot" onclick="goDemo(1)"></span>
+        <span class="demo-dot" onclick="goDemo(2)"></span>
+        <span class="demo-dot" onclick="goDemo(3)"></span>
+        <span class="demo-dot" onclick="goDemo(4)"></span>
+        <span class="demo-dot" onclick="goDemo(5)"></span>
+      </div>
+    </div>
+  </div>
 
   <div class="pricing-wrap" id="pricingSection">
     <div class="pricing-inner">
@@ -2796,6 +3025,96 @@ function toggleMobileMenu() {
 function toggleFaq(el) {
   const item = el.parentElement;
   item.classList.toggle('open');
+}
+
+// ===== DEMO ANIMATION =====
+let _demoStep = 0;
+let _demoTimer = null;
+let _demoTyping = null;
+
+function goDemo(idx) {
+  const steps = document.querySelectorAll('.demo-step');
+  const dots = document.querySelectorAll('.demo-dot');
+  if (!steps.length) return;
+
+  // Exit current
+  steps[_demoStep]?.classList.remove('active');
+  steps[_demoStep]?.classList.add('exit');
+
+  _demoStep = idx;
+
+  // Enter new
+  setTimeout(() => {
+    steps.forEach(s => { s.classList.remove('active', 'exit'); });
+    steps[_demoStep]?.classList.add('active');
+    dots.forEach((d, i) => d.classList.toggle('active', i === _demoStep));
+    triggerStepAnimation(_demoStep);
+  }, 200);
+
+  // Reset auto-advance timer
+  clearInterval(_demoTimer);
+  _demoTimer = setInterval(() => goDemo((_demoStep + 1) % 6), 4500);
+}
+
+function triggerStepAnimation(idx) {
+  if (idx === 0) startTypingAnimation();
+  if (idx === 1) animateDocRows();
+  if (idx === 2) animateShareBtns();
+  if (idx === 3) { const ck = document.querySelector('.ds-sign-check'); if (ck) { ck.classList.remove('pop'); void ck.offsetWidth; ck.classList.add('pop'); } }
+}
+
+function startTypingAnimation() {
+  clearInterval(_demoTyping);
+  const cursor = document.getElementById('dsCursor1');
+  if (!cursor) return;
+  const text = 'Byta blandare i kök, Mora MMIX, inkl. material och arbete';
+  let i = 0;
+  cursor.parentElement.innerHTML = '<span class="ds-cursor" id="dsCursor1"></span>';
+  const c2 = document.getElementById('dsCursor1');
+  _demoTyping = setInterval(() => {
+    if (i < text.length) {
+      c2.insertAdjacentText('beforebegin', text[i]);
+      i++;
+    } else {
+      clearInterval(_demoTyping);
+    }
+  }, 45);
+}
+
+function animateDocRows() {
+  document.querySelectorAll('.ds-doc-row').forEach((r, i) => {
+    r.querySelectorAll('span').forEach(s => { s.classList.remove('reveal'); });
+    setTimeout(() => {
+      r.querySelectorAll('span').forEach(s => s.classList.add('reveal'));
+    }, i * 250);
+  });
+}
+
+function animateShareBtns() {
+  document.querySelectorAll('.ds-share-btn').forEach((btn, i) => {
+    btn.classList.remove('pulse');
+    setTimeout(() => { btn.classList.add('pulse'); setTimeout(() => btn.classList.remove('pulse'), 600); }, i * 300);
+  });
+}
+
+// Start demo when section is visible
+function initDemoObserver() {
+  const demoEl = document.getElementById('demoSection');
+  if (!demoEl || !('IntersectionObserver' in window)) return;
+  let started = false;
+  const obs = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && !started) {
+      started = true;
+      goDemo(0);
+    }
+  }, { threshold: 0.3 });
+  obs.observe(demoEl);
+}
+// Init on page load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDemoObserver);
+} else {
+  initDemoObserver();
 }
 
 function dismissWelcome() {
