@@ -1656,6 +1656,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
               <option value="q3">Jul–Sep (Q3)</option><option value="q4">Okt–Dec (Q4)</option>
               <option value="all">Helår</option>
             </select>
+            <button onclick="exportSRU()" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem;margin-left:auto" title="Exportera SRU-fil för Skatteverket"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> SRU-export</button>
           </div>
           <div id="momsContent"></div>
         </div>
@@ -5005,29 +5006,154 @@ async function renderMoms() {
 
   const { data: allRows } = await sb.from('verification_rows').select('*, verifications!inner(verification_date)').eq('user_id', currentUser.id);
   const filtered = (allRows || []).filter(r => r.verifications?.verification_date >= startD && r.verifications?.verification_date <= endD);
+
+  // Build account saldos (credit - debit for skuld/intäkts-konton)
   const saldo = {};
   filtered.forEach(r => {
     if (!saldo[r.account_number]) saldo[r.account_number] = 0;
     saldo[r.account_number] += (parseFloat(r.credit) || 0) - (parseFloat(r.debit) || 0);
   });
-  const fmt = n => Number(n).toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+  // Compute base amounts (excl. moms) from revenue accounts
+  const rev25 = saldo['3010'] || 0; // Försäljning 25%
+  const rev12 = saldo['3020'] || 0; // Försäljning 12%
+  const rev6  = saldo['3030'] || 0; // Försäljning 6%
+  const rev0  = saldo['3040'] || 0; // Momsfri försäljning
+
+  // Moms amounts from moms accounts
   const utgMoms25 = saldo['2610'] || 0;
   const utgMoms12 = saldo['2620'] || 0;
   const utgMoms6  = saldo['2630'] || 0;
-  const ingMoms   = -(saldo['2640'] || 0);
+  const ingMoms   = -(saldo['2640'] || 0); // Sign flip (debit = positive)
+
   const totalUtg = utgMoms25 + utgMoms12 + utgMoms6;
   const momsAttBetala = totalUtg - ingMoms;
 
-  let html = '<div style="background:white;border:1px solid var(--border);border-radius:12px;padding:1.5rem;max-width:500px">';
-  html += '<div style="font-weight:700;font-size:0.9rem;margin-bottom:1rem;border-bottom:2px solid var(--ink);padding-bottom:0.4rem">MOMSRAPPORT</div>';
-  html += `<div style="display:flex;justify-content:space-between;padding:0.4rem 0;font-size:0.88rem"><span>Utgående moms 25%</span><span>${fmt(utgMoms25)} kr</span></div>`;
-  html += `<div style="display:flex;justify-content:space-between;padding:0.4rem 0;font-size:0.88rem"><span>Utgående moms 12%</span><span>${fmt(utgMoms12)} kr</span></div>`;
-  html += `<div style="display:flex;justify-content:space-between;padding:0.4rem 0;font-size:0.88rem"><span>Utgående moms 6%</span><span>${fmt(utgMoms6)} kr</span></div>`;
-  html += `<div style="display:flex;justify-content:space-between;padding:0.4rem 0;font-weight:600;border-top:1px solid var(--border);margin-top:0.3rem"><span>Summa utgående moms</span><span>${fmt(totalUtg)} kr</span></div>`;
-  html += `<div style="display:flex;justify-content:space-between;padding:0.6rem 0;font-size:0.88rem;color:#2e7d32"><span>Ingående moms (avdrag)</span><span>- ${fmt(ingMoms)} kr</span></div>`;
-  html += `<div style="display:flex;justify-content:space-between;padding:0.6rem 0;font-weight:700;font-size:1.05rem;border-top:2px solid var(--ink);margin-top:0.3rem;color:${momsAttBetala >= 0 ? '#c62828' : '#2e7d32'}"><span>${momsAttBetala >= 0 ? 'Moms att betala' : 'Moms att få tillbaka'}</span><span>${fmt(Math.abs(momsAttBetala))} kr</span></div>`;
+  const fmt = n => Number(Math.round(n)).toLocaleString('sv-SE');
+  const fmtRaw = n => Math.round(n);
+
+  // Store for SRU export
+  window._momsData = {
+    yr, period, sm, em,
+    rev25: fmtRaw(rev25), rev12: fmtRaw(rev12), rev6: fmtRaw(rev6), rev0: fmtRaw(rev0),
+    utgMoms25: fmtRaw(utgMoms25), utgMoms12: fmtRaw(utgMoms12), utgMoms6: fmtRaw(utgMoms6),
+    ingMoms: fmtRaw(ingMoms), momsAttBetala: fmtRaw(momsAttBetala)
+  };
+
+  const periodLabel = { q1: 'Januari–Mars', q2: 'April–Juni', q3: 'Juli–September', q4: 'Oktober–December', all: 'Helår' }[period] || period;
+
+  let html = '<div style="background:white;border:1px solid var(--border);border-radius:12px;padding:1.5rem;max-width:560px;box-sizing:border-box;width:100%">';
+
+  // Header
+  html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:0.6rem;border-bottom:2px solid var(--ink)">
+    <div><div style="font-weight:700;font-size:0.95rem">MOMSDEKLARATION</div>
+    <div style="font-size:0.75rem;color:#888">SKV 4700 · ${periodLabel} ${yr}</div></div>
+    <div style="font-size:0.65rem;color:#999;text-align:right">Offeria<br>${currentProfile?.company_name || ''}<br>${currentProfile?.org_number || ''}</div>
+  </div>`;
+
+  // Section: Momspliktig försäljning
+  html += '<div style="font-weight:600;font-size:0.78rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.5rem">A. Momspliktig försäljning</div>';
+  const rowStyle = 'display:flex;justify-content:space-between;padding:0.35rem 0;font-size:0.85rem;border-bottom:1px solid #f0ede6';
+  const rutaStyle = 'font-size:0.65rem;background:var(--cream);color:var(--gold);padding:0.1rem 0.4rem;border-radius:3px;margin-right:0.5rem;font-weight:600';
+
+  html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">05</span>Försäljning 25%</span><span>${fmt(rev25)} kr</span></div>`;
+  html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">06</span>Försäljning 12%</span><span>${fmt(rev12)} kr</span></div>`;
+  html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">07</span>Försäljning 6%</span><span>${fmt(rev6)} kr</span></div>`;
+  html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">08</span>Momsfri försäljning</span><span>${fmt(rev0)} kr</span></div>`;
+
+  // Section: Utgående moms
+  html += '<div style="font-weight:600;font-size:0.78rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;margin:1rem 0 0.5rem">B. Utgående moms</div>';
+  html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">10</span>Utgående moms 25%</span><span>${fmt(utgMoms25)} kr</span></div>`;
+  html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">11</span>Utgående moms 12%</span><span>${fmt(utgMoms12)} kr</span></div>`;
+  html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">12</span>Utgående moms 6%</span><span>${fmt(utgMoms6)} kr</span></div>`;
+
+  // Section: Ingående moms
+  html += '<div style="font-weight:600;font-size:0.78rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;margin:1rem 0 0.5rem">C. Ingående moms</div>';
+  html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">48</span>Ingående moms att dra av</span><span style="color:#2e7d32">${fmt(ingMoms)} kr</span></div>`;
+
+  // Summary
+  html += `<div style="display:flex;justify-content:space-between;padding:0.8rem 0;font-weight:700;font-size:1.05rem;border-top:2px solid var(--ink);margin-top:1rem;color:${momsAttBetala >= 0 ? '#c62828' : '#2e7d32'}">
+    <span><span style="${rutaStyle}">49</span>${momsAttBetala >= 0 ? 'Moms att betala' : 'Moms att få tillbaka'}</span><span>${fmt(Math.abs(momsAttBetala))} kr</span>
+  </div>`;
+
+  // Info footer
+  html += `<div style="margin-top:1rem;padding:0.8rem;background:var(--cream);border-radius:8px;font-size:0.73rem;color:#888;line-height:1.6">
+    <strong style="color:var(--ink)">Nästa steg:</strong> Logga in på <a href="https://www.skatteverket.se" target="_blank" style="color:var(--gold)">skatteverket.se</a> och fyll i rutorna ovan i din momsdeklaration, eller klicka <strong>SRU-export</strong> för att ladda ner en fil som kan importeras direkt.
+  </div>`;
+
   html += '</div>';
   document.getElementById('momsContent').innerHTML = html;
+}
+
+// ===== SRU EXPORT (Skatteverket) =====
+function exportSRU() {
+  const d = window._momsData;
+  if (!d) { alert('Generera momsrapporten först.'); return; }
+  const p = currentProfile || {};
+  const orgNr = (p.org_number || '').replace(/\D/g, '');
+  if (!orgNr || orgNr.length < 10) {
+    alert('Fyll i organisationsnummer i Företagsprofil för att kunna exportera SRU-fil.');
+    return;
+  }
+
+  // Period mapping for SRU
+  const periodMap = {
+    q1: { from: d.yr + '01', tom: d.yr + '03' },
+    q2: { from: d.yr + '04', tom: d.yr + '06' },
+    q3: { from: d.yr + '07', tom: d.yr + '09' },
+    q4: { from: d.yr + '10', tom: d.yr + '12' },
+    all: { from: d.yr + '01', tom: d.yr + '12' }
+  };
+  const per = periodMap[d.period] || periodMap.all;
+
+  // SRU file format (Skatteverket specification)
+  // INFO.SRU header
+  let infoSru = '';
+  infoSru += '#DATABESKRIVNING_START\n';
+  infoSru += '#PRODUKT SRU\n';
+  infoSru += '#MEDIESSION 1\n';
+  infoSru += '#FILNAMN BLANKETTER.SRU\n';
+  infoSru += '#DATABESKRIVNING_SLUT\n';
+  infoSru += '#MEDESSION 1\n';
+
+  // BLANKETTER.SRU
+  let blankSru = '';
+  blankSru += '#BLANKETT SKV4700\n';
+  blankSru += '#IDENTITET ' + orgNr + ' ' + per.from + ' ' + per.tom + '\n';
+  blankSru += '#UPPGIFT 7011 ' + per.from + '\n'; // Period from
+  blankSru += '#UPPGIFT 7012 ' + per.tom + '\n'; // Period to
+
+  // Ruta 05: Försäljning 25%
+  if (d.rev25 !== 0) blankSru += '#UPPGIFT 6600 ' + d.rev25 + '\n';
+  // Ruta 06: Försäljning 12%
+  if (d.rev12 !== 0) blankSru += '#UPPGIFT 6601 ' + d.rev12 + '\n';
+  // Ruta 07: Försäljning 6%
+  if (d.rev6 !== 0) blankSru += '#UPPGIFT 6602 ' + d.rev6 + '\n';
+  // Ruta 08: Momsfri försäljning
+  if (d.rev0 !== 0) blankSru += '#UPPGIFT 6603 ' + d.rev0 + '\n';
+  // Ruta 10: Utgående moms 25%
+  if (d.utgMoms25 !== 0) blankSru += '#UPPGIFT 6608 ' + d.utgMoms25 + '\n';
+  // Ruta 11: Utgående moms 12%
+  if (d.utgMoms12 !== 0) blankSru += '#UPPGIFT 6609 ' + d.utgMoms12 + '\n';
+  // Ruta 12: Utgående moms 6%
+  if (d.utgMoms6 !== 0) blankSru += '#UPPGIFT 6610 ' + d.utgMoms6 + '\n';
+  // Ruta 48: Ingående moms
+  if (d.ingMoms !== 0) blankSru += '#UPPGIFT 6636 ' + d.ingMoms + '\n';
+  // Ruta 49: Moms att betala/tillbaka
+  blankSru += '#UPPGIFT 6637 ' + d.momsAttBetala + '\n';
+
+  blankSru += '#BLANKETTSLUT\n';
+  blankSru += '#FIL_SLUT\n';
+
+  // Download BLANKETTER.SRU
+  const blob = new Blob([blankSru], { type: 'text/plain;charset=iso-8859-1' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const periodName = { q1: 'Q1', q2: 'Q2', q3: 'Q3', q4: 'Q4', all: 'HELAR' }[d.period] || '';
+  a.download = `BLANKETTER_SKV4700_${d.yr}_${periodName}.SRU`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ===== KONTOPLAN =====
