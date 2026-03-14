@@ -742,14 +742,31 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   .tab-btn { font-size: 0.78rem; padding: 0.5rem 0.8rem; white-space: nowrap; flex-shrink: 0; }
 
   /* Bookkeeping page mobile */
-  #page-bookkeeping select { font-size: 0.8rem; padding: 0.4rem 0.5rem; min-width: 0; }
-  #page-bookkeeping .gen-btn { font-size: 0.75rem !important; padding: 0.4rem 0.7rem !important; }
-  #page-bookkeeping .btn-sm { font-size: 0.7rem !important; padding: 0.3rem 0.5rem !important; }
-  #bkGrundbok > div:first-child { gap: 0.4rem !important; }
-  #bkGrundbok .history-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  #bkHuvudbok .history-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .chart-header { flex-direction: column; gap: 0.3rem; align-items: flex-start; }
-  #bkResultat > div, #bkBalans > div { overflow-x: auto; }
+  #page-bookkeeping { overflow-x: hidden !important; }
+  #page-bookkeeping select { font-size: 0.8rem; padding: 0.4rem 0.5rem; min-width: 0 !important; max-width: 100%; }
+  #page-bookkeeping .gen-btn { font-size: 0.72rem !important; padding: 0.35rem 0.6rem !important; }
+  #page-bookkeeping .btn-sm { font-size: 0.68rem !important; padding: 0.25rem 0.45rem !important; }
+
+  /* Grundbok toolbar — stack vertically on mobile */
+  #bkGrundbok > div:first-child {
+    gap: 0.4rem !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+  }
+  #bkGrundbok > div:first-child > div { margin-left: 0 !important; width: 100%; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  #bkGrundbok > div:first-child select { flex: 0 1 auto; min-width: 0; }
+  #bkGrundbok > div:first-child .gen-btn { flex: 0 1 auto; white-space: nowrap; }
+
+  /* All bk content areas — prevent overflow */
+  #bkGrundbok, #bkHuvudbok, #bkResultat, #bkBalans, #bkMoms, #bkKonton {
+    max-width: 100%; overflow-x: hidden; box-sizing: border-box;
+  }
+  /* Tables scroll horizontally */
+  #grundbokContent, #huvudbokContent, #bkResultat > div:last-child, #bkBalans > div:last-child, #bkMomsContent {
+    overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%;
+  }
+  #bkGrundbok .history-table, #bkHuvudbok .history-table { min-width: 500px; }
+  #bkHbAccount { min-width: 0 !important; max-width: 60vw; }
   #bkBalans > div > div { grid-template-columns: 1fr !important; }
 
   /* Verification modal mobile */
@@ -757,7 +774,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   .ver-amount-line input, .ver-amount-line select { font-size: 0.78rem !important; padding: 0.4rem !important; }
 
   /* All pages - prevent horizontal overflow */
-  .app-page { overflow-x: hidden; }
+  .app-page { overflow-x: hidden !important; }
 
   /* Invoice list - card layout on mobile */
   #invoiceContent .history-table { display: none !important; }
@@ -1587,7 +1604,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <!-- HUVUDBOK (per konto) -->
         <div id="bkHuvudbok" style="display:none">
           <div style="display:flex;gap:0.8rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
-            <select id="bkHbAccount" onchange="renderHuvudbok()" style="padding:0.5rem 0.8rem;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem;min-width:250px"></select>
+            <select id="bkHbAccount" onchange="renderHuvudbok()" style="padding:0.5rem 0.8rem;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem;min-width:200px;max-width:100%"></select>
             <select id="bkHbYear" onchange="renderHuvudbok()" style="padding:0.5rem 0.8rem;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem"></select>
           </div>
           <div id="huvudbokContent"></div>
@@ -1626,7 +1643,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <!-- KONTOPLAN -->
         <div id="bkKonton" style="display:none">
           <div style="display:flex;gap:0.8rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
-            <input id="bkAccountSearch" type="text" placeholder="Sök konto..." oninput="renderKontoplan()" style="flex:1;min-width:200px;padding:0.5rem 0.8rem;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem">
+            <input id="bkAccountSearch" type="text" placeholder="Sök konto..." oninput="renderKontoplan()" style="flex:1;min-width:0;padding:0.5rem 0.8rem;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem">
           </div>
           <div id="kontoplanContent"></div>
         </div>
