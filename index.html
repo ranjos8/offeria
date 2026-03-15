@@ -1581,6 +1581,54 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
               <div id="logoInfoMsg" style="display:none;margin-top:0.6rem;padding:0.6rem 0.9rem;border-radius:8px;font-size:0.8rem;line-height:1.5"></div>
             </div>
           </div>
+
+          <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+            <div class="card-label">
+              <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2-2v16"/><path d="M22 11l-10 6-10-6"/></svg></span> Automatiska påminnelser
+              <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Schemalagda e-postpåminnelser för förfallna fakturor</span>
+            </div>
+            <div style="background:var(--cream);border-left:3px solid var(--teal);padding:1rem;border-radius:6px;margin-bottom:1rem">
+              <div style="font-size:0.82rem;line-height:1.6">
+                <strong>Så fungerar det:</strong> Systemet skickar automatiskt e-postpåminnelser till kunder med förfallna fakturor enligt schemat nedan. Påminnelseavgift 60 kr läggs till från 2:a påminnelsen.
+              </div>
+            </div>
+            <div style="margin-bottom:1rem">
+              <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;font-weight:600;margin-bottom:0.8rem">
+                <input type="checkbox" id="pReminderEnabled" onchange="toggleReminderSettings()" style="width:18px;height:18px;cursor:pointer">
+                <span>Aktivera automatiska påminnelser</span>
+              </label>
+            </div>
+            <div id="reminderSettingsPanel" style="display:none">
+              <div class="field" style="margin-bottom:1rem">
+                <label>Schema (dagar efter förfallodatum)</label>
+                <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:0.5rem">
+                  <label style="display:flex;align-items:center;gap:0.4rem;padding:0.5rem 0.9rem;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;background:white">
+                    <input type="checkbox" class="reminder-day-checkbox" value="7" checked>
+                    <span style="font-size:0.85rem">7 dagar</span>
+                  </label>
+                  <label style="display:flex;align-items:center;gap:0.4rem;padding:0.5rem 0.9rem;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;background:white">
+                    <input type="checkbox" class="reminder-day-checkbox" value="14" checked>
+                    <span style="font-size:0.85rem">14 dagar</span>
+                  </label>
+                  <label style="display:flex;align-items:center;gap:0.4rem;padding:0.5rem 0.9rem;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;background:white">
+                    <input type="checkbox" class="reminder-day-checkbox" value="21">
+                    <span style="font-size:0.85rem">21 dagar</span>
+                  </label>
+                  <label style="display:flex;align-items:center;gap:0.4rem;padding:0.5rem 0.9rem;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;background:white">
+                    <input type="checkbox" class="reminder-day-checkbox" value="30" checked>
+                    <span style="font-size:0.85rem">30 dagar</span>
+                  </label>
+                </div>
+                <div style="font-size:0.75rem;color:#888;margin-top:0.5rem">
+                  Välj efter hur många dagar påminnelser ska skickas. Minst 7 dagar mellan varje påminnelse.
+                </div>
+              </div>
+              <div style="background:#fff8f0;border:1px solid #ffe0b2;padding:0.9rem;border-radius:6px;font-size:0.8rem;color:#e65100">
+                <strong>⚠️ Kom ihåg:</strong> E-postpåminnelser skickas automatiskt från <strong>invoices@offeria.se</strong>. Kunder kan svara direkt till din e-post. Påminnelser skickas kl. 10:00 varje dag för fakturor som uppfyller schemat.
+              </div>
+            </div>
+          </div>
+
           <div style="margin-top:1.2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.8rem">
             <div style="display:flex;align-items:center;gap:0.8rem">
               <button class="save-btn" onclick="saveProfile()">Spara profil</button>
@@ -1657,6 +1705,20 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <div class="dash-card-wide" style="margin-top:1rem">
           <div class="card-label">Att göra</div>
           <div id="dashTodoList" style="margin-top:0.5rem"><div style="padding:1rem;color:#aaa;font-size:0.85rem">Laddar...</div></div>
+        </div>
+
+        <!-- Row 5: Upcoming Reminders -->
+        <div class="dash-card-wide" style="margin-top:1rem">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem">
+            <div class="card-label">
+              <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2-2v16"/><path d="M22 11l-10 6-10-6"/></svg></span>
+              Kommande påminnelser
+            </div>
+            <a onclick="showPage('profile')" style="font-size:0.75rem;color:var(--gold);cursor:pointer;text-decoration:underline">Inställningar</a>
+          </div>
+          <div id="dashRemindersList" style="margin-top:0.5rem">
+            <div style="padding:1rem;color:#aaa;font-size:0.85rem">Laddar...</div>
+          </div>
         </div>
       </div>
 
@@ -2165,6 +2227,7 @@ function fillProfileForm(profile) {
   document.getElementById('pCertifications').value = profile.certifications || '';
   document.getElementById('pPaymentMethods').value = profile.payment_methods || '';
   document.getElementById('pWarranty').value = profile.warranty_text || '';
+  
   // Fill industry chips
   const industries = profile.industries ? JSON.parse(profile.industries) : [];
   document.querySelectorAll('#profileIndustryChips input[type=checkbox]').forEach(cb => {
@@ -2172,6 +2235,21 @@ function fillProfileForm(profile) {
     cb.checked = on;
     cb.closest('.chip').classList.toggle('on', on);
   });
+  
+  // Fill reminder settings
+  const reminderEnabled = profile.reminder_enabled !== false; // Default true
+  const reminderDays = profile.reminder_days_schedule ? JSON.parse(profile.reminder_days_schedule) : [7, 14, 30];
+  
+  const reminderCheckbox = document.getElementById('pReminderEnabled');
+  if (reminderCheckbox) {
+    reminderCheckbox.checked = reminderEnabled;
+    toggleReminderSettings();
+  }
+  
+  document.querySelectorAll('.reminder-day-checkbox').forEach(cb => {
+    cb.checked = reminderDays.includes(parseInt(cb.value));
+  });
+  
   // Pre-select defaults on generate page
   if (profile.default_vat) document.getElementById('vatRate').value = profile.default_vat;
   if (profile.default_pay_terms) document.getElementById('payTerms').value = profile.default_pay_terms;
@@ -2179,6 +2257,12 @@ function fillProfileForm(profile) {
     const sel = document.getElementById('industry');
     if (sel && industries.includes(sel.value) === false) sel.value = industries[0];
   }
+}
+
+function toggleReminderSettings() {
+  const enabled = document.getElementById('pReminderEnabled')?.checked;
+  const panel = document.getElementById('reminderSettingsPanel');
+  if (panel) panel.style.display = enabled ? 'block' : 'none';
 }
 
 function toggleProfileChip(id, cb) {
@@ -2190,6 +2274,11 @@ async function saveProfile() {
   btn.textContent = 'Sparar...';
   btn.disabled = true;
   const selectedIndustries = [...document.querySelectorAll('#profileIndustryChips input[type=checkbox]:checked')].map(cb => cb.value);
+  
+  // Get reminder settings
+  const reminderEnabled = document.getElementById('pReminderEnabled')?.checked || false;
+  const reminderDays = [...document.querySelectorAll('.reminder-day-checkbox:checked')].map(cb => parseInt(cb.value));
+  
   const updates = {
     company_name: document.getElementById('pCompany').value.trim(),
     org_number: document.getElementById('pOrg').value.trim(),
@@ -2209,6 +2298,8 @@ async function saveProfile() {
     payment_methods: document.getElementById('pPaymentMethods').value.trim(),
     warranty_text: document.getElementById('pWarranty').value.trim(),
     industries: JSON.stringify(selectedIndustries),
+    reminder_enabled: reminderEnabled,
+    reminder_days_schedule: JSON.stringify(reminderDays.length > 0 ? reminderDays.sort((a,b) => a-b) : [7, 14, 30])
   };
   const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
   if (error) {
@@ -4263,6 +4354,9 @@ async function loadDashboard() {
     window._chartYear = window._chartYear || yr;
     renderCharts();
 
+    // === KOMMANDE PÅMINNELSER ===
+    loadUpcomingReminders();
+
   } catch(e) { console.error('Dashboard error:', e); }
 }
 
@@ -4336,6 +4430,309 @@ function renderCharts() {
       <div class="chart-bar-label">${monthNames[i]}</div>
     </div>`;
   }).join('');
+}
+
+// ===== UPCOMING REMINDERS =====
+async function loadUpcomingReminders() {
+  if (!currentUser || !currentProfile) return;
+  
+  const reminderEl = document.getElementById('dashRemindersList');
+  if (!reminderEl) return;
+  
+  // Check if reminders are enabled
+  if (currentProfile.reminder_enabled === false) {
+    reminderEl.innerHTML = `
+      <div style="padding:1rem;background:var(--cream);border-radius:8px;border-left:3px solid #ccc">
+        <div style="font-size:0.85rem;color:#666;line-height:1.6">
+          Automatiska påminnelser är inaktiverade. 
+          <a onclick="showPage('profile')" style="color:var(--gold);font-weight:600;cursor:pointer;text-decoration:underline">Aktivera i inställningar</a>
+        </div>
+      </div>
+    `;
+    return;
+  }
+  
+  const today = new Date().toISOString().slice(0, 10);
+  const reminderSchedule = currentProfile.reminder_days_schedule 
+    ? JSON.parse(currentProfile.reminder_days_schedule) 
+    : [7, 14, 30];
+  
+  // Fetch overdue invoices
+  const { data: overdueInvoices } = await sb.from('invoices')
+    .select('id, invoice_number, client_name, invoice_data, total_amount, due_date, reminder_count, last_reminder_at, reminder_fee')
+    .eq('user_id', currentUser.id)
+    .eq('status', 'sent')
+    .lt('due_date', today)
+    .order('due_date', { ascending: true });
+  
+  if (!overdueInvoices || overdueInvoices.length === 0) {
+    reminderEl.innerHTML = `
+      <div style="padding:1rem;color:#2e7d32;font-size:0.85rem;display:flex;align-items:center;gap:0.5rem">
+        <span style="font-size:1.2rem">✓</span>
+        <span>Inga förfallna fakturor — inga påminnelser behövs!</span>
+      </div>
+    `;
+    return;
+  }
+  
+  // Calculate next reminder date for each invoice
+  const reminders = [];
+  overdueInvoices.forEach(inv => {
+    const dueDate = new Date(inv.due_date);
+    const daysOverdue = Math.floor((new Date() - dueDate) / (1000 * 60 * 60 * 24));
+    const lastReminder = inv.last_reminder_at ? new Date(inv.last_reminder_at) : null;
+    const daysSinceLastReminder = lastReminder 
+      ? Math.floor((new Date() - lastReminder) / (1000 * 60 * 60 * 24))
+      : null;
+    
+    // Find next applicable reminder day
+    let nextReminderDay = null;
+    let nextReminderDate = null;
+    
+    for (const day of reminderSchedule) {
+      if (daysOverdue >= day) {
+        // Check if enough time has passed since last reminder (7 days minimum)
+        if (!lastReminder || daysSinceLastReminder >= 7) {
+          nextReminderDay = day;
+          nextReminderDate = new Date(dueDate);
+          nextReminderDate.setDate(nextReminderDate.getDate() + day);
+          break;
+        }
+      }
+    }
+    
+    if (nextReminderDay) {
+      const customerEmail = inv.invoice_data ? JSON.parse(inv.invoice_data).clientEmail : '';
+      const reminderNumber = (inv.reminder_count || 0) + 1;
+      const reminderFee = reminderNumber >= 2 ? 60 : 0;
+      const totalDue = parseFloat(inv.total_amount) + (parseFloat(inv.reminder_fee) || 0) + reminderFee;
+      
+      reminders.push({
+        invoice: inv,
+        daysOverdue,
+        nextReminderDay,
+        nextReminderDate,
+        reminderNumber,
+        reminderFee,
+        totalDue,
+        customerEmail,
+        daysSinceLastReminder
+      });
+    }
+  });
+  
+  if (reminders.length === 0) {
+    reminderEl.innerHTML = `
+      <div style="padding:1rem;background:var(--cream);border-radius:8px;font-size:0.85rem;color:#666">
+        <strong>${overdueInvoices.length}</strong> förfallen${overdueInvoices.length > 1 ? 'a' : ''} faktura${overdueInvoices.length > 1 ? 'or' : ''}, 
+        men ${overdueInvoices.length > 1 ? 'alla har' : 'den har'} redan fått påminnelse nyligen.
+        Nästa påminnelse skickas automatiskt om minst 7 dagar.
+      </div>
+    `;
+    return;
+  }
+  
+  // Sort by next reminder date
+  reminders.sort((a, b) => a.nextReminderDate - b.nextReminderDate);
+  
+  let html = `
+    <div style="background:#fff8f0;border:1px solid #ffe0b2;padding:0.8rem;border-radius:6px;margin-bottom:1rem;font-size:0.82rem;color:#e65100">
+      <strong>📧 Automatiska påminnelser aktiva</strong><br>
+      <span style="color:#666">${reminders.length} påminnelse${reminders.length > 1 ? 'r' : ''} kommer skickas automatiskt kl. 10:00 enligt schema.</span>
+    </div>
+  `;
+  
+  reminders.slice(0, 5).forEach(r => {
+    const isToday = r.nextReminderDate.toISOString().slice(0, 10) === today;
+    const isTomorrow = r.nextReminderDate.toISOString().slice(0, 10) === new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+    const dateLabel = isToday ? 'Idag' : isTomorrow ? 'Imorgon' : r.nextReminderDate.toLocaleDateString('sv-SE', { month: 'short', day: 'numeric' });
+    
+    html += `
+      <div style="border:1px solid var(--border);border-radius:8px;padding:0.9rem;margin-bottom:0.7rem;background:white">
+        <div style="display:flex;justify-content:space-between;align-items:start;gap:1rem;margin-bottom:0.5rem">
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;font-size:0.88rem;margin-bottom:0.2rem">
+              Faktura ${r.invoice.invoice_number} – ${r.invoice.client_name || 'Okänd kund'}
+            </div>
+            <div style="font-size:0.75rem;color:#888">
+              ${r.daysOverdue} dagar förfallen · 
+              ${r.customerEmail || 'Ingen e-post'}
+            </div>
+          </div>
+          <div style="text-align:right;white-space:nowrap">
+            <div style="font-weight:700;font-size:0.95rem;color:#d32f2f">
+              ${r.totalDue.toLocaleString('sv-SE')} kr
+            </div>
+            ${r.reminderFee > 0 ? `<div style="font-size:0.7rem;color:#e65100">+${r.reminderFee} kr avgift</div>` : ''}
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:0.6rem;border-top:1px solid var(--border)">
+          <div style="font-size:0.8rem">
+            <span style="display:inline-block;padding:0.2rem 0.6rem;background:${isToday ? '#fff3e0' : '#f1f8f4'};border-radius:4px;font-weight:600;color:${isToday ? '#e65100' : 'var(--teal)'}">
+              📅 ${dateLabel}
+            </span>
+            <span style="margin-left:0.5rem;color:#888">Påminnelse ${r.reminderNumber}</span>
+          </div>
+          ${r.customerEmail ? '' : '<span style="font-size:0.75rem;color:#c62828">⚠️ Saknar e-post</span>'}
+        </div>
+      </div>
+    `;
+  });
+  
+  if (reminders.length > 5) {
+    html += `<div style="padding:0.5rem;text-align:center;color:#888;font-size:0.8rem">+ ${reminders.length - 5} fler påminnelse${reminders.length - 5 > 1 ? 'r' : ''}</div>`;
+  }
+  
+  reminderEl.innerHTML = html;
+}
+
+// ===== UPCOMING REMINDERS =====
+async function loadUpcomingReminders() {
+  if (!currentUser || !currentProfile) return;
+  
+  const container = document.getElementById('dashRemindersList');
+  if (!container) return;
+  
+  try {
+    // Check if reminders are enabled
+    if (currentProfile.reminder_enabled === false) {
+      container.innerHTML = `
+        <div style="padding:1.2rem;background:var(--cream);border-radius:8px;text-align:center">
+          <div style="font-size:0.88rem;color:#888;margin-bottom:0.6rem">Automatiska påminnelser är inaktiverade</div>
+          <button onclick="showPage('profile')" class="btn-sm" style="font-size:0.8rem;padding:0.45rem 0.9rem">Aktivera i Företagsprofil</button>
+        </div>
+      `;
+      return;
+    }
+    
+    const today = new Date().toISOString().slice(0, 10);
+    const reminderSchedule = currentProfile.reminder_days_schedule ? 
+      JSON.parse(currentProfile.reminder_days_schedule) : [7, 14, 30];
+    
+    // Get overdue invoices
+    const { data: overdueInvoices } = await sb
+      .from('invoices')
+      .select('id, invoice_number, invoice_data, total_amount, due_date, reminder_count, last_reminder_at, reminder_fee')
+      .eq('user_id', currentUser.id)
+      .eq('status', 'sent')
+      .lt('due_date', today)
+      .order('due_date', { ascending: true });
+    
+    if (!overdueInvoices || overdueInvoices.length === 0) {
+      container.innerHTML = `
+        <div style="padding:1.2rem;background:#f1f8f4;border-radius:8px;text-align:center;color:#2e7d32">
+          <div style="font-size:1.2rem;margin-bottom:0.3rem">✓</div>
+          <div style="font-size:0.88rem">Inga förfallna fakturor – inga påminnelser behövs!</div>
+        </div>
+      `;
+      return;
+    }
+    
+    // Calculate which invoices need reminders
+    const remindersNeeded = [];
+    
+    for (const inv of overdueInvoices) {
+      const dueDate = new Date(inv.due_date);
+      const daysOverdue = Math.floor((new Date() - dueDate) / (1000 * 60 * 60 * 24));
+      const reminderCount = inv.reminder_count || 0;
+      const lastReminderDate = inv.last_reminder_at ? new Date(inv.last_reminder_at) : null;
+      const daysSinceLastReminder = lastReminderDate ? 
+        Math.floor((new Date() - lastReminderDate) / (1000 * 60 * 60 * 24)) : 999;
+      
+      // Find next reminder based on schedule
+      let nextReminderDays = null;
+      for (const scheduleDays of reminderSchedule.sort((a, b) => a - b)) {
+        if (daysOverdue >= scheduleDays && daysSinceLastReminder >= 7) {
+          nextReminderDays = scheduleDays;
+          break;
+        }
+      }
+      
+      if (nextReminderDays !== null) {
+        const invData = inv.invoice_data ? JSON.parse(inv.invoice_data) : {};
+        const customerEmail = invData.clientEmail || '';
+        
+        if (customerEmail) {
+          remindersNeeded.push({
+            ...inv,
+            customerName: invData.clientName || 'Okänd kund',
+            customerEmail,
+            daysOverdue,
+            nextReminderNumber: reminderCount + 1,
+            nextReminderFee: (reminderCount + 1) >= 2 ? 60 : 0
+          });
+        }
+      }
+    }
+    
+    if (remindersNeeded.length === 0) {
+      container.innerHTML = `
+        <div style="padding:1.2rem;background:#fff8f0;border-radius:8px;text-align:center">
+          <div style="font-size:0.88rem;color:#888">
+            ${overdueInvoices.length} förfallen${overdueInvoices.length === 1 ? '' : 'a'} faktura${overdueInvoices.length === 1 ? '' : 'or'}, 
+            men ingen${overdueInvoices.length === 1 ? '' : 'a'} behöver påminnelse just nu.<br>
+            <span style="font-size:0.8rem;color:#aaa">Nästa påminnelse skickas enligt ditt schema: ${reminderSchedule.join(', ')} dagar efter förfallodatum.</span>
+          </div>
+        </div>
+      `;
+      return;
+    }
+    
+    // Render reminders
+    let html = `
+      <div style="background:#fff8f0;border-left:3px solid #ff9800;padding:0.9rem;border-radius:6px;margin-bottom:1rem;font-size:0.82rem">
+        <strong>${remindersNeeded.length} påminnelse${remindersNeeded.length === 1 ? '' : 'r'}</strong> kommer att skickas automatiskt vid nästa körning (varje dag kl. 10:00).
+      </div>
+    `;
+    
+    html += remindersNeeded.slice(0, 5).map(reminder => {
+      const totalDue = parseFloat(reminder.total_amount) + 
+                       (parseFloat(reminder.reminder_fee) || 0) + 
+                       reminder.nextReminderFee;
+      
+      return `
+        <div style="border:1px solid var(--border);border-radius:8px;padding:0.9rem;margin-bottom:0.8rem;background:white">
+          <div style="display:flex;justify-content:space-between;align-items:start;gap:1rem;margin-bottom:0.5rem">
+            <div style="flex:1">
+              <div style="font-weight:600;font-size:0.9rem">${reminder.customerName}</div>
+              <div style="font-size:0.78rem;color:#888;margin-top:0.2rem">
+                Faktura #${reminder.invoice_number || 'N/A'} · 
+                <span style="color:#c62828;font-weight:600">${reminder.daysOverdue} dagar förfallen</span>
+              </div>
+            </div>
+            <div style="text-align:right;white-space:nowrap">
+              <div style="font-weight:700;font-size:1rem;color:#c62828">${totalDue.toLocaleString('sv-SE')} kr</div>
+              ${reminder.nextReminderFee > 0 ? `<div style="font-size:0.75rem;color:#e65100">+${reminder.nextReminderFee} kr avgift</div>` : ''}
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.7rem;background:#fff3e0;border-radius:4px;font-size:0.8rem">
+            <span style="color:#ff9800;font-weight:700">⚠️</span>
+            <span style="color:#e65100">
+              <strong>Påminnelse ${reminder.nextReminderNumber}</strong> skickas till ${reminder.customerEmail}
+            </span>
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+    if (remindersNeeded.length > 5) {
+      html += `
+        <div style="text-align:center;padding:0.8rem;color:#888;font-size:0.82rem">
+          … och ${remindersNeeded.length - 5} till
+        </div>
+      `;
+    }
+    
+    container.innerHTML = html;
+    
+  } catch (error) {
+    console.error('Error loading reminders:', error);
+    container.innerHTML = `
+      <div style="padding:1rem;color:#c62828;font-size:0.85rem;background:#ffebee;border-radius:6px">
+        Kunde inte ladda påminnelser. Kontrollera att tabeller är skapade.
+      </div>
+    `;
+  }
 }
 
 // ===== CUSTOMERS =====
