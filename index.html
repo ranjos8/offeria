@@ -2683,7 +2683,7 @@ function addInvRow() {
   const container = document.getElementById('invRows');
   const row = document.createElement('div');
   row.className = 'inv-row-entry';
-  row.style = 'display:grid;grid-template-columns:2fr 0.7fr 0.5fr 0.8fr auto;gap:0.4rem;margin-bottom:0.5rem;align-items:end';
+  row.style = 'display:grid;grid-template-columns:1.8fr 1fr 0.6fr 0.9fr auto;gap:0.4rem;margin-bottom:0.5rem;align-items:end';
   row.innerHTML = `
     <div class="field" style="margin:0"><input class="inv-desc" placeholder="Arbete..."></div>
     <div class="field" style="margin:0"><select class="inv-type" style="padding:0.5rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem"><option value="arbete">Arbete</option><option value="material">Material</option></select></div>
@@ -7337,7 +7337,7 @@ init();
 
 <!-- ===== NEW INVOICE MODAL ===== -->
 <div class="overlay" id="newInvoiceOverlay" onclick="if(event.target===this)closeNewInvoiceModal()">
-  <div class="modal" style="max-width:520px;max-height:90vh;overflow-y:auto">
+  <div class="modal" style="max-width:720px;max-height:90vh;overflow-y:auto">
     <button class="modal-close" onclick="closeNewInvoiceModal()">✕</button>
     <div class="modal-head">
       <div style="font-family:'Fraunces',serif;font-size:1.2rem;color:var(--gold-light)">Ny faktura</div>
@@ -7360,7 +7360,7 @@ init();
       </div>
       <div class="card-label" style="margin-top:1rem;margin-bottom:0.5rem">Rader</div>
       <div id="invRows">
-        <div class="inv-row-entry" style="display:grid;grid-template-columns:2fr 0.7fr 0.5fr 0.8fr;gap:0.4rem;margin-bottom:0.5rem;align-items:end">
+        <div class="inv-row-entry" style="display:grid;grid-template-columns:1.8fr 1fr 0.6fr 0.9fr;gap:0.4rem;margin-bottom:0.5rem;align-items:end">
           <div class="field" style="margin:0"><label style="font-size:0.7rem">Beskrivning</label><input class="inv-desc" placeholder="Arbete..."></div>
           <div class="field" style="margin:0"><label style="font-size:0.7rem">Typ</label><select class="inv-type" style="padding:0.5rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem"><option value="arbete">Arbete</option><option value="material">Material</option></select></div>
           <div class="field" style="margin:0"><label style="font-size:0.7rem">Antal</label><input class="inv-qty" type="number" value="1" min="1"></div>
