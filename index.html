@@ -2683,9 +2683,10 @@ function addInvRow() {
   const container = document.getElementById('invRows');
   const row = document.createElement('div');
   row.className = 'inv-row-entry';
-  row.style = 'display:grid;grid-template-columns:1.3fr 0.5fr 0.8fr auto;gap:0.4rem;margin-bottom:0.5rem;align-items:end';
+  row.style = 'display:grid;grid-template-columns:2fr 0.7fr 0.5fr 0.8fr auto;gap:0.4rem;margin-bottom:0.5rem;align-items:end';
   row.innerHTML = `
     <div class="field" style="margin:0"><input class="inv-desc" placeholder="Arbete..."></div>
+    <div class="field" style="margin:0"><select class="inv-type" style="padding:0.5rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem"><option value="arbete">Arbete</option><option value="material">Material</option></select></div>
     <div class="field" style="margin:0"><input class="inv-qty" type="number" value="1" min="1"></div>
     <div class="field" style="margin:0"><input class="inv-price" type="number" placeholder="0"></div>
     <button onclick="this.parentElement.remove()" style="background:none;border:none;color:#c62828;cursor:pointer;font-size:1.1rem;padding:0.3rem">✕</button>`;
@@ -2705,13 +2706,24 @@ function buildInvoiceHtml(info, invoiceData) {
   const vatRate = invoiceData.vatRate || 25;
   const isCredit = invoiceData.isCredit || false;
   const inclRot = invoiceData.inclRot || false;
+  const rotRutType = invoiceData.rotRutType || 'none';
+  const rotRutLabel = invoiceData.rotRutLabel || 'ROT-avdrag (30% av arbete)';
   const sign = isCredit ? -1 : 1;
   const subtotal = invoiceData.items.reduce((s, it) => s + it.qty * it.price, 0) * sign;
   const vatAmount = Math.round(Math.abs(subtotal) * vatRate / 100) * sign;
   const totalInclVat = subtotal + vatAmount;
   const arbeteSub = invoiceData.items.filter(it => it.type !== 'material').reduce((s, it) => s + it.qty * it.price, 0) * sign;
-  const rotAmount = inclRot && !isCredit ? Math.min(Math.abs(arbeteSub) * 0.3, 50000) : 0;
-  const total = totalInclVat - rotAmount;
+  
+  let rotRutAmount = 0;
+  if (inclRot && !isCredit) {
+    if (rotRutType === 'rut') {
+      rotRutAmount = Math.min(Math.abs(arbeteSub) * 0.5, 75000);
+    } else {
+      rotRutAmount = Math.min(Math.abs(arbeteSub) * 0.3, 50000);
+    }
+  }
+  
+  const total = totalInclVat - rotRutAmount;
   const vatNumber = info.vatNumber || computeVatNumber(info.orgNum);
   const docType = isCredit ? 'KREDITFAKTURA' : (invoiceData.invoiceNumber === 'UTKAST' ? 'UTKAST – FAKTURA' : 'FAKTURA');
 
@@ -2745,8 +2757,8 @@ function buildInvoiceHtml(info, invoiceData) {
     <div class="q-totals"><div class="q-totals-box">
       <div class="trow"><span>Netto (exkl. moms)</span><span>${Number(subtotal).toLocaleString('sv-SE')} kr</span></div>
       <div class="trow"><span>Moms (${vatRate}%)</span><span>${Number(vatAmount).toLocaleString('sv-SE')} kr</span></div>
-      ${inclRot && rotAmount > 0 ? `<div class="trow"><span>Totalt (inkl. moms)</span><span>${Number(totalInclVat).toLocaleString('sv-SE')} kr</span></div><div class="trow rot-row"><span>ROT-avdrag (30% av arbete)</span><span>- ${Number(rotAmount).toLocaleString('sv-SE')} kr</span></div>` : ''}
-      <div class="trow final-row"><span>${isCredit ? 'ER TILLGODO' : (inclRot && rotAmount > 0 ? 'ATT BETALA (efter ROT)' : 'ATT BETALA')}</span><span>${Number(total).toLocaleString('sv-SE')} kr</span></div>
+      ${inclRot && rotRutAmount > 0 ? `<div class="trow"><span>Totalt (inkl. moms)</span><span>${Number(totalInclVat).toLocaleString('sv-SE')} kr</span></div><div class="trow rot-row"><span>${rotRutLabel}</span><span>- ${Number(rotRutAmount).toLocaleString('sv-SE')} kr</span></div>` : ''}
+      <div class="trow final-row"><span>${isCredit ? 'ER TILLGODO' : (inclRot && rotRutAmount > 0 ? `ATT BETALA (efter ${rotRutType.toUpperCase()})` : 'ATT BETALA')}</span><span>${Number(total).toLocaleString('sv-SE')} kr</span></div>
     </div></div>
     ${!isCredit ? `<div class="q-terms"><h4>Betalningsinformation</h4>
       ${info.bankgiro ? `Bankgiro: <strong>${info.bankgiro}</strong><br>` : ''}
@@ -2773,19 +2785,31 @@ async function createManualInvoice() {
   const items = [];
   rows.forEach(r => {
     const desc = r.querySelector('.inv-desc')?.value?.trim();
+    const type = r.querySelector('.inv-type')?.value || 'arbete';
     const qty = parseInt(r.querySelector('.inv-qty')?.value) || 1;
     const price = parseFloat(r.querySelector('.inv-price')?.value) || 0;
-    if (desc && price > 0) items.push({ desc, qty, price });
+    if (desc && price > 0) items.push({ desc, qty, price, type });
   });
   if (items.length === 0) return alert('Lägg till minst en rad med pris.');
 
   const payDays = parseInt(document.getElementById('invPayTerms').value) || 30;
   const vatRate = parseInt(document.getElementById('invVat').value) || 25;
-  const inclRot = document.getElementById('invRot')?.value === '1';
+  const rotRutType = document.getElementById('invRotRut')?.value || 'none';
   const subtotal = items.reduce((s, it) => s + it.qty * it.price, 0);
+  const arbeteSub = items.filter(it => it.type !== 'material').reduce((s, it) => s + it.qty * it.price, 0);
   const vatAmount = Math.round(subtotal * vatRate / 100);
-  const rotAmount = inclRot ? Math.min(subtotal * 0.3, 50000) : 0;
-  const total = subtotal + vatAmount - rotAmount;
+  
+  let rotRutAmount = 0;
+  let rotRutLabel = '';
+  if (rotRutType === 'rot') {
+    rotRutAmount = Math.min(arbeteSub * 0.3, 50000);
+    rotRutLabel = 'ROT-avdrag (30% av arbete)';
+  } else if (rotRutType === 'rut') {
+    rotRutAmount = Math.min(arbeteSub * 0.5, 75000);
+    rotRutLabel = 'RUT-avdrag (50% av arbete)';
+  }
+  
+  const total = subtotal + vatAmount - rotRutAmount;
 
   const now = new Date();
   const due = new Date(now);
@@ -2809,7 +2833,9 @@ async function createManualInvoice() {
     dateStr: now.toISOString().slice(0, 10),
     dueStr: due.toISOString().slice(0, 10),
     payTermsLabel: payDays + ' dagar netto',
-    inclRot
+    inclRot: rotRutType !== 'none',
+    rotRutType: rotRutType,
+    rotRutLabel: rotRutLabel
   };
 
   const invoiceHtml = buildInvoiceHtml(info, invoiceData);
@@ -7334,8 +7360,9 @@ init();
       </div>
       <div class="card-label" style="margin-top:1rem;margin-bottom:0.5rem">Rader</div>
       <div id="invRows">
-        <div class="inv-row-entry" style="display:grid;grid-template-columns:1.3fr 0.5fr 0.8fr;gap:0.4rem;margin-bottom:0.5rem;align-items:end">
+        <div class="inv-row-entry" style="display:grid;grid-template-columns:2fr 0.7fr 0.5fr 0.8fr;gap:0.4rem;margin-bottom:0.5rem;align-items:end">
           <div class="field" style="margin:0"><label style="font-size:0.7rem">Beskrivning</label><input class="inv-desc" placeholder="Arbete..."></div>
+          <div class="field" style="margin:0"><label style="font-size:0.7rem">Typ</label><select class="inv-type" style="padding:0.5rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem"><option value="arbete">Arbete</option><option value="material">Material</option></select></div>
           <div class="field" style="margin:0"><label style="font-size:0.7rem">Antal</label><input class="inv-qty" type="number" value="1" min="1"></div>
           <div class="field" style="margin:0"><label style="font-size:0.7rem">À-pris</label><input class="inv-price" type="number" placeholder="0"></div>
         </div>
@@ -7346,8 +7373,12 @@ init();
         <div class="field" style="margin:0"><label>Momssats</label>
           <select id="invVat"><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
         </div>
-        <div class="field" style="margin:0"><label>ROT-avdrag</label>
-          <select id="invRot"><option value="0">Nej</option><option value="1">Ja (30% av arbete)</option></select>
+        <div class="field" style="margin:0"><label>ROT/RUT-avdrag</label>
+          <select id="invRotRut">
+            <option value="none">Inget avdrag</option>
+            <option value="rot">ROT (30% av arbete)</option>
+            <option value="rut">RUT (50% av arbete)</option>
+          </select>
         </div>
       </div>
       <button onclick="createManualInvoice()" class="stripe-btn" style="margin:1rem 0 0;width:100%">Skapa faktura →</button>
