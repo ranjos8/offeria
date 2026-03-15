@@ -2055,7 +2055,7 @@ function updateUI(profile, used, total) {
   document.getElementById('navUserArea').style.display = 'flex';
   document.getElementById('navAuthBtns').style.display = 'none';
   document.getElementById('mobileMenu').style.display = 'none';
-  document.getElementById('navUserName').textContent = profile?.full_name || profile?.email || '';
+  document.getElementById('navUserName').textContent = profile?.company_name || profile?.full_name || profile?.email || '';
   document.getElementById('navPlanBadge').textContent = PLAN_LABELS[plan];
 
   document.getElementById('sidebarPlan').textContent = PLAN_LABELS[plan];
