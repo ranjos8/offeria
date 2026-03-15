@@ -2687,42 +2687,20 @@ async function createManualInvoice() {
 
   const invoiceHtml = buildInvoiceHtml(info, invoiceData);
 
-  // Check if we're editing an existing draft
-  const editDraftId = document.getElementById('invEditDraftId')?.value;
-
-  if (editDraftId) {
-    // Update existing draft
-    const { error } = await sb.from('invoices').update({
-      client_name: client,
-      title: title,
-      total_amount: total,
-      invoice_html: invoiceHtml,
-      due_date: due.toISOString().slice(0, 10),
-      payment_terms: payDays + ' dagar netto',
-      invoice_data: JSON.stringify({ items, vatRate, clientAddr, inclRot })
-    }).eq('id', editDraftId);
-    if (error) { console.error(error); return alert('Kunde inte uppdatera utkast.'); }
-    // Clean up
-    document.getElementById('invEditDraftId').value = '';
-    const submitBtn = document.querySelector('#newInvoiceModal .stripe-btn');
-    if (submitBtn) submitBtn.textContent = 'Skapa faktura →';
-  } else {
-    // Create new draft
-    const { error } = await sb.from('invoices').insert({
-      user_id: currentUser.id,
-      invoice_number: null,
-      client_name: client,
-      title: title,
-      total_amount: total,
-      invoice_html: invoiceHtml,
-      status: 'draft',
-      due_date: due.toISOString().slice(0, 10),
-      payment_terms: payDays + ' dagar netto',
-      share_id: crypto.randomUUID(),
-      invoice_data: JSON.stringify({ items, vatRate, clientAddr, inclRot })
-    });
-    if (error) { console.error(error); return alert('Kunde inte spara faktura.'); }
-  }
+  const { error } = await sb.from('invoices').insert({
+    user_id: currentUser.id,
+    invoice_number: null,
+    client_name: client,
+    title: title,
+    total_amount: total,
+    invoice_html: invoiceHtml,
+    status: 'draft',
+    due_date: due.toISOString().slice(0, 10),
+    payment_terms: payDays + ' dagar netto',
+    share_id: crypto.randomUUID(),
+    invoice_data: JSON.stringify({ items, vatRate, clientAddr, inclRot })
+  });
+  if (error) { console.error(error); return alert('Kunde inte spara faktura.'); }
 
   closeNewInvoiceModal();
   showPage('invoices');
@@ -2872,58 +2850,245 @@ function closeInvoiceModal() {
 async function editCurrentDraft() {
   if (!_currentInvoice || _currentInvoice.status !== 'draft') return;
   const inv = _currentInvoice;
-  closeInvoiceModal();
+  const doc = document.getElementById('invoiceDoc');
+  if (!doc) return;
 
-  let invData = {};
-  try { invData = inv.invoice_data ? JSON.parse(inv.invoice_data) : {}; } catch(e) {}
+  // Check if ROT is active
+  const invData = inv.invoice_data ? JSON.parse(inv.invoice_data) : {};
+  const hasRot = invData.inclRot || doc.querySelector('.rot-row') || doc.innerHTML.includes('ROT-avdrag');
 
-  openNewInvoiceModal();
+  // Make table cells editable
+  doc.querySelectorAll('.qt tbody tr').forEach(tr => {
+    const cells = tr.querySelectorAll('td');
+    if (cells.length >= 4) {
+      // Detect existing type from (arbete)/(material) span
+      const typeSpan = cells[0].querySelector('span[style*="italic"]');
+      let currentType = 'arbete';
+      if (typeSpan) {
+        currentType = typeSpan.textContent.includes('material') ? 'material' : 'arbete';
+        typeSpan.remove();
+      }
+      // Clean description
+      cells[0].textContent = cells[0].textContent.replace(/\s*\(arbete\)\s*|\s*\(material\)\s*/gi, '').trim();
 
-  // Fill in fields
-  document.getElementById('invClient').value = inv.client_name || '';
-  document.getElementById('invClientAddr').value = invData.clientAddr || '';
-  document.getElementById('invTitle').value = inv.title || '';
-  document.getElementById('invVat').value = String(invData.vatRate || 25);
+      // Description
+      cells[0].setAttribute('contenteditable', 'true');
+      cells[0].style.cssText = 'background:#fefcf6;outline:none;border-bottom:1.5px solid var(--gold-light)';
 
-  const rotSelect = document.getElementById('invRot');
-  if (rotSelect) rotSelect.value = invData.inclRot ? '1' : '0';
+      // Add type selector if ROT is active
+      if (hasRot) {
+        const typeSelect = document.createElement('select');
+        typeSelect.className = 'inv-type-select';
+        typeSelect.style.cssText = 'font-size:0.65rem;padding:0.15rem 0.2rem;border:1px solid #ddd;border-radius:4px;background:white;color:#555;cursor:pointer;margin-left:0.4rem;vertical-align:middle';
+        typeSelect.innerHTML = '<option value="arbete">Arbete</option><option value="material">Material</option>';
+        typeSelect.value = currentType;
+        typeSelect.onchange = recalcInvoiceDraft;
+        cells[0].appendChild(typeSelect);
+      }
 
-  const payTerms = inv.payment_terms || '30 dagar netto';
-  const daysMatch = payTerms.match(/(\d+)/);
-  if (daysMatch) {
-    const paySelect = document.getElementById('invPayTerms');
-    if (paySelect) paySelect.value = daysMatch[1];
+      // Qty
+      cells[1].setAttribute('contenteditable', 'true');
+      cells[1].style.cssText = 'background:#fefcf6;outline:none;border-bottom:1.5px solid var(--gold-light)';
+      // Price
+      cells[2].setAttribute('contenteditable', 'true');
+      cells[2].style.cssText = 'background:#fefcf6;outline:none;border-bottom:1.5px solid var(--gold-light);text-align:right';
+      // Sum = auto
+      cells[3].style.color = '#999';
+      // Delete button
+      const delBtn = document.createElement('button');
+      delBtn.textContent = '×';
+      delBtn.style.cssText = 'background:none;border:none;color:#c62828;font-size:1.2rem;cursor:pointer;padding:0 0.3rem;margin-left:0.3rem';
+      delBtn.onclick = () => { tr.remove(); recalcInvoiceDraft(); };
+      cells[3].appendChild(delBtn);
+
+      // Recalc on edit
+      [cells[1], cells[2]].forEach(c => c.addEventListener('input', recalcInvoiceDraft));
+    }
+  });
+
+  // Make client name editable
+  const clientEl = doc.querySelector('.q-client strong');
+  if (clientEl) { clientEl.setAttribute('contenteditable', 'true'); clientEl.style.background = '#fefcf6'; clientEl.style.borderBottom = '1.5px solid var(--gold-light)'; }
+
+  // Add row button after table
+  const table = doc.querySelector('.qt');
+  if (table) {
+    const addBtn = document.createElement('div');
+    addBtn.id = 'invDraftAddRow';
+    addBtn.innerHTML = '<button style="background:none;border:1.5px dashed var(--gold-light);color:var(--gold);padding:0.5rem 1rem;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.82rem;width:100%">+ Lägg till rad</button>';
+    addBtn.onclick = () => {
+      const tbody = doc.querySelector('.qt tbody');
+      if (!tbody) return;
+      const newRow = document.createElement('tr');
+      const typeSel = hasRot ? '<select class="inv-type-select" onchange="recalcInvoiceDraft()" style="font-size:0.65rem;padding:0.15rem 0.2rem;border:1px solid #ddd;border-radius:4px;background:white;color:#555;cursor:pointer;margin-left:0.4rem"><option value="arbete">Arbete</option><option value="material">Material</option></select>' : '';
+      newRow.innerHTML = `<td contenteditable="true" style="background:#fefcf6;outline:none;border-bottom:1.5px solid var(--gold-light)">Ny rad${typeSel}</td>
+        <td contenteditable="true" style="background:#fefcf6;outline:none;border-bottom:1.5px solid var(--gold-light)">1 st</td>
+        <td contenteditable="true" style="text-align:right;background:#fefcf6;outline:none;border-bottom:1.5px solid var(--gold-light)">0 kr</td>
+        <td style="text-align:right;font-weight:500;color:#999">0 kr<button style="background:none;border:none;color:#c62828;font-size:1.2rem;cursor:pointer;padding:0 0.3rem;margin-left:0.3rem" onclick="this.closest('tr').remove();recalcInvoiceDraft()">×</button></td>`;
+      newRow.querySelectorAll('td[contenteditable]').forEach(c => c.addEventListener('input', recalcInvoiceDraft));
+      tbody.appendChild(newRow);
+    };
+    table.after(addBtn);
   }
 
-  // Populate rows using correct structure
-  const rowsContainer = document.getElementById('invRows');
-  if (rowsContainer && invData.items && invData.items.length > 0) {
-    rowsContainer.innerHTML = '';
-    invData.items.forEach((item, idx) => {
-      const row = document.createElement('div');
-      row.className = 'inv-row-entry';
-      row.style.cssText = 'display:grid;grid-template-columns:2fr 0.7fr 1fr 30px;gap:0.5rem;margin-bottom:0.5rem;align-items:end';
-      row.innerHTML = `<div class="field" style="margin:0">${idx === 0 ? '<label style="font-size:0.7rem">Beskrivning</label>' : ''}<input class="inv-desc" value="${(item.desc || '').replace(/"/g, '&quot;')}" placeholder="Arbete..."></div>
-        <div class="field" style="margin:0">${idx === 0 ? '<label style="font-size:0.7rem">Antal</label>' : ''}<input class="inv-qty" type="number" value="${item.qty || 1}" min="1"></div>
-        <div class="field" style="margin:0">${idx === 0 ? '<label style="font-size:0.7rem">À-pris (kr)</label>' : ''}<input class="inv-price" type="number" value="${item.price || 0}" placeholder="0"></div>
-        ${idx > 0 ? '<button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:#c62828;font-size:1rem;padding-bottom:0.5rem">×</button>' : '<span></span>'}`;
-      rowsContainer.appendChild(row);
-    });
-  }
+  // Show edit hint
+  const hint = document.createElement('div');
+  hint.id = 'invDraftHint';
+  hint.style.cssText = 'text-align:center;padding:0.6rem;background:var(--cream);border-radius:8px;margin-bottom:1rem;font-size:0.78rem;color:var(--gold)';
+  hint.textContent = hasRot
+    ? 'Redigeringsläge — klicka på rader för att ändra. Välj Arbete/Material per rad för korrekt ROT-avdrag.'
+    : 'Redigeringsläge — klicka på rader för att ändra. Summor räknas om automatiskt.';
+  doc.prepend(hint);
 
-  // Store draft ID for update instead of insert
-  let hiddenId = document.getElementById('invEditDraftId');
-  if (!hiddenId) {
-    hiddenId = document.createElement('input');
-    hiddenId.type = 'hidden';
-    hiddenId.id = 'invEditDraftId';
-    document.getElementById('newInvoiceModal').appendChild(hiddenId);
-  }
-  hiddenId.value = inv.id;
+  // Store ROT state
+  doc.dataset.inclRot = hasRot ? '1' : '0';
 
-  // Change button text
-  const submitBtn = document.querySelector('#newInvoiceModal .stripe-btn');
-  if (submitBtn) submitBtn.textContent = 'Spara utkast →';
+  // Change toolbar buttons
+  const btnsEl = document.getElementById('invModalBtns');
+  btnsEl.innerHTML = `
+    <button class="qt-btn" style="background:#2e7d32;color:white;border-color:#2e7d32" onclick="saveDraftInline()">Spara utkast</button>
+    <button class="qt-btn" style="background:var(--gold);color:white;border-color:var(--gold)" onclick="saveDraftInline(true)">Spara & bekräfta</button>
+    <button class="qt-btn" onclick="closeInvoiceModal()" style="margin-left:0.5rem">✕ Avbryt</button>`;
+}
+
+function recalcInvoiceDraft() {
+  const doc = document.getElementById('invoiceDoc');
+  if (!doc) return;
+  const vatRate = 25;
+  const hasRot = doc.dataset.inclRot === '1';
+  let subtotal = 0;
+  let arbeteSub = 0;
+
+  doc.querySelectorAll('.qt tbody tr').forEach(tr => {
+    const cells = tr.querySelectorAll('td');
+    if (cells.length >= 4) {
+      const qtyText = cells[1]?.textContent?.replace(/[^\d]/g, '') || '1';
+      const priceText = cells[2]?.textContent?.replace(/[^\d]/g, '') || '0';
+      const qty = parseInt(qtyText) || 1;
+      const price = parseInt(priceText) || 0;
+      const sum = qty * price;
+      subtotal += sum;
+
+      // Check type selector
+      const typeSel = cells[0].querySelector('.inv-type-select');
+      const type = typeSel ? typeSel.value : 'arbete';
+      if (type !== 'material') arbeteSub += sum;
+
+      // Update sum cell (preserve delete button)
+      const delBtn = cells[3].querySelector('button');
+      cells[3].innerHTML = Number(sum).toLocaleString('sv-SE') + ' kr';
+      if (delBtn) cells[3].appendChild(delBtn);
+    }
+  });
+
+  const vatAmount = Math.round(subtotal * vatRate / 100);
+  const totalInclVat = subtotal + vatAmount;
+  const rotAmount = hasRot ? Math.min(arbeteSub * 0.3, 50000) : 0;
+  const total = totalInclVat - rotAmount;
+
+  // Update totals
+  const trows = doc.querySelectorAll('.trow');
+  trows.forEach(tr => {
+    const label = tr.querySelector('span:first-child')?.textContent || '';
+    const valEl = tr.querySelector('span:last-child');
+    if (!valEl) return;
+    if (label.includes('Netto')) valEl.textContent = Number(subtotal).toLocaleString('sv-SE') + ' kr';
+    if (label.includes('Moms')) valEl.textContent = Number(vatAmount).toLocaleString('sv-SE') + ' kr';
+    if (label.includes('Totalt') && label.includes('inkl')) valEl.textContent = Number(totalInclVat).toLocaleString('sv-SE') + ' kr';
+    if (label.includes('ROT')) valEl.textContent = '- ' + Number(rotAmount).toLocaleString('sv-SE') + ' kr';
+    if (label.includes('BETALA') || label.includes('TILLGODO')) valEl.textContent = Number(total).toLocaleString('sv-SE') + ' kr';
+  });
+
+  // Add/remove ROT row if needed
+  if (hasRot && rotAmount > 0) {
+    const totalsBox = doc.querySelector('.q-totals-box');
+    if (totalsBox && !totalsBox.querySelector('.rot-row')) {
+      const finalRow = totalsBox.querySelector('.final-row');
+      if (finalRow) {
+        // Add totalt inkl moms row before ROT
+        const inclRow = document.createElement('div');
+        inclRow.className = 'trow';
+        inclRow.innerHTML = `<span>Totalt (inkl. moms)</span><span>${Number(totalInclVat).toLocaleString('sv-SE')} kr</span>`;
+        finalRow.before(inclRow);
+        const rotRow = document.createElement('div');
+        rotRow.className = 'trow rot-row';
+        rotRow.innerHTML = `<span>ROT-avdrag (30% av arbete)</span><span>- ${Number(rotAmount).toLocaleString('sv-SE')} kr</span>`;
+        finalRow.before(rotRow);
+        finalRow.querySelector('span:first-child').textContent = 'ATT BETALA (efter ROT)';
+      }
+    }
+  }
+}
+
+async function saveDraftInline(andConfirm) {
+  if (!_currentInvoice) return;
+  const doc = document.getElementById('invoiceDoc');
+  const inv = _currentInvoice;
+
+  // Parse items from table including type
+  const items = [];
+  doc.querySelectorAll('.qt tbody tr').forEach(tr => {
+    const cells = tr.querySelectorAll('td');
+    if (cells.length >= 4) {
+      const typeSel = cells[0].querySelector('.inv-type-select');
+      const type = typeSel ? typeSel.value : 'arbete';
+      const desc = cells[0]?.textContent?.replace(/\s*ArbeteMaterial\s*/g, '').replace(/\(arbete\)|\(material\)/gi, '').trim() || '';
+      const qty = parseInt(cells[1]?.textContent?.replace(/[^\d]/g, '')) || 1;
+      const price = parseInt(cells[2]?.textContent?.replace(/[^\d]/g, '')) || 0;
+      if (desc && price > 0) items.push({ desc, qty, price, type });
+    }
+  });
+  if (items.length === 0) return alert('Minst en rad med pris krävs.');
+
+  const clientName = doc.querySelector('.q-client strong')?.textContent?.trim() || inv.client_name;
+
+  // Clean up edit UI
+  doc.querySelector('#invDraftHint')?.remove();
+  doc.querySelector('#invDraftAddRow')?.remove();
+  doc.querySelectorAll('[contenteditable]').forEach(el => {
+    el.removeAttribute('contenteditable'); el.style.background = ''; el.style.borderBottom = '';
+  });
+  doc.querySelectorAll('.inv-type-select').forEach(s => s.remove());
+  doc.querySelectorAll('.qt tbody td button').forEach(b => b.remove());
+
+  // Rebuild clean HTML
+  const invData = inv.invoice_data ? JSON.parse(inv.invoice_data) : {};
+  const vatRate = invData.vatRate || 25;
+  const inclRot = invData.inclRot || doc.dataset.inclRot === '1';
+  const subtotal = items.reduce((s, it) => s + it.qty * it.price, 0);
+  const vatAmount = Math.round(subtotal * vatRate / 100);
+  const arbeteSub = items.filter(it => it.type !== 'material').reduce((s, it) => s + it.qty * it.price, 0);
+  const rotAmount = inclRot ? Math.min(arbeteSub * 0.3, 50000) : 0;
+  const total = subtotal + vatAmount - rotAmount;
+
+  const p = currentProfile || {};
+  const info = {
+    company: p.company_name || 'Ditt företag', orgNum: p.org_number || '',
+    vatNumber: computeVatNumber(p.org_number), phone: p.phone || '',
+    email: p.email || '', website: p.website || '', address: p.address || '', bankgiro: p.bankgiro || ''
+  };
+  const invoiceDataNew = {
+    title: inv.title, clientName, clientAddress: invData.clientAddr || '',
+    items, vatRate, invoiceNumber: 'UTKAST',
+    dateStr: inv.created_at?.slice(0, 10) || new Date().toISOString().slice(0, 10),
+    dueStr: inv.due_date || '', payTermsLabel: inv.payment_terms || '30 dagar netto', inclRot
+  };
+  const invoiceHtml = buildInvoiceHtml(info, invoiceDataNew);
+
+  await sb.from('invoices').update({
+    client_name: clientName, total_amount: total,
+    invoice_html: invoiceHtml,
+    invoice_data: JSON.stringify({ items, vatRate, clientAddr: invData.clientAddr || '', inclRot })
+  }).eq('id', inv.id);
+
+  if (andConfirm) {
+    closeInvoiceModal();
+    const idx = _invoiceData.indexOf(inv);
+    confirmInvoice(idx);
+  } else {
+    closeInvoiceModal();
+    loadInvoices();
+  }
 }
 
 async function toggleInvoicePaid() {
