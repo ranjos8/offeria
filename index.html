@@ -460,9 +460,10 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 /* upgrade modal */
 .upgrade-modal { max-width: 560px; }
 .upgrade-plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; padding: 1.5rem 2rem; }
-.uplan { border: 1.5px solid var(--border); border-radius: 12px; padding: 1.2rem; cursor: pointer; transition: all 0.15s; }
+.uplan { border: 1.5px solid var(--border); border-radius: 12px; padding: 1.2rem; cursor: pointer; transition: all 0.15s; position: relative; }
 .uplan:hover { border-color: var(--gold); }
 .uplan.sel { border-color: var(--gold); background: #fffaee; }
+.uplan-badge { position: absolute; top: -10px; right: 12px; background: var(--gold); color: white; padding: 0.25rem 0.7rem; border-radius: 12px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; }
 .uplan-name { font-family: 'Fraunces', serif; font-size: 1rem; margin-bottom: 0.2rem; }
 .uplan-price { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.6rem; }
 .uplan-features { font-size: 0.72rem; color: #666; line-height: 1.6; }
@@ -1063,43 +1064,46 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div><span class="plan-amount">0</span><span class="plan-period"> kr/mån</span></div>
           <ul class="plan-features">
             <li>2 AI-offerter per månad</li>
-            <li>Dela via länk &amp; PDF</li>
-            <li>Redigerbara rader</li>
+            <li>Grundläggande fakturering</li>
+            <li>Dela via länk & PDF</li>
             <li>ROT/RUT-beräkning</li>
-            <li style="color:#888;font-style:italic">Offeria-branding i offerten</li>
+            <li style="color:#888;font-style:italic">Ingen bokföring</li>
+            <li style="color:#888;font-style:italic">Ingen logo</li>
           </ul>
           <button class="plan-cta" onclick="openModal('register')">Kom igång gratis</button>
         </div>
         <div class="plan">
           <div class="plan-name">Pro</div>
           <div class="plan-tagline">För aktiva hantverkare</div>
-          <div><span class="plan-amount">99</span><span class="plan-period"> kr/mån</span></div>
+          <div><span class="plan-amount">149</span><span class="plan-period"> kr/mån</span></div>
           <ul class="plan-features">
             <li>10 AI-offerter per månad</li>
+            <li><strong>Full fakturering</strong> (ROT/RUT, kredit)</li>
+            <li>Grundläggande bokföring</li>
+            <li>E-signering</li>
+            <li>Dashboard & statistik</li>
+            <li>Logo i offerter</li>
             <li>Fullständig företagsprofil</li>
-            <li>Egen logotyp på offerter</li>
-            <li>Kund- &amp; artikelregister</li>
-            <li>Offerthistorik</li>
-            <li>Dela via länk &amp; PDF</li>
             <li>Ingen bindningstid</li>
           </ul>
           <button class="plan-cta" onclick="openModal('register')">Välj Pro</button>
         </div>
         <div class="plan featured">
+          <div class="plan-badge">Populärast</div>
           <div class="plan-name">Komplett</div>
           <div class="plan-tagline">Allt du behöver</div>
-          <div><span class="plan-amount">249</span><span class="plan-period"> kr/mån</span></div>
+          <div><span class="plan-amount">349</span><span class="plan-period"> kr/mån</span></div>
           <ul class="plan-features">
             <li>Obegränsade AI-offerter</li>
-            <li><strong>Fakturering &amp; kreditfaktura</strong></li>
-            <li><strong>Bokföring med BAS-kontoplan</strong></li>
-            <li><strong>Fota kvitto — automatisk bokföring</strong></li>
-            <li>Resultat- &amp; balansräkning</li>
-            <li>Momsrapport</li>
-            <li>SIE-export till revisor</li>
-            <li>Dashboard &amp; statistik</li>
-            <li>ROT/RUT-avdrag</li>
-            <li>Egen logotyp</li>
+            <li><strong>Full fakturering</strong> (ROT/RUT, kredit, påminnelser)</li>
+            <li><strong>Full bokföring</strong> (BAS 2026, automatisk)</li>
+            <li><strong>Bankimport</strong> CSV/OFX</li>
+            <li><strong>Automatiska påminnelser</strong> e-post</li>
+            <li><strong>Kvittoskanning</strong> med OCR</li>
+            <li>Leverantörsfakturor</li>
+            <li>Moms & SIE-export</li>
+            <li>E-signering</li>
+            <li>Dashboard & statistik</li>
             <li>Ingen bindningstid</li>
           </ul>
           <button class="plan-cta" onclick="openModal('register')">Välj Komplett</button>
@@ -1111,8 +1115,8 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <ul class="plan-features">
             <li>Allt i Komplett</li>
             <li>API-integration</li>
-            <li>Flera användare / team</li>
-            <li>Faktura istället för kort</li>
+            <li>White label</li>
+            <li>Dedikerad support</li>
             <li>Anpassningar efter era behov</li>
           </ul>
           <button class="plan-cta" onclick="window.location.href='kontakta-oss.html'">Kontakta oss</button>
@@ -1912,20 +1916,21 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <p>Välj en plan och betala säkert via Stripe</p>
     </div>
     <div class="upgrade-plans">
+      <div class="uplan" id="uplan-pro" onclick="selectUPlan('pro')">
+        <div class="uplan-name">Pro</div>
+        <div class="uplan-price">149 kr/mån</div>
+        <div class="uplan-features">10 AI-offerter/månad<br><strong>Full fakturering</strong> (ROT/RUT, kredit)<br>Grundläggande bokföring<br>E-signering<br>Dashboard & statistik<br>Logo i offerter<br>Ingen bindningstid</div>
+      </div>
+      <div class="uplan sel" id="uplan-unlimited" onclick="selectUPlan('unlimited')">
+        <div class="uplan-badge">Populärast</div>
+        <div class="uplan-name">Komplett</div>
+        <div class="uplan-price">349 kr/mån</div>
+        <div class="uplan-features">Obegränsade AI-offerter<br><strong>Full fakturering</strong> (ROT/RUT, kredit, påminnelser)<br><strong>Full bokföring</strong> (BAS 2026, automatisk)<br><strong>Bankimport</strong> CSV/OFX<br><strong>Automatiska påminnelser</strong><br>Kvittoskanning<br>Moms & SIE-export<br>Leverantörsfakturor<br>E-signering<br>Ingen bindningstid</div>
+      </div>
       <div class="uplan" id="uplan-credit" onclick="selectUPlan('credit')">
         <div class="uplan-name">Styck</div>
         <div class="uplan-price">29 kr / offert</div>
-        <div class="uplan-features">1 AI-offert<br>Alla funktioner<br>Ingen bindningstid</div>
-      </div>
-      <div class="uplan sel" id="uplan-pro" onclick="selectUPlan('pro')">
-        <div class="uplan-name">Pro</div>
-        <div class="uplan-price">99 kr/mån</div>
-        <div class="uplan-features">10 AI-offerter/månad<br>Fullständig företagsprofil<br>Egen logotyp<br>Kund- &amp; artikelregister<br>Offerthistorik<br>Ingen bindningstid</div>
-      </div>
-      <div class="uplan" id="uplan-unlimited" onclick="selectUPlan('unlimited')">
-        <div class="uplan-name">Komplett</div>
-        <div class="uplan-price">249 kr/mån</div>
-        <div class="uplan-features">Obegränsade AI-offerter<br><strong>Fakturering &amp; kreditfaktura</strong><br><strong>Bokföring (BAS 2026)</strong><br><strong>Kvittoskanning</strong><br>Resultat- &amp; balansräkning<br>Momsrapport &amp; SIE-export<br>Dashboard &amp; statistik<br>ROT/RUT-avdrag<br>Ingen bindningstid</div>
+        <div class="uplan-features">1 AI-offert<br>Alla funktioner<br>Ingen bindningstid<br>Perfekt för enstaka jobb</div>
       </div>
     </div>
     <div class="stripe-note">Betalning hanteras säkert av Stripe. Du kan avbryta när som helst.</div>
@@ -2652,6 +2657,7 @@ async function markInvoiceUnpaid(idx) {
 // ===== INVOICE MODAL =====
 function openNewInvoiceModal() {
   document.getElementById('invClient').value = '';
+  document.getElementById('invClientEmail').value = '';
   document.getElementById('invClientAddr').value = '';
   document.getElementById('invTitle').value = '';
   document.getElementById('invRows').innerHTML = `
@@ -2758,6 +2764,7 @@ function buildInvoiceHtml(info, invoiceData) {
 async function createManualInvoice() {
   if (!(await checkInvoiceLimit())) return;
   const client = document.getElementById('invClient').value.trim();
+  const clientEmail = document.getElementById('invClientEmail').value.trim();
   const clientAddr = document.getElementById('invClientAddr').value.trim();
   const title = document.getElementById('invTitle').value.trim();
   if (!client || !title) return alert('Fyll i kund och titel.');
@@ -2797,7 +2804,7 @@ async function createManualInvoice() {
   };
 
   const invoiceData = {
-    title, clientName: client, clientAddress: clientAddr, items, vatRate,
+    title, clientName: client, clientEmail: clientEmail, clientAddress: clientAddr, items, vatRate,
     invoiceNumber: 'UTKAST',
     dateStr: now.toISOString().slice(0, 10),
     dueStr: due.toISOString().slice(0, 10),
@@ -2877,7 +2884,7 @@ async function createInvoiceFromQuote() {
   };
 
   const invoiceData = {
-    title, clientName: client, clientAddress: clientAddr, items, vatRate,
+    title, clientName: client, clientEmail: '', clientAddress: clientAddr, items, vatRate,
     invoiceNumber: 'UTKAST',
     dateStr: now.toISOString().slice(0, 10),
     dueStr: due.toISOString().slice(0, 10),
@@ -4316,31 +4323,62 @@ async function loadDashboard() {
 
     // === ATT GÖRA-LISTA ===
     let todos = [];
-    // Overdue invoices
+    
+    // 1. Fakturapåminnelser (förfallna fakturor som behöver påminnelse)
     inv.filter(i => i.status !== 'paid' && i.status !== 'draft' && i.status !== 'credited' && i.status !== 'credit_note' && i.due_date && i.due_date < today).forEach(i => {
       const days = Math.floor((Date.now() - new Date(i.due_date)) / 86400000);
-      todos.push({ color: '#c62828', text: `Förfallen faktura: ${i.invoice_number || ''} – ${i.client_name || 'Okänd'} (${days} dagar)`, action: 'Visa', page: 'invoices' });
+      const reminderCount = i.reminder_count || 0;
+      const text = reminderCount > 0 
+        ? `Förfallen faktura (${reminderCount} påminnels${reminderCount > 1 ? 'er' : 'e'}): ${i.invoice_number || ''} – ${i.client_name || 'Okänd'} (${days} dagar)`
+        : `Förfallen faktura: ${i.invoice_number || ''} – ${i.client_name || 'Okänd'} (${days} dagar)`;
+      todos.push({ color: '#c62828', text, action: 'Påminn', page: 'invoices' });
     });
-    // Supplier invoices due within 7 days
+    
+    // 2. Leverantörsfakturor att betala (inom 7 dagar)
     const in7days = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
     supp.filter(s => s.status !== 'paid' && s.due_date && s.due_date <= in7days).forEach(s => {
       const days = Math.floor((new Date(s.due_date) - Date.now()) / 86400000);
       const label = days < 0 ? `${Math.abs(days)} dagar förfallen` : days === 0 ? 'idag' : `om ${days} dagar`;
       todos.push({ color: '#e65100', text: `Betala: ${s.supplier_name} – ${fmt(s.total_amount)} (förfaller ${label})`, action: 'Visa', page: 'suppliers' });
     });
-    // Quotes awaiting signature
+    
+    // 3. Offertuppföljning (offerter utan svar i 7+ dagar)
     q.filter(r => r.share_id && (!r.signature_status || r.signature_status === 'pending')).forEach(r => {
       const days = Math.floor((Date.now() - new Date(r.created_at)) / 86400000);
-      if (days >= 3) todos.push({ color: 'var(--gold)', text: `Väntar på svar: ${r.client_name || 'Okänd'} – ${r.title || 'Offert'} (${days} dagar)`, action: 'Visa', page: 'generate' });
+      if (days >= 7) {
+        todos.push({ 
+          color: 'var(--gold)', 
+          text: `Följ upp offert: ${r.client_name || 'Okänd'} – ${r.title || 'Offert'} (${days} dagar sedan)`, 
+          action: 'Kontakta', 
+          page: 'generate' 
+        });
+      }
     });
-    // Draft invoices
+    
+    // 4. Momsdeadline (innevarande kvartal)
+    const momsDeadlines = getNextMomsDeadlines();
+    if (momsDeadlines.upcoming) {
+      const daysUntil = Math.floor((new Date(momsDeadlines.upcoming.date) - Date.now()) / 86400000);
+      if (daysUntil <= 14) {
+        const urgency = daysUntil <= 3 ? '#c62828' : daysUntil <= 7 ? '#e65100' : '#f57c00';
+        const label = daysUntil === 0 ? 'idag' : daysUntil === 1 ? 'imorgon' : `om ${daysUntil} dagar`;
+        todos.push({ 
+          color: urgency, 
+          text: `Momsdeklaration: ${momsDeadlines.upcoming.period} (deadline ${label})`, 
+          action: 'Deklarera', 
+          page: 'bookkeeping' 
+        });
+      }
+    }
+    
+    // 5. Utkast-fakturor
     inv.filter(i => i.status === 'draft').forEach(i => {
       todos.push({ color: '#888', text: `Utkast: ${i.title || 'Faktura'} – ${i.client_name || 'Okänd'}`, action: 'Bekräfta', page: 'invoices' });
     });
 
     const todoEl = document.getElementById('dashTodoList');
     if (todos.length === 0) {
-      todoEl.innerHTML = '<div style="padding:0.8rem 0;color:#2e7d32;font-size:0.88rem">Allt klart! Inga uppgifter just nu.</div>';
+      todoEl.innerHTML = '<div style="padding:0.8rem 0;color:#2e7d32;font-size:0.88rem">✓ Allt klart! Inga uppgifter just nu.</div>';
     } else {
       todoEl.innerHTML = todos.slice(0, 10).map(t =>
         `<div class="dash-todo-item"><span class="dash-todo-dot" style="background:${t.color}"></span><span class="dash-todo-text">${t.text}</span><span class="dash-todo-action" onclick="showPage('${t.page}')">${t.action}</span></div>`
@@ -4584,6 +4622,36 @@ async function loadUpcomingReminders() {
   }
   
   reminderEl.innerHTML = html;
+}
+
+// ===== MOMS DEADLINES =====
+function getNextMomsDeadlines() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1; // 1-12
+  
+  // Svenska momsdeadlines (12:e påföljande månad efter kvartalet)
+  const deadlines = [
+    { period: 'Q4 ' + (year - 1), date: new Date(year, 0, 12) }, // Jan 12
+    { period: 'Q1 ' + year, date: new Date(year, 3, 12) },       // Apr 12
+    { period: 'Q2 ' + year, date: new Date(year, 6, 12) },       // Jul 12
+    { period: 'Q3 ' + year, date: new Date(year, 9, 12) },       // Okt 12
+    { period: 'Q4 ' + year, date: new Date(year + 1, 0, 12) }    // Jan 12 nästa år
+  ];
+  
+  // Hitta nästa deadline
+  let upcoming = null;
+  let previous = null;
+  
+  for (let i = 0; i < deadlines.length; i++) {
+    if (deadlines[i].date > now && !upcoming) {
+      upcoming = deadlines[i];
+      previous = i > 0 ? deadlines[i - 1] : null;
+      break;
+    }
+  }
+  
+  return { upcoming, previous };
 }
 
 // ===== UPCOMING REMINDERS =====
@@ -4857,6 +4925,7 @@ function selectCustomerSuggestion(custId, dropdownId) {
   // Determine which context we're in
   if (dropdownId === 'invCustDropdown') {
     document.getElementById('invClient').value = c.name;
+    document.getElementById('invClientEmail').value = c.email || '';
     document.getElementById('invClientAddr').value = c.address || '';
   }
 }
@@ -7255,6 +7324,7 @@ init();
           <div id="invCustDropdown" class="cust-dropdown" style="display:none"></div>
         </div>
       </div>
+      <div class="field"><label>E-post</label><input id="invClientEmail" type="email" placeholder="kund@exempel.se"></div>
       <div class="field"><label>Kundadress</label><input id="invClientAddr" placeholder="Gatan 1, 123 45 Stad"></div>
       <div class="field"><label>Titel / Beskrivning</label><input id="invTitle" placeholder="t.ex. Renovering badrum"></div>
       <div class="field"><label>Betalningsvillkor</label>
