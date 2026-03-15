@@ -365,6 +365,12 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 /* dashboard */
 .dash-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; }
 .dash-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1rem 0.8rem; text-align: center; transition: box-shadow 0.15s; }
+.dash-card-wide { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; }
+.dash-todo-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #f0ede6; font-size: 0.85rem; gap: 0.5rem; }
+.dash-todo-item:last-child { border-bottom: none; }
+.dash-todo-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dash-todo-text { flex: 1; color: #444; }
+.dash-todo-action { font-size: 0.72rem; color: var(--gold); cursor: pointer; text-decoration: underline; white-space: nowrap; }
 .dash-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
 .dash-num { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; color: var(--ink); }
 .dash-label { font-size: 0.68rem; color: #999; margin-top: 0.15rem; }
@@ -735,6 +741,10 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   .dash-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
   .dash-charts-row { grid-template-columns: 1fr; }
   #page-dashboard > div:last-child { grid-template-columns: 1fr !important; }
+  #page-dashboard .dash-card-wide > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+  #page-dashboard > div[style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+  .dash-card-wide { padding: 1rem; }
+  .dash-card-wide .dash-num { font-size: 1rem !important; }
   .chart-container { margin-top: 0; }
   .dash-num { font-size: 1.1rem; }
   .mic-btn { height: 38px; font-size: 0.75rem; padding: 0 0.8rem; }
@@ -1585,28 +1595,51 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <div class="app-page" id="page-dashboard">
         <div class="page-title">Dashboard</div>
         <div class="page-sub">Översikt av din verksamhet</div>
+
+        <!-- Row 1: Core stats -->
         <div class="dash-grid" id="dashGrid">
           <div class="dash-card"><div class="dash-num" id="dashQuotes">0</div><div class="dash-label">Offerter totalt</div></div>
-          <div class="dash-card"><div class="dash-num" id="dashQuoteValue">0 kr</div><div class="dash-label">Offertvärde</div></div>
           <div class="dash-card"><div class="dash-num" id="dashInvoices">0</div><div class="dash-label">Fakturor</div></div>
-          <div class="dash-card"><div class="dash-num" id="dashInvoiceValue">0 kr</div><div class="dash-label">Fakturerat</div></div>
           <div class="dash-card"><div class="dash-num" id="dashPaid">0 kr</div><div class="dash-label">Betalt</div></div>
-          <div class="dash-card"><div class="dash-num" id="dashUnpaid">0 kr</div><div class="dash-label">Obetalt</div></div>
-          <div class="dash-card"><div class="dash-num" id="dashWinRate">–</div><div class="dash-label">Win-rate</div></div>
           <div class="dash-card"><div class="dash-num" id="dashMonthly">0 kr</div><div class="dash-label">Denna månad</div></div>
         </div>
 
+        <!-- Row 2: Resultat + Kassaflöde -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem">
+          <div class="dash-card-wide">
+            <div class="card-label">Resultat <span id="dashResYear" style="color:#888;font-weight:400"></span></div>
+            <div style="display:flex;gap:1.5rem;align-items:flex-end;margin-top:0.5rem;flex-wrap:wrap">
+              <div><div class="dash-num" id="dashResultat" style="font-size:1.6rem">–</div><div class="dash-label">Resultat</div></div>
+              <div><div class="dash-num" id="dashMarginal" style="font-size:1.1rem">–</div><div class="dash-label">Marginal</div></div>
+              <div><div class="dash-num" id="dashMomsAtt" style="font-size:1.1rem">–</div><div class="dash-label">Moms att betala</div></div>
+            </div>
+          </div>
+          <div class="dash-card-wide">
+            <div class="card-label">Kassaflöde</div>
+            <div style="display:flex;gap:1.5rem;align-items:flex-end;margin-top:0.5rem;flex-wrap:wrap">
+              <div><div class="dash-num" id="dashFordringar" style="font-size:1.1rem;color:var(--gold)">0 kr</div><div class="dash-label">Kundfordringar</div></div>
+              <div><div class="dash-num" id="dashSkulder" style="font-size:1.1rem;color:#c62828">0 kr</div><div class="dash-label">Lev.skulder</div></div>
+              <div><div class="dash-num" id="dashNetto" style="font-size:1.3rem">0 kr</div><div class="dash-label">Netto</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3: Charts -->
         <div class="dash-charts-row">
           <div class="chart-container">
             <div class="chart-header">
-              <div class="chart-title">Fakturerat per månad</div>
+              <div class="chart-title">Intäkter vs Kostnader</div>
               <div class="chart-nav">
                 <button onclick="changeChartYear(-1)" class="chart-nav-btn">‹</button>
                 <span id="chartYear" class="chart-year-label">2026</span>
                 <button onclick="changeChartYear(1)" class="chart-nav-btn">›</button>
               </div>
             </div>
-            <div id="chartInvoices" style="display:flex;align-items:flex-end;gap:6px;height:160px;padding:0.5rem 0"></div>
+            <div class="chart-legend" style="margin-bottom:0.5rem">
+              <span><span class="chart-legend-dot" style="background:#2e7d32"></span>Intäkter</span>
+              <span><span class="chart-legend-dot" style="background:#c62828"></span>Kostnader</span>
+            </div>
+            <div id="chartRevCost" style="display:flex;align-items:flex-end;gap:6px;height:160px;padding:0.5rem 0"></div>
           </div>
           <div class="chart-container">
             <div class="chart-header">
@@ -1620,15 +1653,10 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem">
-          <div>
-            <div class="card-label">Väntande offerter (7+ dagar)</div>
-            <div id="dashPending"><div style="padding:1rem;color:#aaa;font-size:0.85rem">Laddar...</div></div>
-          </div>
-          <div>
-            <div class="card-label" style="color:#c62828">Förfallna fakturor</div>
-            <div id="dashOverdue"><div style="padding:1rem;color:#aaa;font-size:0.85rem">Laddar...</div></div>
-          </div>
+        <!-- Row 4: To-do list -->
+        <div class="dash-card-wide" style="margin-top:1rem">
+          <div class="card-label">Att göra</div>
+          <div id="dashTodoList" style="margin-top:0.5rem"><div style="padding:1rem;color:#aaa;font-size:0.85rem">Laddar...</div></div>
         </div>
       </div>
 
@@ -4121,67 +4149,117 @@ function toggleMic() {
 async function loadDashboard() {
   if (!currentUser) return;
   const uid = currentUser.id;
+  const fmt = n => Number(n).toLocaleString('sv-SE', { maximumFractionDigits: 0 }) + ' kr';
+  const today = new Date().toISOString().slice(0, 10);
+  const yr = new Date().getFullYear();
+
   try {
-    // Fetch quotes
-    const { data: quotes } = await sb.from('quote_usage').select('total_amount,created_at,title,client_name').eq('user_id', uid).order('created_at', { ascending: false });
-    // Fetch invoices
-    const { data: invoices } = await sb.from('invoices').select('total_amount,status,due_date,created_at,client_name,title').eq('user_id', uid).order('created_at', { ascending: false });
-    const q = quotes || [];
-    const inv = invoices || [];
-    const quoteTotal = q.reduce((s, r) => s + (parseFloat(r.total_amount) || 0), 0);
-    const invTotal = inv.reduce((s, r) => s + (parseFloat(r.total_amount) || 0), 0);
+    // Fetch all data in parallel
+    const [quotesRes, invoicesRes, suppRes, rowsRes] = await Promise.all([
+      sb.from('quote_usage').select('total_amount,created_at,title,client_name,signature_status,share_id').eq('user_id', uid).order('created_at', { ascending: false }),
+      sb.from('invoices').select('total_amount,status,due_date,created_at,client_name,title,invoice_number,reminder_count').eq('user_id', uid).order('created_at', { ascending: false }),
+      sb.from('supplier_invoices').select('total_amount,status,due_date,supplier_name').eq('user_id', uid),
+      sb.from('verification_rows').select('account_number,debit,credit, verifications!inner(verification_date)').eq('user_id', uid)
+    ]);
+
+    const q = quotesRes.data || [];
+    const inv = invoicesRes.data || [];
+    const supp = suppRes.data || [];
+    const allRows = rowsRes.data || [];
+
+    // === CORE STATS ===
     const paid = inv.filter(i => i.status === 'paid').reduce((s, r) => s + (parseFloat(r.total_amount) || 0), 0);
-    const unpaid = invTotal - paid;
-    // Win rate
-    const winRate = q.length > 0 ? Math.round((inv.length / q.length) * 100) : 0;
-    // This month
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-    const monthly = inv.filter(i => i.created_at >= monthStart).reduce((s, r) => s + (parseFloat(r.total_amount) || 0), 0);
+    const monthly = inv.filter(i => i.created_at >= monthStart && i.status !== 'draft').reduce((s, r) => s + (parseFloat(r.total_amount) || 0), 0);
 
-    const fmt = n => Number(n).toLocaleString('sv-SE', { maximumFractionDigits: 0 }) + ' kr';
     document.getElementById('dashQuotes').textContent = q.length;
-    document.getElementById('dashQuoteValue').textContent = fmt(quoteTotal);
-    document.getElementById('dashInvoices').textContent = inv.length;
-    document.getElementById('dashInvoiceValue').textContent = fmt(invTotal);
+    document.getElementById('dashInvoices').textContent = inv.filter(i => i.status !== 'draft').length;
     document.getElementById('dashPaid').textContent = fmt(paid);
     document.getElementById('dashPaid').style.color = '#2e7d32';
-    document.getElementById('dashUnpaid').textContent = fmt(unpaid);
-    document.getElementById('dashUnpaid').style.color = unpaid > 0 ? '#e05' : '#2e7d32';
-    document.getElementById('dashWinRate').textContent = q.length > 0 ? winRate + '%' : '–';
     document.getElementById('dashMonthly').textContent = fmt(monthly);
 
-    // Pending quotes (older than 7 days, no invoice with same client+title)
-    const sevenDaysAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString();
-    const invClients = new Set(inv.map(i => (i.client_name || '').toLowerCase().trim()));
-    const pending = q.filter(r => r.created_at < sevenDaysAgo && !invClients.has((r.client_name || '').toLowerCase().trim()));
-    const pendEl = document.getElementById('dashPending');
-    if (pending.length === 0) {
-      pendEl.innerHTML = '<div style="padding:1rem;color:#888;font-size:0.85rem">Inga väntande offerter</div>';
-    } else {
-      pendEl.innerHTML = pending.slice(0, 10).map(r => {
-        const days = Math.floor((Date.now() - new Date(r.created_at)) / (1000*60*60*24));
-        return `<div class="dash-pending-item"><span>${r.client_name || 'Okänd kund'} – ${r.title || 'Offert'}</span><span class="days-ago">${days} dagar sedan</span></div>`;
-      }).join('');
-    }
+    // === RESULTAT + MARGINAL + MOMS ===
+    const yrRows = allRows.filter(r => r.verifications?.verification_date?.startsWith(String(yr)));
+    const saldo = {};
+    yrRows.forEach(r => {
+      if (!saldo[r.account_number]) saldo[r.account_number] = 0;
+      saldo[r.account_number] += (parseFloat(r.credit) || 0) - (parseFloat(r.debit) || 0);
+    });
+    // Revenue (class 3)
+    let revenue = 0;
+    Object.entries(saldo).forEach(([k, v]) => { if (k.startsWith('3')) revenue += v; });
+    // Costs (class 4-7)
+    let costs = 0;
+    Object.entries(saldo).forEach(([k, v]) => { if (k >= '4000' && k <= '7999') costs += Math.abs(v); });
+    const resultat = revenue - costs;
+    const marginal = revenue > 0 ? Math.round((resultat / revenue) * 100) : 0;
 
+    // Moms
+    const utgMoms = (saldo['2610'] || 0) + (saldo['2620'] || 0) + (saldo['2630'] || 0);
+    const ingMoms = -(saldo['2640'] || 0);
+    const momsAtt = utgMoms - ingMoms;
+
+    document.getElementById('dashResYear').textContent = yr;
+    const resEl = document.getElementById('dashResultat');
+    resEl.textContent = fmt(resultat);
+    resEl.style.color = resultat >= 0 ? '#2e7d32' : '#c62828';
+    document.getElementById('dashMarginal').textContent = marginal + '%';
+    document.getElementById('dashMarginal').style.color = marginal >= 0 ? '#2e7d32' : '#c62828';
+    const momsEl = document.getElementById('dashMomsAtt');
+    momsEl.textContent = fmt(Math.abs(momsAtt));
+    momsEl.style.color = momsAtt >= 0 ? '#c62828' : '#2e7d32';
+
+    // === KASSAFLÖDE ===
+    const kundfordringar = inv.filter(i => ['sent', 'overdue'].includes(i.status) || (i.status !== 'paid' && i.status !== 'draft' && i.status !== 'credited' && i.status !== 'credit_note'))
+      .reduce((s, r) => s + (parseFloat(r.total_amount) || 0), 0);
+    const levSkulder = supp.filter(s => s.status !== 'paid').reduce((s, r) => s + (parseFloat(r.total_amount) || 0), 0);
+    const netto = kundfordringar - levSkulder;
+
+    document.getElementById('dashFordringar').textContent = fmt(kundfordringar);
+    document.getElementById('dashSkulder').textContent = fmt(levSkulder);
+    const nettoEl = document.getElementById('dashNetto');
+    nettoEl.textContent = fmt(netto);
+    nettoEl.style.color = netto >= 0 ? '#2e7d32' : '#c62828';
+
+    // === ATT GÖRA-LISTA ===
+    let todos = [];
     // Overdue invoices
-    const today = new Date().toISOString().slice(0, 10);
-    const overdue = inv.filter(i => i.status !== 'paid' && i.due_date && i.due_date < today);
-    const overdueEl = document.getElementById('dashOverdue');
-    if (overdue.length === 0) {
-      overdueEl.innerHTML = '<div style="padding:1rem;color:#888;font-size:0.85rem">Inga förfallna fakturor</div>';
+    inv.filter(i => i.status !== 'paid' && i.status !== 'draft' && i.status !== 'credited' && i.status !== 'credit_note' && i.due_date && i.due_date < today).forEach(i => {
+      const days = Math.floor((Date.now() - new Date(i.due_date)) / 86400000);
+      todos.push({ color: '#c62828', text: `Förfallen faktura: ${i.invoice_number || ''} – ${i.client_name || 'Okänd'} (${days} dagar)`, action: 'Visa', page: 'invoices' });
+    });
+    // Supplier invoices due within 7 days
+    const in7days = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+    supp.filter(s => s.status !== 'paid' && s.due_date && s.due_date <= in7days).forEach(s => {
+      const days = Math.floor((new Date(s.due_date) - Date.now()) / 86400000);
+      const label = days < 0 ? `${Math.abs(days)} dagar förfallen` : days === 0 ? 'idag' : `om ${days} dagar`;
+      todos.push({ color: '#e65100', text: `Betala: ${s.supplier_name} – ${fmt(s.total_amount)} (förfaller ${label})`, action: 'Visa', page: 'suppliers' });
+    });
+    // Quotes awaiting signature
+    q.filter(r => r.share_id && (!r.signature_status || r.signature_status === 'pending')).forEach(r => {
+      const days = Math.floor((Date.now() - new Date(r.created_at)) / 86400000);
+      if (days >= 3) todos.push({ color: 'var(--gold)', text: `Väntar på svar: ${r.client_name || 'Okänd'} – ${r.title || 'Offert'} (${days} dagar)`, action: 'Visa', page: 'generate' });
+    });
+    // Draft invoices
+    inv.filter(i => i.status === 'draft').forEach(i => {
+      todos.push({ color: '#888', text: `Utkast: ${i.title || 'Faktura'} – ${i.client_name || 'Okänd'}`, action: 'Bekräfta', page: 'invoices' });
+    });
+
+    const todoEl = document.getElementById('dashTodoList');
+    if (todos.length === 0) {
+      todoEl.innerHTML = '<div style="padding:0.8rem 0;color:#2e7d32;font-size:0.88rem">Allt klart! Inga uppgifter just nu.</div>';
     } else {
-      overdueEl.innerHTML = overdue.map(i => {
-        const days = Math.floor((Date.now() - new Date(i.due_date)) / (1000*60*60*24));
-        return `<div class="dash-pending-item"><span>${i.client_name || 'Okänd'} – ${fmt(i.total_amount)}</span><span class="days-ago">${days} dagar förfallen</span></div>`;
-      }).join('');
+      todoEl.innerHTML = todos.slice(0, 10).map(t =>
+        `<div class="dash-todo-item"><span class="dash-todo-dot" style="background:${t.color}"></span><span class="dash-todo-text">${t.text}</span><span class="dash-todo-action" onclick="showPage('${t.page}')">${t.action}</span></div>`
+      ).join('');
     }
 
-    // ===== CHARTS =====
+    // === CHARTS ===
     window._dashQuotes = q;
     window._dashInvoices = inv;
-    window._chartYear = window._chartYear || new Date().getFullYear();
+    window._dashBkRows = allRows;
+    window._chartYear = window._chartYear || yr;
     renderCharts();
 
   } catch(e) { console.error('Dashboard error:', e); }
@@ -4199,29 +4277,43 @@ function changeChartYear(delta) {
 function renderCharts() {
   const q = window._dashQuotes || [];
   const inv = window._dashInvoices || [];
+  const allRows = window._dashBkRows || [];
   const year = _chartYear;
   document.getElementById('chartYear').textContent = year;
   const monthNames = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
 
-  // Chart 1: Fakturerat per månad
-  const invByMonth = Array(12).fill(0);
-  inv.filter(i => i.status !== 'draft' && i.status !== 'credit_note').forEach(i => {
-    const d = new Date(i.created_at);
-    if (d.getFullYear() === year) invByMonth[d.getMonth()] += Math.abs(parseFloat(i.total_amount)) || 0;
+  // Chart 1: Intäkter vs Kostnader per månad
+  const revByMonth = Array(12).fill(0);
+  const costByMonth = Array(12).fill(0);
+  allRows.forEach(r => {
+    const d = r.verifications?.verification_date;
+    if (!d || !d.startsWith(String(year))) return;
+    const m = parseInt(d.slice(5, 7)) - 1;
+    const acct = r.account_number || '';
+    if (acct.startsWith('3')) {
+      revByMonth[m] += (parseFloat(r.credit) || 0) - (parseFloat(r.debit) || 0);
+    } else if (acct >= '4000' && acct <= '7999') {
+      costByMonth[m] += (parseFloat(r.debit) || 0) - (parseFloat(r.credit) || 0);
+    }
   });
-  const maxInv = Math.max(...invByMonth, 1);
-  const el1 = document.getElementById('chartInvoices');
-  el1.innerHTML = invByMonth.map((val, i) => {
-    const pct = val > 0 ? Math.max((val / maxInv) * 100, 5) : 0;
-    const label = val > 0 ? (val >= 10000 ? Math.round(val/1000) + 'k' : Number(val).toLocaleString('sv-SE')) : '';
-    return `<div class="chart-bar-group">
-      <div class="chart-bar-value">${label}</div>
-      <div style="width:100%;height:130px;display:flex;align-items:flex-end">
-        <div class="chart-bar ${val > 0 ? 'teal' : 'empty'}" style="width:100%;height:${val > 0 ? pct + '%' : '3px'}"></div>
-      </div>
-      <div class="chart-bar-label">${monthNames[i]}</div>
-    </div>`;
-  }).join('');
+  const maxRC = Math.max(...revByMonth, ...costByMonth, 1);
+  const el1 = document.getElementById('chartRevCost');
+  if (el1) {
+    el1.innerHTML = Array(12).fill(0).map((_, i) => {
+      const rv = revByMonth[i], cv = costByMonth[i];
+      const rp = rv > 0 ? Math.max((rv / maxRC) * 100, 5) : 0;
+      const cp = cv > 0 ? Math.max((cv / maxRC) * 100, 5) : 0;
+      const label = rv > 0 || cv > 0 ? (rv >= 10000 ? Math.round(rv/1000) + 'k' : '') : '';
+      return `<div class="chart-bar-group">
+        <div class="chart-bar-value">${label}</div>
+        <div style="width:100%;height:130px;display:flex;align-items:flex-end;gap:2px">
+          <div class="chart-bar" style="flex:1;height:${rv > 0 ? rp + '%' : '3px'};background:${rv > 0 ? '#2e7d32' : '#eee'};border-radius:4px 4px 0 0"></div>
+          <div class="chart-bar" style="flex:1;height:${cv > 0 ? cp + '%' : '3px'};background:${cv > 0 ? '#c62828' : '#eee'};border-radius:4px 4px 0 0"></div>
+        </div>
+        <div class="chart-bar-label">${monthNames[i]}</div>
+      </div>`;
+    }).join('');
+  }
 
   // Chart 2: Offerter vs Fakturor per månad
   const qByMonth = Array(12).fill(0);
