@@ -1851,17 +1851,12 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <p>Välj en plan och betala säkert via Stripe</p>
     </div>
     <div class="upgrade-plans">
-      <div class="uplan" id="uplan-credit" onclick="selectUPlan('credit')">
-        <div class="uplan-name">Styck</div>
-        <div class="uplan-price">29 kr / offert</div>
-        <div class="uplan-features">1 AI-offert<br>Alla funktioner<br>Ingen bindningstid</div>
-      </div>
       <div class="uplan sel" id="uplan-pro" onclick="selectUPlan('pro')">
         <div class="uplan-name">Pro</div>
         <div class="uplan-price">99 kr/mån</div>
         <div class="uplan-features">10 AI-offerter/månad<br>Fullständig företagsprofil<br>Egen logotyp<br>Kund- &amp; artikelregister<br>Offerthistorik<br>Ingen bindningstid</div>
       </div>
-      <div class="uplan" id="uplan-unlimited" onclick="selectUPlan('unlimited')">
+      <div class="uplan" id="uplan-komplett" onclick="selectUPlan('komplett')">
         <div class="uplan-name">Komplett</div>
         <div class="uplan-price">249 kr/mån</div>
         <div class="uplan-features">Obegränsade AI-offerter<br><strong>Fakturering &amp; kreditfaktura</strong><br><strong>Bokföring (BAS 2026)</strong><br><strong>Kvittoskanning</strong><br>Resultat- &amp; balansräkning<br>Momsrapport &amp; SIE-export<br>Dashboard &amp; statistik<br>ROT/RUT-avdrag<br>Ingen bindningstid</div>
@@ -1879,17 +1874,16 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 //  Stripe payment links – ersätt med dina riktiga länkar från Stripe Dashboard
 const STRIPE_LINKS = {
-  credit:    'https://buy.stripe.com/CREDIT_LINK',
   pro:       'https://buy.stripe.com/PRO_LINK',
-  unlimited: 'https://buy.stripe.com/UNLIMITED_LINK'
+  komplett:  'https://buy.stripe.com/KOMPLETT_LINK'
 };
 
 // Anthropic API key – flytta till Supabase Edge Function i produktion!
 // API-nyckeln är nu säkert lagrad i Supabase Edge Function
 
-const PLAN_LIMITS = { free: 2, pro: 10, unlimited: Infinity };
-const INVOICE_LIMITS = { free: 0, pro: 0, unlimited: Infinity };
-const PLAN_LABELS = { free: 'Gratis', pro: 'Pro', unlimited: 'Komplett', credit: 'Styck' };
+const PLAN_LIMITS = { free: 2, pro: 10, komplett: Infinity };
+const INVOICE_LIMITS = { free: 0, pro: 0, komplett: Infinity };
+const PLAN_LABELS = { free: 'Gratis', pro: 'Pro', komplett: 'Komplett' };
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
@@ -2016,13 +2010,13 @@ function updateUI(profile, used, total) {
   document.getElementById('sidebarPlan').textContent = PLAN_LABELS[plan];
   document.getElementById('sidebarQuotaCount').textContent = `${used} / ${limitStr} denna månad`;
   document.getElementById('sidebarQuotaBar').style.width = limit === Infinity ? '20%' : `${Math.min(100, used/limit*100)}%`;
-  if (plan === 'unlimited') document.getElementById('upgradeBtn').style.display = 'none';
+  if (plan === 'komplett') document.getElementById('upgradeBtn').style.display = 'none';
 
   document.getElementById('statTotal').textContent = total;
   document.getElementById('statLeft').textContent = left;
 
   const qNote = document.getElementById('quotaNote');
-  if (plan !== 'unlimited' && used >= limit) {
+  if (plan !== 'komplett' && used >= limit) {
     qNote.innerHTML = 'Veckogränsen nådd! <a onclick="openUpgradeModal()" style="color:var(--gold);font-weight:700;cursor:pointer;text-decoration:underline">Uppgradera nu →</a>';
     qNote.className = 'quota-note warn';
     document.getElementById('genBtn').disabled = true;
@@ -2046,7 +2040,7 @@ function updateUI(profile, used, total) {
   }
   
   // Show mobile hamburger drawer
-  const planName = profile?.plan === 'pro' ? 'Pro' : profile?.plan === 'unlimited' ? 'Unlimited' : profile?.plan === 'styck' ? 'Styck' : 'Gratis';
+  const planName = PLAN_LABELS[profile?.plan] || 'Gratis';
   const drawerLimit = PLAN_LIMITS[profile?.plan || 'free'] === Infinity ? '∞' : PLAN_LIMITS[profile?.plan || 'free'];
   showMobileTabBar(true, planName, used, drawerLimit);
 }
@@ -2443,7 +2437,7 @@ function statusLabel(s) {
 
 async function loadInvoices() {
   const plan = currentProfile?.plan || 'free';
-  if (plan !== 'unlimited') {
+  if (plan !== 'komplett') {
     document.getElementById('invSummary').style.display = 'none';
     document.getElementById('invoiceContent').innerHTML = `
       <div style="text-align:center;padding:3rem 1.5rem">
