@@ -3654,11 +3654,7 @@ function renderExamplePills(override){var el=document.getElementById('examplePil
 let currentInfo = {};
 
 async function generateQuote() {
-  const plan = currentProfile?.plan || 'free';
-  const limit = PLAN_LIMITS[plan];
-  if (limit !== Infinity && monthlyUsed >= limit) {
-    openUpgradeModal(); return;
-  }
+  // Plan-limit kollas nu av Edge Function (super-task)
   const jobText = document.getElementById('jobPrompt').value.trim();
   if (!jobText) { alert('Beskriv uppdraget först!'); return; }
 
