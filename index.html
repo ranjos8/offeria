@@ -460,10 +460,9 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 /* upgrade modal */
 .upgrade-modal { max-width: 560px; }
 .upgrade-plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; padding: 1.5rem 2rem; }
-.uplan { border: 1.5px solid var(--border); border-radius: 12px; padding: 1.2rem; cursor: pointer; transition: all 0.15s; position: relative; }
+.uplan { border: 1.5px solid var(--border); border-radius: 12px; padding: 1.2rem; cursor: pointer; transition: all 0.15s; }
 .uplan:hover { border-color: var(--gold); }
 .uplan.sel { border-color: var(--gold); background: #fffaee; }
-.uplan-badge { position: absolute; top: -10px; right: 12px; background: var(--gold); color: white; padding: 0.25rem 0.7rem; border-radius: 12px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; }
 .uplan-name { font-family: 'Fraunces', serif; font-size: 1rem; margin-bottom: 0.2rem; }
 .uplan-price { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.6rem; }
 .uplan-features { font-size: 0.72rem; color: #666; line-height: 1.6; }
@@ -1066,46 +1065,43 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div><span class="plan-amount">0</span><span class="plan-period"> kr/mån</span></div>
           <ul class="plan-features">
             <li>2 AI-offerter per månad</li>
-            <li>Grundläggande fakturering</li>
-            <li>Dela via länk & PDF</li>
+            <li>Dela via länk &amp; PDF</li>
+            <li>Redigerbara rader</li>
             <li>ROT/RUT-beräkning</li>
-            <li style="color:#888;font-style:italic">Ingen bokföring</li>
-            <li style="color:#888;font-style:italic">Ingen logo</li>
+            <li style="color:#888;font-style:italic">Offeria-branding i offerten</li>
           </ul>
           <button class="plan-cta" onclick="openModal('register')">Kom igång gratis</button>
         </div>
         <div class="plan">
           <div class="plan-name">Pro</div>
           <div class="plan-tagline">För aktiva hantverkare</div>
-          <div><span class="plan-amount">149</span><span class="plan-period"> kr/mån</span></div>
+          <div><span class="plan-amount">99</span><span class="plan-period"> kr/mån</span></div>
           <ul class="plan-features">
             <li>10 AI-offerter per månad</li>
-            <li><strong>Full fakturering</strong> (ROT/RUT, kredit)</li>
-            <li>Grundläggande bokföring</li>
-            <li>E-signering</li>
-            <li>Dashboard & statistik</li>
-            <li>Logo i offerter</li>
             <li>Fullständig företagsprofil</li>
+            <li>Egen logotyp på offerter</li>
+            <li>Kund- &amp; artikelregister</li>
+            <li>Offerthistorik</li>
+            <li>Dela via länk &amp; PDF</li>
             <li>Ingen bindningstid</li>
           </ul>
           <button class="plan-cta" onclick="openModal('register')">Välj Pro</button>
         </div>
         <div class="plan featured">
-          <div class="plan-badge">Populärast</div>
           <div class="plan-name">Komplett</div>
           <div class="plan-tagline">Allt du behöver</div>
-          <div><span class="plan-amount">349</span><span class="plan-period"> kr/mån</span></div>
+          <div><span class="plan-amount">249</span><span class="plan-period"> kr/mån</span></div>
           <ul class="plan-features">
             <li>Obegränsade AI-offerter</li>
-            <li><strong>Full fakturering</strong> (ROT/RUT, kredit, påminnelser)</li>
-            <li><strong>Full bokföring</strong> (BAS 2026, automatisk)</li>
-            <li><strong>Bankimport</strong> CSV/OFX</li>
-            <li><strong>Automatiska påminnelser</strong> e-post</li>
-            <li><strong>Kvittoskanning</strong> med OCR</li>
-            <li>Leverantörsfakturor</li>
-            <li>Moms & SIE-export</li>
-            <li>E-signering</li>
-            <li>Dashboard & statistik</li>
+            <li><strong>Fakturering &amp; kreditfaktura</strong></li>
+            <li><strong>Bokföring med BAS-kontoplan</strong></li>
+            <li><strong>Fota kvitto — automatisk bokföring</strong></li>
+            <li>Resultat- &amp; balansräkning</li>
+            <li>Momsrapport</li>
+            <li>SIE-export till revisor</li>
+            <li>Dashboard &amp; statistik</li>
+            <li>ROT/RUT-avdrag</li>
+            <li>Egen logotyp</li>
             <li>Ingen bindningstid</li>
           </ul>
           <button class="plan-cta" onclick="openModal('register')">Välj Komplett</button>
@@ -1117,8 +1113,8 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <ul class="plan-features">
             <li>Allt i Komplett</li>
             <li>API-integration</li>
-            <li>White label</li>
-            <li>Dedikerad support</li>
+            <li>Flera användare / team</li>
+            <li>Faktura istället för kort</li>
             <li>Anpassningar efter era behov</li>
           </ul>
           <button class="plan-cta" onclick="window.location.href='kontakta-oss.html'">Kontakta oss</button>
@@ -1587,54 +1583,6 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
               <div id="logoInfoMsg" style="display:none;margin-top:0.6rem;padding:0.6rem 0.9rem;border-radius:8px;font-size:0.8rem;line-height:1.5"></div>
             </div>
           </div>
-
-          <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
-            <div class="card-label">
-              <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2-2v16"/><path d="M22 11l-10 6-10-6"/></svg></span> Automatiska påminnelser
-              <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Schemalagda e-postpåminnelser för förfallna fakturor</span>
-            </div>
-            <div style="background:var(--cream);border-left:3px solid var(--teal);padding:1rem;border-radius:6px;margin-bottom:1rem">
-              <div style="font-size:0.82rem;line-height:1.6">
-                <strong>Så fungerar det:</strong> Systemet skickar automatiskt e-postpåminnelser till kunder med förfallna fakturor enligt schemat nedan. Påminnelseavgift 60 kr läggs till från 2:a påminnelsen.
-              </div>
-            </div>
-            <div style="margin-bottom:1rem">
-              <label style="display:flex;align-items:center;gap:0.6rem;cursor:pointer;font-weight:600;margin-bottom:0.8rem">
-                <input type="checkbox" id="pReminderEnabled" onchange="toggleReminderSettings()" style="width:18px;height:18px;cursor:pointer">
-                <span>Aktivera automatiska påminnelser</span>
-              </label>
-            </div>
-            <div id="reminderSettingsPanel" style="display:none">
-              <div class="field" style="margin-bottom:1rem">
-                <label>Schema (dagar efter förfallodatum)</label>
-                <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:0.5rem">
-                  <label style="display:flex;align-items:center;gap:0.4rem;padding:0.5rem 0.9rem;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;background:white">
-                    <input type="checkbox" class="reminder-day-checkbox" value="7" checked>
-                    <span style="font-size:0.85rem">7 dagar</span>
-                  </label>
-                  <label style="display:flex;align-items:center;gap:0.4rem;padding:0.5rem 0.9rem;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;background:white">
-                    <input type="checkbox" class="reminder-day-checkbox" value="14" checked>
-                    <span style="font-size:0.85rem">14 dagar</span>
-                  </label>
-                  <label style="display:flex;align-items:center;gap:0.4rem;padding:0.5rem 0.9rem;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;background:white">
-                    <input type="checkbox" class="reminder-day-checkbox" value="21">
-                    <span style="font-size:0.85rem">21 dagar</span>
-                  </label>
-                  <label style="display:flex;align-items:center;gap:0.4rem;padding:0.5rem 0.9rem;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;background:white">
-                    <input type="checkbox" class="reminder-day-checkbox" value="30" checked>
-                    <span style="font-size:0.85rem">30 dagar</span>
-                  </label>
-                </div>
-                <div style="font-size:0.75rem;color:#888;margin-top:0.5rem">
-                  Välj efter hur många dagar påminnelser ska skickas. Minst 7 dagar mellan varje påminnelse.
-                </div>
-              </div>
-              <div style="background:#fff8f0;border:1px solid #ffe0b2;padding:0.9rem;border-radius:6px;font-size:0.8rem;color:#e65100">
-                <strong>⚠️ Kom ihåg:</strong> E-postpåminnelser skickas automatiskt från <strong>invoices@offeria.se</strong>. Kunder kan svara direkt till din e-post. Påminnelser skickas kl. 10:00 varje dag för fakturor som uppfyller schemat.
-              </div>
-            </div>
-          </div>
-
           <div style="margin-top:1.2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.8rem">
             <div style="display:flex;align-items:center;gap:0.8rem">
               <button class="save-btn" onclick="saveProfile()">Spara profil</button>
@@ -1712,20 +1660,6 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div class="card-label">Att göra</div>
           <div id="dashTodoList" style="margin-top:0.5rem"><div style="padding:1rem;color:#aaa;font-size:0.85rem">Laddar...</div></div>
         </div>
-
-        <!-- Row 5: Upcoming Reminders -->
-        <div class="dash-card-wide" style="margin-top:1rem">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem">
-            <div class="card-label">
-              <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2-2v16"/><path d="M22 11l-10 6-10-6"/></svg></span>
-              Kommande påminnelser
-            </div>
-            <a onclick="showPage('profile')" style="font-size:0.75rem;color:var(--gold);cursor:pointer;text-decoration:underline">Inställningar</a>
-          </div>
-          <div id="dashRemindersList" style="margin-top:0.5rem">
-            <div style="padding:1rem;color:#aaa;font-size:0.85rem">Laddar...</div>
-          </div>
-        </div>
       </div>
 
       <!-- CUSTOMERS PAGE -->
@@ -1762,7 +1696,6 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <button class="tab-btn" id="bkTabBalans" onclick="switchBkTab('balans')">Balans</button>
           <button class="tab-btn" id="bkTabMoms" onclick="switchBkTab('moms')">Moms</button>
           <button class="tab-btn" id="bkTabKonton" onclick="switchBkTab('konton')">Konton</button>
-          <button class="tab-btn" id="bkTabArsbokslut" onclick="switchBkTab('arsbokslut')">Årsbokslut</button>
         </div>
 
         <!-- GRUNDBOK (verifikationer i registreringsordning) -->
@@ -1783,7 +1716,6 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
               <button onclick="exportSIE4()" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem" title="Exportera SIE4-fil för revisor eller annat bokföringsprogram"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> SIE-export</button>
               <button onclick="lockCurrentPeriod()" id="bkLockBtn" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem;display:none" title="Lås vald period — förhindrar ändringar"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span> Lås period</button>
               <button onclick="importSIE4()" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem" title="Importera SIE-fil från annat bokföringsprogram"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> SIE-import</button>
-              <button onclick="openBankImport()" class="btn-sm" style="font-size:0.78rem;padding:0.4rem 0.8rem;background:var(--teal);border-color:var(--teal);color:white" title="Importera bankkontoutdrag (CSV/OFX) och matcha transaktioner automatiskt"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span> Bankimport</button>
             </div>
           </div>
           <div id="grundbokContent"><div style="padding:2rem;text-align:center;color:#aaa">Laddar...</div></div>
@@ -1835,23 +1767,6 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <input id="bkAccountSearch" type="text" placeholder="Sök konto..." oninput="renderKontoplan()" style="flex:1;min-width:0;padding:0.5rem 0.8rem;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem">
           </div>
           <div id="kontoplanContent"></div>
-        </div>
-
-        <!-- ÅRSBOKSLUT (K1 + NE-bilaga) -->
-        <div id="bkArsbokslut" style="display:none">
-          <div style="margin-bottom:1.5rem">
-            <div style="display:flex;gap:0.8rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
-              <select id="arsYear" onchange="renderArsbokslut()" style="padding:0.5rem 0.8rem;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem"></select>
-              <button onclick="generateArsbokslut()" class="gen-btn" style="padding:0.5rem 1.2rem">
-                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
-                Generera årsbokslut
-              </button>
-            </div>
-            <div style="background:#fffef6;border:1px solid #e8d49a;border-radius:8px;padding:1rem;margin-bottom:1rem;font-size:0.85rem;color:#666">
-              <strong>💡 Info:</strong> Årsbokslutet genereras från din bokföring och inkluderar K1-blankett (inkomst av näringsverksamhet) och NE-bilaga (specificerad resultaträkning). Använd detta som underlag för din deklaration.
-            </div>
-          </div>
-          <div id="arsbokslutContent"></div>
         </div>
       </div>
 
@@ -1936,21 +1851,20 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <p>Välj en plan och betala säkert via Stripe</p>
     </div>
     <div class="upgrade-plans">
-      <div class="uplan" id="uplan-pro" onclick="selectUPlan('pro')">
-        <div class="uplan-name">Pro</div>
-        <div class="uplan-price">149 kr/mån</div>
-        <div class="uplan-features">10 AI-offerter/månad<br><strong>Full fakturering</strong> (ROT/RUT, kredit)<br>Grundläggande bokföring<br>E-signering<br>Dashboard & statistik<br>Logo i offerter<br>Ingen bindningstid</div>
-      </div>
-      <div class="uplan sel" id="uplan-unlimited" onclick="selectUPlan('unlimited')">
-        <div class="uplan-badge">Populärast</div>
-        <div class="uplan-name">Komplett</div>
-        <div class="uplan-price">349 kr/mån</div>
-        <div class="uplan-features">Obegränsade AI-offerter<br><strong>Full fakturering</strong> (ROT/RUT, kredit, påminnelser)<br><strong>Full bokföring</strong> (BAS 2026, automatisk)<br><strong>Bankimport</strong> CSV/OFX<br><strong>Automatiska påminnelser</strong><br>Kvittoskanning<br>Moms & SIE-export<br>Leverantörsfakturor<br>E-signering<br>Ingen bindningstid</div>
-      </div>
       <div class="uplan" id="uplan-credit" onclick="selectUPlan('credit')">
         <div class="uplan-name">Styck</div>
         <div class="uplan-price">29 kr / offert</div>
-        <div class="uplan-features">1 AI-offert<br>Alla funktioner<br>Ingen bindningstid<br>Perfekt för enstaka jobb</div>
+        <div class="uplan-features">1 AI-offert<br>Alla funktioner<br>Ingen bindningstid</div>
+      </div>
+      <div class="uplan sel" id="uplan-pro" onclick="selectUPlan('pro')">
+        <div class="uplan-name">Pro</div>
+        <div class="uplan-price">99 kr/mån</div>
+        <div class="uplan-features">10 AI-offerter/månad<br>Fullständig företagsprofil<br>Egen logotyp<br>Kund- &amp; artikelregister<br>Offerthistorik<br>Ingen bindningstid</div>
+      </div>
+      <div class="uplan" id="uplan-unlimited" onclick="selectUPlan('unlimited')">
+        <div class="uplan-name">Komplett</div>
+        <div class="uplan-price">249 kr/mån</div>
+        <div class="uplan-features">Obegränsade AI-offerter<br><strong>Fakturering &amp; kreditfaktura</strong><br><strong>Bokföring (BAS 2026)</strong><br><strong>Kvittoskanning</strong><br>Resultat- &amp; balansräkning<br>Momsrapport &amp; SIE-export<br>Dashboard &amp; statistik<br>ROT/RUT-avdrag<br>Ingen bindningstid</div>
       </div>
     </div>
     <div class="stripe-note">Betalning hanteras säkert av Stripe. Du kan avbryta när som helst.</div>
@@ -1985,55 +1899,18 @@ let monthlyUsed = 0;
 // ===== SECURITY & VALIDATION UTILITIES =====
 
 /**
- * Säker HTML-rendering med DOMPurify
- * Använd ALLTID denna istället för element.innerHTML direkt
- */
-function safeHTML(element, html) {
-  if (typeof DOMPurify !== 'undefined') {
-    element.innerHTML = DOMPurify.sanitize(html);
-  } else {
-    console.warn('DOMPurify not loaded, using unsafe innerHTML');
-    element.innerHTML = html;
-  }
-}
-
-/**
- * Validera att bokföringsverifikation balanserar
- * Debet måste = Kredit
- */
-function validateVerification(rows) {
-  const debitSum = rows.reduce((sum, row) => sum + (parseFloat(row.debit) || 0), 0);
-  const creditSum = rows.reduce((sum, row) => sum + (parseFloat(row.credit) || 0), 0);
-  const diff = Math.abs(debitSum - creditSum);
-  
-  if (diff > 0.01) {
-    return {
-      valid: false,
-      message: `⚠️ Verifikationen balanserar inte!\n\nDebet: ${debitSum.toFixed(2)} kr\nKredit: ${creditSum.toFixed(2)} kr\nSkillnad: ${diff.toFixed(2)} kr\n\nDebet och kredit måste vara lika.`,
-      debitSum,
-      creditSum,
-      diff
-    };
-  }
-  
-  return { valid: true };
-}
-
-/**
  * Bokförings-disclaimer som visas innan export
  */
 function showBookkeepingDisclaimer(callback) {
-  const disclaimerText = `
-    ⚠️ VIKTIG INFORMATION OM BOKFÖRING
-    
-    Detta är ett hjälpmedel för bokföring, INTE en ersättning för professionell rådgivning.
-    
-    • Kontrollera ALLTID din bokföring med en auktoriserad redovisningskonsult innan inlämning till Skatteverket
-    • Offeria.se ansvarar INTE för fel i bokföringen eller konsekvenser av felaktig deklaration
-    • Du är själv ansvarig för att din bokföring följer bokföringslagen och skattelagstiftning
-    
-    Vill du fortsätta med export?
-  `;
+  const disclaimerText = `⚠️ VIKTIG INFORMATION OM BOKFÖRING
+
+Detta är ett hjälpmedel för bokföring, INTE en ersättning för professionell rådgivning.
+
+• Kontrollera ALLTID din bokföring med en auktoriserad redovisningskonsult innan inlämning till Skatteverket
+• Offeria.se ansvarar INTE för fel i bokföringen eller konsekvenser av felaktig deklaration  
+• Du är själv ansvarig för att din bokföring följer bokföringslagen och skattelagstiftning
+
+Vill du fortsätta med export?`;
   
   if (confirm(disclaimerText)) {
     callback();
@@ -2133,7 +2010,7 @@ function updateUI(profile, used, total) {
   document.getElementById('navUserArea').style.display = 'flex';
   document.getElementById('navAuthBtns').style.display = 'none';
   document.getElementById('mobileMenu').style.display = 'none';
-  document.getElementById('navUserName').textContent = profile?.company_name || profile?.full_name || profile?.email || '';
+  document.getElementById('navUserName').textContent = profile?.full_name || profile?.email || '';
   document.getElementById('navPlanBadge').textContent = PLAN_LABELS[plan];
 
   document.getElementById('sidebarPlan').textContent = PLAN_LABELS[plan];
@@ -2310,7 +2187,6 @@ function fillProfileForm(profile) {
   document.getElementById('pCertifications').value = profile.certifications || '';
   document.getElementById('pPaymentMethods').value = profile.payment_methods || '';
   document.getElementById('pWarranty').value = profile.warranty_text || '';
-  
   // Fill industry chips
   const industries = profile.industries ? JSON.parse(profile.industries) : [];
   document.querySelectorAll('#profileIndustryChips input[type=checkbox]').forEach(cb => {
@@ -2318,21 +2194,6 @@ function fillProfileForm(profile) {
     cb.checked = on;
     cb.closest('.chip').classList.toggle('on', on);
   });
-  
-  // Fill reminder settings
-  const reminderEnabled = profile.reminder_enabled !== false; // Default true
-  const reminderDays = profile.reminder_days_schedule ? JSON.parse(profile.reminder_days_schedule) : [7, 14, 30];
-  
-  const reminderCheckbox = document.getElementById('pReminderEnabled');
-  if (reminderCheckbox) {
-    reminderCheckbox.checked = reminderEnabled;
-    toggleReminderSettings();
-  }
-  
-  document.querySelectorAll('.reminder-day-checkbox').forEach(cb => {
-    cb.checked = reminderDays.includes(parseInt(cb.value));
-  });
-  
   // Pre-select defaults on generate page
   if (profile.default_vat) document.getElementById('vatRate').value = profile.default_vat;
   if (profile.default_pay_terms) document.getElementById('payTerms').value = profile.default_pay_terms;
@@ -2340,12 +2201,6 @@ function fillProfileForm(profile) {
     const sel = document.getElementById('industry');
     if (sel && industries.includes(sel.value) === false) sel.value = industries[0];
   }
-}
-
-function toggleReminderSettings() {
-  const enabled = document.getElementById('pReminderEnabled')?.checked;
-  const panel = document.getElementById('reminderSettingsPanel');
-  if (panel) panel.style.display = enabled ? 'block' : 'none';
 }
 
 function toggleProfileChip(id, cb) {
@@ -2357,11 +2212,6 @@ async function saveProfile() {
   btn.textContent = 'Sparar...';
   btn.disabled = true;
   const selectedIndustries = [...document.querySelectorAll('#profileIndustryChips input[type=checkbox]:checked')].map(cb => cb.value);
-  
-  // Get reminder settings
-  const reminderEnabled = document.getElementById('pReminderEnabled')?.checked || false;
-  const reminderDays = [...document.querySelectorAll('.reminder-day-checkbox:checked')].map(cb => parseInt(cb.value));
-  
   const updates = {
     company_name: document.getElementById('pCompany').value.trim(),
     org_number: document.getElementById('pOrg').value.trim(),
@@ -2381,8 +2231,6 @@ async function saveProfile() {
     payment_methods: document.getElementById('pPaymentMethods').value.trim(),
     warranty_text: document.getElementById('pWarranty').value.trim(),
     industries: JSON.stringify(selectedIndustries),
-    reminder_enabled: reminderEnabled,
-    reminder_days_schedule: JSON.stringify(reminderDays.length > 0 ? reminderDays.sort((a,b) => a-b) : [7, 14, 30])
   };
   const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
   if (error) {
@@ -2735,15 +2583,13 @@ async function markInvoiceUnpaid(idx) {
 // ===== INVOICE MODAL =====
 function openNewInvoiceModal() {
   document.getElementById('invClient').value = '';
-  document.getElementById('invClientEmail').value = '';
   document.getElementById('invClientAddr').value = '';
   document.getElementById('invTitle').value = '';
   document.getElementById('invRows').innerHTML = `
-    <div class="inv-row-entry" style="display:grid;grid-template-columns:1.8fr 1fr 0.6fr 0.9fr;gap:0.4rem;margin-bottom:0.5rem;align-items:end">
+    <div class="inv-row-entry" style="display:grid;grid-template-columns:2fr 0.7fr 1fr;gap:0.5rem;margin-bottom:0.5rem;align-items:end">
       <div class="field" style="margin:0"><label style="font-size:0.7rem">Beskrivning</label><input class="inv-desc" placeholder="Arbete..."></div>
-      <div class="field" style="margin:0"><label style="font-size:0.7rem">Typ</label><select class="inv-type" style="padding:0.5rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem"><option value="arbete">Arbete</option><option value="material">Material</option></select></div>
       <div class="field" style="margin:0"><label style="font-size:0.7rem">Antal</label><input class="inv-qty" type="number" value="1" min="1"></div>
-      <div class="field" style="margin:0"><label style="font-size:0.7rem">À-pris</label><input class="inv-price" type="number" placeholder="0"></div>
+      <div class="field" style="margin:0"><label style="font-size:0.7rem">À-pris (kr)</label><input class="inv-price" type="number" placeholder="0"></div>
     </div>`;
   // Set VAT from profile
   const pVat = currentProfile?.default_vat;
@@ -2762,10 +2608,9 @@ function addInvRow() {
   const container = document.getElementById('invRows');
   const row = document.createElement('div');
   row.className = 'inv-row-entry';
-  row.style = 'display:grid;grid-template-columns:1.8fr 1fr 0.6fr 0.9fr auto;gap:0.4rem;margin-bottom:0.5rem;align-items:end';
+  row.style = 'display:grid;grid-template-columns:1.3fr 0.5fr 0.8fr auto;gap:0.4rem;margin-bottom:0.5rem;align-items:end';
   row.innerHTML = `
     <div class="field" style="margin:0"><input class="inv-desc" placeholder="Arbete..."></div>
-    <div class="field" style="margin:0"><select class="inv-type" style="padding:0.5rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem"><option value="arbete">Arbete</option><option value="material">Material</option></select></div>
     <div class="field" style="margin:0"><input class="inv-qty" type="number" value="1" min="1"></div>
     <div class="field" style="margin:0"><input class="inv-price" type="number" placeholder="0"></div>
     <button onclick="this.parentElement.remove()" style="background:none;border:none;color:#c62828;cursor:pointer;font-size:1.1rem;padding:0.3rem">✕</button>`;
@@ -2785,24 +2630,13 @@ function buildInvoiceHtml(info, invoiceData) {
   const vatRate = invoiceData.vatRate || 25;
   const isCredit = invoiceData.isCredit || false;
   const inclRot = invoiceData.inclRot || false;
-  const rotRutType = invoiceData.rotRutType || 'none';
-  const rotRutLabel = invoiceData.rotRutLabel || 'ROT-avdrag (30% av arbete)';
   const sign = isCredit ? -1 : 1;
   const subtotal = invoiceData.items.reduce((s, it) => s + it.qty * it.price, 0) * sign;
   const vatAmount = Math.round(Math.abs(subtotal) * vatRate / 100) * sign;
   const totalInclVat = subtotal + vatAmount;
   const arbeteSub = invoiceData.items.filter(it => it.type !== 'material').reduce((s, it) => s + it.qty * it.price, 0) * sign;
-  
-  let rotRutAmount = 0;
-  if (inclRot && !isCredit) {
-    if (rotRutType === 'rut') {
-      rotRutAmount = Math.min(Math.abs(arbeteSub) * 0.5, 75000);
-    } else {
-      rotRutAmount = Math.min(Math.abs(arbeteSub) * 0.3, 50000);
-    }
-  }
-  
-  const total = totalInclVat - rotRutAmount;
+  const rotAmount = inclRot && !isCredit ? Math.min(Math.abs(arbeteSub) * 0.3, 50000) : 0;
+  const total = totalInclVat - rotAmount;
   const vatNumber = info.vatNumber || computeVatNumber(info.orgNum);
   const docType = isCredit ? 'KREDITFAKTURA' : (invoiceData.invoiceNumber === 'UTKAST' ? 'UTKAST – FAKTURA' : 'FAKTURA');
 
@@ -2836,8 +2670,8 @@ function buildInvoiceHtml(info, invoiceData) {
     <div class="q-totals"><div class="q-totals-box">
       <div class="trow"><span>Netto (exkl. moms)</span><span>${Number(subtotal).toLocaleString('sv-SE')} kr</span></div>
       <div class="trow"><span>Moms (${vatRate}%)</span><span>${Number(vatAmount).toLocaleString('sv-SE')} kr</span></div>
-      ${inclRot && rotRutAmount > 0 ? `<div class="trow"><span>Totalt (inkl. moms)</span><span>${Number(totalInclVat).toLocaleString('sv-SE')} kr</span></div><div class="trow rot-row"><span>${rotRutLabel}</span><span>- ${Number(rotRutAmount).toLocaleString('sv-SE')} kr</span></div>` : ''}
-      <div class="trow final-row"><span>${isCredit ? 'ER TILLGODO' : (inclRot && rotRutAmount > 0 ? `ATT BETALA (efter ${rotRutType.toUpperCase()})` : 'ATT BETALA')}</span><span>${Number(total).toLocaleString('sv-SE')} kr</span></div>
+      ${inclRot && rotAmount > 0 ? `<div class="trow"><span>Totalt (inkl. moms)</span><span>${Number(totalInclVat).toLocaleString('sv-SE')} kr</span></div><div class="trow rot-row"><span>ROT-avdrag (30% av arbete)</span><span>- ${Number(rotAmount).toLocaleString('sv-SE')} kr</span></div>` : ''}
+      <div class="trow final-row"><span>${isCredit ? 'ER TILLGODO' : (inclRot && rotAmount > 0 ? 'ATT BETALA (efter ROT)' : 'ATT BETALA')}</span><span>${Number(total).toLocaleString('sv-SE')} kr</span></div>
     </div></div>
     ${!isCredit ? `<div class="q-terms"><h4>Betalningsinformation</h4>
       ${info.bankgiro ? `Bankgiro: <strong>${info.bankgiro}</strong><br>` : ''}
@@ -2855,7 +2689,6 @@ function buildInvoiceHtml(info, invoiceData) {
 async function createManualInvoice() {
   if (!(await checkInvoiceLimit())) return;
   const client = document.getElementById('invClient').value.trim();
-  const clientEmail = document.getElementById('invClientEmail').value.trim();
   const clientAddr = document.getElementById('invClientAddr').value.trim();
   const title = document.getElementById('invTitle').value.trim();
   if (!client || !title) return alert('Fyll i kund och titel.');
@@ -2864,31 +2697,19 @@ async function createManualInvoice() {
   const items = [];
   rows.forEach(r => {
     const desc = r.querySelector('.inv-desc')?.value?.trim();
-    const type = r.querySelector('.inv-type')?.value || 'arbete';
     const qty = parseInt(r.querySelector('.inv-qty')?.value) || 1;
     const price = parseFloat(r.querySelector('.inv-price')?.value) || 0;
-    if (desc && price > 0) items.push({ desc, qty, price, type });
+    if (desc && price > 0) items.push({ desc, qty, price });
   });
   if (items.length === 0) return alert('Lägg till minst en rad med pris.');
 
   const payDays = parseInt(document.getElementById('invPayTerms').value) || 30;
   const vatRate = parseInt(document.getElementById('invVat').value) || 25;
-  const rotRutType = document.getElementById('invRotRut')?.value || 'none';
+  const inclRot = document.getElementById('invRot')?.value === '1';
   const subtotal = items.reduce((s, it) => s + it.qty * it.price, 0);
-  const arbeteSub = items.filter(it => it.type !== 'material').reduce((s, it) => s + it.qty * it.price, 0);
   const vatAmount = Math.round(subtotal * vatRate / 100);
-  
-  let rotRutAmount = 0;
-  let rotRutLabel = '';
-  if (rotRutType === 'rot') {
-    rotRutAmount = Math.min(arbeteSub * 0.3, 50000);
-    rotRutLabel = 'ROT-avdrag (30% av arbete)';
-  } else if (rotRutType === 'rut') {
-    rotRutAmount = Math.min(arbeteSub * 0.5, 75000);
-    rotRutLabel = 'RUT-avdrag (50% av arbete)';
-  }
-  
-  const total = subtotal + vatAmount - rotRutAmount;
+  const rotAmount = inclRot ? Math.min(subtotal * 0.3, 50000) : 0;
+  const total = subtotal + vatAmount - rotAmount;
 
   const now = new Date();
   const due = new Date(now);
@@ -2907,14 +2728,12 @@ async function createManualInvoice() {
   };
 
   const invoiceData = {
-    title, clientName: client, clientEmail: clientEmail, clientAddress: clientAddr, items, vatRate,
+    title, clientName: client, clientAddress: clientAddr, items, vatRate,
     invoiceNumber: 'UTKAST',
     dateStr: now.toISOString().slice(0, 10),
     dueStr: due.toISOString().slice(0, 10),
     payTermsLabel: payDays + ' dagar netto',
-    inclRot: rotRutType !== 'none',
-    rotRutType: rotRutType,
-    rotRutLabel: rotRutLabel
+    inclRot
   };
 
   const invoiceHtml = buildInvoiceHtml(info, invoiceData);
@@ -2989,7 +2808,7 @@ async function createInvoiceFromQuote() {
   };
 
   const invoiceData = {
-    title, clientName: client, clientEmail: '', clientAddress: clientAddr, items, vatRate,
+    title, clientName: client, clientAddress: clientAddr, items, vatRate,
     invoiceNumber: 'UTKAST',
     dateStr: now.toISOString().slice(0, 10),
     dueStr: due.toISOString().slice(0, 10),
@@ -4428,62 +4247,31 @@ async function loadDashboard() {
 
     // === ATT GÖRA-LISTA ===
     let todos = [];
-    
-    // 1. Fakturapåminnelser (förfallna fakturor som behöver påminnelse)
+    // Overdue invoices
     inv.filter(i => i.status !== 'paid' && i.status !== 'draft' && i.status !== 'credited' && i.status !== 'credit_note' && i.due_date && i.due_date < today).forEach(i => {
       const days = Math.floor((Date.now() - new Date(i.due_date)) / 86400000);
-      const reminderCount = i.reminder_count || 0;
-      const text = reminderCount > 0 
-        ? `Förfallen faktura (${reminderCount} påminnels${reminderCount > 1 ? 'er' : 'e'}): ${i.invoice_number || ''} – ${i.client_name || 'Okänd'} (${days} dagar)`
-        : `Förfallen faktura: ${i.invoice_number || ''} – ${i.client_name || 'Okänd'} (${days} dagar)`;
-      todos.push({ color: '#c62828', text, action: 'Påminn', page: 'invoices' });
+      todos.push({ color: '#c62828', text: `Förfallen faktura: ${i.invoice_number || ''} – ${i.client_name || 'Okänd'} (${days} dagar)`, action: 'Visa', page: 'invoices' });
     });
-    
-    // 2. Leverantörsfakturor att betala (inom 7 dagar)
+    // Supplier invoices due within 7 days
     const in7days = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
     supp.filter(s => s.status !== 'paid' && s.due_date && s.due_date <= in7days).forEach(s => {
       const days = Math.floor((new Date(s.due_date) - Date.now()) / 86400000);
       const label = days < 0 ? `${Math.abs(days)} dagar förfallen` : days === 0 ? 'idag' : `om ${days} dagar`;
       todos.push({ color: '#e65100', text: `Betala: ${s.supplier_name} – ${fmt(s.total_amount)} (förfaller ${label})`, action: 'Visa', page: 'suppliers' });
     });
-    
-    // 3. Offertuppföljning (offerter utan svar i 7+ dagar)
+    // Quotes awaiting signature
     q.filter(r => r.share_id && (!r.signature_status || r.signature_status === 'pending')).forEach(r => {
       const days = Math.floor((Date.now() - new Date(r.created_at)) / 86400000);
-      if (days >= 7) {
-        todos.push({ 
-          color: 'var(--gold)', 
-          text: `Följ upp offert: ${r.client_name || 'Okänd'} – ${r.title || 'Offert'} (${days} dagar sedan)`, 
-          action: 'Kontakta', 
-          page: 'generate' 
-        });
-      }
+      if (days >= 3) todos.push({ color: 'var(--gold)', text: `Väntar på svar: ${r.client_name || 'Okänd'} – ${r.title || 'Offert'} (${days} dagar)`, action: 'Visa', page: 'generate' });
     });
-    
-    // 4. Momsdeadline (innevarande kvartal)
-    const momsDeadlines = getNextMomsDeadlines();
-    if (momsDeadlines.upcoming) {
-      const daysUntil = Math.floor((new Date(momsDeadlines.upcoming.date) - Date.now()) / 86400000);
-      if (daysUntil <= 14) {
-        const urgency = daysUntil <= 3 ? '#c62828' : daysUntil <= 7 ? '#e65100' : '#f57c00';
-        const label = daysUntil === 0 ? 'idag' : daysUntil === 1 ? 'imorgon' : `om ${daysUntil} dagar`;
-        todos.push({ 
-          color: urgency, 
-          text: `Momsdeklaration: ${momsDeadlines.upcoming.period} (deadline ${label})`, 
-          action: 'Deklarera', 
-          page: 'bookkeeping' 
-        });
-      }
-    }
-    
-    // 5. Utkast-fakturor
+    // Draft invoices
     inv.filter(i => i.status === 'draft').forEach(i => {
       todos.push({ color: '#888', text: `Utkast: ${i.title || 'Faktura'} – ${i.client_name || 'Okänd'}`, action: 'Bekräfta', page: 'invoices' });
     });
 
     const todoEl = document.getElementById('dashTodoList');
     if (todos.length === 0) {
-      todoEl.innerHTML = '<div style="padding:0.8rem 0;color:#2e7d32;font-size:0.88rem">✓ Allt klart! Inga uppgifter just nu.</div>';
+      todoEl.innerHTML = '<div style="padding:0.8rem 0;color:#2e7d32;font-size:0.88rem">Allt klart! Inga uppgifter just nu.</div>';
     } else {
       todoEl.innerHTML = todos.slice(0, 10).map(t =>
         `<div class="dash-todo-item"><span class="dash-todo-dot" style="background:${t.color}"></span><span class="dash-todo-text">${t.text}</span><span class="dash-todo-action" onclick="showPage('${t.page}')">${t.action}</span></div>`
@@ -4496,9 +4284,6 @@ async function loadDashboard() {
     window._dashBkRows = allRows;
     window._chartYear = window._chartYear || yr;
     renderCharts();
-
-    // === KOMMANDE PÅMINNELSER ===
-    loadUpcomingReminders();
 
   } catch(e) { console.error('Dashboard error:', e); }
 }
@@ -4573,339 +4358,6 @@ function renderCharts() {
       <div class="chart-bar-label">${monthNames[i]}</div>
     </div>`;
   }).join('');
-}
-
-// ===== UPCOMING REMINDERS =====
-async function loadUpcomingReminders() {
-  if (!currentUser || !currentProfile) return;
-  
-  const reminderEl = document.getElementById('dashRemindersList');
-  if (!reminderEl) return;
-  
-  // Check if reminders are enabled
-  if (currentProfile.reminder_enabled === false) {
-    reminderEl.innerHTML = `
-      <div style="padding:1rem;background:var(--cream);border-radius:8px;border-left:3px solid #ccc">
-        <div style="font-size:0.85rem;color:#666;line-height:1.6">
-          Automatiska påminnelser är inaktiverade. 
-          <a onclick="showPage('profile')" style="color:var(--gold);font-weight:600;cursor:pointer;text-decoration:underline">Aktivera i inställningar</a>
-        </div>
-      </div>
-    `;
-    return;
-  }
-  
-  const today = new Date().toISOString().slice(0, 10);
-  const reminderSchedule = currentProfile.reminder_days_schedule 
-    ? JSON.parse(currentProfile.reminder_days_schedule) 
-    : [7, 14, 30];
-  
-  // Fetch overdue invoices
-  const { data: overdueInvoices } = await sb.from('invoices')
-    .select('id, invoice_number, client_name, invoice_data, total_amount, due_date, reminder_count, last_reminder_at, reminder_fee')
-    .eq('user_id', currentUser.id)
-    .eq('status', 'sent')
-    .lt('due_date', today)
-    .order('due_date', { ascending: true });
-  
-  if (!overdueInvoices || overdueInvoices.length === 0) {
-    reminderEl.innerHTML = `
-      <div style="padding:1rem;color:#2e7d32;font-size:0.85rem;display:flex;align-items:center;gap:0.5rem">
-        <span style="font-size:1.2rem">✓</span>
-        <span>Inga förfallna fakturor — inga påminnelser behövs!</span>
-      </div>
-    `;
-    return;
-  }
-  
-  // Calculate next reminder date for each invoice
-  const reminders = [];
-  overdueInvoices.forEach(inv => {
-    const dueDate = new Date(inv.due_date);
-    const daysOverdue = Math.floor((new Date() - dueDate) / (1000 * 60 * 60 * 24));
-    const lastReminder = inv.last_reminder_at ? new Date(inv.last_reminder_at) : null;
-    const daysSinceLastReminder = lastReminder 
-      ? Math.floor((new Date() - lastReminder) / (1000 * 60 * 60 * 24))
-      : null;
-    
-    // Find next applicable reminder day
-    let nextReminderDay = null;
-    let nextReminderDate = null;
-    
-    for (const day of reminderSchedule) {
-      if (daysOverdue >= day) {
-        // Check if enough time has passed since last reminder (7 days minimum)
-        if (!lastReminder || daysSinceLastReminder >= 7) {
-          nextReminderDay = day;
-          nextReminderDate = new Date(dueDate);
-          nextReminderDate.setDate(nextReminderDate.getDate() + day);
-          break;
-        }
-      }
-    }
-    
-    if (nextReminderDay) {
-      const customerEmail = inv.invoice_data ? JSON.parse(inv.invoice_data).clientEmail : '';
-      const reminderNumber = (inv.reminder_count || 0) + 1;
-      const reminderFee = reminderNumber >= 2 ? 60 : 0;
-      const totalDue = parseFloat(inv.total_amount) + (parseFloat(inv.reminder_fee) || 0) + reminderFee;
-      
-      reminders.push({
-        invoice: inv,
-        daysOverdue,
-        nextReminderDay,
-        nextReminderDate,
-        reminderNumber,
-        reminderFee,
-        totalDue,
-        customerEmail,
-        daysSinceLastReminder
-      });
-    }
-  });
-  
-  if (reminders.length === 0) {
-    reminderEl.innerHTML = `
-      <div style="padding:1rem;background:var(--cream);border-radius:8px;font-size:0.85rem;color:#666">
-        <strong>${overdueInvoices.length}</strong> förfallen${overdueInvoices.length > 1 ? 'a' : ''} faktura${overdueInvoices.length > 1 ? 'or' : ''}, 
-        men ${overdueInvoices.length > 1 ? 'alla har' : 'den har'} redan fått påminnelse nyligen.
-        Nästa påminnelse skickas automatiskt om minst 7 dagar.
-      </div>
-    `;
-    return;
-  }
-  
-  // Sort by next reminder date
-  reminders.sort((a, b) => a.nextReminderDate - b.nextReminderDate);
-  
-  let html = `
-    <div style="background:#fff8f0;border:1px solid #ffe0b2;padding:0.8rem;border-radius:6px;margin-bottom:1rem;font-size:0.82rem;color:#e65100">
-      <strong>📧 Automatiska påminnelser aktiva</strong><br>
-      <span style="color:#666">${reminders.length} påminnelse${reminders.length > 1 ? 'r' : ''} kommer skickas automatiskt kl. 10:00 enligt schema.</span>
-    </div>
-  `;
-  
-  reminders.slice(0, 5).forEach(r => {
-    const isToday = r.nextReminderDate.toISOString().slice(0, 10) === today;
-    const isTomorrow = r.nextReminderDate.toISOString().slice(0, 10) === new Date(Date.now() + 86400000).toISOString().slice(0, 10);
-    const dateLabel = isToday ? 'Idag' : isTomorrow ? 'Imorgon' : r.nextReminderDate.toLocaleDateString('sv-SE', { month: 'short', day: 'numeric' });
-    
-    html += `
-      <div style="border:1px solid var(--border);border-radius:8px;padding:0.9rem;margin-bottom:0.7rem;background:white">
-        <div style="display:flex;justify-content:space-between;align-items:start;gap:1rem;margin-bottom:0.5rem">
-          <div style="flex:1;min-width:0">
-            <div style="font-weight:600;font-size:0.88rem;margin-bottom:0.2rem">
-              Faktura ${r.invoice.invoice_number} – ${r.invoice.client_name || 'Okänd kund'}
-            </div>
-            <div style="font-size:0.75rem;color:#888">
-              ${r.daysOverdue} dagar förfallen · 
-              ${r.customerEmail || 'Ingen e-post'}
-            </div>
-          </div>
-          <div style="text-align:right;white-space:nowrap">
-            <div style="font-weight:700;font-size:0.95rem;color:#d32f2f">
-              ${r.totalDue.toLocaleString('sv-SE')} kr
-            </div>
-            ${r.reminderFee > 0 ? `<div style="font-size:0.7rem;color:#e65100">+${r.reminderFee} kr avgift</div>` : ''}
-          </div>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:0.6rem;border-top:1px solid var(--border)">
-          <div style="font-size:0.8rem">
-            <span style="display:inline-block;padding:0.2rem 0.6rem;background:${isToday ? '#fff3e0' : '#f1f8f4'};border-radius:4px;font-weight:600;color:${isToday ? '#e65100' : 'var(--teal)'}">
-              📅 ${dateLabel}
-            </span>
-            <span style="margin-left:0.5rem;color:#888">Påminnelse ${r.reminderNumber}</span>
-          </div>
-          ${r.customerEmail ? '' : '<span style="font-size:0.75rem;color:#c62828">⚠️ Saknar e-post</span>'}
-        </div>
-      </div>
-    `;
-  });
-  
-  if (reminders.length > 5) {
-    html += `<div style="padding:0.5rem;text-align:center;color:#888;font-size:0.8rem">+ ${reminders.length - 5} fler påminnelse${reminders.length - 5 > 1 ? 'r' : ''}</div>`;
-  }
-  
-  reminderEl.innerHTML = html;
-}
-
-// ===== MOMS DEADLINES =====
-function getNextMomsDeadlines() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth() + 1; // 1-12
-  
-  // Svenska momsdeadlines (12:e påföljande månad efter kvartalet)
-  const deadlines = [
-    { period: 'Q4 ' + (year - 1), date: new Date(year, 0, 12) }, // Jan 12
-    { period: 'Q1 ' + year, date: new Date(year, 3, 12) },       // Apr 12
-    { period: 'Q2 ' + year, date: new Date(year, 6, 12) },       // Jul 12
-    { period: 'Q3 ' + year, date: new Date(year, 9, 12) },       // Okt 12
-    { period: 'Q4 ' + year, date: new Date(year + 1, 0, 12) }    // Jan 12 nästa år
-  ];
-  
-  // Hitta nästa deadline
-  let upcoming = null;
-  let previous = null;
-  
-  for (let i = 0; i < deadlines.length; i++) {
-    if (deadlines[i].date > now && !upcoming) {
-      upcoming = deadlines[i];
-      previous = i > 0 ? deadlines[i - 1] : null;
-      break;
-    }
-  }
-  
-  return { upcoming, previous };
-}
-
-// ===== UPCOMING REMINDERS =====
-async function loadUpcomingReminders() {
-  if (!currentUser || !currentProfile) return;
-  
-  const container = document.getElementById('dashRemindersList');
-  if (!container) return;
-  
-  try {
-    // Check if reminders are enabled
-    if (currentProfile.reminder_enabled === false) {
-      container.innerHTML = `
-        <div style="padding:1.2rem;background:var(--cream);border-radius:8px;text-align:center">
-          <div style="font-size:0.88rem;color:#888;margin-bottom:0.6rem">Automatiska påminnelser är inaktiverade</div>
-          <button onclick="showPage('profile')" class="btn-sm" style="font-size:0.8rem;padding:0.45rem 0.9rem">Aktivera i Företagsprofil</button>
-        </div>
-      `;
-      return;
-    }
-    
-    const today = new Date().toISOString().slice(0, 10);
-    const reminderSchedule = currentProfile.reminder_days_schedule ? 
-      JSON.parse(currentProfile.reminder_days_schedule) : [7, 14, 30];
-    
-    // Get overdue invoices
-    const { data: overdueInvoices } = await sb
-      .from('invoices')
-      .select('id, invoice_number, invoice_data, total_amount, due_date, reminder_count, last_reminder_at, reminder_fee')
-      .eq('user_id', currentUser.id)
-      .eq('status', 'sent')
-      .lt('due_date', today)
-      .order('due_date', { ascending: true });
-    
-    if (!overdueInvoices || overdueInvoices.length === 0) {
-      container.innerHTML = `
-        <div style="padding:1.2rem;background:#f1f8f4;border-radius:8px;text-align:center;color:#2e7d32">
-          <div style="font-size:1.2rem;margin-bottom:0.3rem">✓</div>
-          <div style="font-size:0.88rem">Inga förfallna fakturor – inga påminnelser behövs!</div>
-        </div>
-      `;
-      return;
-    }
-    
-    // Calculate which invoices need reminders
-    const remindersNeeded = [];
-    
-    for (const inv of overdueInvoices) {
-      const dueDate = new Date(inv.due_date);
-      const daysOverdue = Math.floor((new Date() - dueDate) / (1000 * 60 * 60 * 24));
-      const reminderCount = inv.reminder_count || 0;
-      const lastReminderDate = inv.last_reminder_at ? new Date(inv.last_reminder_at) : null;
-      const daysSinceLastReminder = lastReminderDate ? 
-        Math.floor((new Date() - lastReminderDate) / (1000 * 60 * 60 * 24)) : 999;
-      
-      // Find next reminder based on schedule
-      let nextReminderDays = null;
-      for (const scheduleDays of reminderSchedule.sort((a, b) => a - b)) {
-        if (daysOverdue >= scheduleDays && daysSinceLastReminder >= 7) {
-          nextReminderDays = scheduleDays;
-          break;
-        }
-      }
-      
-      if (nextReminderDays !== null) {
-        const invData = inv.invoice_data ? JSON.parse(inv.invoice_data) : {};
-        const customerEmail = invData.clientEmail || '';
-        
-        if (customerEmail) {
-          remindersNeeded.push({
-            ...inv,
-            customerName: invData.clientName || 'Okänd kund',
-            customerEmail,
-            daysOverdue,
-            nextReminderNumber: reminderCount + 1,
-            nextReminderFee: (reminderCount + 1) >= 2 ? 60 : 0
-          });
-        }
-      }
-    }
-    
-    if (remindersNeeded.length === 0) {
-      container.innerHTML = `
-        <div style="padding:1.2rem;background:#fff8f0;border-radius:8px;text-align:center">
-          <div style="font-size:0.88rem;color:#888">
-            ${overdueInvoices.length} förfallen${overdueInvoices.length === 1 ? '' : 'a'} faktura${overdueInvoices.length === 1 ? '' : 'or'}, 
-            men ingen${overdueInvoices.length === 1 ? '' : 'a'} behöver påminnelse just nu.<br>
-            <span style="font-size:0.8rem;color:#aaa">Nästa påminnelse skickas enligt ditt schema: ${reminderSchedule.join(', ')} dagar efter förfallodatum.</span>
-          </div>
-        </div>
-      `;
-      return;
-    }
-    
-    // Render reminders
-    let html = `
-      <div style="background:#fff8f0;border-left:3px solid #ff9800;padding:0.9rem;border-radius:6px;margin-bottom:1rem;font-size:0.82rem">
-        <strong>${remindersNeeded.length} påminnelse${remindersNeeded.length === 1 ? '' : 'r'}</strong> kommer att skickas automatiskt vid nästa körning (varje dag kl. 10:00).
-      </div>
-    `;
-    
-    html += remindersNeeded.slice(0, 5).map(reminder => {
-      const totalDue = parseFloat(reminder.total_amount) + 
-                       (parseFloat(reminder.reminder_fee) || 0) + 
-                       reminder.nextReminderFee;
-      
-      return `
-        <div style="border:1px solid var(--border);border-radius:8px;padding:0.9rem;margin-bottom:0.8rem;background:white">
-          <div style="display:flex;justify-content:space-between;align-items:start;gap:1rem;margin-bottom:0.5rem">
-            <div style="flex:1">
-              <div style="font-weight:600;font-size:0.9rem">${reminder.customerName}</div>
-              <div style="font-size:0.78rem;color:#888;margin-top:0.2rem">
-                Faktura #${reminder.invoice_number || 'N/A'} · 
-                <span style="color:#c62828;font-weight:600">${reminder.daysOverdue} dagar förfallen</span>
-              </div>
-            </div>
-            <div style="text-align:right;white-space:nowrap">
-              <div style="font-weight:700;font-size:1rem;color:#c62828">${totalDue.toLocaleString('sv-SE')} kr</div>
-              ${reminder.nextReminderFee > 0 ? `<div style="font-size:0.75rem;color:#e65100">+${reminder.nextReminderFee} kr avgift</div>` : ''}
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.7rem;background:#fff3e0;border-radius:4px;font-size:0.8rem">
-            <span style="color:#ff9800;font-weight:700">⚠️</span>
-            <span style="color:#e65100">
-              <strong>Påminnelse ${reminder.nextReminderNumber}</strong> skickas till ${reminder.customerEmail}
-            </span>
-          </div>
-        </div>
-      `;
-    }).join('');
-    
-    if (remindersNeeded.length > 5) {
-      html += `
-        <div style="text-align:center;padding:0.8rem;color:#888;font-size:0.82rem">
-          … och ${remindersNeeded.length - 5} till
-        </div>
-      `;
-    }
-    
-    container.innerHTML = html;
-    
-  } catch (error) {
-    console.error('Error loading reminders:', error);
-    container.innerHTML = `
-      <div style="padding:1rem;color:#c62828;font-size:0.85rem;background:#ffebee;border-radius:6px">
-        Kunde inte ladda påminnelser. Kontrollera att tabeller är skapade.
-      </div>
-    `;
-  }
 }
 
 // ===== CUSTOMERS =====
@@ -5030,7 +4482,6 @@ function selectCustomerSuggestion(custId, dropdownId) {
   // Determine which context we're in
   if (dropdownId === 'invCustDropdown') {
     document.getElementById('invClient').value = c.name;
-    document.getElementById('invClientEmail').value = c.email || '';
     document.getElementById('invClientAddr').value = c.address || '';
   }
 }
@@ -5234,8 +4685,8 @@ function insertPickedArticlesInvoice() {
     const qty = parseFloat(document.getElementById('pickerQty-' + id)?.value) || 1;
     const row = document.createElement('div');
     row.className = 'inv-row-entry';
-    row.style.cssText = 'display:grid;grid-template-columns:1.8fr 1fr 0.6fr 0.9fr auto;gap:0.4rem;margin-bottom:0.5rem;align-items:end';
-    row.innerHTML = `<div class="field" style="margin:0"><input class="inv-desc" value="${a.name}"></div><div class="field" style="margin:0"><select class="inv-type" style="padding:0.5rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem"><option value="arbete">Arbete</option><option value="material">Material</option></select></div><div class="field" style="margin:0"><input class="inv-qty" type="number" value="${qty}" min="1"></div><div class="field" style="margin:0"><input class="inv-price" type="number" value="${a.price}"></div><button onclick="this.parentElement.remove()" style="background:none;border:none;color:#e05;cursor:pointer;font-size:1.1rem;padding:0 0.3rem;margin-bottom:0.3rem">×</button>`;
+    row.style.cssText = 'display:grid;grid-template-columns:1.3fr 0.5fr 0.8fr auto;gap:0.4rem;margin-bottom:0.5rem;align-items:end';
+    row.innerHTML = `<div class="field" style="margin:0"><label style="font-size:0.7rem">Beskrivning</label><input class="inv-desc" value="${a.name}"></div><div class="field" style="margin:0"><label style="font-size:0.7rem">Antal</label><input class="inv-qty" type="number" value="${qty}" min="1"></div><div class="field" style="margin:0"><label style="font-size:0.7rem">À-pris</label><input class="inv-price" type="number" value="${a.price}"></div><button onclick="this.parentElement.remove()" style="background:none;border:none;color:#e05;cursor:pointer;font-size:1.1rem;padding:0 0.3rem;margin-bottom:0.3rem">×</button>`;
     container.appendChild(row);
   });
   closeArticlePicker();
@@ -5437,7 +4888,7 @@ function renderGrundbok() {
 }
 
 function switchBkTab(tab) {
-  const tabs = ['grundbok','huvudbok','resultat','balans','moms','konton','arsbokslut'];
+  const tabs = ['grundbok','huvudbok','resultat','balans','moms','konton'];
   tabs.forEach(t => {
     const el = document.getElementById('bk' + t.charAt(0).toUpperCase() + t.slice(1));
     const btn = document.getElementById('bkTab' + t.charAt(0).toUpperCase() + t.slice(1));
@@ -5449,7 +4900,6 @@ function switchBkTab(tab) {
   if (tab === 'balans') renderBalans();
   if (tab === 'moms') renderMoms();
   if (tab === 'konton') renderKontoplan();
-  if (tab === 'arsbokslut') initArsbokslut();
 }
 
 // ===== VERIFICATION CRUD =====
@@ -6674,986 +6124,35 @@ async function saveReceiptVerification() {
   alert(`✓ Verifikation V${verNum} skapad från kvitto!`);
 }
 
-// ===== ÅRSBOKSLUT (K1 + NE-BILAGA) =====
-let _arsbokslutData = null;
-
-function initArsbokslut() {
-  // Populera år-dropdown
-  const yearSelect = document.getElementById('arsYear');
-  if (!yearSelect) return;
-  
-  const currentYear = new Date().getFullYear();
-  yearSelect.innerHTML = '';
-  for (let y = currentYear; y >= currentYear - 5; y--) {
-    const opt = document.createElement('option');
-    opt.value = y;
-    opt.textContent = y;
-    if (y === currentYear - 1) opt.selected = true; // Föregående år som default
-    yearSelect.appendChild(opt);
-  }
-  
-  // Försök ladda tidigare genererat årsbokslut
-  renderArsbokslut();
-}
-
-async function generateArsbokslut() {
-  if (!currentUser) return;
-  
-  const year = parseInt(document.getElementById('arsYear')?.value);
-  if (!year) return alert('Välj ett år');
-  
-  const btn = event.target;
-  const origText = btn.innerHTML;
-  btn.innerHTML = '<span class="ico">⏳</span> Genererar...';
-  btn.disabled = true;
-  
-  try {
-    const { data, error } = await sb.rpc('calculate_annual_closing', {
-      p_user_id: currentUser.id,
-      p_year: year
-    });
-    
-    if (error) throw error;
-    
-    _arsbokslutData = data;
-    renderArsbokslut();
-    
-    alert('Årsbokslut genererat! 🎉');
-  } catch (err) {
-    console.error('Error generating årsbokslut:', err);
-    alert('Kunde inte generera årsbokslut. Kontrollera att du har bokföring för detta år.');
-  } finally {
-    btn.innerHTML = origText;
-    btn.disabled = false;
-  }
-}
-
-async function renderArsbokslut() {
-  const el = document.getElementById('arsbokslutContent');
-  if (!el) return;
-  
-  const year = parseInt(document.getElementById('arsYear')?.value);
-  if (!year) {
-    el.innerHTML = '<div class="empty-state"><p>Välj ett år för att visa årsbokslut</p></div>';
-    return;
-  }
-  
-  // Försök hämta sparat årsbokslut
-  if (!_arsbokslutData || _arsbokslutData.year !== year) {
-    try {
-      const { data } = await sb.rpc('get_annual_closing', {
-        p_user_id: currentUser.id,
-        p_year: year
-      });
-      _arsbokslutData = data;
-    } catch (err) {
-      console.error('Error loading årsbokslut:', err);
-    }
-  }
-  
-  if (!_arsbokslutData) {
-    el.innerHTML = `<div class="empty-state">
-      <p>Inget årsbokslut genererat för ${year}</p>
-      <p style="font-size:0.85rem;color:#888;margin-top:0.5rem">Klicka på "Generera årsbokslut" för att skapa K1-blankett och NE-bilaga</p>
-    </div>`;
-    return;
-  }
-  
-  const result = _arsbokslutData.result;
-  const revenue = _arsbokslutData.revenue;
-  const expenses = _arsbokslutData.expenses;
-  
-  const fmt = (n) => Math.round(n).toLocaleString('sv-SE');
-  
-  let html = `
-    <div style="display:grid;gap:1.5rem">
-      
-      <!-- K1-BLANKETT -->
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-          <h3 style="margin:0;font-size:1.1rem;color:var(--gold)">K1 - Inkomst av näringsverksamhet</h3>
-          <button onclick="exportK1PDF()" class="gen-btn" style="padding:0.4rem 1rem;font-size:0.85rem">
-            <span class="ico">📄</span> Exportera PDF
-          </button>
-        </div>
-        
-        <div style="background:#f9f9f9;border:1px solid #ddd;border-radius:6px;padding:1.5rem;font-family:monospace;font-size:0.9rem">
-          <div style="text-align:center;margin-bottom:1.5rem;font-weight:bold">
-            INKOMSTDEKLARATION ${year}<br>
-            K1 - Enskild näringsverksamhet
-          </div>
-          
-          <table style="width:100%;border-collapse:collapse">
-            <tr>
-              <td style="padding:0.5rem 0;border-bottom:1px solid #ddd">Intäkter (netto)</td>
-              <td style="padding:0.5rem 0;border-bottom:1px solid #ddd;text-align:right;font-weight:bold">${fmt(result.total_revenue)} kr</td>
-            </tr>
-            <tr>
-              <td style="padding:0.5rem 0;border-bottom:1px solid #ddd">Kostnader</td>
-              <td style="padding:0.5rem 0;border-bottom:1px solid #ddd;text-align:right">${fmt(result.total_expenses)} kr</td>
-            </tr>
-            <tr>
-              <td style="padding:0.8rem 0;font-weight:bold;font-size:1.05rem">Resultat före skatt</td>
-              <td style="padding:0.8rem 0;text-align:right;font-weight:bold;font-size:1.05rem;color:${result.net_result >= 0 ? '#2e7d32' : '#c62828'}">${fmt(result.net_result)} kr</td>
-            </tr>
-          </table>
-          
-          <div style="margin-top:1.5rem;padding-top:1rem;border-top:2px solid #ddd;font-size:0.85rem;color:#666">
-            <p style="margin:0.3rem 0">Överskott/underskott av näringsverksamhet överförs till blankett NE (NE-bilaga)</p>
-            <p style="margin:0.3rem 0">Detta belopp utgör underlag för beräkning av egenavgifter och inkomstskatt</p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- NE-BILAGA -->
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-          <h3 style="margin:0;font-size:1.1rem;color:var(--gold)">NE-bilaga - Specificerad resultaträkning</h3>
-          <button onclick="exportNEPDF()" class="gen-btn" style="padding:0.4rem 1rem;font-size:0.85rem">
-            <span class="ico">📄</span> Exportera PDF
-          </button>
-        </div>
-        
-        <div style="background:#f9f9f9;border:1px solid #ddd;border-radius:6px;padding:1.5rem">
-          
-          <!-- INTÄKTER -->
-          <h4 style="margin:0 0 0.8rem 0;color:var(--gold);font-size:0.95rem">Intäkter</h4>
-          <table style="width:100%;border-collapse:collapse;margin-bottom:1.5rem;font-size:0.9rem">
-            ${revenue.accounts.map(acc => `
-              <tr>
-                <td style="padding:0.3rem 0">${acc.account_number} - ${acc.account_name}</td>
-                <td style="text-align:right;padding:0.3rem 0">${fmt(acc.amount)} kr</td>
-              </tr>
-            `).join('')}
-            <tr style="border-top:2px solid #ddd">
-              <td style="padding:0.5rem 0;font-weight:bold">Summa intäkter</td>
-              <td style="text-align:right;padding:0.5rem 0;font-weight:bold">${fmt(revenue.total)} kr</td>
-            </tr>
-          </table>
-          
-          <!-- KOSTNADER -->
-          <h4 style="margin:1.5rem 0 0.8rem 0;color:var(--gold);font-size:0.95rem">Kostnader</h4>
-          <table style="width:100%;border-collapse:collapse;margin-bottom:1.5rem;font-size:0.9rem">
-            ${expenses.accounts.map(acc => `
-              <tr>
-                <td style="padding:0.3rem 0">${acc.account_number} - ${acc.account_name}</td>
-                <td style="text-align:right;padding:0.3rem 0">${fmt(acc.amount)} kr</td>
-              </tr>
-            `).join('')}
-            <tr style="border-top:2px solid #ddd">
-              <td style="padding:0.5rem 0;font-weight:bold">Summa kostnader</td>
-              <td style="text-align:right;padding:0.5rem 0;font-weight:bold">${fmt(expenses.total)} kr</td>
-            </tr>
-          </table>
-          
-          <!-- RESULTAT -->
-          <table style="width:100%;border-collapse:collapse;margin-top:1.5rem;padding-top:1rem;border-top:3px solid #333">
-            <tr>
-              <td style="padding:0.5rem 0;font-weight:bold;font-size:1.05rem">Årets resultat</td>
-              <td style="text-align:right;padding:0.5rem 0;font-weight:bold;font-size:1.05rem;color:${result.net_result >= 0 ? '#2e7d32' : '#c62828'}">${fmt(result.net_result)} kr</td>
-            </tr>
-          </table>
-          
-        </div>
-      </div>
-      
-      <!-- KOSTNADER PER KATEGORI -->
-      <div class="card">
-        <h3 style="margin:0 0 1rem 0;font-size:1.1rem;color:var(--gold)">Kostnadsfördelning</h3>
-        <div style="background:#f9f9f9;border:1px solid #ddd;border-radius:6px;padding:1.5rem">
-          <table style="width:100%;border-collapse:collapse;font-size:0.9rem">
-            ${Object.entries(expenses.by_category || {}).map(([cat, total]) => `
-              <tr>
-                <td style="padding:0.4rem 0;border-bottom:1px solid #ddd">${cat}</td>
-                <td style="text-align:right;padding:0.4rem 0;border-bottom:1px solid #ddd">${fmt(total)} kr</td>
-                <td style="text-align:right;padding:0.4rem 0;border-bottom:1px solid #ddd;color:#888">${Math.round((total / expenses.total) * 100)}%</td>
-              </tr>
-            `).join('')}
-          </table>
-        </div>
-      </div>
-      
-    </div>
-  `;
-  
-  el.innerHTML = html;
-}
-
-async function exportK1PDF() {
-  if (!_arsbokslutData) {
-    alert('Generera årsbokslut först!');
-    return;
-  }
-  
-  showBookkeepingDisclaimer(() => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const result = _arsbokslutData.result;
-    const year = _arsbokslutData.year;
-    
-    const fmt = (n) => Math.round(n).toLocaleString('sv-SE');
-    
-    // Rubrik
-    doc.setFontSize(16);
-  doc.setFont(undefined, 'bold');
-  doc.text(`INKOMSTDEKLARATION ${year}`, 105, 20, { align: 'center' });
-  
-  doc.setFontSize(14);
-  doc.text('K1 - Enskild näringsverksamhet', 105, 30, { align: 'center' });
-  
-  // Företagsinfo
-  const p = currentProfile || {};
-  doc.setFontSize(10);
-  doc.setFont(undefined, 'normal');
-  let y = 45;
-  if (p.company_name) {
-    doc.text(p.company_name, 20, y);
-    y += 6;
-  }
-  if (p.org_number) {
-    doc.text(`Org.nr: ${p.org_number}`, 20, y);
-    y += 6;
-  }
-  
-  // Resultaträkning
-  y += 10;
-  doc.setFontSize(11);
-  doc.setFont(undefined, 'bold');
-  doc.text('RESULTATRÄKNING', 20, y);
-  y += 10;
-  
-  // Tabell
-  doc.setFont(undefined, 'normal');
-  doc.setFontSize(10);
-  
-  // Linje
-  doc.line(20, y, 190, y);
-  y += 7;
-  
-  // Intäkter
-  doc.text('Intäkter (netto)', 20, y);
-  doc.text(`${fmt(result.total_revenue)} kr`, 190, y, { align: 'right' });
-  y += 7;
-  
-  // Kostnader
-  doc.text('Kostnader', 20, y);
-  doc.text(`${fmt(result.total_expenses)} kr`, 190, y, { align: 'right' });
-  y += 7;
-  
-  // Linje
-  doc.line(20, y, 190, y);
-  y += 7;
-  
-  // Resultat
-  doc.setFont(undefined, 'bold');
-  doc.setFontSize(12);
-  doc.text('Resultat före skatt', 20, y);
-  doc.text(`${fmt(result.net_result)} kr`, 190, y, { align: 'right' });
-  y += 15;
-  
-  // Info-text
-  doc.setFont(undefined, 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(100);
-  const infoText = [
-    'Överskott/underskott av näringsverksamhet överförs till blankett NE (NE-bilaga).',
-    'Detta belopp utgör underlag för beräkning av egenavgifter och inkomstskatt.'
-  ];
-  infoText.forEach(line => {
-    doc.text(line, 20, y);
-    y += 5;
-  });
-  
-  // Footer
-  doc.setFontSize(8);
-  doc.setTextColor(150);
-  doc.text(`Genererat från Offeria.se - ${new Date().toLocaleDateString('sv-SE')}`, 105, 285, { align: 'center' });
-  
-  // Spara
-  doc.save(`K1_${year}_${p.company_name || 'Årsbokslut'}.pdf`);
-  }); // End disclaimer callback
-}
-
-async function exportNEPDF() {
-  if (!_arsbokslutData) {
-    alert('Generera årsbokslut först!');
-    return;
-  }
-  
-  showBookkeepingDisclaimer(() => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const revenue = _arsbokslutData.revenue;
-    const expenses = _arsbokslutData.expenses;
-    const result = _arsbokslutData.result;
-    const year = _arsbokslutData.year;
-    
-    const fmt = (n) => Math.round(n).toLocaleString('sv-SE');
-    
-    // Rubrik
-    doc.setFontSize(16);
-    doc.setFont(undefined, 'bold');
-    doc.text(`NE-BILAGA ${year}`, 105, 20, { align: 'center' });
-  
-  doc.setFontSize(12);
-  doc.text('Specificerad resultaträkning', 105, 28, { align: 'center' });
-  
-  // Företagsinfo
-  const p = currentProfile || {};
-  doc.setFontSize(10);
-  doc.setFont(undefined, 'normal');
-  let y = 40;
-  if (p.company_name) {
-    doc.text(p.company_name, 20, y);
-    y += 6;
-  }
-  if (p.org_number) {
-    doc.text(`Org.nr: ${p.org_number}`, 20, y);
-    y += 10;
-  }
-  
-  // INTÄKTER
-  y += 5;
-  doc.setFontSize(11);
-  doc.setFont(undefined, 'bold');
-  doc.text('INTÄKTER', 20, y);
-  y += 8;
-  
-  doc.setFont(undefined, 'normal');
-  doc.setFontSize(9);
-  
-  revenue.accounts.forEach(acc => {
-    // Sidbrytning om nära slutet
-    if (y > 270) {
-      doc.addPage();
-      y = 20;
-    }
-    
-    doc.text(`${acc.account_number} - ${acc.account_name}`, 20, y);
-    doc.text(`${fmt(acc.amount)} kr`, 190, y, { align: 'right' });
-    y += 6;
-  });
-  
-  // Summa intäkter
-  y += 2;
-  doc.line(20, y, 190, y);
-  y += 6;
-  doc.setFont(undefined, 'bold');
-  doc.text('Summa intäkter', 20, y);
-  doc.text(`${fmt(revenue.total)} kr`, 190, y, { align: 'right' });
-  y += 12;
-  
-  // KOSTNADER
-  if (y > 260) {
-    doc.addPage();
-    y = 20;
-  }
-  
-  doc.setFontSize(11);
-  doc.text('KOSTNADER', 20, y);
-  y += 8;
-  
-  doc.setFont(undefined, 'normal');
-  doc.setFontSize(9);
-  
-  expenses.accounts.forEach(acc => {
-    // Sidbrytning om nära slutet
-    if (y > 270) {
-      doc.addPage();
-      y = 20;
-    }
-    
-    doc.text(`${acc.account_number} - ${acc.account_name}`, 20, y);
-    doc.text(`${fmt(acc.amount)} kr`, 190, y, { align: 'right' });
-    y += 6;
-  });
-  
-  // Summa kostnader
-  y += 2;
-  doc.line(20, y, 190, y);
-  y += 6;
-  doc.setFont(undefined, 'bold');
-  doc.text('Summa kostnader', 20, y);
-  doc.text(`${fmt(expenses.total)} kr`, 190, y, { align: 'right' });
-  y += 12;
-  
-  // RESULTAT
-  if (y > 270) {
-    doc.addPage();
-    y = 20;
-  }
-  
-  doc.line(20, y, 190, y);
-  doc.line(20, y + 1, 190, y + 1);
-  y += 8;
-  
-  doc.setFontSize(12);
-  doc.setFont(undefined, 'bold');
-  doc.text('ÅRETS RESULTAT', 20, y);
-  doc.text(`${fmt(result.net_result)} kr`, 190, y, { align: 'right' });
-  
-  // Footer på alla sidor
-  const pageCount = doc.internal.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    doc.setFontSize(8);
-    doc.setTextColor(150);
-    doc.text(`Genererat från Offeria.se - ${new Date().toLocaleDateString('sv-SE')}`, 105, 285, { align: 'center' });
-    doc.text(`Sida ${i} av ${pageCount}`, 190, 285, { align: 'right' });
-  }
-  
-  // Spara
-  doc.save(`NE-bilaga_${year}_${p.company_name || 'Årsbokslut'}.pdf`);
-  }); // End disclaimer callback
-}
-
-// ===== BANK IMPORT =====
-let _bankTransactions = [];
-
-function openBankImport() {
-  document.getElementById('bankImportOverlay').style.display = 'flex';
-  document.getElementById('bankUploadStep').style.display = 'block';
-  document.getElementById('bankParsingStep').style.display = 'none';
-  document.getElementById('bankMatchingStep').style.display = 'none';
-  _bankTransactions = [];
-}
-
-function closeBankImport() {
-  document.getElementById('bankImportOverlay').style.display = 'none';
-  _bankTransactions = [];
-}
-
-async function onBankFileSelected(input) {
-  if (!input.files || !input.files[0]) return;
-  const file = input.files[0];
-  const format = document.getElementById('bankImportFormat').value;
-
-  // Show parsing step
-  document.getElementById('bankUploadStep').style.display = 'none';
-  document.getElementById('bankParsingStep').style.display = 'block';
-
-  try {
-    const text = await file.text();
-    let transactions = [];
-
-    if (format.startsWith('csv-')) {
-      transactions = parseCSV(text, format);
-    } else if (format === 'ofx') {
-      transactions = parseOFX(text);
-    }
-
-    // Match transactions against invoices and supplier invoices
-    await matchTransactions(transactions);
-
-    _bankTransactions = transactions;
-    
-    // Show matching step
-    document.getElementById('bankParsingStep').style.display = 'none';
-    document.getElementById('bankMatchingStep').style.display = 'block';
-    
-    renderBankTransactions();
-  } catch (err) {
-    console.error('Bank import error:', err);
-    alert('Kunde inte läsa filen. Kontrollera att formatet är korrekt.');
-    document.getElementById('bankUploadStep').style.display = 'block';
-    document.getElementById('bankParsingStep').style.display = 'none';
-  }
-}
-
-function parseCSV(text, format) {
-  const lines = text.trim().split('\n').map(l => l.trim()).filter(l => l);
-  const transactions = [];
-  
-  // Skip header row(s) - most Swedish banks have 1-2 header rows
-  let dataStartRow = 1;
-  if (format === 'csv-swedbank' || format === 'csv-seb') dataStartRow = 1;
-  if (format === 'csv-handelsbanken') dataStartRow = 1;
-  if (format === 'csv-nordea') dataStartRow = 1;
-
-  for (let i = dataStartRow; i < lines.length; i++) {
-    const line = lines[i];
-    // Handle both comma and semicolon separators
-    const parts = line.includes(';') ? parseCSVLine(line, ';') : parseCSVLine(line, ',');
-    
-    let tx = null;
-    
-    if (format === 'csv-swedbank') {
-      // Swedbank: Datum;Beskrivning;Belopp;Saldo
-      if (parts.length >= 3) {
-        tx = {
-          date: normalizeDate(parts[0]),
-          description: parts[1].trim(),
-          amount: parseAmount(parts[2]),
-          balance: parts[3] ? parseAmount(parts[3]) : null
-        };
-      }
-    } else if (format === 'csv-seb') {
-      // SEB: Bokföringsdatum;Transaktionsdatum;Beskrivning;Belopp;Saldo
-      if (parts.length >= 4) {
-        tx = {
-          date: normalizeDate(parts[0]),
-          description: parts[2].trim(),
-          amount: parseAmount(parts[3]),
-          balance: parts[4] ? parseAmount(parts[4]) : null
-        };
-      }
-    } else if (format === 'csv-handelsbanken') {
-      // Handelsbanken: Datum;Text;Belopp;Saldo
-      if (parts.length >= 3) {
-        tx = {
-          date: normalizeDate(parts[0]),
-          description: parts[1].trim(),
-          amount: parseAmount(parts[2]),
-          balance: parts[3] ? parseAmount(parts[3]) : null
-        };
-      }
-    } else if (format === 'csv-nordea') {
-      // Nordea: Bokföringsdatum;Transaktionsdatum;Betalare/Mottagare;Händelse;Belopp;Saldo
-      if (parts.length >= 5) {
-        tx = {
-          date: normalizeDate(parts[0]),
-          description: (parts[2] + ' ' + parts[3]).trim(),
-          amount: parseAmount(parts[4]),
-          balance: parts[5] ? parseAmount(parts[5]) : null
-        };
-      }
-    } else if (format === 'csv-generic') {
-      // Generic: Try to detect columns automatically
-      // Assume: Date, Description, Amount (and maybe Balance)
-      if (parts.length >= 3) {
-        tx = {
-          date: normalizeDate(parts[0]),
-          description: parts[1].trim(),
-          amount: parseAmount(parts[2]),
-          balance: parts[3] ? parseAmount(parts[3]) : null
-        };
-      }
-    }
-    
-    if (tx && tx.date && tx.description && tx.amount !== null) {
-      transactions.push(tx);
-    }
-  }
-  
-  return transactions;
-}
-
-function parseCSVLine(line, separator) {
-  const result = [];
-  let current = '';
-  let inQuotes = false;
-  
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === separator && !inQuotes) {
-      result.push(current);
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  result.push(current);
-  
-  return result.map(s => s.replace(/^"|"$/g, '').trim());
-}
-
-function parseOFX(text) {
-  const transactions = [];
-  
-  // Extract STMTTRN blocks (transaction statements)
-  const txRegex = /<STMTTRN>([\s\S]*?)<\/STMTTRN>/g;
-  let match;
-  
-  while ((match = txRegex.exec(text)) !== null) {
-    const block = match[1];
-    
-    const dateMatch = block.match(/<DTPOSTED>(\d{8})/);
-    const amountMatch = block.match(/<TRNAMT>([-\d.]+)/);
-    const descMatch = block.match(/<NAME>(.*?)(?:<|$)/);
-    const memoMatch = block.match(/<MEMO>(.*?)(?:<|$)/);
-    
-    if (dateMatch && amountMatch) {
-      const dateStr = dateMatch[1];
-      const date = `${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
-      const description = (descMatch ? descMatch[1].trim() : '') + 
-                         (memoMatch ? ' ' + memoMatch[1].trim() : '');
-      
-      transactions.push({
-        date,
-        description: description.trim() || 'Transaktion',
-        amount: parseFloat(amountMatch[1]),
-        balance: null
-      });
-    }
-  }
-  
-  return transactions;
-}
-
-function normalizeDate(dateStr) {
-  // Handle formats: YYYY-MM-DD, DD/MM/YYYY, DD.MM.YYYY, YYYYMMDD
-  dateStr = dateStr.trim();
-  
-  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
-  if (/^\d{8}$/.test(dateStr)) {
-    return `${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`;
-  }
-  
-  const parts = dateStr.split(/[.\/\-]/);
-  if (parts.length === 3) {
-    if (parts[0].length === 4) {
-      // YYYY-MM-DD or YYYY/MM/DD
-      return `${parts[0]}-${parts[1].padStart(2,'0')}-${parts[2].padStart(2,'0')}`;
-    } else {
-      // DD/MM/YYYY or DD.MM.YYYY
-      return `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
-    }
-  }
-  
-  return dateStr;
-}
-
-function parseAmount(amountStr) {
-  if (!amountStr) return null;
-  // Remove spaces, replace comma with dot
-  const clean = amountStr.replace(/\s/g, '').replace(',', '.');
-  return parseFloat(clean) || 0;
-}
-
-async function matchTransactions(transactions) {
-  // Fetch all unpaid invoices and supplier invoices
-  const { data: invoices } = await sb.from('invoices')
-    .select('*')
-    .eq('user_id', currentUser.id)
-    .eq('status', 'sent')
-    .order('invoice_date', { ascending: false });
-  
-  const { data: supplierInvoices } = await sb.from('supplier_invoices')
-    .select('*')
-    .eq('user_id', currentUser.id)
-    .eq('payment_status', 'unpaid')
-    .order('invoice_date', { ascending: false });
-  
-  // Match each transaction
-  for (const tx of transactions) {
-    tx.matched = null;
-    tx.matchType = null;
-    tx.confidence = 0;
-    
-    // Try to match customer invoices (positive amounts = incoming payments)
-    if (tx.amount > 0 && invoices) {
-      for (const inv of invoices) {
-        const score = calculateMatchScore(tx, inv, 'invoice');
-        if (score > tx.confidence) {
-          tx.matched = inv;
-          tx.matchType = 'invoice';
-          tx.confidence = score;
-        }
-      }
-    }
-    
-    // Try to match supplier invoices (negative amounts = outgoing payments)
-    if (tx.amount < 0 && supplierInvoices) {
-      for (const suppInv of supplierInvoices) {
-        const score = calculateMatchScore(tx, suppInv, 'supplier_invoice');
-        if (score > tx.confidence) {
-          tx.matched = suppInv;
-          tx.matchType = 'supplier_invoice';
-          tx.confidence = score;
-        }
-      }
-    }
-  }
-}
-
-function calculateMatchScore(transaction, invoice, type) {
-  let score = 0;
-  const txAmount = Math.abs(transaction.amount);
-  const invAmount = type === 'invoice' ? parseFloat(invoice.total_amount) : parseFloat(invoice.amount_incl_vat);
-  
-  // Amount match (most important) - allow 1% tolerance
-  const amountDiff = Math.abs(txAmount - invAmount);
-  const amountTolerance = invAmount * 0.01;
-  if (amountDiff <= amountTolerance) {
-    score += 60; // High score for amount match
-  } else if (amountDiff <= invAmount * 0.05) {
-    score += 30; // Medium score for close match
-  }
-  
-  // Date proximity (within 30 days)
-  const txDate = new Date(transaction.date);
-  const invDate = new Date(invoice.invoice_date);
-  const daysDiff = Math.abs((txDate - invDate) / (1000 * 60 * 60 * 24));
-  if (daysDiff <= 7) score += 20;
-  else if (daysDiff <= 14) score += 15;
-  else if (daysDiff <= 30) score += 10;
-  
-  // Description match
-  const txDesc = transaction.description.toLowerCase();
-  if (type === 'invoice' && invoice.customer_name) {
-    const custName = invoice.customer_name.toLowerCase();
-    if (txDesc.includes(custName) || custName.includes(txDesc.split(' ')[0])) {
-      score += 15;
-    }
-  } else if (type === 'supplier_invoice' && invoice.supplier_name) {
-    const suppName = invoice.supplier_name.toLowerCase();
-    if (txDesc.includes(suppName) || suppName.includes(txDesc.split(' ')[0])) {
-      score += 15;
-    }
-  }
-  
-  // Invoice number in description
-  if (type === 'invoice' && invoice.invoice_number) {
-    if (txDesc.includes(invoice.invoice_number.toString())) score += 10;
-  }
-  
-  return score;
-}
-
-function renderBankTransactions() {
-  const container = document.getElementById('bankTransactionsList');
-  const matched = _bankTransactions.filter(tx => tx.matched);
-  const unmatched = _bankTransactions.filter(tx => !tx.matched);
-  
-  document.getElementById('bankTxCount').textContent = _bankTransactions.length;
-  document.getElementById('bankMatchedCount').textContent = matched.length;
-  document.getElementById('bankUnmatchedCount').textContent = unmatched.length;
-  
-  let html = '';
-  
-  const showMatched = document.getElementById('bankShowMatched')?.checked ?? true;
-  const showUnmatched = document.getElementById('bankShowUnmatched')?.checked ?? true;
-  
-  const toShow = [
-    ...(showMatched ? matched : []),
-    ...(showUnmatched ? unmatched : [])
-  ];
-  
-  toShow.forEach((tx, idx) => {
-    const isPositive = tx.amount > 0;
-    const matchIcon = tx.matched ? 
-      `<span style="color:#2e7d32;font-weight:700">✓</span>` : 
-      `<span style="color:#f57c00">⚠</span>`;
-    
-    const matchInfo = tx.matched ? 
-      (tx.matchType === 'invoice' ? 
-        `Faktura #${tx.matched.invoice_number} – ${tx.matched.customer_name}` : 
-        `Leverantörsfaktura – ${tx.matched.supplier_name}`) : 
-      'Ingen matchning';
-    
-    const confidenceBar = tx.matched ? 
-      `<div style="margin-top:0.3rem;background:#eee;height:4px;border-radius:2px;overflow:hidden">
-        <div style="background:${tx.confidence > 70 ? '#2e7d32' : tx.confidence > 40 ? '#f57c00' : '#d32f2f'};width:${tx.confidence}%;height:100%"></div>
-      </div>` : '';
-    
-    html += `
-      <div class="bank-tx-item" data-idx="${idx}" style="border:1px solid var(--border);border-radius:8px;padding:0.9rem;margin-bottom:0.8rem;background:${tx.matched ? '#f1f8f4' : 'white'}">
-        <div style="display:flex;gap:1rem;align-items:start">
-          <div style="font-size:1.3rem;padding-top:0.2rem">${matchIcon}</div>
-          <div style="flex:1;min-width:0">
-            <div style="display:flex;justify-content:space-between;align-items:start;gap:1rem;margin-bottom:0.3rem">
-              <div>
-                <div style="font-weight:600;font-size:0.9rem">${tx.description}</div>
-                <div style="font-size:0.78rem;color:#888;margin-top:0.2rem">${tx.date}</div>
-              </div>
-              <div style="text-align:right;white-space:nowrap">
-                <div style="font-weight:700;font-size:1rem;color:${isPositive ? '#2e7d32' : '#d32f2f'}">${isPositive ? '+' : ''}${tx.amount.toFixed(2)} kr</div>
-              </div>
-            </div>
-            ${tx.matched ? `
-              <div style="font-size:0.8rem;color:#2e7d32;margin-top:0.4rem;padding:0.4rem 0.6rem;background:white;border-radius:4px;border:1px solid #c8e6c9">
-                ${matchInfo} ${tx.confidence > 0 ? `(${Math.round(tx.confidence)}% match)` : ''}
-              </div>
-              ${confidenceBar}
-            ` : `
-              <div style="font-size:0.8rem;color:#f57c00;margin-top:0.4rem;padding:0.4rem 0.6rem;background:#fff8f0;border-radius:4px;border:1px solid #ffe0b2">
-                ${matchInfo} – Bokförs som manuell transaktion
-              </div>
-            `}
-          </div>
-          <label style="display:flex;align-items:center;cursor:pointer">
-            <input type="checkbox" class="bank-tx-checkbox" data-idx="${idx}" ${tx.matched || tx.amount < 0 ? 'checked' : ''} 
-                   style="width:18px;height:18px;cursor:pointer">
-          </label>
-        </div>
-      </div>
-    `;
-  });
-  
-  container.innerHTML = html || '<div style="text-align:center;padding:2rem;color:#999">Inga transaktioner att visa</div>';
-  updateImportButtonCount();
-}
-
-function filterBankTransactions() {
-  renderBankTransactions();
-}
-
-function updateImportButtonCount() {
-  const checked = document.querySelectorAll('.bank-tx-checkbox:checked').length;
-  document.getElementById('bankImportBtnCount').textContent = checked > 0 ? checked : '';
-}
-
-document.addEventListener('change', (e) => {
-  if (e.target.classList.contains('bank-tx-checkbox')) {
-    updateImportButtonCount();
-  }
-});
-
-async function executeBankImport() {
-  const checkboxes = document.querySelectorAll('.bank-tx-checkbox:checked');
-  if (checkboxes.length === 0) return alert('Välj minst en transaktion att importera.');
-  
-  const bankAccount = document.getElementById('bankImportAccount').value;
-  let imported = 0;
-  let errors = [];
-  
-  for (const checkbox of checkboxes) {
-    const idx = parseInt(checkbox.dataset.idx);
-    const tx = _bankTransactions[idx];
-    if (!tx) continue;
-    
-    try {
-      const year = parseInt(tx.date.slice(0, 4));
-      const { data: numD } = await sb.rpc('get_next_verification_number', { 
-        p_user_id: currentUser.id, 
-        p_year: year 
-      });
-      const verNum = numD || 1;
-      
-      let rows = [];
-      let description = tx.description;
-      let sourceType = 'bank_import';
-      
-      if (tx.matched && tx.matchType === 'invoice') {
-        // Customer payment: Debit Bank, Credit Customer Receivable
-        const inv = tx.matched;
-        description = `Betalning faktura #${inv.invoice_number} – ${inv.customer_name}`;
-        rows = [
-          { account_number: bankAccount, debit: Math.abs(tx.amount), credit: 0 },
-          { account_number: '1510', debit: 0, credit: Math.abs(tx.amount) }
-        ];
-        
-        // Update invoice status
-        await sb.from('invoices').update({ 
-          status: 'paid', 
-          payment_date: tx.date 
-        }).eq('id', inv.id);
-        
-      } else if (tx.matched && tx.matchType === 'supplier_invoice') {
-        // Supplier payment: Debit Supplier Payable, Credit Bank
-        const suppInv = tx.matched;
-        description = `Betalning leverantör ${suppInv.supplier_name}`;
-        rows = [
-          { account_number: '2440', debit: Math.abs(tx.amount), credit: 0 },
-          { account_number: bankAccount, debit: 0, credit: Math.abs(tx.amount) }
-        ];
-        
-        // Update supplier invoice status
-        await sb.from('supplier_invoices').update({ 
-          payment_status: 'paid', 
-          payment_date: tx.date 
-        }).eq('id', suppInv.id);
-        
-      } else {
-        // Unmatched transaction - book as general in/out
-        if (tx.amount > 0) {
-          // Income
-          rows = [
-            { account_number: bankAccount, debit: tx.amount, credit: 0 },
-            { account_number: '3000', debit: 0, credit: tx.amount } // Generic income
-          ];
-        } else {
-          // Expense
-          rows = [
-            { account_number: '6000', debit: Math.abs(tx.amount), credit: 0 }, // Generic expense
-            { account_number: bankAccount, debit: 0, credit: Math.abs(tx.amount) }
-          ];
-        }
-      }
-      
-      // Create verification
-      const { data: ver, error: verErr } = await sb.from('verifications').insert({
-        user_id: currentUser.id,
-        verification_number: verNum,
-        verification_date: tx.date,
-        description,
-        source_type: sourceType,
-        created_by: currentUser.email
-      }).select().single();
-      
-      if (verErr) throw new Error(verErr.message);
-      
-      // Insert rows
-      await sb.from('verification_rows').insert(
-        rows.map(r => ({ verification_id: ver.id, user_id: currentUser.id, ...r }))
-      );
-      
-      // Audit log
-      await sb.from('bookkeeping_audit_log').insert({
-        user_id: currentUser.id,
-        action: 'create',
-        entity_type: 'verification',
-        entity_id: ver.id,
-        details: { 
-          verification_number: verNum, 
-          source: 'bank_import',
-          matched: !!tx.matched,
-          match_type: tx.matchType 
-        }
-      });
-      
-      imported++;
-      
-    } catch (err) {
-      console.error('Import error for transaction:', tx, err);
-      errors.push(`${tx.description}: ${err.message}`);
-    }
-  }
-  
-  closeBankImport();
-  loadBookkeeping();
-  
-  if (errors.length > 0) {
-    alert(`Importerade ${imported} transaktioner.\n\nFel (${errors.length}):\n${errors.slice(0, 3).join('\n')}`);
-  } else {
-    alert(`✓ ${imported} transaktioner importerade och bokförda!`);
-  }
-}
-
 // ===== SIE4 EXPORT =====
 async function exportSIE4() {
   if (!currentUser || !currentProfile) return alert('Logga in och fyll i företagsprofil först.');
-  
-  // Visa disclaimer innan export
-  showBookkeepingDisclaimer(async () => {
-    const yr = document.getElementById('bkYear')?.value || new Date().getFullYear();
-    const p = currentProfile;
+  const yr = document.getElementById('bkYear')?.value || new Date().getFullYear();
+  const p = currentProfile;
 
-    // Fetch all verifications + rows for the year
-    const { data: vers } = await sb.from('verifications').select('*').eq('user_id', currentUser.id)
-      .gte('verification_date', yr + '-01-01').lte('verification_date', yr + '-12-31').order('verification_number');
-    const verIds = (vers || []).map(v => v.id);
-    let rows = [];
-    if (verIds.length > 0) {
-      const { data } = await sb.from('verification_rows').select('*').eq('user_id', currentUser.id).in('verification_id', verIds);
-      rows = data || [];
-    }
+  // Fetch all verifications + rows for the year
+  const { data: vers } = await sb.from('verifications').select('*').eq('user_id', currentUser.id)
+    .gte('verification_date', yr + '-01-01').lte('verification_date', yr + '-12-31').order('verification_number');
+  const verIds = (vers || []).map(v => v.id);
+  let rows = [];
+  if (verIds.length > 0) {
+    const { data } = await sb.from('verification_rows').select('*').eq('user_id', currentUser.id).in('verification_id', verIds);
+    rows = data || [];
+  }
 
-    // Build SIE4 file
-    let sie = '';
-    sie += '#FLAGGA 0\n';
-    sie += '#FORMAT PC8\n';
-    sie += '#SIETYP 4\n';
-    sie += '#PROGRAM "Offeria" "1.0"\n';
-    sie += `#GEN ${new Date().toISOString().slice(0, 10).replace(/-/g, '')}\n`;
-    sie += `#FNAMN "${(p.company_name || 'Företag').replace(/"/g, "''")}"\n`;
-    if (p.org_number) sie += `#ORGNR ${p.org_number.replace('-', '')}\n`;
-    if (p.address) sie += `#ADRESS "" "${p.address}" "" ""\n`;
-    sie += `#RAR 0 ${yr}0101 ${yr}1231\n`;
-    sie += `#TAXAR ${parseInt(yr) + 1}\n`;
-    sie += '#KPTYP BAS2026\n';
+  // Build SIE4 file
+  let sie = '';
+  sie += '#FLAGGA 0\n';
+  sie += '#FORMAT PC8\n';
+  sie += '#SIETYP 4\n';
+  sie += '#PROGRAM "Offeria" "1.0"\n';
+  sie += `#GEN ${new Date().toISOString().slice(0, 10).replace(/-/g, '')}\n`;
+  sie += `#FNAMN "${(p.company_name || 'Företag').replace(/"/g, "''")}"\n`;
+  if (p.org_number) sie += `#ORGNR ${p.org_number.replace('-', '')}\n`;
+  if (p.address) sie += `#ADRESS "" "${p.address}" "" ""\n`;
+  sie += `#RAR 0 ${yr}0101 ${yr}1231\n`;
+  sie += `#TAXAR ${parseInt(yr) + 1}\n`;
+  sie += '#KPTYP BAS2026\n';
 
   // Accounts
   _bkAccounts.filter(a => a.is_active).forEach(a => {
@@ -7711,7 +6210,6 @@ async function exportSIE4() {
   a.download = `offeria_sie4_${yr}.si`;
   a.click();
   URL.revokeObjectURL(url);
-  }); // End of disclaimer callback
 }
 
 // ===== SIE4 IMPORT =====
@@ -7854,7 +6352,7 @@ init();
 
 <!-- ===== NEW INVOICE MODAL ===== -->
 <div class="overlay" id="newInvoiceOverlay" onclick="if(event.target===this)closeNewInvoiceModal()">
-  <div class="modal" style="max-width:720px;max-height:90vh;overflow-y:auto">
+  <div class="modal" style="max-width:520px;max-height:90vh;overflow-y:auto">
     <button class="modal-close" onclick="closeNewInvoiceModal()">✕</button>
     <div class="modal-head">
       <div style="font-family:'Fraunces',serif;font-size:1.2rem;color:var(--gold-light)">Ny faktura</div>
@@ -7867,7 +6365,6 @@ init();
           <div id="invCustDropdown" class="cust-dropdown" style="display:none"></div>
         </div>
       </div>
-      <div class="field"><label>E-post</label><input id="invClientEmail" type="email" placeholder="kund@exempel.se"></div>
       <div class="field"><label>Kundadress</label><input id="invClientAddr" placeholder="Gatan 1, 123 45 Stad"></div>
       <div class="field"><label>Titel / Beskrivning</label><input id="invTitle" placeholder="t.ex. Renovering badrum"></div>
       <div class="field"><label>Betalningsvillkor</label>
@@ -7877,9 +6374,8 @@ init();
       </div>
       <div class="card-label" style="margin-top:1rem;margin-bottom:0.5rem">Rader</div>
       <div id="invRows">
-        <div class="inv-row-entry" style="display:grid;grid-template-columns:1.8fr 1fr 0.6fr 0.9fr;gap:0.4rem;margin-bottom:0.5rem;align-items:end">
+        <div class="inv-row-entry" style="display:grid;grid-template-columns:1.3fr 0.5fr 0.8fr;gap:0.4rem;margin-bottom:0.5rem;align-items:end">
           <div class="field" style="margin:0"><label style="font-size:0.7rem">Beskrivning</label><input class="inv-desc" placeholder="Arbete..."></div>
-          <div class="field" style="margin:0"><label style="font-size:0.7rem">Typ</label><select class="inv-type" style="padding:0.5rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem"><option value="arbete">Arbete</option><option value="material">Material</option></select></div>
           <div class="field" style="margin:0"><label style="font-size:0.7rem">Antal</label><input class="inv-qty" type="number" value="1" min="1"></div>
           <div class="field" style="margin:0"><label style="font-size:0.7rem">À-pris</label><input class="inv-price" type="number" placeholder="0"></div>
         </div>
@@ -7890,12 +6386,8 @@ init();
         <div class="field" style="margin:0"><label>Momssats</label>
           <select id="invVat"><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
         </div>
-        <div class="field" style="margin:0"><label>ROT/RUT-avdrag</label>
-          <select id="invRotRut">
-            <option value="none">Inget avdrag</option>
-            <option value="rot">ROT (30% av arbete)</option>
-            <option value="rut">RUT (50% av arbete)</option>
-          </select>
+        <div class="field" style="margin:0"><label>ROT-avdrag</label>
+          <select id="invRot"><option value="0">Nej</option><option value="1">Ja (30% av arbete)</option></select>
         </div>
       </div>
       <button onclick="createManualInvoice()" class="stripe-btn" style="margin:1rem 0 0;width:100%">Skapa faktura →</button>
@@ -8027,95 +6519,6 @@ init();
         </div>
       </div>
       <button onclick="saveReceiptVerification()" class="stripe-btn" style="width:100%">Bokför kvitto →</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===== BANK IMPORT MODAL ===== -->
-<div class="overlay" id="bankImportOverlay" onclick="if(event.target===this)closeBankImport()">
-  <div class="modal" style="max-width:900px;padding:1.8rem 2rem;max-height:90vh;overflow-y:auto">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-      <h3 style="margin:0"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span> Importera bankkontoutdrag</h3>
-      <button onclick="closeBankImport()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#999">✕</button>
-    </div>
-    <p style="font-size:0.85rem;color:#888;margin-bottom:1.5rem">Ladda upp kontoutdrag i CSV eller OFX-format — transaktioner matchas automatiskt mot fakturor och bokförs.</p>
-
-    <div id="bankUploadStep">
-      <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap">
-        <div class="field" style="flex:1;min-width:200px;margin:0">
-          <label>Konto att bokföra på</label>
-          <select id="bankImportAccount" style="width:100%;padding:0.55rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
-            <option value="1930">1930 Företagskonto</option>
-            <option value="1940">1940 Sparkonto</option>
-            <option value="1950">1950 Annat konto</option>
-          </select>
-        </div>
-        <div class="field" style="flex:1;min-width:200px;margin:0">
-          <label>Format</label>
-          <select id="bankImportFormat" style="width:100%;padding:0.55rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
-            <option value="csv-swedbank">CSV - Swedbank</option>
-            <option value="csv-seb">CSV - SEB</option>
-            <option value="csv-handelsbanken">CSV - Handelsbanken</option>
-            <option value="csv-nordea">CSV - Nordea</option>
-            <option value="csv-generic">CSV - Generisk</option>
-            <option value="ofx">OFX - Alla banker</option>
-          </select>
-        </div>
-      </div>
-
-      <div style="border:2px dashed var(--border);border-radius:12px;padding:2.5rem;text-align:center;cursor:pointer;margin-bottom:1.5rem;transition:border-color 0.15s" onclick="document.getElementById('bankFileInput').click()" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
-        <div style="font-size:1.5rem;margin-bottom:0.5rem;color:var(--teal)"><span class="ico" style="font-size:2.5rem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></span></div>
-        <div style="font-size:0.95rem;font-weight:600;margin-bottom:0.3rem">Klicka för att välja fil</div>
-        <div style="font-size:0.78rem;color:#999">Stöder .csv och .ofx filer</div>
-        <input id="bankFileInput" type="file" accept=".csv,.ofx,.qfx" onchange="onBankFileSelected(this)" style="display:none">
-      </div>
-
-      <div style="background:var(--cream);border-left:3px solid var(--gold);padding:1rem;border-radius:6px;font-size:0.82rem">
-        <div style="font-weight:600;margin-bottom:0.4rem;color:var(--gold)">💡 Tips:</div>
-        <ul style="margin:0;padding-left:1.2rem;line-height:1.6">
-          <li>Ladda ner kontoutdrag från din nätbank (vanligtvis under "Export" eller "Rapporter")</li>
-          <li>Välj CSV eller OFX-format om möjligt</li>
-          <li>Transaktioner matchas automatiskt mot dina fakturor och leverantörsfakturor</li>
-          <li>Du kan granska och redigera innan bokföring</li>
-        </ul>
-      </div>
-    </div>
-
-    <div id="bankParsingStep" style="display:none;text-align:center;padding:2rem">
-      <div style="display:inline-block;width:32px;height:32px;border:4px solid var(--border);border-top:4px solid var(--teal);border-radius:50%;animation:spin 0.8s linear infinite"></div>
-      <div style="margin-top:1rem;font-size:0.95rem;color:var(--teal);font-weight:600">Läser fil och matchar transaktioner...</div>
-    </div>
-
-    <div id="bankMatchingStep" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:0.8rem;border-bottom:2px solid var(--border)">
-        <div>
-          <div style="font-weight:600;font-size:1rem">Transaktioner funna: <span id="bankTxCount">0</span></div>
-          <div style="font-size:0.82rem;color:#888;margin-top:0.2rem">
-            <span style="color:#2e7d32;font-weight:600" id="bankMatchedCount">0</span> matchade · 
-            <span style="color:#f57c00;font-weight:600" id="bankUnmatchedCount">0</span> omatchade
-          </div>
-        </div>
-        <div style="display:flex;gap:0.5rem">
-          <label style="display:flex;align-items:center;gap:0.3rem;font-size:0.82rem;cursor:pointer">
-            <input type="checkbox" id="bankShowMatched" checked onchange="filterBankTransactions()">
-            <span>Visa matchade</span>
-          </label>
-          <label style="display:flex;align-items:center;gap:0.3rem;font-size:0.82rem;cursor:pointer">
-            <input type="checkbox" id="bankShowUnmatched" checked onchange="filterBankTransactions()">
-            <span>Visa omatchade</span>
-          </label>
-        </div>
-      </div>
-
-      <div id="bankTransactionsList" style="max-height:400px;overflow-y:auto;margin-bottom:1.5rem"></div>
-
-      <div style="display:flex;gap:0.8rem;justify-content:flex-end">
-        <button onclick="closeBankImport()" class="btn-sm btn-outline">Avbryt</button>
-        <button onclick="executeBankImport()" class="stripe-btn" style="padding:0.6rem 1.5rem">
-          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-          Bokför <span id="bankImportBtnCount"></span> transaktioner
-        </button>
-      </div>
     </div>
   </div>
 </div>
