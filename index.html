@@ -874,6 +874,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   .qt-btn { font-size: 0.72rem; padding: 0.4rem 0.6rem; }
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -6820,13 +6821,227 @@ async function renderArsbokslut() {
 }
 
 async function exportK1PDF() {
-  alert('PDF-export kommer snart! 📄');
-  // TODO: Implementera PDF-export med jsPDF
+  if (!_arsbokslutData) {
+    alert('Generera årsbokslut först!');
+    return;
+  }
+  
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const result = _arsbokslutData.result;
+  const year = _arsbokslutData.year;
+  
+  const fmt = (n) => Math.round(n).toLocaleString('sv-SE');
+  
+  // Rubrik
+  doc.setFontSize(16);
+  doc.setFont(undefined, 'bold');
+  doc.text(`INKOMSTDEKLARATION ${year}`, 105, 20, { align: 'center' });
+  
+  doc.setFontSize(14);
+  doc.text('K1 - Enskild näringsverksamhet', 105, 30, { align: 'center' });
+  
+  // Företagsinfo
+  const p = currentProfile || {};
+  doc.setFontSize(10);
+  doc.setFont(undefined, 'normal');
+  let y = 45;
+  if (p.company_name) {
+    doc.text(p.company_name, 20, y);
+    y += 6;
+  }
+  if (p.org_number) {
+    doc.text(`Org.nr: ${p.org_number}`, 20, y);
+    y += 6;
+  }
+  
+  // Resultaträkning
+  y += 10;
+  doc.setFontSize(11);
+  doc.setFont(undefined, 'bold');
+  doc.text('RESULTATRÄKNING', 20, y);
+  y += 10;
+  
+  // Tabell
+  doc.setFont(undefined, 'normal');
+  doc.setFontSize(10);
+  
+  // Linje
+  doc.line(20, y, 190, y);
+  y += 7;
+  
+  // Intäkter
+  doc.text('Intäkter (netto)', 20, y);
+  doc.text(`${fmt(result.total_revenue)} kr`, 190, y, { align: 'right' });
+  y += 7;
+  
+  // Kostnader
+  doc.text('Kostnader', 20, y);
+  doc.text(`${fmt(result.total_expenses)} kr`, 190, y, { align: 'right' });
+  y += 7;
+  
+  // Linje
+  doc.line(20, y, 190, y);
+  y += 7;
+  
+  // Resultat
+  doc.setFont(undefined, 'bold');
+  doc.setFontSize(12);
+  doc.text('Resultat före skatt', 20, y);
+  doc.text(`${fmt(result.net_result)} kr`, 190, y, { align: 'right' });
+  y += 15;
+  
+  // Info-text
+  doc.setFont(undefined, 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(100);
+  const infoText = [
+    'Överskott/underskott av näringsverksamhet överförs till blankett NE (NE-bilaga).',
+    'Detta belopp utgör underlag för beräkning av egenavgifter och inkomstskatt.'
+  ];
+  infoText.forEach(line => {
+    doc.text(line, 20, y);
+    y += 5;
+  });
+  
+  // Footer
+  doc.setFontSize(8);
+  doc.setTextColor(150);
+  doc.text(`Genererat från Offeria.se - ${new Date().toLocaleDateString('sv-SE')}`, 105, 285, { align: 'center' });
+  
+  // Spara
+  doc.save(`K1_${year}_${p.company_name || 'Årsbokslut'}.pdf`);
 }
 
 async function exportNEPDF() {
-  alert('PDF-export kommer snart! 📄');
-  // TODO: Implementera PDF-export med jsPDF
+  if (!_arsbokslutData) {
+    alert('Generera årsbokslut först!');
+    return;
+  }
+  
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const revenue = _arsbokslutData.revenue;
+  const expenses = _arsbokslutData.expenses;
+  const result = _arsbokslutData.result;
+  const year = _arsbokslutData.year;
+  
+  const fmt = (n) => Math.round(n).toLocaleString('sv-SE');
+  
+  // Rubrik
+  doc.setFontSize(16);
+  doc.setFont(undefined, 'bold');
+  doc.text(`NE-BILAGA ${year}`, 105, 20, { align: 'center' });
+  
+  doc.setFontSize(12);
+  doc.text('Specificerad resultaträkning', 105, 28, { align: 'center' });
+  
+  // Företagsinfo
+  const p = currentProfile || {};
+  doc.setFontSize(10);
+  doc.setFont(undefined, 'normal');
+  let y = 40;
+  if (p.company_name) {
+    doc.text(p.company_name, 20, y);
+    y += 6;
+  }
+  if (p.org_number) {
+    doc.text(`Org.nr: ${p.org_number}`, 20, y);
+    y += 10;
+  }
+  
+  // INTÄKTER
+  y += 5;
+  doc.setFontSize(11);
+  doc.setFont(undefined, 'bold');
+  doc.text('INTÄKTER', 20, y);
+  y += 8;
+  
+  doc.setFont(undefined, 'normal');
+  doc.setFontSize(9);
+  
+  revenue.accounts.forEach(acc => {
+    // Sidbrytning om nära slutet
+    if (y > 270) {
+      doc.addPage();
+      y = 20;
+    }
+    
+    doc.text(`${acc.account_number} - ${acc.account_name}`, 20, y);
+    doc.text(`${fmt(acc.amount)} kr`, 190, y, { align: 'right' });
+    y += 6;
+  });
+  
+  // Summa intäkter
+  y += 2;
+  doc.line(20, y, 190, y);
+  y += 6;
+  doc.setFont(undefined, 'bold');
+  doc.text('Summa intäkter', 20, y);
+  doc.text(`${fmt(revenue.total)} kr`, 190, y, { align: 'right' });
+  y += 12;
+  
+  // KOSTNADER
+  if (y > 260) {
+    doc.addPage();
+    y = 20;
+  }
+  
+  doc.setFontSize(11);
+  doc.text('KOSTNADER', 20, y);
+  y += 8;
+  
+  doc.setFont(undefined, 'normal');
+  doc.setFontSize(9);
+  
+  expenses.accounts.forEach(acc => {
+    // Sidbrytning om nära slutet
+    if (y > 270) {
+      doc.addPage();
+      y = 20;
+    }
+    
+    doc.text(`${acc.account_number} - ${acc.account_name}`, 20, y);
+    doc.text(`${fmt(acc.amount)} kr`, 190, y, { align: 'right' });
+    y += 6;
+  });
+  
+  // Summa kostnader
+  y += 2;
+  doc.line(20, y, 190, y);
+  y += 6;
+  doc.setFont(undefined, 'bold');
+  doc.text('Summa kostnader', 20, y);
+  doc.text(`${fmt(expenses.total)} kr`, 190, y, { align: 'right' });
+  y += 12;
+  
+  // RESULTAT
+  if (y > 270) {
+    doc.addPage();
+    y = 20;
+  }
+  
+  doc.line(20, y, 190, y);
+  doc.line(20, y + 1, 190, y + 1);
+  y += 8;
+  
+  doc.setFontSize(12);
+  doc.setFont(undefined, 'bold');
+  doc.text('ÅRETS RESULTAT', 20, y);
+  doc.text(`${fmt(result.net_result)} kr`, 190, y, { align: 'right' });
+  
+  // Footer på alla sidor
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text(`Genererat från Offeria.se - ${new Date().toLocaleDateString('sv-SE')}`, 105, 285, { align: 'center' });
+    doc.text(`Sida ${i} av ${pageCount}`, 190, 285, { align: 'right' });
+  }
+  
+  // Spara
+  doc.save(`NE-bilaga_${year}_${p.company_name || 'Årsbokslut'}.pdf`);
 }
 
 // ===== BANK IMPORT =====
