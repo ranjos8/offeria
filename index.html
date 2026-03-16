@@ -875,6 +875,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
 </head>
 <body>
 
@@ -1980,6 +1981,64 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
 let currentProfile = null;
 let monthlyUsed = 0;
+
+// ===== SECURITY & VALIDATION UTILITIES =====
+
+/**
+ * Säker HTML-rendering med DOMPurify
+ * Använd ALLTID denna istället för element.innerHTML direkt
+ */
+function safeHTML(element, html) {
+  if (typeof DOMPurify !== 'undefined') {
+    element.innerHTML = DOMPurify.sanitize(html);
+  } else {
+    console.warn('DOMPurify not loaded, using unsafe innerHTML');
+    element.innerHTML = html;
+  }
+}
+
+/**
+ * Validera att bokföringsverifikation balanserar
+ * Debet måste = Kredit
+ */
+function validateVerification(rows) {
+  const debitSum = rows.reduce((sum, row) => sum + (parseFloat(row.debit) || 0), 0);
+  const creditSum = rows.reduce((sum, row) => sum + (parseFloat(row.credit) || 0), 0);
+  const diff = Math.abs(debitSum - creditSum);
+  
+  if (diff > 0.01) {
+    return {
+      valid: false,
+      message: `⚠️ Verifikationen balanserar inte!\n\nDebet: ${debitSum.toFixed(2)} kr\nKredit: ${creditSum.toFixed(2)} kr\nSkillnad: ${diff.toFixed(2)} kr\n\nDebet och kredit måste vara lika.`,
+      debitSum,
+      creditSum,
+      diff
+    };
+  }
+  
+  return { valid: true };
+}
+
+/**
+ * Bokförings-disclaimer som visas innan export
+ */
+function showBookkeepingDisclaimer(callback) {
+  const disclaimerText = `
+    ⚠️ VIKTIG INFORMATION OM BOKFÖRING
+    
+    Detta är ett hjälpmedel för bokföring, INTE en ersättning för professionell rådgivning.
+    
+    • Kontrollera ALLTID din bokföring med en auktoriserad redovisningskonsult innan inlämning till Skatteverket
+    • Offeria.se ansvarar INTE för fel i bokföringen eller konsekvenser av felaktig deklaration
+    • Du är själv ansvarig för att din bokföring följer bokföringslagen och skattelagstiftning
+    
+    Vill du fortsätta med export?
+  `;
+  
+  if (confirm(disclaimerText)) {
+    callback();
+  }
+}
 
 // ===== INIT =====
 let _loginHandled = false;
@@ -6826,15 +6885,16 @@ async function exportK1PDF() {
     return;
   }
   
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const result = _arsbokslutData.result;
-  const year = _arsbokslutData.year;
-  
-  const fmt = (n) => Math.round(n).toLocaleString('sv-SE');
-  
-  // Rubrik
-  doc.setFontSize(16);
+  showBookkeepingDisclaimer(() => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const result = _arsbokslutData.result;
+    const year = _arsbokslutData.year;
+    
+    const fmt = (n) => Math.round(n).toLocaleString('sv-SE');
+    
+    // Rubrik
+    doc.setFontSize(16);
   doc.setFont(undefined, 'bold');
   doc.text(`INKOMSTDEKLARATION ${year}`, 105, 20, { align: 'center' });
   
@@ -6911,6 +6971,7 @@ async function exportK1PDF() {
   
   // Spara
   doc.save(`K1_${year}_${p.company_name || 'Årsbokslut'}.pdf`);
+  }); // End disclaimer callback
 }
 
 async function exportNEPDF() {
@@ -6919,19 +6980,20 @@ async function exportNEPDF() {
     return;
   }
   
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const revenue = _arsbokslutData.revenue;
-  const expenses = _arsbokslutData.expenses;
-  const result = _arsbokslutData.result;
-  const year = _arsbokslutData.year;
-  
-  const fmt = (n) => Math.round(n).toLocaleString('sv-SE');
-  
-  // Rubrik
-  doc.setFontSize(16);
-  doc.setFont(undefined, 'bold');
-  doc.text(`NE-BILAGA ${year}`, 105, 20, { align: 'center' });
+  showBookkeepingDisclaimer(() => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const revenue = _arsbokslutData.revenue;
+    const expenses = _arsbokslutData.expenses;
+    const result = _arsbokslutData.result;
+    const year = _arsbokslutData.year;
+    
+    const fmt = (n) => Math.round(n).toLocaleString('sv-SE');
+    
+    // Rubrik
+    doc.setFontSize(16);
+    doc.setFont(undefined, 'bold');
+    doc.text(`NE-BILAGA ${year}`, 105, 20, { align: 'center' });
   
   doc.setFontSize(12);
   doc.text('Specificerad resultaträkning', 105, 28, { align: 'center' });
@@ -7042,6 +7104,7 @@ async function exportNEPDF() {
   
   // Spara
   doc.save(`NE-bilaga_${year}_${p.company_name || 'Årsbokslut'}.pdf`);
+  }); // End disclaimer callback
 }
 
 // ===== BANK IMPORT =====
@@ -7562,32 +7625,35 @@ async function executeBankImport() {
 // ===== SIE4 EXPORT =====
 async function exportSIE4() {
   if (!currentUser || !currentProfile) return alert('Logga in och fyll i företagsprofil först.');
-  const yr = document.getElementById('bkYear')?.value || new Date().getFullYear();
-  const p = currentProfile;
+  
+  // Visa disclaimer innan export
+  showBookkeepingDisclaimer(async () => {
+    const yr = document.getElementById('bkYear')?.value || new Date().getFullYear();
+    const p = currentProfile;
 
-  // Fetch all verifications + rows for the year
-  const { data: vers } = await sb.from('verifications').select('*').eq('user_id', currentUser.id)
-    .gte('verification_date', yr + '-01-01').lte('verification_date', yr + '-12-31').order('verification_number');
-  const verIds = (vers || []).map(v => v.id);
-  let rows = [];
-  if (verIds.length > 0) {
-    const { data } = await sb.from('verification_rows').select('*').eq('user_id', currentUser.id).in('verification_id', verIds);
-    rows = data || [];
-  }
+    // Fetch all verifications + rows for the year
+    const { data: vers } = await sb.from('verifications').select('*').eq('user_id', currentUser.id)
+      .gte('verification_date', yr + '-01-01').lte('verification_date', yr + '-12-31').order('verification_number');
+    const verIds = (vers || []).map(v => v.id);
+    let rows = [];
+    if (verIds.length > 0) {
+      const { data } = await sb.from('verification_rows').select('*').eq('user_id', currentUser.id).in('verification_id', verIds);
+      rows = data || [];
+    }
 
-  // Build SIE4 file
-  let sie = '';
-  sie += '#FLAGGA 0\n';
-  sie += '#FORMAT PC8\n';
-  sie += '#SIETYP 4\n';
-  sie += '#PROGRAM "Offeria" "1.0"\n';
-  sie += `#GEN ${new Date().toISOString().slice(0, 10).replace(/-/g, '')}\n`;
-  sie += `#FNAMN "${(p.company_name || 'Företag').replace(/"/g, "''")}"\n`;
-  if (p.org_number) sie += `#ORGNR ${p.org_number.replace('-', '')}\n`;
-  if (p.address) sie += `#ADRESS "" "${p.address}" "" ""\n`;
-  sie += `#RAR 0 ${yr}0101 ${yr}1231\n`;
-  sie += `#TAXAR ${parseInt(yr) + 1}\n`;
-  sie += '#KPTYP BAS2026\n';
+    // Build SIE4 file
+    let sie = '';
+    sie += '#FLAGGA 0\n';
+    sie += '#FORMAT PC8\n';
+    sie += '#SIETYP 4\n';
+    sie += '#PROGRAM "Offeria" "1.0"\n';
+    sie += `#GEN ${new Date().toISOString().slice(0, 10).replace(/-/g, '')}\n`;
+    sie += `#FNAMN "${(p.company_name || 'Företag').replace(/"/g, "''")}"\n`;
+    if (p.org_number) sie += `#ORGNR ${p.org_number.replace('-', '')}\n`;
+    if (p.address) sie += `#ADRESS "" "${p.address}" "" ""\n`;
+    sie += `#RAR 0 ${yr}0101 ${yr}1231\n`;
+    sie += `#TAXAR ${parseInt(yr) + 1}\n`;
+    sie += '#KPTYP BAS2026\n';
 
   // Accounts
   _bkAccounts.filter(a => a.is_active).forEach(a => {
@@ -7645,6 +7711,7 @@ async function exportSIE4() {
   a.download = `offeria_sie4_${yr}.si`;
   a.click();
   URL.revokeObjectURL(url);
+  }); // End of disclaimer callback
 }
 
 // ===== SIE4 IMPORT =====
