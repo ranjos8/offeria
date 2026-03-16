@@ -1760,6 +1760,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <button class="tab-btn" id="bkTabBalans" onclick="switchBkTab('balans')">Balans</button>
           <button class="tab-btn" id="bkTabMoms" onclick="switchBkTab('moms')">Moms</button>
           <button class="tab-btn" id="bkTabKonton" onclick="switchBkTab('konton')">Konton</button>
+          <button class="tab-btn" id="bkTabArsbokslut" onclick="switchBkTab('arsbokslut')">Årsbokslut</button>
         </div>
 
         <!-- GRUNDBOK (verifikationer i registreringsordning) -->
@@ -1832,6 +1833,23 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <input id="bkAccountSearch" type="text" placeholder="Sök konto..." oninput="renderKontoplan()" style="flex:1;min-width:0;padding:0.5rem 0.8rem;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem">
           </div>
           <div id="kontoplanContent"></div>
+        </div>
+
+        <!-- ÅRSBOKSLUT (K1 + NE-bilaga) -->
+        <div id="bkArsbokslut" style="display:none">
+          <div style="margin-bottom:1.5rem">
+            <div style="display:flex;gap:0.8rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
+              <select id="arsYear" onchange="renderArsbokslut()" style="padding:0.5rem 0.8rem;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem"></select>
+              <button onclick="generateArsbokslut()" class="gen-btn" style="padding:0.5rem 1.2rem">
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+                Generera årsbokslut
+              </button>
+            </div>
+            <div style="background:#fffef6;border:1px solid #e8d49a;border-radius:8px;padding:1rem;margin-bottom:1rem;font-size:0.85rem;color:#666">
+              <strong>💡 Info:</strong> Årsbokslutet genereras från din bokföring och inkluderar K1-blankett (inkomst av näringsverksamhet) och NE-bilaga (specificerad resultaträkning). Använd detta som underlag för din deklaration.
+            </div>
+          </div>
+          <div id="arsbokslutContent"></div>
         </div>
       </div>
 
@@ -5359,7 +5377,7 @@ function renderGrundbok() {
 }
 
 function switchBkTab(tab) {
-  const tabs = ['grundbok','huvudbok','resultat','balans','moms','konton'];
+  const tabs = ['grundbok','huvudbok','resultat','balans','moms','konton','arsbokslut'];
   tabs.forEach(t => {
     const el = document.getElementById('bk' + t.charAt(0).toUpperCase() + t.slice(1));
     const btn = document.getElementById('bkTab' + t.charAt(0).toUpperCase() + t.slice(1));
@@ -5371,6 +5389,7 @@ function switchBkTab(tab) {
   if (tab === 'balans') renderBalans();
   if (tab === 'moms') renderMoms();
   if (tab === 'konton') renderKontoplan();
+  if (tab === 'arsbokslut') initArsbokslut();
 }
 
 // ===== VERIFICATION CRUD =====
@@ -6593,6 +6612,221 @@ async function saveReceiptVerification() {
   closeReceiptScan();
   loadBookkeeping();
   alert(`✓ Verifikation V${verNum} skapad från kvitto!`);
+}
+
+// ===== ÅRSBOKSLUT (K1 + NE-BILAGA) =====
+let _arsbokslutData = null;
+
+function initArsbokslut() {
+  // Populera år-dropdown
+  const yearSelect = document.getElementById('arsYear');
+  if (!yearSelect) return;
+  
+  const currentYear = new Date().getFullYear();
+  yearSelect.innerHTML = '';
+  for (let y = currentYear; y >= currentYear - 5; y--) {
+    const opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y;
+    if (y === currentYear - 1) opt.selected = true; // Föregående år som default
+    yearSelect.appendChild(opt);
+  }
+  
+  // Försök ladda tidigare genererat årsbokslut
+  renderArsbokslut();
+}
+
+async function generateArsbokslut() {
+  if (!currentUser) return;
+  
+  const year = parseInt(document.getElementById('arsYear')?.value);
+  if (!year) return alert('Välj ett år');
+  
+  const btn = event.target;
+  const origText = btn.innerHTML;
+  btn.innerHTML = '<span class="ico">⏳</span> Genererar...';
+  btn.disabled = true;
+  
+  try {
+    const { data, error } = await sb.rpc('calculate_annual_closing', {
+      p_user_id: currentUser.id,
+      p_year: year
+    });
+    
+    if (error) throw error;
+    
+    _arsbokslutData = data;
+    renderArsbokslut();
+    
+    alert('Årsbokslut genererat! 🎉');
+  } catch (err) {
+    console.error('Error generating årsbokslut:', err);
+    alert('Kunde inte generera årsbokslut. Kontrollera att du har bokföring för detta år.');
+  } finally {
+    btn.innerHTML = origText;
+    btn.disabled = false;
+  }
+}
+
+async function renderArsbokslut() {
+  const el = document.getElementById('arsbokslutContent');
+  if (!el) return;
+  
+  const year = parseInt(document.getElementById('arsYear')?.value);
+  if (!year) {
+    el.innerHTML = '<div class="empty-state"><p>Välj ett år för att visa årsbokslut</p></div>';
+    return;
+  }
+  
+  // Försök hämta sparat årsbokslut
+  if (!_arsbokslutData || _arsbokslutData.year !== year) {
+    try {
+      const { data } = await sb.rpc('get_annual_closing', {
+        p_user_id: currentUser.id,
+        p_year: year
+      });
+      _arsbokslutData = data;
+    } catch (err) {
+      console.error('Error loading årsbokslut:', err);
+    }
+  }
+  
+  if (!_arsbokslutData) {
+    el.innerHTML = `<div class="empty-state">
+      <p>Inget årsbokslut genererat för ${year}</p>
+      <p style="font-size:0.85rem;color:#888;margin-top:0.5rem">Klicka på "Generera årsbokslut" för att skapa K1-blankett och NE-bilaga</p>
+    </div>`;
+    return;
+  }
+  
+  const result = _arsbokslutData.result;
+  const revenue = _arsbokslutData.revenue;
+  const expenses = _arsbokslutData.expenses;
+  
+  const fmt = (n) => Math.round(n).toLocaleString('sv-SE');
+  
+  let html = `
+    <div style="display:grid;gap:1.5rem">
+      
+      <!-- K1-BLANKETT -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <h3 style="margin:0;font-size:1.1rem;color:var(--gold)">K1 - Inkomst av näringsverksamhet</h3>
+          <button onclick="exportK1PDF()" class="gen-btn" style="padding:0.4rem 1rem;font-size:0.85rem">
+            <span class="ico">📄</span> Exportera PDF
+          </button>
+        </div>
+        
+        <div style="background:#f9f9f9;border:1px solid #ddd;border-radius:6px;padding:1.5rem;font-family:monospace;font-size:0.9rem">
+          <div style="text-align:center;margin-bottom:1.5rem;font-weight:bold">
+            INKOMSTDEKLARATION ${year}<br>
+            K1 - Enskild näringsverksamhet
+          </div>
+          
+          <table style="width:100%;border-collapse:collapse">
+            <tr>
+              <td style="padding:0.5rem 0;border-bottom:1px solid #ddd">Intäkter (netto)</td>
+              <td style="padding:0.5rem 0;border-bottom:1px solid #ddd;text-align:right;font-weight:bold">${fmt(result.total_revenue)} kr</td>
+            </tr>
+            <tr>
+              <td style="padding:0.5rem 0;border-bottom:1px solid #ddd">Kostnader</td>
+              <td style="padding:0.5rem 0;border-bottom:1px solid #ddd;text-align:right">${fmt(result.total_expenses)} kr</td>
+            </tr>
+            <tr>
+              <td style="padding:0.8rem 0;font-weight:bold;font-size:1.05rem">Resultat före skatt</td>
+              <td style="padding:0.8rem 0;text-align:right;font-weight:bold;font-size:1.05rem;color:${result.net_result >= 0 ? '#2e7d32' : '#c62828'}">${fmt(result.net_result)} kr</td>
+            </tr>
+          </table>
+          
+          <div style="margin-top:1.5rem;padding-top:1rem;border-top:2px solid #ddd;font-size:0.85rem;color:#666">
+            <p style="margin:0.3rem 0">Överskott/underskott av näringsverksamhet överförs till blankett NE (NE-bilaga)</p>
+            <p style="margin:0.3rem 0">Detta belopp utgör underlag för beräkning av egenavgifter och inkomstskatt</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- NE-BILAGA -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <h3 style="margin:0;font-size:1.1rem;color:var(--gold)">NE-bilaga - Specificerad resultaträkning</h3>
+          <button onclick="exportNEPDF()" class="gen-btn" style="padding:0.4rem 1rem;font-size:0.85rem">
+            <span class="ico">📄</span> Exportera PDF
+          </button>
+        </div>
+        
+        <div style="background:#f9f9f9;border:1px solid #ddd;border-radius:6px;padding:1.5rem">
+          
+          <!-- INTÄKTER -->
+          <h4 style="margin:0 0 0.8rem 0;color:var(--gold);font-size:0.95rem">Intäkter</h4>
+          <table style="width:100%;border-collapse:collapse;margin-bottom:1.5rem;font-size:0.9rem">
+            ${revenue.accounts.map(acc => `
+              <tr>
+                <td style="padding:0.3rem 0">${acc.account_number} - ${acc.account_name}</td>
+                <td style="text-align:right;padding:0.3rem 0">${fmt(acc.amount)} kr</td>
+              </tr>
+            `).join('')}
+            <tr style="border-top:2px solid #ddd">
+              <td style="padding:0.5rem 0;font-weight:bold">Summa intäkter</td>
+              <td style="text-align:right;padding:0.5rem 0;font-weight:bold">${fmt(revenue.total)} kr</td>
+            </tr>
+          </table>
+          
+          <!-- KOSTNADER -->
+          <h4 style="margin:1.5rem 0 0.8rem 0;color:var(--gold);font-size:0.95rem">Kostnader</h4>
+          <table style="width:100%;border-collapse:collapse;margin-bottom:1.5rem;font-size:0.9rem">
+            ${expenses.accounts.map(acc => `
+              <tr>
+                <td style="padding:0.3rem 0">${acc.account_number} - ${acc.account_name}</td>
+                <td style="text-align:right;padding:0.3rem 0">${fmt(acc.amount)} kr</td>
+              </tr>
+            `).join('')}
+            <tr style="border-top:2px solid #ddd">
+              <td style="padding:0.5rem 0;font-weight:bold">Summa kostnader</td>
+              <td style="text-align:right;padding:0.5rem 0;font-weight:bold">${fmt(expenses.total)} kr</td>
+            </tr>
+          </table>
+          
+          <!-- RESULTAT -->
+          <table style="width:100%;border-collapse:collapse;margin-top:1.5rem;padding-top:1rem;border-top:3px solid #333">
+            <tr>
+              <td style="padding:0.5rem 0;font-weight:bold;font-size:1.05rem">Årets resultat</td>
+              <td style="text-align:right;padding:0.5rem 0;font-weight:bold;font-size:1.05rem;color:${result.net_result >= 0 ? '#2e7d32' : '#c62828'}">${fmt(result.net_result)} kr</td>
+            </tr>
+          </table>
+          
+        </div>
+      </div>
+      
+      <!-- KOSTNADER PER KATEGORI -->
+      <div class="card">
+        <h3 style="margin:0 0 1rem 0;font-size:1.1rem;color:var(--gold)">Kostnadsfördelning</h3>
+        <div style="background:#f9f9f9;border:1px solid #ddd;border-radius:6px;padding:1.5rem">
+          <table style="width:100%;border-collapse:collapse;font-size:0.9rem">
+            ${Object.entries(expenses.by_category || {}).map(([cat, total]) => `
+              <tr>
+                <td style="padding:0.4rem 0;border-bottom:1px solid #ddd">${cat}</td>
+                <td style="text-align:right;padding:0.4rem 0;border-bottom:1px solid #ddd">${fmt(total)} kr</td>
+                <td style="text-align:right;padding:0.4rem 0;border-bottom:1px solid #ddd;color:#888">${Math.round((total / expenses.total) * 100)}%</td>
+              </tr>
+            `).join('')}
+          </table>
+        </div>
+      </div>
+      
+    </div>
+  `;
+  
+  el.innerHTML = html;
+}
+
+async function exportK1PDF() {
+  alert('PDF-export kommer snart! 📄');
+  // TODO: Implementera PDF-export med jsPDF
+}
+
+async function exportNEPDF() {
+  alert('PDF-export kommer snart! 📄');
+  // TODO: Implementera PDF-export med jsPDF
 }
 
 // ===== BANK IMPORT =====
