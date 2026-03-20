@@ -2270,6 +2270,7 @@ const INVOICE_LIMITS = { free: 0, pro: 0, komplett: Infinity };
 const PLAN_LABELS = { free: 'Gratis', pro: 'Pro', komplett: 'Komplett' };
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = sb; //  
 let currentUser = null;
 let currentProfile = null;
 let monthlyUsed = 0;
