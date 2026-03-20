@@ -6729,9 +6729,6 @@ async function sendAIMessage() {
   input.value = '';
   input.style.height = 'auto';
   
-  // Lägg till i historik
-  aiChatHistory.push({ role: 'user', content: question });
-  
   // Visa typing indicator
   const typingId = showTypingIndicator();
   
@@ -6741,35 +6738,38 @@ async function sendAIMessage() {
   input.disabled = true;
   
   try {
-    // Hämta kontext
-    const context = await getBookkeepingContext();
+    console.log('Calling Edge Function with minimal payload...');
     
-    // Anropa super-task Edge Function
+    // MINIMAL PAYLOAD - inga extra fält
     const { data, error } = await sb.functions.invoke('super-task', {
       body: {
         task: 'bookkeeping_assistant',
         question: question,
-        history: aiChatHistory.slice(-10), // Senaste 10 meddelandena
-        context: context
+        history: [],
+        context: {}
       }
     });
     
-    if (error) throw error;
+    console.log('Edge Function response:', { data, error });
+    
+    if (error) {
+      console.error('Edge Function error:', error);
+      throw error;
+    }
     
     // Ta bort typing indicator
     removeTypingIndicator(typingId);
     
     // Lägg till AI-svar
-    const answer = data.answer || 'Tyvärr kunde jag inte svara på den frågan.';
+    const answer = data?.answer || 'Inget svar från AI';
     addMessageToChat('assistant', answer);
-    
-    // Lägg till i historik
-    aiChatHistory.push({ role: 'assistant', content: answer });
     
   } catch (error) {
     console.error('AI Chat error:', error);
+    console.error('Error type:', error.constructor.name);
+    console.error('Error message:', error.message);
     removeTypingIndicator(typingId);
-    addMessageToChat('assistant', 'Något gick fel. Försök igen senare.');
+    addMessageToChat('assistant', 'Något gick fel. Försök igen senare. (Error: ' + error.message + ')');
   } finally {
     sendBtn.disabled = false;
     input.disabled = false;
