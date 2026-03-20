@@ -6745,7 +6745,7 @@ async function sendAIMessage() {
     const context = await getBookkeepingContext();
     
     // Anropa super-task Edge Function
-    const { data, error } = await supabase.functions.invoke('super-task', {
+    const { data, error } = await sb.functions.invoke('super-task', {
       body: {
         task: 'bookkeeping_assistant',
         question: question,
@@ -6840,13 +6840,13 @@ function removeTypingIndicator(id) {
 async function getBookkeepingContext() {
   try {
     // Hämta kontoplan
-    const { data: accounts } = await supabase
+    const { data: accounts } = await sb
       .from('chart_of_accounts')
       .select('account_number, account_name, account_type')
       .order('account_number');
     
     // Hämta senaste verifikationer
-    const { data: verifications } = await supabase
+    const { data: verifications } = await sb
       .from('verifications')
       .select(`
         verification_number,
@@ -6862,14 +6862,14 @@ async function getBookkeepingContext() {
       .limit(5);
     
     // Hämta företagsinfo
-    const { data: profile } = await supabase
+    const { data: profile } = await sb
       .from('profiles')
       .select('company_name, org_number, vat_registered')
       .eq('id', currentUser.id)
       .single();
     
     // Hämta räkenskapsår
-    const { data: fiscalYear } = await supabase
+    const { data: fiscalYear } = await sb
       .from('fiscal_years')
       .select('start_date, end_date')
       .eq('user_id', currentUser.id)
