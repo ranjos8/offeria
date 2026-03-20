@@ -2370,6 +2370,13 @@ function onLogout() {
   if (toggle) toggle.style.display = 'none';
   const logoutBtn = document.getElementById('navLogoutBtn');
   if (logoutBtn) logoutBtn.style.display = '';
+  // Hide AI chat widget
+  const aiWidget = document.getElementById('aiChatWidget');
+  if (aiWidget) aiWidget.style.display = 'none';
+  const aiPanel = document.getElementById('aiChatPanel');
+  if (aiPanel) aiPanel.classList.remove('active');
+  // Clear AI chat history
+  aiChatHistory = [];
   showView('landing');
   document.getElementById('navUserArea').style.display = 'none';
   document.getElementById('navAuthBtns').style.display = '';
