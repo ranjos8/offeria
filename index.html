@@ -6838,52 +6838,28 @@ function removeTypingIndicator(id) {
 }
 
 async function getBookkeepingContext() {
+  // Returnera bara basic info - inget som kan krascha
   try {
-    // Hämta kontoplan
-    const { data: accounts } = await sb
-      .from('chart_of_accounts')
-      .select('account_number, account_name, account_type')
-      .order('account_number');
+    if (!currentUser || !currentUser.id) {
+      console.log('No current user for context');
+      return {};
+    }
     
-    // Hämta senaste verifikationer
-    const { data: verifications } = await sb
-      .from('verifications')
-      .select(`
-        verification_number,
-        verification_date,
-        description,
-        verification_rows (
-          account_number,
-          debit,
-          credit
-        )
-      `)
-      .order('verification_date', { ascending: false })
-      .limit(5);
-    
-    // Hämta företagsinfo
-    const { data: profile } = await sb
-      .from('profiles')
-      .select('company_name, org_number, vat_registered')
-      .eq('id', currentUser.id)
-      .single();
-    
-    // Hämta räkenskapsår
-    const { data: fiscalYear } = await sb
-      .from('fiscal_years')
-      .select('start_date, end_date')
-      .eq('user_id', currentUser.id)
-      .order('start_date', { ascending: false })
-      .limit(1)
-      .single();
+    // Endast hämta company_name om det finns
+    let companyName = null;
+    try {
+      const { data: profile } = await sb
+        .from('profiles')
+        .select('company_name')
+        .eq('id', currentUser.id)
+        .single();
+      companyName = profile?.company_name;
+    } catch (e) {
+      console.log('Could not fetch profile:', e);
+    }
     
     return {
-      company_name: profile?.company_name,
-      org_number: profile?.org_number,
-      vat_registered: profile?.vat_registered,
-      fiscal_year: fiscalYear,
-      account_count: accounts?.length || 0,
-      recent_verifications_count: verifications?.length || 0
+      company_name: companyName || 'Ditt företag'
     };
   } catch (error) {
     console.error('Error fetching context:', error);
