@@ -5977,16 +5977,21 @@ async function renderMoms() {
   });
 
   // Compute base amounts (excl. moms) from revenue accounts
-  const rev25 = saldo['3010'] || 0; // Försäljning 25%
-  const rev12 = saldo['3020'] || 0; // Försäljning 12%
-  const rev6  = saldo['3030'] || 0; // Försäljning 6%
-  const rev0  = saldo['3040'] || 0; // Momsfri försäljning
+  const rev25 = saldo['3001'] || 0; // Försäljning 25%
+  const rev12 = saldo['3002'] || 0; // Försäljning 12%
+  const rev6  = saldo['3003'] || 0; // Försäljning 6%
+  const rev0  = saldo['3106'] || 0; // Momsfri försäljning
 
-  // Moms amounts from moms accounts
-  const utgMoms25 = saldo['2610'] || 0;
-  const utgMoms12 = saldo['2620'] || 0;
-  const utgMoms6  = saldo['2630'] || 0;
-  const ingMoms   = -(saldo['2640'] || 0); // Sign flip (debit = positive)
+  // Utgående moms (försäljning)
+  const utgMoms25 = saldo['2611'] || 0;
+  const utgMoms12 = saldo['2621'] || 0;
+  const utgMoms6  = saldo['2631'] || 0;
+  
+  // Ingående moms (inköp) - summera alla tre satser
+  const ingMoms25 = -(saldo['2640'] || 0); // 25% (debit = positive)
+  const ingMoms12 = -(saldo['2641'] || 0); // 12%
+  const ingMoms6  = -(saldo['2642'] || 0); // 6%
+  const ingMoms   = ingMoms25 + ingMoms12 + ingMoms6;
 
   const totalUtg = utgMoms25 + utgMoms12 + utgMoms6;
   const momsAttBetala = totalUtg - ingMoms;
@@ -5999,6 +6004,7 @@ async function renderMoms() {
     yr, period, sm, em,
     rev25: fmtRaw(rev25), rev12: fmtRaw(rev12), rev6: fmtRaw(rev6), rev0: fmtRaw(rev0),
     utgMoms25: fmtRaw(utgMoms25), utgMoms12: fmtRaw(utgMoms12), utgMoms6: fmtRaw(utgMoms6),
+    ingMoms25: fmtRaw(ingMoms25), ingMoms12: fmtRaw(ingMoms12), ingMoms6: fmtRaw(ingMoms6),
     ingMoms: fmtRaw(ingMoms), momsAttBetala: fmtRaw(momsAttBetala)
   };
 
@@ -6031,7 +6037,10 @@ async function renderMoms() {
 
   // Section: Ingående moms
   html += '<div style="font-weight:600;font-size:0.78rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;margin:1rem 0 0.5rem">C. Ingående moms</div>';
-  html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">48</span>Ingående moms att dra av</span><span style="color:#2e7d32">${fmt(ingMoms)} kr</span></div>`;
+  html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">30</span>Ingående moms 25%</span><span style="color:#2e7d32">${fmt(ingMoms25)} kr</span></div>`;
+  html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">31</span>Ingående moms 12%</span><span style="color:#2e7d32">${fmt(ingMoms12)} kr</span></div>`;
+  html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">32</span>Ingående moms 6%</span><span style="color:#2e7d32">${fmt(ingMoms6)} kr</span></div>`;
+  html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">48</span>Total ingående moms</span><span style="color:#2e7d32;font-weight:600">${fmt(ingMoms)} kr</span></div>`;
 
   // Summary
   html += `<div style="display:flex;justify-content:space-between;padding:0.8rem 0;font-weight:700;font-size:1.05rem;border-top:2px solid var(--ink);margin-top:1rem;color:${momsAttBetala >= 0 ? '#c62828' : '#2e7d32'}">
