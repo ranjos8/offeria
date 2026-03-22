@@ -5287,10 +5287,10 @@ function switchBkTab(tab) {
 // ===== VERIFICATION CRUD =====
 const CATEGORY_MAP = {
   // === INTÄKTER (FÖRSÄLJNING) ===
-  forsaljning_25:  { debit: '1510', credit: '3001', desc: 'Försäljning 25% moms', defaultVat: 25, isRevenue: true },
-  forsaljning_12:  { debit: '1510', credit: '3002', desc: 'Försäljning 12% moms', defaultVat: 12, isRevenue: true },
-  forsaljning_6:   { debit: '1510', credit: '3003', desc: 'Försäljning 6% moms', defaultVat: 6, isRevenue: true },
-  forsaljning_0:   { debit: '1510', credit: '3106', desc: 'Försäljning 0% moms', defaultVat: 0, isRevenue: true },
+  forsaljning_25:  { credit: '3001', desc: 'Försäljning 25% moms', defaultVat: 25, isRevenue: true },
+  forsaljning_12:  { credit: '3002', desc: 'Försäljning 12% moms', defaultVat: 12, isRevenue: true },
+  forsaljning_6:   { credit: '3003', desc: 'Försäljning 6% moms', defaultVat: 6, isRevenue: true },
+  forsaljning_0:   { credit: '3106', desc: 'Försäljning 0% moms', defaultVat: 0, isRevenue: true },
   
   // === INKÖP & MATERIAL ===
   material:        { debit: '4010', credit: null, desc: 'Inköp material', defaultVat: 25 },
@@ -5322,7 +5322,7 @@ const CATEGORY_MAP = {
   
   // === EXTERN TJÄNSTER ===
   redovisning:     { debit: '6530', credit: null, desc: 'Redovisning/Revision', defaultVat: 25 },
-  representation:  { debit: '6070', credit: null, desc: 'Representation', defaultVat: 25 },
+  representation:  { debit: '6070', credit: null, desc: 'Representation', defaultVat: 25, vatDeductible: 0.5 },
   ovrigt:          { debit: '6990', credit: null, desc: 'Övriga externa kostnader', defaultVat: 25 },
   
   // === EGET KAPITAL (ENSKILD FIRMA) ===
@@ -5359,7 +5359,8 @@ function applyVerCategory() {
         accountInfoText.innerHTML = `<strong>Intäkt (kredit):</strong> ${cm.credit}<br><strong>Utgående moms (kredit):</strong> ${cm.defaultVat === 25 ? '2611' : cm.defaultVat === 12 ? '2621' : cm.defaultVat === 6 ? '2631' : 'Ingen moms'}<br><strong>Inbetalning (debet):</strong> Välj nedan om kund betalar direkt eller senare`;
       } else {
         const defaultVatAcc = cm.defaultVat === 25 ? '2640' : cm.defaultVat === 12 ? '2641' : cm.defaultVat === 6 ? '2642' : cm.defaultVat === 0 ? 'Ingen moms' : '2640';
-        accountInfoText.innerHTML = `<strong>Kostnad (debet):</strong> ${cm.debit}<br><strong>Moms (debet):</strong> ${defaultVatAcc}${defaultVatAcc !== 'Ingen moms' ? ' (ingående moms)' : ''}<br><strong>Betalning (kredit):</strong> Bank/Skuld`;
+        const vatDeductNote = cm.vatDeductible === 0.5 ? ' (50% avdragsrätt)' : '';
+        accountInfoText.innerHTML = `<strong>Kostnad (debet):</strong> ${cm.debit}<br><strong>Moms (debet):</strong> ${defaultVatAcc}${defaultVatAcc !== 'Ingen moms' ? ' (ingående moms)' + vatDeductNote : ''}<br><strong>Betalning (kredit):</strong> Bank/Skuld`;
       }
       
       // Sätt default momssats
@@ -5629,15 +5630,20 @@ async function saveVerification() {
 
         const netto = Math.round(amount / (1 + vatPct / 100) * 100) / 100;
         const moms = Math.round((amount - netto) * 100) / 100;
+        
+        // Beräkna avdragsgill moms (50% för representation)
+        const vatDeductible = cm.vatDeductible || 1.0;
+        const deductibleVat = Math.round(moms * vatDeductible * 100) / 100;
+        const nonDeductibleVat = moms - deductibleVat;
 
-        // Debit cost account
-        rows.push({ account_number: cm.debit, debit: netto, credit: 0 });
+        // Debit cost account (inklusive ej avdragsgill moms)
+        rows.push({ account_number: cm.debit, debit: netto + nonDeductibleVat, credit: 0 });
 
-        // Debit VAT account (different account per VAT rate for ingående moms)
-        if (moms > 0) {
+        // Debit VAT account (endast avdragsgill del)
+        if (deductibleVat > 0) {
           const vatAccount = vatPct === 25 ? '2640' : vatPct === 12 ? '2641' : vatPct === 6 ? '2642' : null;
           if (vatAccount) {
-            rows.push({ account_number: vatAccount, debit: moms, credit: 0 });
+            rows.push({ account_number: vatAccount, debit: deductibleVat, credit: 0 });
           }
         }
 
@@ -5775,18 +5781,23 @@ async function autoBookInvoices() {
       const verNum = numD || 1;
 
       const isCredit = i.status === 'credit_note';
+      
+      // Välj rätt konton baserat på momssats
+      const saleAccount = vatPct === 25 ? '3001' : vatPct === 12 ? '3002' : vatPct === 6 ? '3003' : '3106';
+      const vatAccount = vatPct === 25 ? '2611' : vatPct === 12 ? '2621' : vatPct === 6 ? '2631' : null;
+      
       let rows;
       if (isCredit) {
         rows = [
-          { account_number: '3010', debit: netto, credit: 0 },
-          { account_number: '2610', debit: moms, credit: 0 },
+          { account_number: saleAccount, debit: netto, credit: 0 },
+          { account_number: vatAccount, debit: moms, credit: 0 },
           { account_number: '1510', debit: 0, credit: total }
         ];
       } else {
         rows = [
           { account_number: '1510', debit: total - rotAmount, credit: 0 },
-          { account_number: '3010', debit: 0, credit: netto },
-          { account_number: '2610', debit: 0, credit: moms }
+          { account_number: saleAccount, debit: 0, credit: netto },
+          { account_number: vatAccount, debit: 0, credit: moms }
         ];
         if (rotAmount > 0) {
           rows.push({ account_number: '1580', debit: rotAmount, credit: 0 }); // Fordran ROT-avdrag
