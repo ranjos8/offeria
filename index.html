@@ -1564,6 +1564,21 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           </div>
 
           <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+            <div class="card-label"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span> Bokföringsinställningar</div>
+            <div class="field" style="margin-bottom:1rem">
+              <label>Bokföringsmetod för leverantörsfakturor</label>
+              <select id="pAccountingMethod" onchange="saveProfile()">
+                <option value="kontant">Kontantmetoden (1-stegs, betala direkt)</option>
+                <option value="faktura">Fakturametoden (2-stegs, registrera + betala)</option>
+              </select>
+              <div style="font-size:0.7rem;color:#888;margin-top:0.3rem;line-height:1.5">
+                <strong>Kontantmetoden:</strong> Enklare, bokför när du betalar fakturan.<br>
+                <strong>Fakturametoden:</strong> Mer avancerad, bokför när fakturan anländer (skuld 2440), betala senare.
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
             <div class="card-label"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></span> Standardgaranti <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Används om garanti är ikryssad</span></div>
             <div class="field"><textarea id="pWarranty" style="height:70px;resize:none;border:1.5px solid var(--border);border-radius:8px;padding:0.6rem 0.85rem;font-family:DM Sans,sans-serif;font-size:0.88rem;outline:none;background:var(--paper);width:100%" placeholder="t.ex. 2 års garanti på allt utfört arbete enligt konsumenttjänstlagen."></textarea></div>
           </div>
@@ -2573,6 +2588,7 @@ function fillProfileForm(profile) {
   document.getElementById('pCertifications').value = profile.certifications || '';
   document.getElementById('pPaymentMethods').value = profile.payment_methods || '';
   document.getElementById('pWarranty').value = profile.warranty_text || '';
+  document.getElementById('pAccountingMethod').value = profile.accounting_method || 'kontant';
   // Fill industry chips
   const industries = profile.industries ? JSON.parse(profile.industries) : [];
   document.querySelectorAll('#profileIndustryChips input[type=checkbox]').forEach(cb => {
@@ -2616,6 +2632,7 @@ async function saveProfile() {
     certifications: document.getElementById('pCertifications').value.trim(),
     payment_methods: document.getElementById('pPaymentMethods').value.trim(),
     warranty_text: document.getElementById('pWarranty').value.trim(),
+    accounting_method: document.getElementById('pAccountingMethod')?.value || 'kontant',
     industries: JSON.stringify(selectedIndustries),
   };
   const { error } = await sb.from('profiles').update(updates).eq('id', currentUser.id);
