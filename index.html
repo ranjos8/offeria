@@ -5180,30 +5180,29 @@ async function lockCurrentPeriod() {
 
   if (!confirm(`Lås ${monthName} ${yr}?\n\nAlla verifikationer i perioden blir låsta och kan inte ändras. Rättelser sker via nya rättelseverifikationer.\n\nDetta kan inte ångras.`)) return;
 
-  // Lock all verifications in the period
-  const startDate = yr + '-' + mo + '-01';
-  const d = new Date(parseInt(yr), parseInt(mo), 0);
-  const endDate = yr + '-' + mo + '-' + String(d.getDate()).padStart(2, '0');
-
-  const { error: lockErr } = await sb.from('locked_periods').insert({
-    user_id: currentUser.id, period: periodKey, locked_by: currentUser.email
+  // Använd backend-funktionen för att låsa perioden
+  const { data, error } = await sb.rpc('lock_period', {
+    p_user_id: currentUser.id,
+    p_year: parseInt(yr),
+    p_month: parseInt(mo)
   });
 
-  if (lockErr) { alert('Kunde inte låsa period: ' + lockErr.message); return; }
+  if (error) {
+    alert('Kunde inte låsa period: ' + error.message);
+    return;
+  }
 
-  // Mark all verifications as locked
-  await sb.from('verifications').update({ is_locked: true })
-    .eq('user_id', currentUser.id)
-    .gte('verification_date', startDate)
-    .lte('verification_date', endDate);
-
-  // Audit log
-  await sb.from('bookkeeping_audit_log').insert({
-    user_id: currentUser.id, action: 'lock', entity_type: 'period',
-    details: { period: periodKey }
+  const lockedCount = data?.[0]?.locked_count || 0;
+  
+  // Lägg till i locked_periods tabell för historik
+  await sb.from('locked_periods').insert({
+    user_id: currentUser.id, 
+    period: periodKey, 
+    locked_by: currentUser.email,
+    locked_count: lockedCount
   });
 
-  alert(`${monthName} ${yr} är nu låst.`);
+  alert(`Period låst! ${lockedCount} verifikation(er) låstes för ${monthName} ${yr}.`);
   loadBookkeeping();
 }
 
