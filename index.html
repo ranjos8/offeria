@@ -6281,36 +6281,146 @@ async function saveSupplierInvoice() {
 async function markSupplierPaid(idx) {
   const s = _supplierData[idx];
   if (!s) return;
+  
+  // Hämta användarens bokföringsmetod
+  const { data: profile } = await sb.from('profiles').select('accounting_method').eq('id', currentUser.id).single();
+  const accountingMethod = profile?.accounting_method || 'kontant';
+  
   const { error } = await sb.from('supplier_invoices').update({
     status: 'paid', paid_date: new Date().toISOString().slice(0, 10)
   }).eq('id', s.id);
   if (error) return alert('Kunde inte uppdatera.');
 
-  // Auto-book the payment
+  // Bokföringslogik
   const catMap = { material:'4010', drivmedel:'5610', bil:'5615', telefon:'6210', forsakring:'6310', hyra:'5010', kontorsmaterial:'6110', underentreprenor:'4600', verktyg:'5410', ovrigt:'6990' };
   const debitAccount = catMap[s.category] || '6990';
   const yr = new Date().getFullYear();
-  const { data: numD } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: yr });
-  const verNum = numD || 1;
   const vatAmount = parseFloat(s.vat_amount) || 0;
   const netAmount = parseFloat(s.total_amount) - vatAmount;
+  const totalAmount = parseFloat(s.total_amount);
 
+  if (accountingMethod === 'faktura') {
+    // ===== FAKTURAMETODEN (2-STEGS) =====
+    
+    // STEG 1: Registrering (om inte redan gjord)
+    if (!s.registration_verification_id) {
+      const { data: numD1 } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: yr });
+      const verNum1 = numD1 || 1;
+      
+      const rows1 = [
+        { account_number: debitAccount, debit: netAmount, credit: 0 },   // Kostnad
+        { account_number: '2640', debit: vatAmount, credit: 0 },         // Ingående moms
+        { account_number: '2440', debit: 0, credit: totalAmount }        // Leverantörsskuld
+      ];
+
+      const { data: ver1 } = await sb.from('verifications').insert({
+        user_id: currentUser.id, verification_number: verNum1,
+        verification_date: s.invoice_date || new Date().toISOString().slice(0, 10),
+        description: 'Leverantörsfaktura ' + s.supplier_name + (s.invoice_number ? ' #' + s.invoice_number : ''),
+        source_type: 'supplier_registration', source_id: s.id, created_by: 'auto'
+      }).select().single();
+
+      if (ver1) {
+        await sb.from('verification_rows').insert(rows1.map(r => ({ verification_id: ver1.id, user_id: currentUser.id, ...r })));
+        await sb.from('supplier_invoices').update({ registration_verification_id: ver1.id }).eq('id', s.id);
+      }
+    }
+
+    // STEG 2: Betalning (alltid när användaren markerar som betald)
+    const { data: numD2 } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: yr });
+    const verNum2 = numD2 || 1;
+    
+    const rows2 = [
+      { account_number: '2440', debit: totalAmount, credit: 0 },         // Minskar skuld
+      { account_number: '1930', debit: 0, credit: totalAmount }          // Minskar bank
+    ];
+
+    const { data: ver2 } = await sb.from('verifications').insert({
+      user_id: currentUser.id, verification_number: verNum2,
+      verification_date: new Date().toISOString().slice(0, 10),
+      description: 'Betalning leverantör ' + s.supplier_name + (s.invoice_number ? ' #' + s.invoice_number : ''),
+      source_type: 'supplier_payment', source_id: s.id, created_by: 'auto'
+    }).select().single();
+
+    if (ver2) {
+      await sb.from('verification_rows').insert(rows2.map(r => ({ verification_id: ver2.id, user_id: currentUser.id, ...r })));
+      await sb.from('supplier_invoices').update({ payment_verification_id: ver2.id }).eq('id', s.id);
+    }
+
+  } else {
+    // ===== KONTANTMETODEN (1-STEGS) =====
+    const { data: numD } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: yr });
+    const verNum = numD || 1;
+
+    const rows = [
+      { account_number: debitAccount, debit: netAmount, credit: 0 },
+      { account_number: '2640', debit: vatAmount, credit: 0 },
+      { account_number: '1930', debit: 0, credit: totalAmount }
+    ];
+
+    const { data: ver } = await sb.from('verifications').insert({
+      user_id: currentUser.id, verification_number: verNum,
+      verification_date: new Date().toISOString().slice(0, 10),
+      description: 'Leverantör ' + s.supplier_name + (s.invoice_number ? ' #' + s.invoice_number : ''),
+      source_type: 'supplier', source_id: s.id, created_by: 'auto'
+    }).select().single();
+
+    if (ver) {
+      await sb.from('verification_rows').insert(rows.map(r => ({ verification_id: ver.id, user_id: currentUser.id, ...r })));
+      await sb.from('supplier_invoices').update({ verification_id: ver.id }).eq('id', s.id);
+    }
+  }
+
+  loadSuppliers();
+}
+
+// Registrera leverantörsfaktura (endast för fakturametoden)
+async function registerSupplierInvoice(idx) {
+  const s = _supplierData[idx];
+  if (!s) return;
+  
+  // Hämta användarens bokföringsmetod
+  const { data: profile } = await sb.from('profiles').select('accounting_method').eq('id', currentUser.id).single();
+  if (profile?.accounting_method !== 'faktura') {
+    return alert('Denna funktion är endast för fakturametoden. Ändra i inställningar.');
+  }
+  
+  if (s.registration_verification_id) {
+    return alert('Fakturan är redan registrerad.');
+  }
+  
+  const { error } = await sb.from('supplier_invoices').update({
+    status: 'registered'
+  }).eq('id', s.id);
+  if (error) return alert('Kunde inte uppdatera.');
+
+  // STEG 1: Registrering (bokför mot 2440)
+  const catMap = { material:'4010', drivmedel:'5610', bil:'5615', telefon:'6210', forsakring:'6310', hyra:'5010', kontorsmaterial:'6110', underentreprenor:'4600', verktyg:'5410', ovrigt:'6990' };
+  const debitAccount = catMap[s.category] || '6990';
+  const yr = new Date().getFullYear();
+  const vatAmount = parseFloat(s.vat_amount) || 0;
+  const netAmount = parseFloat(s.total_amount) - vatAmount;
+  const totalAmount = parseFloat(s.total_amount);
+
+  const { data: numD } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: yr });
+  const verNum = numD || 1;
+  
   const rows = [
-    { account_number: debitAccount, debit: netAmount, credit: 0 },
-    { account_number: '2640', debit: vatAmount, credit: 0 },
-    { account_number: '1930', debit: 0, credit: parseFloat(s.total_amount) }
+    { account_number: debitAccount, debit: netAmount, credit: 0 },   // Kostnad
+    { account_number: '2640', debit: vatAmount, credit: 0 },         // Ingående moms
+    { account_number: '2440', debit: 0, credit: totalAmount }        // Leverantörsskuld
   ];
 
   const { data: ver } = await sb.from('verifications').insert({
     user_id: currentUser.id, verification_number: verNum,
-    verification_date: new Date().toISOString().slice(0, 10),
-    description: 'Leverantör ' + s.supplier_name + (s.invoice_number ? ' #' + s.invoice_number : ''),
-    source_type: 'supplier', source_id: s.id, created_by: 'auto'
+    verification_date: s.invoice_date || new Date().toISOString().slice(0, 10),
+    description: 'Leverantörsfaktura ' + s.supplier_name + (s.invoice_number ? ' #' + s.invoice_number : ''),
+    source_type: 'supplier_registration', source_id: s.id, created_by: 'auto'
   }).select().single();
 
   if (ver) {
     await sb.from('verification_rows').insert(rows.map(r => ({ verification_id: ver.id, user_id: currentUser.id, ...r })));
-    await sb.from('supplier_invoices').update({ verification_id: ver.id }).eq('id', s.id);
+    await sb.from('supplier_invoices').update({ registration_verification_id: ver.id }).eq('id', s.id);
   }
 
   loadSuppliers();
