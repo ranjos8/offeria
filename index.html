@@ -5352,11 +5352,14 @@ function updateVatBreakdown() {
   let totalNetto = 0;
   let totalVat = 0;
   let totalInkl = 0;
+  let vatAccounts = new Set();
+  let paymentAccounts = new Set();
   
   amountLines.forEach(line => {
     const amount = parseFloat(line.querySelector('.ver-line-amount')?.value) || 0;
     if (amount <= 0) return;
     const vatPct = parseInt(line.querySelector('.ver-line-vat')?.value) || 0;
+    const payAcc = line.querySelector('.ver-line-pay')?.value || '1930';
     
     const netto = Math.round(amount / (1 + vatPct / 100) * 100) / 100;
     const vat = Math.round((amount - netto) * 100) / 100;
@@ -5364,6 +5367,14 @@ function updateVatBreakdown() {
     totalNetto += netto;
     totalVat += vat;
     totalInkl += amount;
+    
+    // Samla momskonton
+    if (vatPct === 25) vatAccounts.add('2640');
+    else if (vatPct === 12) vatAccounts.add('2641');
+    else if (vatPct === 6) vatAccounts.add('2642');
+    
+    // Samla betalningskonton
+    paymentAccounts.add(payAcc);
   });
   
   const breakdown = document.getElementById('verVatBreakdown');
@@ -5374,6 +5385,58 @@ function updateVatBreakdown() {
     document.getElementById('verTotalAmount').textContent = totalInkl.toFixed(2).replace('.', ',') + ' kr';
   } else {
     breakdown.style.display = 'none';
+  }
+  
+  // Uppdatera kontoinfo-box med dynamisk momskonto + betalningskonto
+  const cat = document.getElementById('verCategory').value;
+  const cm = CATEGORY_MAP[cat];
+  const accountInfo = document.getElementById('verAccountInfo');
+  const accountInfoText = document.getElementById('verAccountInfoText');
+  
+  if (cm && !cm.noVat && accountInfo.style.display !== 'none') {
+    const vatAccountsStr = Array.from(vatAccounts).join(', ');
+    const paymentAccountsStr = Array.from(paymentAccounts).map(acc => {
+      if (acc === '1930') return '1930 (Bank)';
+      if (acc === '1940') return '1940 (BG)';
+      if (acc === '1910') return '1910 (Kontant)';
+      if (acc === '2440') return '2440 (Leverantörsskuld)';
+      return acc;
+    }).join(', ');
+    
+    accountInfoText.innerHTML = `<strong>Kostnad (debet):</strong> ${cm.debit}<br><strong>Moms (debet):</strong> ${vatAccountsStr || '2640'} (ingående moms)<br><strong>Betalning (kredit):</strong> ${paymentAccountsStr}`;
+  }
+  
+  // Balanskontroll (visuell feedback)
+  const cat2 = document.getElementById('verCategory').value;
+  if (cat2 && cat2 !== 'custom' && totalInkl > 0) {
+    const cm2 = CATEGORY_MAP[cat2];
+    if (cm2) {
+      // Beräkna vad debet/kredit SKULLE bli
+      let calcDebit = totalNetto + totalVat;
+      let calcCredit = totalInkl;
+      const balanced = Math.abs(calcDebit - calcCredit) < 0.01;
+      
+      // Visa balansindikator
+      let balanceIndicator = document.getElementById('verBalanceIndicator');
+      if (!balanceIndicator) {
+        balanceIndicator = document.createElement('div');
+        balanceIndicator.id = 'verBalanceIndicator';
+        balanceIndicator.style.cssText = 'margin-top:0.5rem;padding:0.5rem 0.8rem;border-radius:6px;font-size:0.8rem;font-weight:600;text-align:center';
+        breakdown.appendChild(balanceIndicator);
+      }
+      
+      if (balanced) {
+        balanceIndicator.style.background = '#e8f5e9';
+        balanceIndicator.style.color = '#2e7d32';
+        balanceIndicator.style.border = '1px solid #81c784';
+        balanceIndicator.innerHTML = '✔ Balanserad verifikation';
+      } else {
+        balanceIndicator.style.background = '#fff3e0';
+        balanceIndicator.style.color = '#e65100';
+        balanceIndicator.style.border = '1px solid #ffb74d';
+        balanceIndicator.innerHTML = `⚠ Ej balanserad (D: ${calcDebit.toFixed(2)}, K: ${calcCredit.toFixed(2)})`;
+      }
+    }
   }
 }
 
@@ -5396,7 +5459,7 @@ function addVerAmountLine() {
   row.style.cssText = 'display:grid;grid-template-columns:1fr 90px 90px 30px;gap:0.4rem;margin-bottom:0.4rem;align-items:center';
   row.innerHTML = `<input type="number" step="0.01" placeholder="Belopp inkl moms" class="ver-line-amount" oninput="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.85rem;font-family:inherit">
     <select class="ver-line-vat" onchange="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.82rem;font-family:inherit"><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
-    <select class="ver-line-pay" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.75rem;font-family:inherit"><option value="1930">Bank</option><option value="1940">BG</option><option value="1910">Kontant</option><option value="2440">Skuld</option></select>
+    <select class="ver-line-pay" onchange="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.75rem;font-family:inherit"><option value="1930">1930 - Bank</option><option value="1940">1940 - BG</option><option value="1910">1910 - Kontant</option><option value="2440">2440 - Skuld</option></select>
     <button onclick="this.parentElement.remove();updateVatBreakdown()" style="background:none;border:none;cursor:pointer;color:#c62828;font-size:1rem">×</button>`;
   container.appendChild(row);
 }
@@ -5419,7 +5482,7 @@ function openNewVerification() {
   document.getElementById('verAmountLines').innerHTML = `<div class="ver-amount-line" style="display:grid;grid-template-columns:1fr 90px 90px 30px;gap:0.4rem;margin-bottom:0.4rem;align-items:center">
     <input type="number" step="0.01" placeholder="Belopp inkl moms" class="ver-line-amount" oninput="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.85rem;font-family:inherit">
     <select class="ver-line-vat" onchange="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.82rem;font-family:inherit"><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
-    <select class="ver-line-pay" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.75rem;font-family:inherit"><option value="1930">Bank</option><option value="1940">BG</option><option value="1910">Kontant</option><option value="2440">Skuld</option></select>
+    <select class="ver-line-pay" onchange="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.75rem;font-family:inherit"><option value="1930">1930 - Bank</option><option value="1940">1940 - BG</option><option value="1910">1910 - Kontant</option><option value="2440">2440 - Skuld</option></select>
     <span></span>
   </div>`;
   document.getElementById('verificationModalOverlay').style.display = 'flex';
