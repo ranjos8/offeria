@@ -5305,13 +5305,31 @@ function applyVerCategory() {
   const cat = document.getElementById('verCategory').value;
   const amountSection = document.getElementById('verAmountSection');
   const manualRows = document.getElementById('verManualRows');
+  const accountInfo = document.getElementById('verAccountInfo');
+  const accountInfoText = document.getElementById('verAccountInfoText');
+  
   if (cat === 'custom') {
     amountSection.style.display = 'none';
     manualRows.style.display = 'block';
+    accountInfo.style.display = 'none';
     if (!document.getElementById('verRowsContainer').children.length) { addManualVerRow(); addManualVerRow(); }
   } else {
     amountSection.style.display = CATEGORY_MAP[cat]?.noVat ? 'none' : 'block';
     manualRows.style.display = 'none';
+    
+    // Visa kontoinfo
+    const cm = CATEGORY_MAP[cat];
+    if (cm) {
+      accountInfo.style.display = 'block';
+      if (cm.noVat) {
+        accountInfoText.innerHTML = `<strong>Debet:</strong> ${cm.debit} <strong>Kredit:</strong> ${cm.credit}`;
+      } else {
+        accountInfoText.innerHTML = `<strong>Kostnad (debet):</strong> ${cm.debit}<br><strong>Moms (debet):</strong> 2640 (ingående moms)<br><strong>Betalning (kredit):</strong> Bank/Skuld`;
+      }
+    } else {
+      accountInfo.style.display = 'none';
+    }
+    
     // For noVat categories, show a simple amount field
     if (CATEGORY_MAP[cat]?.noVat) {
       amountSection.style.display = 'block';
@@ -5323,6 +5341,40 @@ function applyVerCategory() {
   }
   const cm = CATEGORY_MAP[cat];
   if (cm && !document.getElementById('verDesc').value) document.getElementById('verDesc').value = cm.desc;
+  
+  // Uppdatera momsuppdelning
+  updateVatBreakdown();
+}
+
+// Ny funktion: Uppdatera momsuppdelning i realtid
+function updateVatBreakdown() {
+  const amountLines = document.querySelectorAll('.ver-amount-line');
+  let totalNetto = 0;
+  let totalVat = 0;
+  let totalInkl = 0;
+  
+  amountLines.forEach(line => {
+    const amount = parseFloat(line.querySelector('.ver-line-amount')?.value) || 0;
+    if (amount <= 0) return;
+    const vatPct = parseInt(line.querySelector('.ver-line-vat')?.value) || 0;
+    
+    const netto = Math.round(amount / (1 + vatPct / 100) * 100) / 100;
+    const vat = Math.round((amount - netto) * 100) / 100;
+    
+    totalNetto += netto;
+    totalVat += vat;
+    totalInkl += amount;
+  });
+  
+  const breakdown = document.getElementById('verVatBreakdown');
+  if (totalInkl > 0) {
+    breakdown.style.display = 'block';
+    document.getElementById('verNettoAmount').textContent = totalNetto.toFixed(2).replace('.', ',') + ' kr';
+    document.getElementById('verVatAmount').textContent = totalVat.toFixed(2).replace('.', ',') + ' kr';
+    document.getElementById('verTotalAmount').textContent = totalInkl.toFixed(2).replace('.', ',') + ' kr';
+  } else {
+    breakdown.style.display = 'none';
+  }
 }
 
 function addManualVerRow() {
@@ -5342,10 +5394,10 @@ function addVerAmountLine() {
   const row = document.createElement('div');
   row.className = 'ver-amount-line';
   row.style.cssText = 'display:grid;grid-template-columns:1fr 90px 90px 30px;gap:0.4rem;margin-bottom:0.4rem;align-items:center';
-  row.innerHTML = `<input type="number" step="0.01" placeholder="Belopp inkl moms" class="ver-line-amount" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.85rem;font-family:inherit">
-    <select class="ver-line-vat" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.82rem;font-family:inherit"><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
+  row.innerHTML = `<input type="number" step="0.01" placeholder="Belopp inkl moms" class="ver-line-amount" oninput="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.85rem;font-family:inherit">
+    <select class="ver-line-vat" onchange="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.82rem;font-family:inherit"><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
     <select class="ver-line-pay" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.75rem;font-family:inherit"><option value="1930">Bank</option><option value="1940">BG</option><option value="1910">Kontant</option><option value="2440">Skuld</option></select>
-    <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:#c62828;font-size:1rem">×</button>`;
+    <button onclick="this.parentElement.remove();updateVatBreakdown()" style="background:none;border:none;cursor:pointer;color:#c62828;font-size:1rem">×</button>`;
   container.appendChild(row);
 }
 
@@ -5355,15 +5407,18 @@ function openNewVerification() {
   document.getElementById('verDate').value = new Date().toISOString().slice(0, 10);
   document.getElementById('verCategory').value = '';
   document.getElementById('verDesc').value = '';
+  document.getElementById('verCounterpart').value = '';
   document.getElementById('verFile').value = '';
   document.getElementById('verAmountSection').style.display = 'block';
   document.getElementById('verMomsRow').style.display = 'none';
   document.getElementById('verManualRows').style.display = 'none';
+  document.getElementById('verAccountInfo').style.display = 'none';
+  document.getElementById('verVatBreakdown').style.display = 'none';
   document.getElementById('verRowsContainer').innerHTML = '';
   // Reset amount lines to single line
   document.getElementById('verAmountLines').innerHTML = `<div class="ver-amount-line" style="display:grid;grid-template-columns:1fr 90px 90px 30px;gap:0.4rem;margin-bottom:0.4rem;align-items:center">
-    <input type="number" step="0.01" placeholder="Belopp inkl moms" class="ver-line-amount" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.85rem;font-family:inherit">
-    <select class="ver-line-vat" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.82rem;font-family:inherit"><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
+    <input type="number" step="0.01" placeholder="Belopp inkl moms" class="ver-line-amount" oninput="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.85rem;font-family:inherit">
+    <select class="ver-line-vat" onchange="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.82rem;font-family:inherit"><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
     <select class="ver-line-pay" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.75rem;font-family:inherit"><option value="1930">Bank</option><option value="1940">BG</option><option value="1910">Kontant</option><option value="2440">Skuld</option></select>
     <span></span>
   </div>`;
@@ -5374,8 +5429,12 @@ function closeVerModal() { document.getElementById('verificationModalOverlay').s
 async function saveVerification() {
   const date = document.getElementById('verDate').value;
   const desc = document.getElementById('verDesc').value.trim();
+  const counterpart = document.getElementById('verCounterpart').value.trim();
   const cat = document.getElementById('verCategory').value;
   if (!date || !desc) return alert('Ange datum och beskrivning.');
+
+  // Bygg fullständig beskrivning med motpart
+  const fullDesc = counterpart ? `${desc} (${counterpart})` : desc;
 
   let rows = [];
   if (cat === 'custom') {
@@ -5464,7 +5523,7 @@ async function saveVerification() {
   // Insert verification
   const { data: ver, error: verErr } = await sb.from('verifications').insert({
     user_id: currentUser.id, verification_number: verNum, verification_date: date,
-    description: desc, source_type: 'manual', attachment_url: attachmentUrl,
+    description: fullDesc, source_type: 'manual', attachment_url: attachmentUrl,
     created_by: currentUser.email
   }).select().single();
 
@@ -7109,32 +7168,42 @@ init();
       <div class="field" style="margin:0"><label>Kategori</label>
         <select id="verCategory" onchange="applyVerCategory()" style="width:100%;padding:0.55rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
           <option value="">– Välj kategori –</option>
-          <option value="material">Inköp material</option>
-          <option value="bil">Bilkostnad</option>
-          <option value="telefon">Telefon/Internet</option>
-          <option value="forsakring">Försäkring</option>
-          <option value="hyra">Lokalhyra</option>
-          <option value="kontorsmaterial">Kontorsmaterial</option>
-          <option value="drivmedel">Drivmedel</option>
-          <option value="underentreprenor">Underentreprenör</option>
-          <option value="redovisning">Redovisning/Revision</option>
-          <option value="bank">Bankkostnad</option>
-          <option value="egen_insattning">Egen insättning</option>
-          <option value="eget_uttag">Eget uttag</option>
-          <option value="lon">Lön</option>
-          <option value="custom">Ange konton manuellt</option>
+          <option value="material">Inköp material (4010)</option>
+          <option value="bil">Bilkostnad (5615)</option>
+          <option value="telefon">Telefon/Internet (6210)</option>
+          <option value="forsakring">Försäkring (6310)</option>
+          <option value="hyra">Lokalhyra (5010)</option>
+          <option value="kontorsmaterial">Kontorsmaterial (6110)</option>
+          <option value="drivmedel">Drivmedel (5610)</option>
+          <option value="underentreprenor">Underentreprenör (4600)</option>
+          <option value="redovisning">Redovisning/Revision (6530)</option>
+          <option value="bank">Bankkostnad (6570)</option>
+          <option value="egen_insattning">Egen insättning (2013)</option>
+          <option value="eget_uttag">Eget uttag (2018)</option>
+          <option value="lon">Lön (7010)</option>
+          <option value="custom">⚙️ Ange konton manuellt</option>
         </select>
       </div>
     </div>
-    <div class="field" style="margin-bottom:1rem"><label>Beskrivning *</label><input id="verDesc" placeholder="T.ex. Inköp byggmaterial Bauhaus"></div>
+    
+    <!-- Kontoinfo (visas efter kategorival) -->
+    <div id="verAccountInfo" style="display:none;background:#f0f7ff;border:1px solid #b3d9ff;border-radius:8px;padding:0.8rem;margin-bottom:1rem;font-size:0.85rem">
+      <strong style="color:#0066cc">📋 Kontoring:</strong>
+      <div id="verAccountInfoText" style="margin-top:0.3rem;color:#333"></div>
+    </div>
+    
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1rem">
+      <div class="field" style="margin:0"><label>Beskrivning *</label><input id="verDesc" placeholder="T.ex. Inköp byggmaterial"></div>
+      <div class="field" style="margin:0"><label>Motpart (leverantör/kund)</label><input id="verCounterpart" placeholder="T.ex. Bauhaus, IKEA"></div>
+    </div>
 
     <!-- Amount lines - supports multiple lines with different VAT -->
     <div id="verAmountSection">
       <label style="font-size:0.76rem;font-weight:600;color:#555;margin-bottom:0.4rem;display:block">Belopp *</label>
       <div id="verAmountLines">
         <div class="ver-amount-line" style="display:grid;grid-template-columns:1fr 90px 90px 30px;gap:0.4rem;margin-bottom:0.4rem;align-items:center">
-          <input type="number" step="0.01" placeholder="Belopp inkl moms" class="ver-line-amount" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.85rem;font-family:inherit">
-          <select class="ver-line-vat" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.82rem;font-family:inherit">
+          <input type="number" step="0.01" placeholder="Belopp inkl moms" class="ver-line-amount" oninput="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.85rem;font-family:inherit">
+          <select class="ver-line-vat" onchange="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.82rem;font-family:inherit">
             <option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option>
           </select>
           <select class="ver-line-pay" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.75rem;font-family:inherit">
@@ -7144,6 +7213,24 @@ init();
         </div>
       </div>
       <button onclick="addVerAmountLine()" style="font-size:0.75rem;color:var(--gold);background:none;border:1px dashed var(--gold-light);border-radius:6px;padding:0.25rem 0.7rem;cursor:pointer;margin-top:0.2rem;font-family:inherit">+ Rad med annan moms</button>
+      
+      <!-- Momsuppdelning (realtid) -->
+      <div id="verVatBreakdown" style="display:none;background:#f9fdf9;border:1px solid #c8e6c9;border-radius:8px;padding:0.8rem;margin-top:0.8rem;font-size:0.85rem">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem">
+          <div>
+            <div style="font-size:0.7rem;color:#555;margin-bottom:0.2rem">Exkl moms</div>
+            <div id="verNettoAmount" style="font-weight:600;color:#2e7d32">0 kr</div>
+          </div>
+          <div>
+            <div style="font-size:0.7rem;color:#555;margin-bottom:0.2rem">Moms</div>
+            <div id="verVatAmount" style="font-weight:600;color:#f57c00">0 kr</div>
+          </div>
+          <div>
+            <div style="font-size:0.7rem;color:#555;margin-bottom:0.2rem">Inkl moms</div>
+            <div id="verTotalAmount" style="font-weight:700;color:#1976d2">0 kr</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div id="verMomsRow" style="display:none"></div>
