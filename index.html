@@ -5356,7 +5356,7 @@ function applyVerCategory() {
       if (cm.noVat) {
         accountInfoText.innerHTML = `<strong>Debet:</strong> ${cm.debit} <strong>Kredit:</strong> ${cm.credit}`;
       } else if (cm.isRevenue) {
-        accountInfoText.innerHTML = `<strong>Kundfordran (debet):</strong> 1510<br><strong>Försäljning (kredit):</strong> ${cm.credit}<br><strong>Utgående moms (kredit):</strong> ${cm.defaultVat === 25 ? '2611' : cm.defaultVat === 12 ? '2612' : cm.defaultVat === 6 ? '2613' : 'Ingen moms'}`;
+        accountInfoText.innerHTML = `<strong>Intäkt (kredit):</strong> ${cm.credit}<br><strong>Utgående moms (kredit):</strong> ${cm.defaultVat === 25 ? '2611' : cm.defaultVat === 12 ? '2621' : cm.defaultVat === 6 ? '2631' : 'Ingen moms'}<br><strong>Inbetalning (debet):</strong> Välj nedan om kund betalar direkt eller senare`;
       } else {
         const defaultVatAcc = cm.defaultVat === 25 ? '2640' : cm.defaultVat === 12 ? '2641' : cm.defaultVat === 6 ? '2642' : cm.defaultVat === 0 ? 'Ingen moms' : '2640';
         accountInfoText.innerHTML = `<strong>Kostnad (debet):</strong> ${cm.debit}<br><strong>Moms (debet):</strong> ${defaultVatAcc}${defaultVatAcc !== 'Ingen moms' ? ' (ingående moms)' : ''}<br><strong>Betalning (kredit):</strong> Bank/Skuld`;
@@ -5376,8 +5376,28 @@ function applyVerCategory() {
       amountSection.style.display = 'block';
       // Hide VAT and payment selects for noVat
       document.querySelectorAll('.ver-line-vat, .ver-line-pay').forEach(el => el.style.display = 'none');
-    } else {
+    } else if (CATEGORY_MAP[cat]?.isRevenue) {
+      // För intäkter: visa rätt betalningsalternativ
       document.querySelectorAll('.ver-line-vat, .ver-line-pay').forEach(el => el.style.display = '');
+      // Ändra betalningsalternativ till intäkts-konton
+      document.querySelectorAll('.ver-line-pay').forEach(sel => {
+        sel.innerHTML = `
+          <option value="1930">1930 - Bank (betald direkt)</option>
+          <option value="1510">1510 - Kundfordran (faktura)</option>
+          <option value="1940">1940 - BG (betald direkt)</option>
+        `;
+      });
+    } else {
+      // För kostnader: visa normala betalningsalternativ
+      document.querySelectorAll('.ver-line-vat, .ver-line-pay').forEach(el => el.style.display = '');
+      document.querySelectorAll('.ver-line-pay').forEach(sel => {
+        sel.innerHTML = `
+          <option value="1930">1930 - Bank</option>
+          <option value="1940">1940 - BG</option>
+          <option value="1910">1910 - Kontant</option>
+          <option value="2440">2440 - Leverantörsskuld</option>
+        `;
+      });
     }
   }
   const cm = CATEGORY_MAP[cat];
@@ -5573,19 +5593,20 @@ async function saveVerification() {
         const amount = parseFloat(line.querySelector('.ver-line-amount')?.value) || 0;
         if (amount <= 0) return;
         const vatPct = parseInt(line.querySelector('.ver-line-vat')?.value) || 0;
+        const paymentAcc = line.querySelector('.ver-line-pay')?.value || '1930'; // Bank eller Kundfordran
         
         const netto = Math.round(amount / (1 + vatPct / 100) * 100) / 100;
         const moms = Math.round((amount - netto) * 100) / 100;
         
-        // Debit: Kundfordran (total inkl moms)
-        rows.push({ account_number: '1510', debit: amount, credit: 0 });
+        // Debit: Inbetalning (Bank 1930 eller Kundfordran 1510)
+        rows.push({ account_number: paymentAcc, debit: amount, credit: 0 });
         
         // Credit: Försäljning (netto)
         rows.push({ account_number: cm.credit, debit: 0, credit: netto });
         
         // Credit: Utgående moms
         if (moms > 0) {
-          const vatAccount = vatPct === 25 ? '2611' : vatPct === 12 ? '2612' : vatPct === 6 ? '2613' : null;
+          const vatAccount = vatPct === 25 ? '2611' : vatPct === 12 ? '2621' : vatPct === 6 ? '2631' : null;
           if (vatAccount) {
             rows.push({ account_number: vatAccount, debit: 0, credit: moms });
           }
