@@ -5286,19 +5286,51 @@ function switchBkTab(tab) {
 
 // ===== VERIFICATION CRUD =====
 const CATEGORY_MAP = {
-  material:        { debit: '4010', credit: null, desc: 'Inköp material' },
-  bil:             { debit: '5615', credit: null, desc: 'Bilkostnad' },
-  drivmedel:       { debit: '5610', credit: null, desc: 'Drivmedel' },
-  telefon:         { debit: '6210', credit: null, desc: 'Telefon' },
-  forsakring:      { debit: '6310', credit: null, desc: 'Försäkring' },
-  hyra:            { debit: '5010', credit: null, desc: 'Lokalhyra' },
-  kontorsmaterial: { debit: '6110', credit: null, desc: 'Kontorsmaterial' },
-  underentreprenor:{ debit: '4600', credit: null, desc: 'Underentreprenör' },
-  redovisning:     { debit: '6530', credit: null, desc: 'Redovisning' },
-  bank:            { debit: '6570', credit: null, desc: 'Bankkostnad' },
+  // === INTÄKTER (FÖRSÄLJNING) ===
+  forsaljning_25:  { debit: '1510', credit: '3001', desc: 'Försäljning 25% moms', defaultVat: 25, isRevenue: true },
+  forsaljning_12:  { debit: '1510', credit: '3002', desc: 'Försäljning 12% moms', defaultVat: 12, isRevenue: true },
+  forsaljning_6:   { debit: '1510', credit: '3003', desc: 'Försäljning 6% moms', defaultVat: 6, isRevenue: true },
+  forsaljning_0:   { debit: '1510', credit: '3106', desc: 'Försäljning 0% moms', defaultVat: 0, isRevenue: true },
+  
+  // === INKÖP & MATERIAL ===
+  material:        { debit: '4010', credit: null, desc: 'Inköp material', defaultVat: 25 },
+  underentreprenor:{ debit: '4600', credit: null, desc: 'Underentreprenör', defaultVat: 25 },
+  forbrukning:     { debit: '5460', credit: null, desc: 'Förbrukningsinventarier', defaultVat: 25 },
+  
+  // === BIL & RESA ===
+  bil:             { debit: '5615', credit: null, desc: 'Bilkostnad', defaultVat: 25 },
+  drivmedel:       { debit: '5610', credit: null, desc: 'Drivmedel', defaultVat: 25 },
+  resa:            { debit: '5800', credit: null, desc: 'Resekostnader', defaultVat: 25 },
+  
+  // === LOKAL & HYRA ===
+  hyra:            { debit: '5010', credit: null, desc: 'Lokalhyra', defaultVat: 0 },
+  
+  // === MARKNADSFÖRING ===
+  reklam:          { debit: '5910', credit: null, desc: 'Reklam och PR', defaultVat: 25 },
+  
+  // === TELE & IT ===
+  telefon:         { debit: '6210', credit: null, desc: 'Telefon/Internet', defaultVat: 25 },
+  programvara:     { debit: '6540', credit: null, desc: 'IT-tjänster/Programvara', defaultVat: 25 },
+  
+  // === KONTORSKOSTNADER ===
+  kontorsmaterial: { debit: '6110', credit: null, desc: 'Kontorsmaterial', defaultVat: 25 },
+  porto:           { debit: '6250', credit: null, desc: 'Porto/Frakt', defaultVat: 25 },
+  
+  // === FÖRSÄKRING & AVGIFTER ===
+  forsakring:      { debit: '6310', credit: null, desc: 'Försäkring', defaultVat: 0 },
+  bank:            { debit: '6570', credit: null, desc: 'Bankkostnad', defaultVat: 0 },
+  
+  // === EXTERN TJÄNSTER ===
+  redovisning:     { debit: '6530', credit: null, desc: 'Redovisning/Revision', defaultVat: 25 },
+  representation:  { debit: '6070', credit: null, desc: 'Representation', defaultVat: 25 },
+  ovrigt:          { debit: '6990', credit: null, desc: 'Övriga externa kostnader', defaultVat: 25 },
+  
+  // === EGET KAPITAL (ENSKILD FIRMA) ===
   egen_insattning: { debit: '1930', credit: '2013', desc: 'Egen insättning', noVat: true },
   eget_uttag:      { debit: '2018', credit: '1930', desc: 'Eget uttag', noVat: true },
-  lon:             { debit: '7010', credit: '1930', desc: 'Lön', noVat: true },
+  
+  // === LÖN (FÖRENKLA) ===
+  lon:             { debit: '7010', credit: '1930', desc: 'Lön (netto)', noVat: true },
 };
 
 function applyVerCategory() {
@@ -5323,8 +5355,17 @@ function applyVerCategory() {
       accountInfo.style.display = 'block';
       if (cm.noVat) {
         accountInfoText.innerHTML = `<strong>Debet:</strong> ${cm.debit} <strong>Kredit:</strong> ${cm.credit}`;
+      } else if (cm.isRevenue) {
+        accountInfoText.innerHTML = `<strong>Kundfordran (debet):</strong> 1510<br><strong>Försäljning (kredit):</strong> ${cm.credit}<br><strong>Utgående moms (kredit):</strong> ${cm.defaultVat === 25 ? '2611' : cm.defaultVat === 12 ? '2612' : cm.defaultVat === 6 ? '2613' : 'Ingen moms'}`;
       } else {
-        accountInfoText.innerHTML = `<strong>Kostnad (debet):</strong> ${cm.debit}<br><strong>Moms (debet):</strong> 2640 (ingående moms)<br><strong>Betalning (kredit):</strong> Bank/Skuld`;
+        const defaultVatAcc = cm.defaultVat === 25 ? '2640' : cm.defaultVat === 12 ? '2641' : cm.defaultVat === 6 ? '2642' : cm.defaultVat === 0 ? 'Ingen moms' : '2640';
+        accountInfoText.innerHTML = `<strong>Kostnad (debet):</strong> ${cm.debit}<br><strong>Moms (debet):</strong> ${defaultVatAcc}${defaultVatAcc !== 'Ingen moms' ? ' (ingående moms)' : ''}<br><strong>Betalning (kredit):</strong> Bank/Skuld`;
+      }
+      
+      // Sätt default momssats
+      if (cm.defaultVat !== undefined) {
+        const vatSelect = document.querySelector('.ver-line-vat');
+        if (vatSelect) vatSelect.value = cm.defaultVat;
       }
     } else {
       accountInfo.style.display = 'none';
@@ -5524,8 +5565,38 @@ async function saveVerification() {
         { account_number: cm.debit, debit: totalInkl, credit: 0 },
         { account_number: cm.credit, debit: 0, credit: totalInkl }
       ];
+    } else if (cm.isRevenue) {
+      // INTÄKTER/FÖRSÄLJNING
+      const amountLines = document.querySelectorAll('.ver-amount-line');
+      let totalIncome = 0;
+      amountLines.forEach(line => {
+        const amount = parseFloat(line.querySelector('.ver-line-amount')?.value) || 0;
+        if (amount <= 0) return;
+        const vatPct = parseInt(line.querySelector('.ver-line-vat')?.value) || 0;
+        
+        const netto = Math.round(amount / (1 + vatPct / 100) * 100) / 100;
+        const moms = Math.round((amount - netto) * 100) / 100;
+        
+        // Debit: Kundfordran (total inkl moms)
+        rows.push({ account_number: '1510', debit: amount, credit: 0 });
+        
+        // Credit: Försäljning (netto)
+        rows.push({ account_number: cm.credit, debit: 0, credit: netto });
+        
+        // Credit: Utgående moms
+        if (moms > 0) {
+          const vatAccount = vatPct === 25 ? '2611' : vatPct === 12 ? '2612' : vatPct === 6 ? '2613' : null;
+          if (vatAccount) {
+            rows.push({ account_number: vatAccount, debit: 0, credit: moms });
+          }
+        }
+        
+        totalIncome += amount;
+      });
+      
+      if (totalIncome <= 0) return alert('Ange minst ett belopp.');
     } else {
-      // Multi-line: each line can have different VAT
+      // KOSTNADER (befintlig logik)
       const amountLines = document.querySelectorAll('.ver-amount-line');
       let totalPay = 0;
       const payAccounts = {};
@@ -5543,7 +5614,10 @@ async function saveVerification() {
 
         // Debit VAT account (different account per VAT rate for ingående moms)
         if (moms > 0) {
-          rows.push({ account_number: '2640', debit: moms, credit: 0 });
+          const vatAccount = vatPct === 25 ? '2640' : vatPct === 12 ? '2641' : vatPct === 6 ? '2642' : null;
+          if (vatAccount) {
+            rows.push({ account_number: vatAccount, debit: moms, credit: 0 });
+          }
         }
 
         // Accumulate payment per account
@@ -7231,20 +7305,67 @@ init();
       <div class="field" style="margin:0"><label>Kategori</label>
         <select id="verCategory" onchange="applyVerCategory()" style="width:100%;padding:0.55rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
           <option value="">– Välj kategori –</option>
-          <option value="material">Inköp material (4010)</option>
-          <option value="bil">Bilkostnad (5615)</option>
-          <option value="telefon">Telefon/Internet (6210)</option>
-          <option value="forsakring">Försäkring (6310)</option>
-          <option value="hyra">Lokalhyra (5010)</option>
-          <option value="kontorsmaterial">Kontorsmaterial (6110)</option>
-          <option value="drivmedel">Drivmedel (5610)</option>
-          <option value="underentreprenor">Underentreprenör (4600)</option>
-          <option value="redovisning">Redovisning/Revision (6530)</option>
-          <option value="bank">Bankkostnad (6570)</option>
-          <option value="egen_insattning">Egen insättning (2013)</option>
-          <option value="eget_uttag">Eget uttag (2018)</option>
-          <option value="lon">Lön (7010)</option>
-          <option value="custom">⚙️ Ange konton manuellt</option>
+          
+          <optgroup label="💰 INTÄKTER">
+            <option value="forsaljning_25">Försäljning 25% moms (3001)</option>
+            <option value="forsaljning_12">Försäljning 12% moms (3002)</option>
+            <option value="forsaljning_6">Försäljning 6% moms (3003)</option>
+            <option value="forsaljning_0">Försäljning 0% moms (3106)</option>
+          </optgroup>
+          
+          <optgroup label="📦 INKÖP & MATERIAL">
+            <option value="material">Inköp material (4010)</option>
+            <option value="underentreprenor">Underentreprenör (4600)</option>
+            <option value="forbrukning">Förbrukningsinventarier (5460)</option>
+          </optgroup>
+          
+          <optgroup label="🚗 BIL & RESA">
+            <option value="bil">Bilkostnad (5615)</option>
+            <option value="drivmedel">Drivmedel (5610)</option>
+            <option value="resa">Resekostnader (5800)</option>
+          </optgroup>
+          
+          <optgroup label="🏢 LOKAL">
+            <option value="hyra">Lokalhyra (5010)</option>
+          </optgroup>
+          
+          <optgroup label="📣 MARKNADSFÖRING">
+            <option value="reklam">Reklam och PR (5910)</option>
+          </optgroup>
+          
+          <optgroup label="💻 TELE & IT">
+            <option value="telefon">Telefon/Internet (6210)</option>
+            <option value="programvara">IT-tjänster/Programvara (6540)</option>
+          </optgroup>
+          
+          <optgroup label="📝 KONTORSKOSTNADER">
+            <option value="kontorsmaterial">Kontorsmaterial (6110)</option>
+            <option value="porto">Porto/Frakt (6250)</option>
+          </optgroup>
+          
+          <optgroup label="🛡️ FÖRSÄKRING & AVGIFTER">
+            <option value="forsakring">Försäkring (6310)</option>
+            <option value="bank">Bankkostnad (6570)</option>
+          </optgroup>
+          
+          <optgroup label="👔 EXTERNA TJÄNSTER">
+            <option value="redovisning">Redovisning/Revision (6530)</option>
+            <option value="representation">Representation (6070)</option>
+            <option value="ovrigt">Övriga externa kostnader (6990)</option>
+          </optgroup>
+          
+          <optgroup label="💼 EGET KAPITAL (Enskild firma)">
+            <option value="egen_insattning">Egen insättning (2013)</option>
+            <option value="eget_uttag">Eget uttag (2018)</option>
+          </optgroup>
+          
+          <optgroup label="👥 LÖN">
+            <option value="lon">Lön (netto) (7010)</option>
+          </optgroup>
+          
+          <optgroup label="⚙️ AVANCERAT">
+            <option value="custom">Ange konton manuellt</option>
+          </optgroup>
         </select>
       </div>
     </div>
