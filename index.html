@@ -5341,6 +5341,10 @@ const CATEGORY_MAP = {
   representation:  { debit: '6070', credit: null, desc: 'Representation', defaultVat: 25, vatDeductible: 0.5 },
   ovrigt:          { debit: '6990', credit: null, desc: 'Övriga externa kostnader', defaultVat: 25 },
   
+  // === EU-INKÖP (REVERSE CHARGE) ===
+  eu_tjanst:       { debit: '4010', credit: null, desc: 'Inköp tjänster EU (reverse charge)', defaultVat: 25, isReverseCharge: true },
+  eu_vara:         { debit: '4010', credit: null, desc: 'Inköp varor EU (reverse charge)', defaultVat: 25, isReverseChargeGoods: true },
+  
   // === EGET KAPITAL (ENSKILD FIRMA) ===
   egen_insattning: { debit: '1930', credit: '2013', desc: 'Egen insättning', noVat: true },
   eget_uttag:      { debit: '2018', credit: '1930', desc: 'Eget uttag', noVat: true },
@@ -5650,6 +5654,21 @@ async function saveVerification() {
 
         const netto = Math.round(amount / (1 + vatPct / 100) * 100) / 100;
         const moms = Math.round((amount - netto) * 100) / 100;
+        
+        // REVERSE CHARGE (EU-inköp)
+        if (cm.isReverseCharge || cm.isReverseChargeGoods) {
+          // EU-inköp tjänster eller varor
+          // Bokföring: Debet kostnad (netto), Debet 2645 (beräknad moms), Kredit 2614 (utgående moms), Kredit betalning
+          rows.push({ account_number: cm.debit, debit: netto, credit: 0 });
+          rows.push({ account_number: '2645', debit: moms, credit: 0, vat_code: '21' }); // Beräknad ingående moms
+          rows.push({ account_number: '2614', debit: 0, credit: moms, vat_code: '21' }); // Utgående moms vid import
+          
+          // Accumulate payment per account
+          if (!payAccounts[payAcc]) payAccounts[payAcc] = 0;
+          payAccounts[payAcc] += amount;
+          totalPay += amount;
+          return; // Skip normal vat logic
+        }
         
         // Beräkna avdragsgill moms (50% för representation)
         const vatDeductible = cm.vatDeductible || 1.0;
