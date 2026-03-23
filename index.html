@@ -5837,7 +5837,7 @@ async function saveVerification() {
   // Insert rows
   const rowInserts = rows.map(r => ({
     verification_id: ver.id, user_id: currentUser.id,
-    account_number: r.account_number, debit: r.debit, credit: r.credit
+    account_number: r.account_number, debit: r.debit, credit: r.credit, vat_code: r.vat_code || null
   }));
   const { error: rowErr } = await sb.from('verification_rows').insert(rowInserts);
   if (rowErr) return alert('Fel vid radinmatning: ' + rowErr.message);
