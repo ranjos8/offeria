@@ -97,11 +97,12 @@ nav {
   margin-bottom: 1.5rem; animation: fadeUp 0.5s ease both;
 }
 .hero h1 {
-  font-family: 'Fraunces', serif; font-size: clamp(2.8rem, 6vw, 5rem);
-  line-height: 1.08; letter-spacing: -2px; max-width: 750px;
+  font-family: 'Fraunces', serif; font-size: clamp(2.3rem, 5vw, 4rem);
+  line-height: 1.15; letter-spacing: -1.5px; max-width: 750px;
   animation: fadeUp 0.5s 0.1s ease both;
 }
 .hero h1 em { font-style: italic; color: var(--gold); }
+.hero h1 .highlight { color: var(--gold-light); }
 .hero p {
   font-size: 1rem; color: var(--muted); max-width: 460px;
   line-height: 1.75; margin: 1.5rem auto 2.5rem;
@@ -668,7 +669,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
   /* Hero */
   .hero { padding: 3rem 1.2rem 2.5rem; }
-  .hero h1 { font-size: 2.2rem; }
+  .hero h1 { font-size: 1.9rem; line-height: 1.2; }
   .hero p { font-size: 1rem; }
   .hero-btns { flex-direction: column; align-items: center; gap: 0.75rem; }
   .btn-hero { width: 100%; max-width: 320px; text-align: center; }
@@ -850,7 +851,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 }
 
 @media (max-width: 400px) {
-  .hero h1 { font-size: 1.8rem; }
+  .hero h1 { font-size: 1.6rem; line-height: 1.25; }
   nav svg { width: 140px; height: 32px; }
   .stats-row { grid-template-columns: 1fr 1fr; }
   .plans { grid-template-columns: 1fr; gap: 0.75rem; max-width: 340px; margin-left: auto; margin-right: auto; }
@@ -934,9 +935,9 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 <div class="view active" id="viewLanding" style="display:none">
 
   <section class="hero">
-    <div class="hero-badge"><span class="ico"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.09 6.26L20.18 9.27l-5.09 3.88L16.18 20 12 16.77 7.82 20l1.09-6.85L3.82 9.27l6.09-1.01z"/></svg></span> Offert · Faktura · Bokföring — allt i en tjänst</div>
-    <h1>Hela företaget<br>på <em>ett ställe</em></h1>
-    <p>Skapa offerter med AI, fakturera kunder, fota kvitton och bokför — direkt i mobilen. Byggt för svenska hantverkare.</p>
+    <div class="hero-badge"><span class="ico"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.09 6.26L20.18 9.27l-5.09 3.88L16.18 20 12 16.77 7.82 20l1.09-6.85L3.82 9.27l6.09-1.01z"/></svg></span> AI-offert · Faktura · Auto-bokföring</div>
+    <h1><span class="highlight">Smartare</span> offerter.<br><span class="highlight">Snabbare</span> fakturor.<br><span class="highlight">Komplett</span> bokföring.</h1>
+    <p>Med hjälp av AI. Fota kvitton och bokför automatiskt. Momsrapport med ett klick. Allt i mobilen, byggt för svenska hantverkare.</p>
     <div class="hero-btns">
       <button class="btn-hero" onclick="openModal('register')">Kom igång gratis →</button>
       <button class="btn-hero-sec" onclick="document.getElementById('pricingSection').scrollIntoView({behavior:'smooth'})">Se priser</button>
@@ -946,7 +947,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   <!-- ANIMATED DEMO -->
   <div class="demo-wrap" id="demoSection">
     <div class="eyebrow">Så fungerar det</div>
-    <div class="section-h">Från jobbeskrivning till bokfört — på sekunder</div>
+    <div class="section-h">Från jobbeskrivning till bokfört</div>
     <div class="demo-phone">
       <div class="demo-notch"></div>
       <div class="demo-screen" id="demoScreen">
@@ -1026,7 +1027,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <!-- Step 6: Receipt & bookkeeping -->
         <div class="demo-step" id="ds6">
           <div class="ds-label">Steg 6</div>
-          <div class="ds-title">Fota kvitto — bokfört</div>
+          <div class="ds-title">Fota kvitto — AI bokför</div>
           <div class="ds-mockup">
             <div class="ds-receipt-mock">
               <div class="ds-receipt-img">
@@ -1034,8 +1035,8 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
               </div>
               <div class="ds-receipt-arrow">→</div>
               <div class="ds-receipt-entry">
-                <div class="ds-re-label">Automatiskt bokförd</div>
-                <div class="ds-re-row"><span>5010</span><span>Material</span><span>3 040 kr</span></div>
+                <div class="ds-re-label">AI bokför automatiskt</div>
+                <div class="ds-re-row"><span>4010</span><span>Material</span><span>3 040 kr</span></div>
                 <div class="ds-re-row"><span>2640</span><span>Moms</span><span>760 kr</span></div>
               </div>
             </div>
@@ -1094,11 +1095,19 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <ul class="plan-features">
             <li>Obegränsade AI-offerter</li>
             <li><strong>Fakturering &amp; kreditfaktura</strong></li>
-            <li><strong>Bokföring med BAS-kontoplan</strong></li>
-            <li><strong>Fota kvitto — automatisk bokföring</strong></li>
+            <li><strong>E-signering av offerter</strong></li>
+            <li><strong>Automatiska påminnelser</strong></li>
+            <li><strong>Bokföring med BAS 2026</strong></li>
+            <li><strong>Leverantörsfakturor (faktura- &amp; kontantmetoden)</strong></li>
+            <li><strong>EU-inköp / Reverse charge</strong></li>
+            <li><strong>Fota kvitto — AI bokför automatiskt</strong></li>
+            <li><strong>AI Bokföringsassistent</strong></li>
             <li>Resultat- &amp; balansräkning</li>
-            <li>Momsrapport</li>
+            <li>Momsrapport (SKV 4700)</li>
+            <li>SRU-export till Skatteverket</li>
             <li>SIE-export till revisor</li>
+            <li>Korrigeringsverifikationer</li>
+            <li>Audit log (revisionsspår)</li>
             <li>Dashboard &amp; statistik</li>
             <li>ROT/RUT-avdrag</li>
             <li>Egen logotyp</li>
@@ -1274,7 +1283,10 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <a href="/cookies.html" style="display:block;color:#888;text-decoration:none;margin-bottom:0.4rem">Cookies</a>
       </div>
     </div>
-    <div style="max-width:900px;margin:1.5rem auto 0;padding-top:1.5rem;border-top:1px solid #222;text-align:center;color:#555;font-size:0.75rem">© 2025–2026 Offeria. Alla rättigheter förbehållna.</div>
+    <div style="max-width:900px;margin:1.5rem auto 0;padding-top:1.5rem;border-top:1px solid #222;text-align:center;color:#555;font-size:0.75rem">
+      <div>© 2025–2026 Offeria. Alla rättigheter förbehållna.</div>
+      <div style="margin-top:0.3rem;color:#666;font-size:0.72rem">Drivs av Techtrix AB · Org.nr 559577-6591</div>
+    </div>
   </footer>
 
 </div>
@@ -2182,6 +2194,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     <a href="/cookies.html" style="color:var(--gold-light);text-decoration:none;margin:0 0.5rem">Cookies</a>
   </div>
   <div>© 2026 Offeria · <span style="color:#888"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a2cbccc4cde2cdc4c4c7d0cbc38cd1c7">[email&#160;protected]</a></span></div>
+  <div style="margin-top:0.3rem;color:#666;font-size:0.72rem">Drivs av Techtrix AB · Org.nr 559577-6591</div>
 </footer>
 
 <!-- ===== AUTH MODAL ===== -->
