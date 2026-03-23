@@ -5448,8 +5448,16 @@ const CATEGORY_MAP = {
   egen_insattning: { debit: '1930', credit: '2013', desc: 'Egen insättning', noVat: true },
   eget_uttag:      { debit: '2018', credit: '1930', desc: 'Eget uttag', noVat: true },
   
-  // === LÖN (FÖRENKLA) ===
-  lon:             { debit: '7010', credit: '1930', desc: 'Lön (netto)', noVat: true },
+  // === LÖN ===
+  lon:             { 
+    debit: '7010',           // Lönekostnad (brutto)
+    credit: null,            // Flera krediter (2710, 2731, 1930)
+    desc: 'Lön till anställd',
+    noVat: true,
+    isPayroll: true,         // Flagga för lönlogik
+    taxRate: 0.30,           // Källskatt 30% (standard)
+    socialFeeRate: 0.3142    // Arbetsgivaravgifter 31.42%
+  },
 };
 
 function applyVerCategory() {
@@ -5472,7 +5480,20 @@ function applyVerCategory() {
     const cm = CATEGORY_MAP[cat];
     if (cm) {
       accountInfo.style.display = 'block';
-      if (cm.noVat) {
+      if (cm.isPayroll) {
+        // Lön - visa alla konton som påverkas
+        accountInfoText.innerHTML = `
+          <strong>Bokföring av lön:</strong><br>
+          <span style="color:#888;font-size:0.85rem">
+          • <strong>Debet 7010:</strong> Lönekostnad (brutto)<br>
+          • <strong>Debet 7510:</strong> Arbetsgivaravgifter (31.42%)<br>
+          • <strong>Kredit 2710:</strong> Källskatt till Skatteverket (30%)<br>
+          • <strong>Kredit 2731:</strong> Sociala avgifter till Skatteverket<br>
+          • <strong>Kredit 1930:</strong> Netto till anställd<br>
+          <em>Ange bruttolön nedan</em>
+          </span>
+        `;
+      } else if (cm.noVat) {
         accountInfoText.innerHTML = `<strong>Debet:</strong> ${cm.debit} <strong>Kredit:</strong> ${cm.credit}`;
       } else if (cm.isRevenue) {
         accountInfoText.innerHTML = `<strong>Intäkt (kredit):</strong> ${cm.credit}<br><strong>Utgående moms (kredit):</strong> ${cm.defaultVat === 25 ? '2611' : cm.defaultVat === 12 ? '2621' : cm.defaultVat === 6 ? '2631' : 'Ingen moms'}<br><strong>Inbetalning (debet):</strong> Välj nedan om kund betalar direkt eller senare`;
@@ -5491,10 +5512,10 @@ function applyVerCategory() {
       accountInfo.style.display = 'none';
     }
     
-    // For noVat categories, show a simple amount field
-    if (CATEGORY_MAP[cat]?.noVat) {
+    // For noVat or payroll categories, show a simple amount field
+    if (CATEGORY_MAP[cat]?.noVat || CATEGORY_MAP[cat]?.isPayroll) {
       amountSection.style.display = 'block';
-      // Hide VAT and payment selects for noVat
+      // Hide VAT and payment selects for noVat/payroll
       document.querySelectorAll('.ver-line-vat, .ver-line-pay').forEach(el => el.style.display = 'none');
     } else if (CATEGORY_MAP[cat]?.isRevenue) {
       // För intäkter: visa rätt betalningsalternativ
@@ -5696,8 +5717,38 @@ async function saveVerification() {
     const cm = CATEGORY_MAP[cat];
     if (!cm) return alert('Välj en kategori.');
 
-    if (cm.noVat) {
-      // Simple: read first amount line only
+    if (cm.isPayroll) {
+      // LÖN-LOGIK
+      const firstAmount = document.querySelector('.ver-line-amount');
+      const grossSalary = parseFloat(firstAmount?.value) || 0;
+      if (grossSalary <= 0) return alert('Ange bruttolön.');
+
+      // Beräkningar
+      const taxRate = cm.taxRate || 0.30;           // Källskatt (30% standard)
+      const socialFeeRate = cm.socialFeeRate || 0.3142; // Arbetsgivaravgifter (31.42%)
+      
+      const tax = Math.round(grossSalary * taxRate * 100) / 100;                    // Källskatt
+      const socialFees = Math.round(grossSalary * socialFeeRate * 100) / 100;       // Arbetsgivaravgifter
+      const netSalary = Math.round((grossSalary - tax) * 100) / 100;                // Netto till anställd
+
+      // Bokföring:
+      // Debet 7010: Bruttolön
+      rows.push({ account_number: '7010', debit: grossSalary, credit: 0 });
+      
+      // Debet 7510: Arbetsgivaravgifter
+      rows.push({ account_number: '7510', debit: socialFees, credit: 0 });
+      
+      // Kredit 2710: Källskatt (skuld till Skatteverket)
+      rows.push({ account_number: '2710', debit: 0, credit: tax });
+      
+      // Kredit 2731: Sociala avgifter (skuld till Skatteverket)
+      rows.push({ account_number: '2731', debit: 0, credit: socialFees });
+      
+      // Kredit 1930: Netto till anställd (utbetalning)
+      rows.push({ account_number: '1930', debit: 0, credit: netSalary });
+
+    } else if (cm.noVat) {
+      // Simple: read first amount line only (egen insättning, eget uttag)
       const firstAmount = document.querySelector('.ver-line-amount');
       const totalInkl = parseFloat(firstAmount?.value) || 0;
       if (totalInkl <= 0) return alert('Ange belopp.');
@@ -7656,7 +7707,7 @@ init();
           </optgroup>
           
           <optgroup label="👥 LÖN">
-            <option value="lon">Lön (netto) (7010)</option>
+            <option value="lon">Lön till anställd (brutto)</option>
           </optgroup>
           
           <optgroup label="⚙️ AVANCERAT">
