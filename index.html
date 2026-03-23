@@ -1742,6 +1742,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <div style="margin-left:auto;display:flex;gap:0.4rem">
               <button onclick="exportSIE4()" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem" title="Exportera SIE4-fil för revisor eller annat bokföringsprogram"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> SIE-export</button>
               <button onclick="lockCurrentPeriod()" id="bkLockBtn" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem;display:none" title="Lås vald period — förhindrar ändringar"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span> Lås period</button>
+              <button onclick="closeYear()" id="bkCloseYearBtn" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem;display:none" title="Stäng räkenskapsår — nollställ resultaträkning mot eget kapital"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span> Årsavslut</button>
               <button onclick="importSIE4()" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem" title="Importera SIE-fil från annat bokföringsprogram"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> SIE-import</button>
             </div>
           </div>
@@ -5188,6 +5189,26 @@ async function loadBookkeeping() {
     }
   } else if (lockBtn) { lockBtn.style.display = 'none'; }
 
+  // Visa årsavslut-knapp om december är låst
+  const closeYearBtn = document.getElementById('bkCloseYearBtn');
+  if (closeYearBtn && mo === '12') {
+    closeYearBtn.style.display = 'inline-flex';
+    // Kolla om årsavslut redan gjorts
+    const { data: closingData } = await sb.from('annual_closings').select('*').eq('user_id', currentUser.id).eq('fiscal_year', parseInt(yr)).eq('status', 'completed').single();
+    if (closingData) {
+      closeYearBtn.innerHTML = '<span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span> År avslutat';
+      closeYearBtn.style.background = '#e8f5e9'; closeYearBtn.style.color = '#2e7d32'; closeYearBtn.style.borderColor = '#2e7d32';
+      closeYearBtn.onclick = null;
+      closeYearBtn.title = `Årsbokslut ${yr} genomfört. Resultat: ${formatCurrency(closingData.result_after_tax || 0)}`;
+    } else {
+      closeYearBtn.innerHTML = '<span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span> Årsavslut';
+      closeYearBtn.style.background = ''; closeYearBtn.style.color = ''; closeYearBtn.style.borderColor = '';
+      closeYearBtn.onclick = closeYear;
+    }
+  } else if (closeYearBtn) { 
+    closeYearBtn.style.display = 'none'; 
+  }
+
   const { data: vers } = await sb.from('verifications').select('*').eq('user_id', currentUser.id)
     .gte('verification_date', startDate).lte('verification_date', endDate).order('verification_number');
   _bkVerifications = vers || [];
@@ -5234,6 +5255,71 @@ async function lockCurrentPeriod() {
 
   alert(`Period låst! ${lockedCount} verifikation(er) låstes för ${monthName} ${yr}.`);
   loadBookkeeping();
+}
+
+async function closeYear() {
+  const yr = document.getElementById('bkYear')?.value;
+  if (!yr) return alert('Välj ett år att stänga.');
+
+  // Kontrollera att december är låst
+  const { data: decLocked } = await sb.from('locked_periods')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .eq('period', yr + '-12')
+    .single();
+
+  if (!decLocked) {
+    return alert('December måste vara låst innan årsbokslut.\n\nLås december först genom att välja månad "December" och klicka "Lås period".');
+  }
+
+  // Kontrollera om årsavslut redan gjorts
+  const { data: existingClosing } = await sb.from('annual_closings')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .eq('fiscal_year', parseInt(yr))
+    .eq('status', 'completed')
+    .single();
+
+  if (existingClosing) {
+    return alert('Årsbokslut har redan genomförts för ' + yr + '.\n\nResultat: ' + formatCurrency(existingClosing.result_after_tax));
+  }
+
+  if (!confirm(`Stäng räkenskapsår ${yr}?\n\n• Alla resultatkonton (3xxx-8xxx) nollställs\n• Resultatet förs över till konto 2099 (Årets resultat)\n• En låst årsbokslutsverifikation skapas\n• Nästa år (${parseInt(yr)+1}) skapas automatiskt\n\nDetta kan inte ångras.\n\nVill du fortsätta?`)) return;
+
+  const loadingMsg = document.createElement('div');
+  loadingMsg.innerHTML = '<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--ink);padding:2rem;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:9999;text-align:center"><div style="font-size:1.2rem;margin-bottom:1rem">Genomför årsbokslut...</div><div style="color:#888;font-size:0.9rem">Detta kan ta några sekunder</div></div>';
+  document.body.appendChild(loadingMsg);
+
+  try {
+    const { data, error } = await sb.rpc('close_fiscal_year', {
+      p_user_id: currentUser.id,
+      p_year: parseInt(yr)
+    });
+
+    document.body.removeChild(loadingMsg);
+
+    if (error) {
+      alert('Kunde inte genomföra årsbokslut: ' + error.message);
+      return;
+    }
+
+    const result = data?.[0];
+    if (!result?.success) {
+      alert(result?.message || 'Kunde inte genomföra årsbokslut');
+      return;
+    }
+
+    const resultAmount = result.result_amount || 0;
+    const resultText = resultAmount >= 0 ? 'Vinst' : 'Förlust';
+
+    alert(`✅ Årsbokslut ${yr} genomfört!\n\n${resultText}: ${formatCurrency(Math.abs(resultAmount))}\n\nÅrsbokslutsverifikation skapad.\nNästa år (${parseInt(yr)+1}) är redo att användas.`);
+    
+    // Ladda om bokföring
+    loadBookkeeping();
+  } catch (err) {
+    document.body.removeChild(loadingMsg);
+    alert('Fel vid årsbokslut: ' + err.message);
+  }
 }
 
 function renderGrundbok() {
