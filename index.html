@@ -5615,17 +5615,21 @@ async function saveVerification() {
         const netto = Math.round(amount / (1 + vatPct / 100) * 100) / 100;
         const moms = Math.round((amount - netto) * 100) / 100;
         
+        // Momskoder (SKV 4700)
+        const saleVatCode = vatPct === 25 ? '05' : vatPct === 12 ? '06' : vatPct === 6 ? '07' : '08';
+        const outgoingVatCode = vatPct === 25 ? '10' : vatPct === 12 ? '11' : vatPct === 6 ? '12' : null;
+        
         // Debit: Inbetalning (Bank 1930 eller Kundfordran 1510)
         rows.push({ account_number: paymentAcc, debit: amount, credit: 0 });
         
         // Credit: Försäljning (netto)
-        rows.push({ account_number: cm.credit, debit: 0, credit: netto });
+        rows.push({ account_number: cm.credit, debit: 0, credit: netto, vat_code: saleVatCode });
         
         // Credit: Utgående moms
         if (moms > 0) {
           const vatAccount = vatPct === 25 ? '2611' : vatPct === 12 ? '2621' : vatPct === 6 ? '2631' : null;
           if (vatAccount) {
-            rows.push({ account_number: vatAccount, debit: 0, credit: moms });
+            rows.push({ account_number: vatAccount, debit: 0, credit: moms, vat_code: outgoingVatCode });
           }
         }
         
@@ -5651,6 +5655,9 @@ async function saveVerification() {
         const vatDeductible = cm.vatDeductible || 1.0;
         const deductibleVat = Math.round(moms * vatDeductible * 100) / 100;
         const nonDeductibleVat = moms - deductibleVat;
+        
+        // Momskod för ingående moms
+        const incomingVatCode = vatPct === 25 ? '30' : vatPct === 12 ? '31' : vatPct === 6 ? '32' : null;
 
         // Debit cost account (inklusive ej avdragsgill moms)
         rows.push({ account_number: cm.debit, debit: netto + nonDeductibleVat, credit: 0 });
@@ -5659,7 +5666,7 @@ async function saveVerification() {
         if (deductibleVat > 0) {
           const vatAccount = vatPct === 25 ? '2640' : vatPct === 12 ? '2641' : vatPct === 6 ? '2642' : null;
           if (vatAccount) {
-            rows.push({ account_number: vatAccount, debit: deductibleVat, credit: 0 });
+            rows.push({ account_number: vatAccount, debit: deductibleVat, credit: 0, vat_code: incomingVatCode });
           }
         }
 
@@ -5802,18 +5809,22 @@ async function autoBookInvoices() {
       const saleAccount = vatPct === 25 ? '3001' : vatPct === 12 ? '3002' : vatPct === 6 ? '3003' : '3106';
       const vatAccount = vatPct === 25 ? '2611' : vatPct === 12 ? '2621' : vatPct === 6 ? '2631' : null;
       
+      // Momskoder
+      const saleVatCode = vatPct === 25 ? '05' : vatPct === 12 ? '06' : vatPct === 6 ? '07' : '08';
+      const outgoingVatCode = vatPct === 25 ? '10' : vatPct === 12 ? '11' : vatPct === 6 ? '12' : null;
+      
       let rows;
       if (isCredit) {
         rows = [
-          { account_number: saleAccount, debit: netto, credit: 0 },
-          { account_number: vatAccount, debit: moms, credit: 0 },
+          { account_number: saleAccount, debit: netto, credit: 0, vat_code: saleVatCode },
+          { account_number: vatAccount, debit: moms, credit: 0, vat_code: outgoingVatCode },
           { account_number: '1510', debit: 0, credit: total }
         ];
       } else {
         rows = [
           { account_number: '1510', debit: total - rotAmount, credit: 0 },
-          { account_number: saleAccount, debit: 0, credit: netto },
-          { account_number: vatAccount, debit: 0, credit: moms }
+          { account_number: saleAccount, debit: 0, credit: netto, vat_code: saleVatCode },
+          { account_number: vatAccount, debit: 0, credit: moms, vat_code: outgoingVatCode }
         ];
         if (rotAmount > 0) {
           rows.push({ account_number: '1580', debit: rotAmount, credit: 0 }); // Fordran ROT-avdrag
