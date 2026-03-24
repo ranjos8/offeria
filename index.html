@@ -1509,9 +1509,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           </div>
           <div class="field"><label>Beskrivning</label><input id="suppDesc" placeholder="Vad gäller fakturan?"></div>
           <input type="hidden" id="suppEditId" value="">
-          <div style="text-align:center">
-            <button class="stripe-btn" onclick="saveSupplierInvoice()" style="width:100%;margin-top:1rem;padding:0.85rem;font-size:1rem">Spara leverantörsfaktura →</button>
-          </div>
+          <button class="stripe-btn" onclick="saveSupplierInvoice()" style="width:100%;padding:0.85rem;font-size:1rem;margin-top:1rem">Spara leverantörsfaktura →</button>
         </div>
       </div>
 
@@ -1725,6 +1723,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <button class="tab-btn" id="bkTabBalans" onclick="switchBkTab('balans')">Balans</button>
           <button class="tab-btn" id="bkTabMoms" onclick="switchBkTab('moms')">Moms</button>
           <button class="tab-btn" id="bkTabKonton" onclick="switchBkTab('konton')">Konton</button>
+          <button class="tab-btn" id="bkTabImport" onclick="switchBkTab('import')">Bank-import</button>
         </div>
 
         <!-- GRUNDBOK (verifikationer i registreringsordning) -->
@@ -1797,6 +1796,49 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <input id="bkAccountSearch" type="text" placeholder="Sök konto..." oninput="renderKontoplan()" style="flex:1;min-width:0;padding:0.5rem 0.8rem;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem">
           </div>
           <div id="kontoplanContent"></div>
+        </div>
+
+        <!-- BANK-IMPORT -->
+        <div id="bkImport" style="display:none">
+          <div class="gen-card" style="max-width:900px">
+            <div class="card-label">
+              <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+              Importera banktransaktioner
+            </div>
+            <p style="font-size:0.9rem;color:#666;margin-bottom:1.5rem">Ladda upp CSV-fil från din bank. Systemet matchar automatiskt transaktioner mot fakturor och skapar verifikationer.</p>
+            
+            <!-- Upload area -->
+            <div id="bankImportUploadArea" style="border:2px dashed var(--border);border-radius:12px;padding:2rem;text-align:center;cursor:pointer;margin-bottom:1.5rem;transition:border-color 0.15s" onclick="document.getElementById('bankCsvFile').click()" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
+              <div style="font-size:2rem;margin-bottom:0.5rem;color:var(--gold)">📁</div>
+              <div style="font-size:1rem;font-weight:600;margin-bottom:0.3rem">Klicka för att välja CSV-fil</div>
+              <div style="font-size:0.85rem;color:#999">Nordea, SEB, Handelsbanken, Swedbank</div>
+              <input id="bankCsvFile" type="file" accept=".csv,.txt" onchange="processBankCsv(this)" style="display:none">
+            </div>
+
+            <!-- Preview/Matching area -->
+            <div id="bankImportPreview" style="display:none">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                <h3 style="margin:0;font-size:1.1rem">Hittade <span id="bankTransCount">0</span> transaktioner</h3>
+                <button onclick="clearBankImport()" class="btn-sm btn-outline">Rensa</button>
+              </div>
+              <div id="bankTransList" style="display:flex;flex-direction:column;gap:0.8rem;max-height:500px;overflow-y:auto"></div>
+              <div style="margin-top:1.5rem;display:flex;gap:0.8rem;justify-content:flex-end">
+                <button onclick="clearBankImport()" class="btn-sm btn-outline">Avbryt</button>
+                <button onclick="createVerificationsFromBank()" class="gen-btn" style="background:var(--teal);border-color:var(--teal)">Skapa <span id="bankSelectedCount">0</span> verifikationer</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Info box -->
+          <div class="gen-card" style="max-width:900px;background:#f0f7ff;border:1px solid #b3d9ff;margin-top:1rem">
+            <h4 style="margin:0 0 0.5rem 0;color:#0066cc">💡 Hur det fungerar</h4>
+            <ul style="font-size:0.88rem;color:#333;margin:0;padding-left:1.2rem">
+              <li>Ladda upp CSV-fil från din internetbank</li>
+              <li>Systemet matchar automatiskt transaktioner mot befintliga fakturor och leverantörsfakturor</li>
+              <li>Granska matchningarna och välj vilka som ska bokföras</li>
+              <li>Verifikationer skapas automatiskt med rätt konton och belopp</li>
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -5387,7 +5429,7 @@ function renderGrundbok() {
 }
 
 function switchBkTab(tab) {
-  const tabs = ['grundbok','huvudbok','resultat','balans','moms','konton'];
+  const tabs = ['grundbok','huvudbok','resultat','balans','moms','konton','import'];
   tabs.forEach(t => {
     const el = document.getElementById('bk' + t.charAt(0).toUpperCase() + t.slice(1));
     const btn = document.getElementById('bkTab' + t.charAt(0).toUpperCase() + t.slice(1));
@@ -7243,6 +7285,314 @@ async function importSIE4() {
   input.click();
 }
 
+// ===== BANK-IMPORT (CSV) =====
+let bankTransactions = [];
+
+function processBankCsv(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const text = e.target.result;
+    bankTransactions = parseCsvToTransactions(text);
+    
+    if (bankTransactions.length === 0) {
+      alert('Kunde inte hitta några transaktioner i filen. Kontrollera att det är rätt format.');
+      return;
+    }
+
+    // Match transactions against invoices, suppliers, ROT
+    await matchTransactions();
+    
+    // Show preview
+    renderBankTransactions();
+  };
+  reader.readAsText(file, 'ISO-8859-1'); // Most Swedish banks use ISO-8859-1
+}
+
+function parseCsvToTransactions(csvText) {
+  const lines = csvText.split('\n').filter(l => l.trim());
+  const transactions = [];
+  
+  // Try to detect format (Nordea, SEB, Handelsbanken)
+  const headers = lines[0].toLowerCase();
+  
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line.trim()) continue;
+    
+    // Parse CSV (handle quotes)
+    const cols = line.match(/(".*?"|[^,]+)(?=\s*,|\s*$)/g) || [];
+    const row = cols.map(c => c.replace(/^"|"$/g, '').trim());
+    
+    if (row.length < 3) continue;
+    
+    // Try different formats
+    let trans = null;
+    
+    // Nordea format: Datum, Transaktion, Kategori, Belopp, Saldo
+    if (headers.includes('datum') && headers.includes('belopp')) {
+      trans = {
+        date: parseSwedishDate(row[0]),
+        description: row[1] || '',
+        amount: parseFloat(row[3]?.replace(',', '.').replace(/\s/g, '')) || 0,
+        balance: parseFloat(row[4]?.replace(',', '.').replace(/\s/g, '')) || 0
+      };
+    }
+    // SEB format: Bokföringsdatum, Valutadatum, Verifikationsnummer, Text/mottagare, Belopp, Saldo
+    else if (headers.includes('bokf') || headers.includes('valuta')) {
+      trans = {
+        date: parseSwedishDate(row[0]),
+        description: row[3] || row[1] || '',
+        amount: parseFloat(row[4]?.replace(',', '.').replace(/\s/g, '')) || 0,
+        balance: parseFloat(row[5]?.replace(',', '.').replace(/\s/g, '')) || 0
+      };
+    }
+    // Generic fallback
+    else {
+      trans = {
+        date: parseSwedishDate(row[0]),
+        description: row[1] || '',
+        amount: parseFloat(row[row.length - 2]?.replace(',', '.').replace(/\s/g, '')) || 0,
+        balance: parseFloat(row[row.length - 1]?.replace(',', '.').replace(/\s/g, '')) || 0
+      };
+    }
+    
+    if (trans && trans.date && !isNaN(trans.amount)) {
+      trans.id = 'trans_' + i;
+      trans.selected = true; // Pre-select all
+      trans.matched = null; // Will be set by matchTransactions
+      transactions.push(trans);
+    }
+  }
+  
+  return transactions;
+}
+
+function parseSwedishDate(dateStr) {
+  if (!dateStr) return null;
+  // Handle formats: 2026-03-24, 2026/03/24, 24/03/2026, 240324
+  const cleaned = dateStr.replace(/[\/\-\s]/g, '');
+  if (cleaned.length === 8) {
+    // YYYYMMDD
+    if (cleaned.substring(0, 2) === '20') {
+      return cleaned.substring(0, 4) + '-' + cleaned.substring(4, 6) + '-' + cleaned.substring(6, 8);
+    }
+    // DDMMYYYY
+    else {
+      return cleaned.substring(4, 8) + '-' + cleaned.substring(2, 4) + '-' + cleaned.substring(0, 2);
+    }
+  }
+  if (cleaned.length === 6) {
+    // YYMMDD
+    const year = '20' + cleaned.substring(0, 2);
+    return year + '-' + cleaned.substring(2, 4) + '-' + cleaned.substring(4, 6);
+  }
+  return dateStr; // Return as-is if can't parse
+}
+
+async function matchTransactions() {
+  // Fetch all unpaid invoices and supplier invoices
+  const { data: invoices } = await sb.from('invoices')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .eq('status', 'sent');
+  
+  const { data: suppliers } = await sb.from('supplier_invoices')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .eq('status', 'unpaid');
+  
+  // Match each transaction
+  for (const trans of bankTransactions) {
+    trans.matched = null;
+    trans.matchType = null;
+    
+    // Positive amounts = incoming (customer payments)
+    if (trans.amount > 0) {
+      const match = invoices?.find(inv => {
+        const amountMatch = Math.abs(inv.total_inkl - trans.amount) < 1; // Within 1 kr
+        const dateClose = Math.abs(new Date(inv.invoice_date) - new Date(trans.date)) < 30 * 24 * 60 * 60 * 1000; // Within 30 days
+        return amountMatch || (inv.customer_name && trans.description.toLowerCase().includes(inv.customer_name.toLowerCase()));
+      });
+      
+      if (match) {
+        trans.matched = match;
+        trans.matchType = 'invoice';
+        trans.suggestedBooking = {
+          description: `Betalning faktura ${match.invoice_number} - ${match.customer_name}`,
+          rows: [
+            { account_number: '1930', debit: trans.amount, credit: 0 },
+            { account_number: '1510', debit: 0, credit: trans.amount }
+          ]
+        };
+      }
+    }
+    
+    // Negative amounts = outgoing (supplier payments)
+    else if (trans.amount < 0) {
+      const absAmount = Math.abs(trans.amount);
+      const match = suppliers?.find(sup => {
+        const amountMatch = Math.abs(sup.amount_inkl - absAmount) < 1;
+        const nameMatch = sup.supplier_name && trans.description.toLowerCase().includes(sup.supplier_name.toLowerCase());
+        return amountMatch || nameMatch;
+      });
+      
+      if (match) {
+        trans.matched = match;
+        trans.matchType = 'supplier';
+        trans.suggestedBooking = {
+          description: `Betalning leverantörsfaktura ${match.supplier_name}`,
+          rows: [
+            { account_number: '2440', debit: absAmount, credit: 0 },
+            { account_number: '1930', debit: 0, credit: absAmount }
+          ]
+        };
+      }
+    }
+    
+    // No match = manual categorization needed
+    if (!trans.matched) {
+      trans.suggestedBooking = {
+        description: trans.description,
+        rows: [
+          { account_number: trans.amount > 0 ? '1930' : '1930', debit: trans.amount > 0 ? trans.amount : 0, credit: trans.amount < 0 ? Math.abs(trans.amount) : 0 },
+          { account_number: '????', debit: trans.amount < 0 ? Math.abs(trans.amount) : 0, credit: trans.amount > 0 ? trans.amount : 0 }
+        ]
+      };
+    }
+  }
+}
+
+function renderBankTransactions() {
+  document.getElementById('bankImportUploadArea').style.display = 'none';
+  document.getElementById('bankImportPreview').style.display = 'block';
+  document.getElementById('bankTransCount').textContent = bankTransactions.length;
+  updateSelectedCount();
+  
+  const list = document.getElementById('bankTransList');
+  list.innerHTML = bankTransactions.map(trans => `
+    <div style="border:1px solid ${trans.matched ? '#4caf50' : '#ddd'};border-radius:8px;padding:1rem;background:${trans.matched ? '#f1f8f4' : 'white'}">
+      <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:0.5rem">
+        <input type="checkbox" ${trans.selected ? 'checked' : ''} onchange="toggleTransaction('${trans.id}', this.checked)" style="width:18px;height:18px">
+        <div style="flex:1">
+          <div style="font-weight:600;margin-bottom:0.2rem">${trans.description}</div>
+          <div style="font-size:0.85rem;color:#666">${trans.date} • ${trans.amount >= 0 ? '+' : ''}${trans.amount.toFixed(2)} kr</div>
+        </div>
+        <div style="text-align:right">
+          ${trans.matched ? `<div style="font-size:0.8rem;color:#4caf50;font-weight:600">✓ Matchad</div><div style="font-size:0.75rem;color:#666">${trans.matchType === 'invoice' ? 'Faktura' : 'Leverantör'}: ${trans.matched.invoice_number || trans.matched.supplier_name}</div>` : '<div style="font-size:0.8rem;color:#ff9800">⚠ Ingen matchning</div>'}
+        </div>
+      </div>
+      ${trans.suggestedBooking ? `
+        <div style="background:#f9f9f9;border-radius:6px;padding:0.6rem;font-size:0.82rem;margin-top:0.5rem">
+          <div style="font-weight:600;margin-bottom:0.3rem">Föreslagen bokföring:</div>
+          ${trans.suggestedBooking.rows.map(r => `<div style="display:grid;grid-template-columns:80px 1fr 1fr;gap:0.5rem"><span>${r.account_number}</span><span>${r.debit > 0 ? r.debit.toFixed(2) : ''}</span><span>${r.credit > 0 ? r.credit.toFixed(2) : ''}</span></div>`).join('')}
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+}
+
+function toggleTransaction(id, selected) {
+  const trans = bankTransactions.find(t => t.id === id);
+  if (trans) trans.selected = selected;
+  updateSelectedCount();
+}
+
+function updateSelectedCount() {
+  const selected = bankTransactions.filter(t => t.selected).length;
+  document.getElementById('bankSelectedCount').textContent = selected;
+}
+
+async function createVerificationsFromBank() {
+  const selected = bankTransactions.filter(t => t.selected);
+  if (selected.length === 0) {
+    alert('Välj minst en transaktion att bokföra.');
+    return;
+  }
+  
+  // Filter out transactions without proper suggested booking
+  const valid = selected.filter(t => t.suggestedBooking && !t.suggestedBooking.rows.some(r => r.account_number === '????'));
+  
+  if (valid.length < selected.length) {
+    if (!confirm(`${selected.length - valid.length} transaktioner saknar korrekt matchning och kommer hoppas över.\n\nFortsätt med ${valid.length} verifikationer?`)) {
+      return;
+    }
+  }
+  
+  if (valid.length === 0) {
+    alert('Inga transaktioner med giltig bokföring hittades.');
+    return;
+  }
+  
+  let created = 0;
+  for (const trans of valid) {
+    const yr = parseInt(trans.date.substring(0, 4));
+    
+    // Ensure fiscal year exists
+    await sb.from('fiscal_years').upsert({
+      user_id: currentUser.id, start_date: yr + '-01-01', end_date: yr + '-12-31'
+    }, { onConflict: 'user_id,start_date', ignoreDuplicates: true });
+    
+    // Get next verification number
+    const { data: numD } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: yr });
+    const verNum = numD || 1;
+    
+    // Create verification
+    const { data: ver, error } = await sb.from('verifications').insert({
+      user_id: currentUser.id,
+      verification_number: verNum,
+      verification_date: trans.date,
+      description: trans.suggestedBooking.description,
+      source_type: 'bank_import',
+      created_by: currentUser.email
+    }).select().single();
+    
+    if (ver && !error) {
+      // Create rows
+      await sb.from('verification_rows').insert(
+        trans.suggestedBooking.rows.map(r => ({
+          verification_id: ver.id,
+          user_id: currentUser.id,
+          account_number: r.account_number,
+          debit: r.debit,
+          credit: r.credit
+        }))
+      );
+      
+      // Mark invoice/supplier as paid if matched
+      if (trans.matchType === 'invoice' && trans.matched) {
+        await sb.from('invoices')
+          .update({ status: 'paid', paid_date: trans.date })
+          .eq('id', trans.matched.id);
+      } else if (trans.matchType === 'supplier' && trans.matched) {
+        await sb.from('supplier_invoices')
+          .update({ status: 'paid', paid_date: trans.date })
+          .eq('id', trans.matched.id);
+      }
+      
+      created++;
+    }
+  }
+  
+  // Reload bookkeeping
+  _bkInitialized = false;
+  await initBookkeeping();
+  
+  // Clear and show success
+  clearBankImport();
+  alert(`✓ Bank-import klar!\n\n${created} verifikationer skapade`);
+  switchBkTab('grundbok');
+}
+
+function clearBankImport() {
+  bankTransactions = [];
+  document.getElementById('bankImportUploadArea').style.display = 'block';
+  document.getElementById('bankImportPreview').style.display = 'none';
+  document.getElementById('bankCsvFile').value = '';
+}
+
 // ===== BOKFÖRINGS-AI CHAT FUNCTIONS =====
 let aiChatHistory = [];
 
@@ -7732,22 +8082,25 @@ init();
 
     <!-- Amount lines - supports multiple lines with different VAT -->
     <div id="verAmountSection">
-      <div style="display:grid;grid-template-columns:2fr 140px 250px 30px;gap:0.8rem;margin-bottom:0.6rem;align-items:end">
-        <label style="font-size:0.85rem;font-weight:600;color:#555">Belopp inkl. moms *</label>
-        <label style="font-size:0.85rem;font-weight:600;color:#555">Moms</label>
-        <label style="font-size:0.85rem;font-weight:600;color:#555">Betalning</label>
-        <span></span>
-      </div>
+      <label style="font-size:0.85rem;font-weight:600;color:#555;margin-bottom:0.6rem;display:block">Belopp *</label>
       <div id="verAmountLines">
-        <div class="ver-amount-line" style="display:grid;grid-template-columns:2fr 140px 250px 30px;gap:0.8rem;margin-bottom:0.6rem;align-items:center">
-          <input type="number" step="0.01" placeholder="12500" class="ver-line-amount" oninput="updateVatBreakdown()" style="padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit">
-          <select class="ver-line-vat" onchange="updateVatBreakdown()" style="padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit">
-            <option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option>
-          </select>
-          <select class="ver-line-pay" style="padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit">
-            <option value="1930">1930 - Bank</option><option value="1940">1940 - BG</option><option value="1910">1910 - Kontant</option><option value="2440">2440 - Skuld</option><option value="1510">1510 - Kundfordran</option>
-          </select>
-          <span></span>
+        <div class="ver-amount-line" style="display:grid;grid-template-columns:2fr auto auto;gap:0.8rem;margin-bottom:0.6rem;align-items:center">
+          <input type="number" step="0.01" placeholder="Belopp inkl moms" class="ver-line-amount" oninput="updateVatBreakdown()" style="padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit">
+          <div style="display:flex;flex-direction:column;gap:0.3rem">
+            <label style="font-size:0.8rem;font-weight:600;color:#555">Moms</label>
+            <select class="ver-line-vat" onchange="updateVatBreakdown()" style="padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit;min-width:100px">
+              <option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.3rem">
+            <label style="font-size:0.8rem;font-weight:600;color:#555">Betalning</label>
+            <select class="ver-line-pay" style="padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit;min-width:180px">
+              <option value="1930">1930 - Bank</option><option value="1940">1940 - BG</option><option value="1910">1910 - Kontant</option><option value="2440">2440 - Skuld</option><option value="1510">1510 - Kundfordran</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <button onclick="addVerAmountLine()" style="font-size:0.8rem;color:var(--gold);background:none;border:1px dashed var(--gold-light);border-radius:6px;padding:0.4rem 0.9rem;cursor:pointer;margin-top:0.3rem;font-family:inherit">+ Rad med annan moms</button>
         </div>
       </div>
       <button onclick="addVerAmountLine()" style="font-size:0.8rem;color:var(--gold);background:none;border:1px dashed var(--gold-light);border-radius:6px;padding:0.4rem 0.9rem;cursor:pointer;margin-top:0.3rem;font-family:inherit">+ Rad med annan moms</button>
@@ -7779,9 +8132,7 @@ init();
       <button onclick="addManualVerRow()" style="font-size:0.82rem;color:var(--gold);background:none;border:1px dashed var(--gold-light);border-radius:6px;padding:0.4rem 0.9rem;cursor:pointer;margin-top:0.5rem;font-family:inherit">+ Lägg till rad</button>
     </div>
     <div class="field" style="margin-bottom:1.5rem"><label>Kvitto/underlag (valfritt)</label><input id="verFile" type="file" accept="image/*,.pdf" style="font-size:0.9rem;padding:0.6rem"></div>
-    <div style="text-align:center">
-      <button onclick="saveVerification()" class="stripe-btn" style="width:100%;margin-top:1rem;padding:0.85rem;font-size:1rem">Spara verifikation</button>
-    </div>
+    <button onclick="saveVerification()" class="stripe-btn" style="width:100%;padding:0.85rem;font-size:1rem;margin-top:1rem">Spara verifikation</button>
   </div>
 </div>
 
