@@ -1725,6 +1725,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <button class="tab-btn" id="bkTabBalans" onclick="switchBkTab('balans')">Balans</button>
           <button class="tab-btn" id="bkTabMoms" onclick="switchBkTab('moms')">Moms</button>
           <button class="tab-btn" id="bkTabKonton" onclick="switchBkTab('konton')">Konton</button>
+          <button class="tab-btn" id="bkTabBankimport" onclick="switchBkTab('bankimport')">🏦 Bankimport</button>
         </div>
 
         <!-- GRUNDBOK (verifikationer i registreringsordning) -->
@@ -1797,6 +1798,53 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <input id="bkAccountSearch" type="text" placeholder="Sök konto..." oninput="renderKontoplan()" style="flex:1;min-width:0;padding:0.5rem 0.8rem;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem">
           </div>
           <div id="kontoplanContent"></div>
+        </div>
+
+        <!-- BANK-IMPORT -->
+        <div id="bkBankimport" style="display:none">
+          <div style="max-width:800px">
+            <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1.2rem">
+              Importera banktransaktioner från din bank (CSV-format). Stöder SEB, Swedbank, Handelsbanken, Nordea och de flesta svenska banker.
+              Varje transaktion bokförs som en verifikation mot valt bankkonto.
+            </p>
+            <div style="display:flex;gap:0.8rem;align-items:center;flex-wrap:wrap;margin-bottom:1.2rem">
+              <button onclick="openBankImport()" class="gen-btn" style="padding:0.5rem 1.2rem;font-size:0.85rem">
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+                Välj CSV-fil
+              </button>
+              <select id="bankImportAccount" style="padding:0.5rem 0.8rem;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem">
+                <option value="1930">1930 – Företagskonto</option>
+                <option value="1920">1920 – Plusgiro</option>
+                <option value="1910">1910 – Kassa</option>
+              </select>
+              <span style="font-size:0.82rem;color:var(--text-muted)">Bankkonto att importera mot</span>
+            </div>
+            <div id="bankImportPreview" style="display:none">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;flex-wrap:wrap;gap:0.5rem">
+                <div id="bankImportSummary" style="font-size:0.9rem;color:var(--text-muted)"></div>
+                <div style="display:flex;gap:0.5rem">
+                  <button onclick="bankImportSelectAll(true)" class="btn-sm btn-outline" style="font-size:0.75rem;padding:0.3rem 0.6rem">Välj alla</button>
+                  <button onclick="bankImportSelectAll(false)" class="btn-sm btn-outline" style="font-size:0.75rem;padding:0.3rem 0.6rem">Avmarkera alla</button>
+                  <button onclick="bankImportCommit()" class="gen-btn" style="padding:0.4rem 1rem;font-size:0.85rem;background:#2e7d32;border-color:#2e7d32">✓ Bokför markerade</button>
+                </div>
+              </div>
+              <div style="overflow-x:auto">
+                <table style="width:100%;border-collapse:collapse;font-size:0.83rem">
+                  <thead>
+                    <tr style="border-bottom:2px solid var(--border);text-align:left">
+                      <th style="padding:0.5rem 0.4rem;width:32px"><input type="checkbox" id="bankImportCheckAll" onchange="bankImportToggleAll(this)"></th>
+                      <th style="padding:0.5rem 0.4rem">Datum</th>
+                      <th style="padding:0.5rem 0.4rem">Beskrivning</th>
+                      <th style="padding:0.5rem 0.4rem;text-align:right">Belopp</th>
+                      <th style="padding:0.5rem 0.4rem;min-width:180px">Motkonto</th>
+                      <th style="padding:0.5rem 0.4rem;width:80px">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bankImportRows"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -5387,7 +5435,7 @@ function renderGrundbok() {
 }
 
 function switchBkTab(tab) {
-  const tabs = ['grundbok','huvudbok','resultat','balans','moms','konton'];
+  const tabs = ['grundbok','huvudbok','resultat','balans','moms','konton','bankimport'];
   tabs.forEach(t => {
     const el = document.getElementById('bk' + t.charAt(0).toUpperCase() + t.slice(1));
     const btn = document.getElementById('bkTab' + t.charAt(0).toUpperCase() + t.slice(1));
@@ -5660,11 +5708,11 @@ function addVerAmountLine() {
   const container = document.getElementById('verAmountLines');
   const row = document.createElement('div');
   row.className = 'ver-amount-line';
-  row.style.cssText = 'display:grid;grid-template-columns:1fr 90px 90px 30px;gap:0.4rem;margin-bottom:0.4rem;align-items:center';
-  row.innerHTML = `<input type="number" step="0.01" placeholder="Belopp inkl moms" class="ver-line-amount" oninput="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.85rem;font-family:inherit">
-    <select class="ver-line-vat" onchange="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.82rem;font-family:inherit"><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
-    <select class="ver-line-pay" onchange="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.75rem;font-family:inherit"><option value="1930">1930 - Bank</option><option value="1940">1940 - BG</option><option value="1910">1910 - Kontant</option><option value="2440">2440 - Skuld</option></select>
-    <button onclick="this.parentElement.remove();updateVatBreakdown()" style="background:none;border:none;cursor:pointer;color:#c62828;font-size:1rem">×</button>`;
+  row.style.cssText = 'display:grid;grid-template-columns:2fr 120px 1fr 30px;gap:0.8rem;margin-bottom:0.6rem;align-items:center';
+  row.innerHTML = `<input type="number" step="0.01" placeholder="Belopp inkl moms" class="ver-line-amount" oninput="updateVatBreakdown()" style="padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit;width:100%;box-sizing:border-box">
+    <select class="ver-line-vat" onchange="updateVatBreakdown()" style="padding:0.75rem 0.5rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit;width:100%;box-sizing:border-box"><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
+    <select class="ver-line-pay" style="padding:0.75rem 0.5rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit;width:100%;box-sizing:border-box"><option value="1930">1930 - Företagskonto</option><option value="1940">1940 - Plusgiro/BG</option><option value="1910">1910 - Kontant</option><option value="2440">2440 - Leverantörsskuld</option></select>
+    <button onclick="this.parentElement.remove();updateVatBreakdown()" style="background:none;border:none;cursor:pointer;color:#c62828;font-size:1.2rem;line-height:1">×</button>`;
   container.appendChild(row);
 }
 
@@ -5683,10 +5731,10 @@ function openNewVerification() {
   document.getElementById('verVatBreakdown').style.display = 'none';
   document.getElementById('verRowsContainer').innerHTML = '';
   // Reset amount lines to single line
-  document.getElementById('verAmountLines').innerHTML = `<div class="ver-amount-line" style="display:grid;grid-template-columns:1fr 90px 90px 30px;gap:0.4rem;margin-bottom:0.4rem;align-items:center">
-    <input type="number" step="0.01" placeholder="Belopp inkl moms" class="ver-line-amount" oninput="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.85rem;font-family:inherit">
-    <select class="ver-line-vat" onchange="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.82rem;font-family:inherit"><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
-    <select class="ver-line-pay" onchange="updateVatBreakdown()" style="padding:0.5rem;border-radius:6px;border:1.5px solid var(--border);font-size:0.75rem;font-family:inherit"><option value="1930">1930 - Bank</option><option value="1940">1940 - BG</option><option value="1910">1910 - Kontant</option><option value="2440">2440 - Skuld</option></select>
+  document.getElementById('verAmountLines').innerHTML = `<div class="ver-amount-line" style="display:grid;grid-template-columns:2fr 120px 1fr 30px;gap:0.8rem;margin-bottom:0.6rem;align-items:center">
+    <input type="number" step="0.01" placeholder="Belopp inkl moms" class="ver-line-amount" oninput="updateVatBreakdown()" style="padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit;width:100%;box-sizing:border-box">
+    <select class="ver-line-vat" onchange="updateVatBreakdown()" style="padding:0.75rem 0.5rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit;width:100%;box-sizing:border-box"><option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option></select>
+    <select class="ver-line-pay" style="padding:0.75rem 0.5rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit;width:100%;box-sizing:border-box"><option value="1930">1930 - Företagskonto</option><option value="1940">1940 - Plusgiro/BG</option><option value="1910">1910 - Kontant</option><option value="2440">2440 - Leverantörsskuld</option></select>
     <span></span>
   </div>`;
   document.getElementById('verificationModalOverlay').style.display = 'flex';
@@ -7243,6 +7291,266 @@ async function importSIE4() {
   input.click();
 }
 
+// ===== BANK-IMPORT =====
+let _bankImportRows = [];
+
+function openBankImport() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.csv,.CSV,.txt,.TXT';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const text = await file.text();
+    parseBankCSV(text, file.name);
+  };
+  input.click();
+}
+
+function parseBankCSV(text, filename) {
+  const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').filter(l => l.trim());
+  const delim = lines[0].includes(';') ? ';' : ',';
+
+  function splitLine(line) {
+    const result = [];
+    let inQuote = false, cur = '';
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQuote = !inQuote; continue; }
+      if (ch === delim && !inQuote) { result.push(cur.trim()); cur = ''; continue; }
+      cur += ch;
+    }
+    result.push(cur.trim());
+    return result;
+  }
+
+  // Find header row — look for datum/date keyword
+  let headerIdx = -1;
+  for (let i = 0; i < Math.min(lines.length, 10); i++) {
+    const lower = lines[i].toLowerCase();
+    if (lower.includes('datum') || lower.includes('date') || lower.includes('bokf')) {
+      headerIdx = i;
+      break;
+    }
+  }
+  if (headerIdx === -1) {
+    alert('Kunde inte hitta rubrikrad i filen.\nKontrollera att det är en korrekt bank-CSV från SEB, Swedbank, Handelsbanken eller Nordea.');
+    return;
+  }
+
+  const headers = splitLine(lines[headerIdx]).map(h => h.toLowerCase().replace(/['"]/g, '').trim());
+
+  function findCol(...names) {
+    for (const n of names) {
+      const idx = headers.findIndex(h => h.includes(n));
+      if (idx !== -1) return idx;
+    }
+    return -1;
+  }
+
+  const colDate   = findCol('bokföringsdag', 'bokf.dag', 'datum', 'date', 'transaktionsdatum', 'värdedag');
+  const colDesc   = findCol('text', 'beskrivning', 'rubrik', 'avsändare', 'mottagare', 'kommentar', 'transaktion', 'meddelande');
+  const colAmount = findCol('belopp', 'amount', 'summa', 'kronor', 'transaktionsbelopp');
+
+  if (colDate === -1 || colAmount === -1) {
+    alert('Kunde inte tolka kolumner.\nHittade: ' + headers.join(', ') + '\n\nExportera filen som CSV direkt från din internetbank.');
+    return;
+  }
+
+  // Build duplicate detection set from existing verifications
+  const existingKeys = new Set((_bkVerifications || []).map(v =>
+    (v.description || '') + '|' + (v.verification_date || '')
+  ));
+
+  const rows = [];
+  for (let i = headerIdx + 1; i < lines.length; i++) {
+    const cols = splitLine(lines[i]);
+    if (cols.length < Math.max(colDate, colAmount) + 1) continue;
+
+    let dateRaw = (cols[colDate] || '').trim();
+    let descRaw = colDesc !== -1 ? (cols[colDesc] || '').trim() : '';
+    let amtRaw  = (cols[colAmount] || '').trim();
+
+    // Normalise date formats: YYYY-MM-DD, YYYYMMDD, DD/MM/YYYY, DD-MM-YYYY
+    let date = dateRaw.replace(/\//g, '-');
+    if (/^\d{8}$/.test(date))
+      date = date.slice(0,4) + '-' + date.slice(4,6) + '-' + date.slice(6,8);
+    if (/^\d{2}-\d{2}-\d{4}$/.test(date))
+      date = date.slice(6,10) + '-' + date.slice(3,5) + '-' + date.slice(0,2);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
+
+    // Normalise amount: Swedish thousands separator = space, decimal = comma
+    const amtClean = amtRaw.replace(/\s/g, '').replace(',', '.');
+    const amount = parseFloat(amtClean);
+    if (isNaN(amount) || amount === 0) continue;
+
+    const desc = descRaw || (amount > 0 ? 'Inbetalning' : 'Utbetalning');
+    const isDuplicate = existingKeys.has(desc + '|' + date);
+
+    // Suggest motkonto based on keywords
+    const dl = desc.toLowerCase();
+    let suggested = '';
+    if      (dl.includes('lön') || dl.includes('salary'))                                        suggested = '7010';
+    else if (dl.includes('skatteverket') || dl.includes('skatt'))                                suggested = '2510';
+    else if (dl.includes('moms'))                                                                suggested = '2650';
+    else if (dl.includes('hyra'))                                                                suggested = '5010';
+    else if (dl.includes('telefon') || dl.includes('tele2') || dl.includes('telia') || dl.includes('telenor')) suggested = '6210';
+    else if (dl.includes('försäkring') || dl.includes('if ') || dl.includes('trygg') || dl.includes('folksam')) suggested = '6310';
+    else if (dl.includes('el ') || dl.includes('vattenfall') || dl.includes('fortum'))           suggested = '5020';
+    else if (dl.includes('okq8') || dl.includes('preem') || dl.includes('circle k') || dl.includes('st1'))    suggested = '5610';
+    else if (dl.includes('swish') && amount > 0)                                                 suggested = '3001';
+    else if (dl.includes('bankgiro') || dl.includes('plusgiro'))                                 suggested = amount > 0 ? '3001' : '6990';
+    else if (amount > 0)                                                                         suggested = '3001'; // Inkomst → Försäljning
+    else                                                                                         suggested = '6990'; // Utgift → Övriga kostnader
+
+    rows.push({ date, desc, amount, suggested, isDuplicate, include: !isDuplicate });
+  }
+
+  if (rows.length === 0) {
+    alert('Inga giltiga transaktionsrader hittades.\nKontrollera att filen innehåller transaktioner under rubrikraden.');
+    return;
+  }
+
+  _bankImportRows = rows;
+  renderBankImportTable();
+}
+
+function renderBankImportTable() {
+  const rows = _bankImportRows;
+  const tbody = document.getElementById('bankImportRows');
+  if (!tbody) return;
+  const accounts = (_bkAccounts || []);
+
+  // Build account options once
+  const accOptions = accounts.map(a =>
+    `<option value="${a.account_number}">${a.account_number} – ${a.account_name}</option>`
+  ).join('');
+
+  tbody.innerHTML = rows.map((r, i) => {
+    const amtStyle = r.amount > 0 ? 'color:#2e7d32;font-weight:600' : 'color:#c62828;font-weight:600';
+    const amtStr   = (r.amount > 0 ? '+' : '') + r.amount.toLocaleString('sv-SE', {minimumFractionDigits:2, maximumFractionDigits:2});
+    const badge    = r.isDuplicate
+      ? '<span style="font-size:0.72rem;background:#fff3cd;color:#856404;padding:2px 6px;border-radius:4px;white-space:nowrap">Dubblett?</span>'
+      : '<span style="font-size:0.72rem;background:#e8f5e9;color:#2e7d32;padding:2px 6px;border-radius:4px">Ny</span>';
+
+    // Inject selected attribute into the matching option
+    const opts = accOptions.replace(`value="${r.suggested}"`, `value="${r.suggested}" selected`);
+
+    return `<tr style="border-bottom:1px solid var(--border);${r.isDuplicate ? 'opacity:0.55' : ''}">
+      <td style="padding:0.4rem 0.3rem">
+        <input type="checkbox" ${r.include ? 'checked' : ''}
+          onchange="_bankImportRows[${i}].include=this.checked;_updateBankSummary()">
+      </td>
+      <td style="padding:0.4rem 0.3rem;white-space:nowrap">${r.date}</td>
+      <td style="padding:0.4rem 0.3rem;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.desc}">${r.desc}</td>
+      <td style="padding:0.4rem 0.3rem;text-align:right;white-space:nowrap"><span style="${amtStyle}">${amtStr}</span></td>
+      <td style="padding:0.4rem 0.3rem">
+        <select onchange="_bankImportRows[${i}].suggested=this.value"
+          style="width:100%;padding:0.3rem 0.4rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.79rem">
+          <option value="">– välj konto –</option>
+          ${opts}
+        </select>
+      </td>
+      <td style="padding:0.4rem 0.3rem">${badge}</td>
+    </tr>`;
+  }).join('');
+
+  _updateBankSummary();
+  document.getElementById('bankImportPreview').style.display = 'block';
+}
+
+function _updateBankSummary() {
+  const total    = _bankImportRows.length;
+  const selected = _bankImportRows.filter(r => r.include).length;
+  const dupes    = _bankImportRows.filter(r => r.isDuplicate).length;
+  const el = document.getElementById('bankImportSummary');
+  if (el) el.textContent = `${total} rader — ${dupes} möjliga dubletter avmarkerade — ${selected} markerade för bokföring`;
+}
+
+function bankImportToggleAll(cb) {
+  _bankImportRows.forEach(r => r.include = cb.checked);
+  renderBankImportTable();
+}
+
+function bankImportSelectAll(val) {
+  _bankImportRows.forEach(r => r.include = val);
+  renderBankImportTable();
+  const cb = document.getElementById('bankImportCheckAll');
+  if (cb) cb.checked = val;
+}
+
+async function bankImportCommit() {
+  const bankAccount = document.getElementById('bankImportAccount').value || '1930';
+  const toImport = _bankImportRows.filter(r => r.include);
+
+  if (toImport.length === 0) { alert('Inga rader är markerade.'); return; }
+
+  const missing = toImport.filter(r => !r.suggested);
+  if (missing.length > 0) {
+    alert(`${missing.length} markerade rader saknar motkonto.\nVälj konto för alla rader du vill bokföra.`);
+    return;
+  }
+
+  if (!confirm(`Bokför ${toImport.length} transaktioner mot konto ${bankAccount}?\n\nDetta skapar ${toImport.length} verifikationer i grundboken.`)) return;
+
+  const uid = currentUser.id;
+  let imported = 0, errors = 0;
+
+  for (const row of toImport) {
+    const yr = parseInt(row.date.slice(0, 4));
+
+    // Ensure fiscal year exists
+    await sb.from('fiscal_years').upsert(
+      { user_id: uid, start_date: yr + '-01-01', end_date: yr + '-12-31' },
+      { onConflict: 'user_id,start_date', ignoreDuplicates: true }
+    );
+
+    const { data: numD } = await sb.rpc('get_next_verification_number', { p_user_id: uid, p_year: yr });
+    const verNum = numD || 1;
+    const absAmt = Math.abs(row.amount);
+
+    // Positive = pengar in på bankkontot → debit bankkonto, credit motkonto
+    // Negative = pengar ut → debit motkonto, credit bankkonto
+    const verRows = row.amount > 0
+      ? [
+          { account_number: bankAccount,   debit: absAmt, credit: 0 },
+          { account_number: row.suggested, debit: 0,      credit: absAmt }
+        ]
+      : [
+          { account_number: row.suggested, debit: absAmt, credit: 0 },
+          { account_number: bankAccount,   debit: 0,      credit: absAmt }
+        ];
+
+    const { data: ver, error } = await sb.from('verifications').insert({
+      user_id: uid,
+      verification_number: verNum,
+      verification_date:   row.date,
+      description:         row.desc,
+      source_type:         'bank_import',
+      created_by:          'Bankimport'
+    }).select().single();
+
+    if (ver && !error) {
+      await sb.from('verification_rows').insert(
+        verRows.map(r => ({ ...r, verification_id: ver.id, user_id: uid }))
+      );
+      imported++;
+    } else {
+      errors++;
+      console.error('bankImport row error:', error, row);
+    }
+  }
+
+  // Reload bokföring
+  _bkInitialized = false;
+  await initBookkeeping();
+  _bankImportRows = [];
+  document.getElementById('bankImportPreview').style.display = 'none';
+
+  const msg = `Import klar!\n\n✓ ${imported} verifikationer skapade${errors ? '\n✗ ' + errors + ' fel — kontrollera konsolen' : ''}`;
+  alert(msg);
+}
+
 // ===== BOKFÖRINGS-AI CHAT FUNCTIONS =====
 let aiChatHistory = [];
 
@@ -7732,20 +8040,20 @@ init();
 
     <!-- Amount lines - supports multiple lines with different VAT -->
     <div id="verAmountSection">
-      <div style="display:grid;grid-template-columns:2fr 140px 250px 30px;gap:0.8rem;margin-bottom:0.6rem;align-items:end">
+      <div style="display:grid;grid-template-columns:2fr 120px 1fr 30px;gap:0.8rem;margin-bottom:0.4rem;align-items:end">
         <label style="font-size:0.85rem;font-weight:600;color:#555">Belopp inkl. moms *</label>
         <label style="font-size:0.85rem;font-weight:600;color:#555">Moms</label>
         <label style="font-size:0.85rem;font-weight:600;color:#555">Betalning</label>
         <span></span>
       </div>
       <div id="verAmountLines">
-        <div class="ver-amount-line" style="display:grid;grid-template-columns:2fr 140px 250px 30px;gap:0.8rem;margin-bottom:0.6rem;align-items:center">
-          <input type="number" step="0.01" placeholder="12500" class="ver-line-amount" oninput="updateVatBreakdown()" style="padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit">
-          <select class="ver-line-vat" onchange="updateVatBreakdown()" style="padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit">
+        <div class="ver-amount-line" style="display:grid;grid-template-columns:2fr 120px 1fr 30px;gap:0.8rem;margin-bottom:0.6rem;align-items:center">
+          <input type="number" step="0.01" placeholder="12500" class="ver-line-amount" oninput="updateVatBreakdown()" style="padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit;width:100%;box-sizing:border-box">
+          <select class="ver-line-vat" onchange="updateVatBreakdown()" style="padding:0.75rem 0.5rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit;width:100%;box-sizing:border-box">
             <option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option>
           </select>
-          <select class="ver-line-pay" style="padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit">
-            <option value="1930">1930 - Bank</option><option value="1940">1940 - BG</option><option value="1910">1910 - Kontant</option><option value="2440">2440 - Skuld</option><option value="1510">1510 - Kundfordran</option>
+          <select class="ver-line-pay" style="padding:0.75rem 0.5rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit;width:100%;box-sizing:border-box">
+            <option value="1930">1930 - Företagskonto</option><option value="1940">1940 - Plusgiro/BG</option><option value="1910">1910 - Kontant</option><option value="2440">2440 - Leverantörsskuld</option><option value="1510">1510 - Kundfordran</option>
           </select>
           <span></span>
         </div>
@@ -7779,8 +8087,8 @@ init();
       <button onclick="addManualVerRow()" style="font-size:0.82rem;color:var(--gold);background:none;border:1px dashed var(--gold-light);border-radius:6px;padding:0.4rem 0.9rem;cursor:pointer;margin-top:0.5rem;font-family:inherit">+ Lägg till rad</button>
     </div>
     <div class="field" style="margin-bottom:1.5rem"><label>Kvitto/underlag (valfritt)</label><input id="verFile" type="file" accept="image/*,.pdf" style="font-size:0.9rem;padding:0.6rem"></div>
-    <div style="text-align:center">
-      <button onclick="saveVerification()" class="stripe-btn" style="width:100%;margin-top:1rem;padding:0.85rem;font-size:1rem">Spara verifikation</button>
+    <div style="margin-top:1.5rem">
+      <button onclick="saveVerification()" class="stripe-btn" style="width:100%;box-sizing:border-box;padding:0.85rem;font-size:1rem">Spara verifikation</button>
     </div>
   </div>
 </div>
