@@ -1509,9 +1509,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           </div>
           <div class="field"><label>Beskrivning</label><input id="suppDesc" placeholder="Vad gäller fakturan?"></div>
           <input type="hidden" id="suppEditId" value="">
-          <div style="display:flex;justify-content:center;width:100%;margin-top:24px">
-            <button class="stripe-btn" onclick="saveSupplierInvoice()" style="width:100%;max-width:980px;height:60px;font-size:1rem">Spara leverantörsfaktura →</button>
-          </div>
+          <button class="stripe-btn" onclick="saveSupplierInvoice()" style="width:100%;padding:0.85rem;font-size:1rem;margin-top:1rem">Spara leverantörsfaktura →</button>
         </div>
       </div>
 
@@ -7732,25 +7730,22 @@ init();
 
     <!-- Amount lines - supports multiple lines with different VAT -->
     <div id="verAmountSection">
-      <label style="font-size:0.85rem;font-weight:600;color:#555;margin-bottom:0.8rem;display:block">Belopp *</label>
-      
-      <!-- Labels row (same grid as inputs) -->
-      <div style="display:grid;grid-template-columns:2fr 160px 240px;gap:16px;align-items:center;margin-bottom:6px">
-        <div></div>
-        <label style="font-size:0.85rem;font-weight:600;color:#666">Moms</label>
-        <label style="font-size:0.85rem;font-weight:600;color:#666">Betalning</label>
-      </div>
-      
-      <!-- Inputs row (same grid as labels) -->
+      <label style="font-size:0.85rem;font-weight:600;color:#555;margin-bottom:0.6rem;display:block">Belopp *</label>
       <div id="verAmountLines">
-        <div class="ver-amount-line" style="display:grid;grid-template-columns:2fr 160px 240px;gap:16px;align-items:center;margin-bottom:0.6rem">
-          <input type="number" step="0.01" placeholder="Belopp inkl moms" class="ver-line-amount" oninput="updateVatBreakdown()" style="width:100%;min-height:44px;padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit;box-sizing:border-box">
-          <select class="ver-line-vat" onchange="updateVatBreakdown()" style="width:100%;min-height:44px;padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit;box-sizing:border-box">
-            <option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option>
-          </select>
-          <select class="ver-line-pay" style="width:100%;min-width:240px;min-height:44px;padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit;box-sizing:border-box;white-space:nowrap">
-            <option value="1930">1930 - Bank</option><option value="1940">1940 - BG</option><option value="1910">1910 - Kontant</option><option value="2440">2440 - Skuld</option><option value="1510">1510 - Kundfordran</option>
-          </select>
+        <div class="ver-amount-line" style="display:grid;grid-template-columns:2fr auto auto;gap:0.8rem;margin-bottom:0.6rem;align-items:center">
+          <input type="number" step="0.01" placeholder="Belopp inkl moms" class="ver-line-amount" oninput="updateVatBreakdown()" style="padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit">
+          <div style="display:flex;flex-direction:column;gap:0.3rem">
+            <label style="font-size:0.8rem;font-weight:600;color:#555">Moms</label>
+            <select class="ver-line-vat" onchange="updateVatBreakdown()" style="padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit;min-width:100px">
+              <option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.3rem">
+            <label style="font-size:0.8rem;font-weight:600;color:#555">Betalning</label>
+            <select class="ver-line-pay" style="padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-size:0.92rem;font-family:inherit;min-width:180px">
+              <option value="1930">1930 - Bank</option><option value="1940">1940 - BG</option><option value="1910">1910 - Kontant</option><option value="2440">2440 - Skuld</option><option value="1510">1510 - Kundfordran</option>
+            </select>
+          </div>
         </div>
       </div>
       <button onclick="addVerAmountLine()" style="font-size:0.8rem;color:var(--gold);background:none;border:1px dashed var(--gold-light);border-radius:6px;padding:0.4rem 0.9rem;cursor:pointer;margin-top:0.3rem;font-family:inherit">+ Rad med annan moms</button>
@@ -7785,9 +7780,7 @@ init();
       <button onclick="addManualVerRow()" style="font-size:0.82rem;color:var(--gold);background:none;border:1px dashed var(--gold-light);border-radius:6px;padding:0.4rem 0.9rem;cursor:pointer;margin-top:0.5rem;font-family:inherit">+ Lägg till rad</button>
     </div>
     <div class="field" style="margin-bottom:1.5rem"><label>Kvitto/underlag (valfritt)</label><input id="verFile" type="file" accept="image/*,.pdf" style="font-size:0.9rem;padding:0.6rem"></div>
-    <div style="display:flex;justify-content:center;width:100%;margin-top:24px">
-      <button onclick="saveVerification()" class="stripe-btn" style="width:100%;max-width:980px;height:60px;font-size:1rem">Spara verifikation</button>
-    </div>
+    <button onclick="saveVerification()" class="stripe-btn" style="width:100%;padding:0.85rem;font-size:1rem;margin-top:1rem">Spara verifikation</button>
   </div>
 </div>
 
