@@ -1509,7 +1509,9 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           </div>
           <div class="field"><label>Beskrivning</label><input id="suppDesc" placeholder="Vad gäller fakturan?"></div>
           <input type="hidden" id="suppEditId" value="">
-          <button class="stripe-btn" onclick="saveSupplierInvoice()" style="width:100%;margin-top:1rem">Spara leverantörsfaktura →</button>
+          <div style="text-align:center">
+            <button class="stripe-btn" onclick="saveSupplierInvoice()" style="width:100%;margin-top:1rem;padding:0.85rem;font-size:1rem">Spara leverantörsfaktura →</button>
+          </div>
         </div>
       </div>
 
@@ -7777,7 +7779,9 @@ init();
       <button onclick="addManualVerRow()" style="font-size:0.82rem;color:var(--gold);background:none;border:1px dashed var(--gold-light);border-radius:6px;padding:0.4rem 0.9rem;cursor:pointer;margin-top:0.5rem;font-family:inherit">+ Lägg till rad</button>
     </div>
     <div class="field" style="margin-bottom:1.5rem"><label>Kvitto/underlag (valfritt)</label><input id="verFile" type="file" accept="image/*,.pdf" style="font-size:0.9rem;padding:0.6rem"></div>
-    <button onclick="saveVerification()" class="stripe-btn" style="width:100%;margin-top:1rem;padding:0.85rem;font-size:1rem">Spara verifikation</button>
+    <div style="text-align:center">
+      <button onclick="saveVerification()" class="stripe-btn" style="width:100%;margin-top:1rem;padding:0.85rem;font-size:1rem">Spara verifikation</button>
+    </div>
   </div>
 </div>
 
