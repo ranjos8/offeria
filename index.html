@@ -5201,16 +5201,20 @@ async function initBookkeeping() {
   const yearNow = new Date().getFullYear();
   ['bkYear','bkHbYear','bkResYear','bkBalYear','bkMomsYear'].forEach(id => {
     const sel = document.getElementById(id);
-    if (!sel || sel.options.length > 1) return;
+    if (!sel) return;
+    const currentVal = sel.value;
     sel.innerHTML = '';
-    for (let y = yearNow; y >= yearNow - 3; y--) {
+    for (let y = yearNow; y >= yearNow - 5; y--) {
       sel.innerHTML += `<option value="${y}">${y}</option>`;
     }
+    if (currentVal) sel.value = currentVal;
   });
-  // Populate account selector for huvudbok
+  // Always refresh account selector for huvudbok (catches newly added accounts)
   const hbSel = document.getElementById('bkHbAccount');
-  if (hbSel && hbSel.options.length <= 1) {
+  if (hbSel) {
+    const hbVal = hbSel.value;
     hbSel.innerHTML = _bkAccounts.filter(a => a.is_active).map(a => `<option value="${a.account_number}">${a.account_number} – ${a.account_name}</option>`).join('');
+    if (hbVal) hbSel.value = hbVal;
   }
   loadBookkeeping();
 }
@@ -6068,13 +6072,14 @@ async function autoBookInvoices() {
     // Book payment (if paid and not already booked)
     if (i.status === 'paid' && !bookedIds.has(i.id + '_payment')) {
       const total = Math.abs(parseFloat(i.total_amount)) || 0;
-      const yr = new Date().getFullYear();
+      const payDate = (i.paid_at || new Date().toISOString()).slice(0, 10);
+      const yr = parseInt(payDate.slice(0, 4));
       const { data: numD } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: yr });
       const verNum = numD || 1;
 
       const { data: ver } = await sb.from('verifications').insert({
         user_id: currentUser.id, verification_number: verNum,
-        verification_date: new Date().toISOString().slice(0, 10),
+        verification_date: payDate,
         description: 'Betalning ' + (i.invoice_number || '') + ' – ' + (i.client_name || ''),
         source_type: 'payment', source_id: i.id, created_by: 'auto'
       }).select().single();
@@ -6128,7 +6133,11 @@ async function renderHuvudbok() {
 async function renderResultat() {
   const yr = document.getElementById('bkResYear')?.value || new Date().getFullYear();
   if (!currentUser) return;
-  const { data: allRows } = await sb.from('verification_rows').select('*, verifications!inner(verification_date)').eq('user_id', currentUser.id);
+  const { data: allRows } = await sb.from('verification_rows')
+    .select('*, verifications!inner(verification_date)')
+    .eq('user_id', currentUser.id)
+    .gte('verifications.verification_date', yr + '-01-01')
+    .lte('verifications.verification_date', yr + '-12-31');
   const filtered = (allRows || []).filter(r => r.verifications?.verification_date?.startsWith(yr));
   const saldoByAccount = {};
   filtered.forEach(r => {
@@ -6172,13 +6181,34 @@ async function renderResultat() {
 async function renderBalans() {
   const yr = document.getElementById('bkBalYear')?.value || new Date().getFullYear();
   if (!currentUser) return;
-  const { data: allRows } = await sb.from('verification_rows').select('*, verifications!inner(verification_date)').eq('user_id', currentUser.id);
+  const { data: allRows } = await sb.from('verification_rows')
+    .select('*, verifications!inner(verification_date)')
+    .eq('user_id', currentUser.id)
+    .lte('verifications.verification_date', yr + '-12-31');
   const filtered = (allRows || []).filter(r => r.verifications?.verification_date <= yr + '-12-31');
   const saldoByAccount = {};
   filtered.forEach(r => {
     if (!saldoByAccount[r.account_number]) saldoByAccount[r.account_number] = 0;
     saldoByAccount[r.account_number] += (parseFloat(r.debit) || 0) - (parseFloat(r.credit) || 0);
   });
+
+  // Beräkna årets resultat (klass 3-8 netto) och lägg på 2099
+  const ytdFiltered = filtered.filter(r => r.verifications?.verification_date?.startsWith(yr));
+  let aretResultat = 0;
+  ytdFiltered.forEach(r => {
+    const acc = parseInt(r.account_number);
+    if (acc >= 3000 && acc <= 8999) {
+      aretResultat += (parseFloat(r.credit) || 0) - (parseFloat(r.debit) || 0);
+    }
+  });
+  // Lägg årets resultat till konto 2099 om det inte redan finns (dvs årsavslut inte gjorts)
+  const existing2099 = saldoByAccount['2099'] || 0;
+  // Om årsavslut körts finns resultatet redan i 2099, annars lägg till beräknat
+  const hasClosing = filtered.some(r => r.account_number === '2099');
+  if (!hasClosing && aretResultat !== 0) {
+    saldoByAccount['2099'] = (saldoByAccount['2099'] || 0) - aretResultat;
+  }
+
   const fmt = n => Number(n).toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   const tillgangar = _bkAccounts.filter(a => a.account_class === 1);
   const skulder = _bkAccounts.filter(a => a.account_class === 2);
@@ -6196,7 +6226,18 @@ async function renderBalans() {
     const val = saldoByAccount[a.account_number] || 0;
     if (val !== 0) { totS += Math.abs(val); html += `<div style="display:flex;justify-content:space-between;padding:0.25rem 0;font-size:0.85rem"><span>${a.account_number} ${a.account_name}</span><span>${fmt(Math.abs(val))} kr</span></div>`; }
   });
+  // Visa årets resultat om årsavslut inte gjorts
+  if (!hasClosing && aretResultat !== 0) {
+    html += `<div style="display:flex;justify-content:space-between;padding:0.25rem 0;font-size:0.85rem;color:#888;font-style:italic"><span>2099 Årets resultat (beräknat)</span><span>${fmt(Math.abs(aretResultat))} kr</span></div>`;
+    totS += Math.abs(aretResultat);
+  }
   html += `<div style="display:flex;justify-content:space-between;padding:0.5rem 0;font-weight:700;border-top:2px solid var(--ink);margin-top:0.5rem">SUMMA<span>${fmt(totS)} kr</span></div></div>`;
+
+  // Balansvarnig om T ≠ EK+S
+  const diff = Math.abs(totT - totS);
+  if (diff > 1) {
+    html += `<div style="grid-column:1/-1;padding:0.6rem 1rem;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;font-size:0.82rem;color:#856404">⚠ Balansräkningen är inte i balans (diff: ${fmt(diff)} kr). Kontrollera att alla verifikationer är korrekt bokförda.</div>`;
+  }
   html += '</div>';
   document.getElementById('balansContent').innerHTML = html;
 }
@@ -6212,7 +6253,11 @@ async function renderMoms() {
   const endDt = new Date(parseInt(yr), parseInt(em), 0);
   const endD = yr + '-' + em + '-' + String(endDt.getDate()).padStart(2, '0');
 
-  const { data: allRows } = await sb.from('verification_rows').select('*, verifications!inner(verification_date)').eq('user_id', currentUser.id);
+  const { data: allRows } = await sb.from('verification_rows')
+    .select('*, verifications!inner(verification_date)')
+    .eq('user_id', currentUser.id)
+    .gte('verifications.verification_date', startD)
+    .lte('verifications.verification_date', endD);
   const filtered = (allRows || []).filter(r => r.verifications?.verification_date >= startD && r.verifications?.verification_date <= endD);
 
   // Build account saldos (credit - debit for skuld/intäkts-konton)
@@ -6226,20 +6271,27 @@ async function renderMoms() {
   const rev25 = saldo['3001'] || 0; // Försäljning 25%
   const rev12 = saldo['3002'] || 0; // Försäljning 12%
   const rev6  = saldo['3003'] || 0; // Försäljning 6%
-  const rev0  = saldo['3106'] || 0; // Momsfri försäljning
+  const rev0  = (saldo['3106'] || 0) + (saldo['3108'] || 0); // Momsfri försäljning
 
   // Utgående moms (försäljning)
   const utgMoms25 = saldo['2611'] || 0;
   const utgMoms12 = saldo['2621'] || 0;
   const utgMoms6  = saldo['2631'] || 0;
-  
+
+  // EU reverse charge — utgående moms (2614=tjänster, 2615=varor)
+  const utgMomsEuTjanst = saldo['2614'] || 0;  // Ruta 21
+  const utgMomsEuVara   = saldo['2615'] || 0;  // Ruta 22
+
+  // EU reverse charge — ingående moms (2645=beräknad ingående)
+  const ingMomsEu = -(saldo['2645'] || 0);      // Ruta 23
+
   // Ingående moms (inköp) - summera alla tre satser
   const ingMoms25 = -(saldo['2640'] || 0); // 25% (debit = positive)
   const ingMoms12 = -(saldo['2641'] || 0); // 12%
   const ingMoms6  = -(saldo['2642'] || 0); // 6%
-  const ingMoms   = ingMoms25 + ingMoms12 + ingMoms6;
+  const ingMoms   = ingMoms25 + ingMoms12 + ingMoms6 + ingMomsEu;
 
-  const totalUtg = utgMoms25 + utgMoms12 + utgMoms6;
+  const totalUtg = utgMoms25 + utgMoms12 + utgMoms6 + utgMomsEuTjanst + utgMomsEuVara;
   const momsAttBetala = totalUtg - ingMoms;
 
   const fmt = n => Number(Math.round(n)).toLocaleString('sv-SE');
@@ -6250,7 +6302,9 @@ async function renderMoms() {
     yr, period, sm, em,
     rev25: fmtRaw(rev25), rev12: fmtRaw(rev12), rev6: fmtRaw(rev6), rev0: fmtRaw(rev0),
     utgMoms25: fmtRaw(utgMoms25), utgMoms12: fmtRaw(utgMoms12), utgMoms6: fmtRaw(utgMoms6),
+    utgMomsEuTjanst: fmtRaw(utgMomsEuTjanst), utgMomsEuVara: fmtRaw(utgMomsEuVara),
     ingMoms25: fmtRaw(ingMoms25), ingMoms12: fmtRaw(ingMoms12), ingMoms6: fmtRaw(ingMoms6),
+    ingMomsEu: fmtRaw(ingMomsEu),
     ingMoms: fmtRaw(ingMoms), momsAttBetala: fmtRaw(momsAttBetala)
   };
 
@@ -6280,12 +6334,15 @@ async function renderMoms() {
   html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">10</span>Utgående moms 25%</span><span>${fmt(utgMoms25)} kr</span></div>`;
   html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">11</span>Utgående moms 12%</span><span>${fmt(utgMoms12)} kr</span></div>`;
   html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">12</span>Utgående moms 6%</span><span>${fmt(utgMoms6)} kr</span></div>`;
+  if (utgMomsEuTjanst !== 0) html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">21</span>Utgående moms EU-tjänster (reverse charge)</span><span>${fmt(utgMomsEuTjanst)} kr</span></div>`;
+  if (utgMomsEuVara !== 0)   html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">22</span>Utgående moms EU-varor (reverse charge)</span><span>${fmt(utgMomsEuVara)} kr</span></div>`;
 
   // Section: Ingående moms
   html += '<div style="font-weight:600;font-size:0.78rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;margin:1rem 0 0.5rem">C. Ingående moms</div>';
   html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">30</span>Ingående moms 25%</span><span style="color:#2e7d32">${fmt(ingMoms25)} kr</span></div>`;
   html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">31</span>Ingående moms 12%</span><span style="color:#2e7d32">${fmt(ingMoms12)} kr</span></div>`;
   html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">32</span>Ingående moms 6%</span><span style="color:#2e7d32">${fmt(ingMoms6)} kr</span></div>`;
+  if (ingMomsEu !== 0) html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">23</span>Ingående moms EU (reverse charge)</span><span style="color:#2e7d32">${fmt(ingMomsEu)} kr</span></div>`;
   html += `<div style="${rowStyle}"><span><span style="${rutaStyle}">48</span>Total ingående moms</span><span style="color:#2e7d32;font-weight:600">${fmt(ingMoms)} kr</span></div>`;
 
   // Summary
@@ -6354,6 +6411,12 @@ function exportSRU() {
   if (d.utgMoms12 !== 0) blankSru += '#UPPGIFT 6609 ' + d.utgMoms12 + '\n';
   // Ruta 12: Utgående moms 6%
   if (d.utgMoms6 !== 0) blankSru += '#UPPGIFT 6610 ' + d.utgMoms6 + '\n';
+  // Ruta 21: Utgående moms EU-tjänster (reverse charge)
+  if (d.utgMomsEuTjanst !== 0) blankSru += '#UPPGIFT 6617 ' + d.utgMomsEuTjanst + '\n';
+  // Ruta 22: Utgående moms EU-varor (reverse charge)
+  if (d.utgMomsEuVara !== 0) blankSru += '#UPPGIFT 6618 ' + d.utgMomsEuVara + '\n';
+  // Ruta 23: Ingående moms EU (reverse charge)
+  if (d.ingMomsEu !== 0) blankSru += '#UPPGIFT 6619 ' + d.ingMomsEu + '\n';
   // Ruta 48: Ingående moms
   if (d.ingMoms !== 0) blankSru += '#UPPGIFT 6636 ' + d.ingMoms + '\n';
   // Ruta 49: Moms att betala/tillbaka
