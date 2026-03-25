@@ -1754,7 +1754,19 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
               <option value="07">Juli</option><option value="08">Augusti</option><option value="09">September</option>
               <option value="10">Oktober</option><option value="11">November</option><option value="12">December</option>
             </select>
+            <input id="bkSearch" type="text" placeholder="Sök verifikation..." oninput="renderGrundbok()" style="padding:0.5rem 0.8rem;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem;min-width:160px;flex:1;max-width:240px">
             <button onclick="openNewVerification()" class="gen-btn" style="padding:0.5rem 1.2rem;font-size:0.85rem">+ Ny verifikation</button>
+            <button onclick="openReceiptScan()" class="gen-btn" style="padding:0.5rem 1rem;font-size:0.85rem;background:#2e7d32;border-color:#2e7d32"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></span> Fota kvitto</button>
+            <button onclick="autoBookInvoices()" class="gen-btn" style="padding:0.5rem 1rem;font-size:0.8rem;background:var(--teal);border-color:var(--teal)" title="Bokför automatiskt alla obokförda fakturor och betalningar"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span> Autobokför</button>
+            <div style="margin-left:auto;display:flex;gap:0.4rem">
+              <button onclick="exportSIE4()" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem" title="Exportera SIE4-fil för revisor eller annat bokföringsprogram"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> SIE-export</button>
+              <button onclick="lockCurrentPeriod()" id="bkLockBtn" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem;display:none" title="Lås vald period — förhindrar ändringar"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span> Lås period</button>
+              <button onclick="closeYear()" id="bkCloseYearBtn" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem;display:none" title="Stäng räkenskapsår — nollställ resultaträkning mot eget kapital"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span> Årsavslut</button>
+              <button onclick="importSIE4()" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem" title="Importera SIE-fil från annat bokföringsprogram"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> SIE-import</button>
+            </div>
+          </div>
+          <div id="grundbokContent"><div style="padding:2rem;text-align:center;color:#aaa">Laddar...</div></div>
+        </div>
             <button onclick="openReceiptScan()" class="gen-btn" style="padding:0.5rem 1rem;font-size:0.85rem;background:#2e7d32;border-color:#2e7d32"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></span> Fota kvitto</button>
             <button onclick="autoBookInvoices()" class="gen-btn" style="padding:0.5rem 1rem;font-size:0.8rem;background:var(--teal);border-color:var(--teal)" title="Bokför automatiskt alla obokförda fakturor och betalningar"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span> Autobokför</button>
             <div style="margin-left:auto;display:flex;gap:0.4rem">
@@ -1803,6 +1815,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
               <option value="all">Helår</option>
             </select>
             <button onclick="exportSRU()" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem;margin-left:auto" title="Exportera SRU-fil för Skatteverket"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> SRU-export</button>
+            <button onclick="printMomsReport()" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem" title="Skriv ut / spara som PDF"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span> Skriv ut / PDF</button>
           </div>
           <div id="momsContent"></div>
         </div>
@@ -2215,16 +2228,10 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
     <div class="ai-suggestions" id="aiSuggestions">
       <div class="ai-suggestions-title">Vanliga frågor:</div>
-      <div class="ai-suggestion-buttons">
-        <button class="ai-suggestion-btn" onclick="askSuggestion('Hur bokför jag en leverantörsfaktura?')">
-          Hur bokför jag en leverantörsfaktura?
-        </button>
-        <button class="ai-suggestion-btn" onclick="askSuggestion('Kan jag dra av inköp av en kontorstol?')">
-          Kan jag dra av inköp av en kontorstol?
-        </button>
-        <button class="ai-suggestion-btn" onclick="askSuggestion('Hur fungerar moms vid olika typer av försäljning?')">
-          Hur fungerar moms vid olika typer av försäljning?
-        </button>
+      <div class="ai-suggestion-buttons" id="aiSuggestionButtons">
+        <button class="ai-suggestion-btn" onclick="askSuggestion('Hur bokför jag en leverantörsfaktura?')">Hur bokför jag en leverantörsfaktura?</button>
+        <button class="ai-suggestion-btn" onclick="askSuggestion('Vad är skillnaden mellan kontantmetoden och fakturametoden?')">Kontantmetoden vs fakturametoden?</button>
+        <button class="ai-suggestion-btn" onclick="askSuggestion('Hur fungerar moms vid EU-inköp (reverse charge)?')">Moms vid EU-inköp?</button>
       </div>
     </div>
 
@@ -4727,24 +4734,29 @@ async function loadDashboard() {
 
     // === ATT GÖRA-LISTA ===
     let todos = [];
-    // Overdue invoices
+    // Förfallna kundfakturor
     inv.filter(i => i.status !== 'paid' && i.status !== 'draft' && i.status !== 'credited' && i.status !== 'credit_note' && i.due_date && i.due_date < today).forEach(i => {
       const days = Math.floor((Date.now() - new Date(i.due_date)) / 86400000);
-      todos.push({ color: '#c62828', text: `Förfallen faktura: ${i.invoice_number || ''} – ${i.client_name || 'Okänd'} (${days} dagar)`, action: 'Visa', page: 'invoices' });
+      todos.push({ color: '#c62828', text: `Förfallen kundfaktura: ${i.invoice_number || ''} – ${i.client_name || 'Okänd'} (${days} dagar sedan)`, action: 'Visa', page: 'invoices' });
     });
-    // Supplier invoices due within 7 days
+    // Förfallna leverantörsfakturor (egna, tydligt röda)
+    supp.filter(s => s.status !== 'paid' && s.due_date && s.due_date < today).forEach(s => {
+      const days = Math.floor((Date.now() - new Date(s.due_date)) / 86400000);
+      todos.push({ color: '#c62828', text: `⚠ Förfallen leverantörsfaktura: ${s.supplier_name} – ${fmt(s.total_amount)} kr (${days} dagar)`, action: 'Betala', page: 'suppliers' });
+    });
+    // Leverantörsfakturor som förfaller inom 7 dagar
     const in7days = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
-    supp.filter(s => s.status !== 'paid' && s.due_date && s.due_date <= in7days).forEach(s => {
+    supp.filter(s => s.status !== 'paid' && s.due_date && s.due_date >= today && s.due_date <= in7days).forEach(s => {
       const days = Math.floor((new Date(s.due_date) - Date.now()) / 86400000);
-      const label = days < 0 ? `${Math.abs(days)} dagar förfallen` : days === 0 ? 'idag' : `om ${days} dagar`;
-      todos.push({ color: '#e65100', text: `Betala: ${s.supplier_name} – ${fmt(s.total_amount)} (förfaller ${label})`, action: 'Visa', page: 'suppliers' });
+      const label = days === 0 ? 'idag' : `om ${days} dag${days > 1 ? 'ar' : ''}`;
+      todos.push({ color: '#e65100', text: `Betala leverantör: ${s.supplier_name} – ${fmt(s.total_amount)} kr (förfaller ${label})`, action: 'Visa', page: 'suppliers' });
     });
-    // Quotes awaiting signature
+    // Offerter som väntar på svar
     q.filter(r => r.share_id && (!r.signature_status || r.signature_status === 'pending')).forEach(r => {
       const days = Math.floor((Date.now() - new Date(r.created_at)) / 86400000);
       if (days >= 3) todos.push({ color: 'var(--gold)', text: `Väntar på svar: ${r.client_name || 'Okänd'} – ${r.title || 'Offert'} (${days} dagar)`, action: 'Visa', page: 'generate' });
     });
-    // Draft invoices
+    // Fakturautkast
     inv.filter(i => i.status === 'draft').forEach(i => {
       todos.push({ color: '#888', text: `Utkast: ${i.title || 'Faktura'} – ${i.client_name || 'Okänd'}`, action: 'Bekräfta', page: 'invoices' });
     });
@@ -4861,12 +4873,74 @@ function renderCustomers(list) {
     return;
   }
   el.innerHTML = list.map(c => `
-    <div class="cust-card" onclick="editCustomer('${c.id}')">
+    <div class="cust-card" onclick="viewCustomer('${c.id}')">
       <div class="cust-name">${c.name}</div>
       <div class="cust-info">${[c.email, c.phone, c.address].filter(Boolean).join(' · ') || 'Inga uppgifter'}</div>
       ${c.notes ? `<div class="cust-info" style="font-style:italic;margin-top:0.2rem">${c.notes}</div>` : ''}
     </div>
   `).join('');
+}
+
+async function viewCustomer(id) {
+  const c = _customersData.find(x => x.id === id);
+  if (!c) return;
+
+  // Hämta fakturor och offerter kopplade till kunden
+  const [{ data: invs }, { data: quotes }] = await Promise.all([
+    sb.from('invoices').select('invoice_number,total_amount,status,created_at').eq('user_id', currentUser.id).ilike('client_name', `%${c.name}%`).order('created_at', { ascending: false }).limit(20),
+    sb.from('quotes').select('title,total_amount,created_at').eq('user_id', currentUser.id).ilike('client_name', `%${c.name}%`).order('created_at', { ascending: false }).limit(10)
+  ]);
+
+  const fmt = n => Number(n || 0).toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  const statusLabel = s => ({ draft:'Utkast', sent:'Skickad', paid:'Betald', overdue:'Förfallen', credited:'Krediterad' }[s] || s);
+  const statusColor = s => ({ paid:'#2e7d32', overdue:'#c62828', sent:'#b8902e', draft:'#888', credited:'#555' }[s] || '#888');
+
+  const totalFakturerat = (invs || []).filter(i => i.status !== 'draft').reduce((s, i) => s + parseFloat(i.total_amount || 0), 0);
+  const totalBetalt = (invs || []).filter(i => i.status === 'paid').reduce((s, i) => s + parseFloat(i.total_amount || 0), 0);
+
+  const invHtml = (invs || []).length === 0 ? '<div style="color:#aaa;font-size:0.85rem;padding:0.5rem 0">Inga fakturor</div>' :
+    (invs || []).map(i => `<div style="display:flex;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid var(--border);font-size:0.85rem">
+      <span>Faktura ${i.invoice_number || '–'} <span style="font-size:0.72rem;color:${statusColor(i.status)}">${statusLabel(i.status)}</span></span>
+      <span style="font-weight:600">${fmt(i.total_amount)} kr</span>
+    </div>`).join('');
+
+  const qHtml = (quotes || []).length === 0 ? '<div style="color:#aaa;font-size:0.85rem;padding:0.5rem 0">Inga offerter</div>' :
+    (quotes || []).map(q => `<div style="display:flex;justify-content:space-between;padding:0.35rem 0;border-bottom:1px solid var(--border);font-size:0.85rem">
+      <span>${q.title || 'Offert'} <span style="font-size:0.72rem;color:#888">${(q.created_at||'').slice(0,10)}</span></span>
+      <span style="font-weight:600">${fmt(q.total_amount)} kr</span>
+    </div>`).join('');
+
+  const popup = document.createElement('div');
+  popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center;padding:1rem';
+  popup.onclick = e => { if (e.target === popup) popup.remove(); };
+  popup.innerHTML = `<div style="background:white;border-radius:14px;max-width:560px;width:100%;padding:1.8rem;box-shadow:0 20px 60px rgba(0,0,0,0.3);max-height:90vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.2rem">
+      <div>
+        <h3 style="margin:0;font-size:1.2rem">${c.name}</h3>
+        <div style="font-size:0.82rem;color:#888;margin-top:0.3rem">${[c.email, c.phone, c.address].filter(Boolean).join(' · ') || ''}</div>
+      </div>
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <button onclick="editCustomer('${c.id}');this.closest('[style*=position]').remove()" style="background:none;border:1px solid var(--border);border-radius:6px;padding:0.3rem 0.7rem;cursor:pointer;font-size:0.8rem;font-family:inherit">Redigera</button>
+        <button onclick="this.closest('[style*=position]').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#999">✕</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1.2rem">
+      <div style="background:#f5f5f3;border-radius:8px;padding:0.8rem;text-align:center">
+        <div style="font-size:1.1rem;font-weight:700;color:#2e7d32">${fmt(totalBetalt)} kr</div>
+        <div style="font-size:0.72rem;color:#888">Totalt betalt</div>
+      </div>
+      <div style="background:#f5f5f3;border-radius:8px;padding:0.8rem;text-align:center">
+        <div style="font-size:1.1rem;font-weight:700;color:var(--gold)">${fmt(totalFakturerat)} kr</div>
+        <div style="font-size:0.72rem;color:#888">Totalt fakturerat</div>
+      </div>
+    </div>
+    <div style="font-weight:600;font-size:0.82rem;color:#555;margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.05em">Fakturor</div>
+    ${invHtml}
+    <div style="font-weight:600;font-size:0.82rem;color:#555;margin:1rem 0 0.5rem;text-transform:uppercase;letter-spacing:0.05em">Offerter</div>
+    ${qHtml}
+    ${c.notes ? `<div style="margin-top:1rem;padding:0.7rem 0.9rem;background:#fffaee;border-radius:8px;font-size:0.83rem;color:#666;font-style:italic">${c.notes}</div>` : ''}
+  </div>`;
+  document.body.appendChild(popup);
 }
 function filterCustomers() {
   const q = document.getElementById('customerSearch').value.toLowerCase();
@@ -5195,6 +5269,9 @@ async function initBookkeeping() {
     s.onload = () => { window._tesseractLoaded = true; };
     document.head.appendChild(s);
   }
+  // NOTE: Supabase migration required once:
+  // ALTER TABLE supplier_invoices ADD COLUMN IF NOT EXISTS vat_pct integer DEFAULT 25;
+
   // Initialize chart of accounts if first time
   if (!_bkInitialized) {
     const { data: accounts } = await sb.from('chart_of_accounts').select('*').eq('user_id', currentUser.id).order('sort_order');
@@ -5221,7 +5298,7 @@ async function initBookkeeping() {
     if (!sel) return;
     const currentVal = sel.value;
     sel.innerHTML = '';
-    for (let y = yearNow; y >= yearNow - 5; y--) {
+    for (let y = yearNow; y >= yearNow - 10; y--) {
       sel.innerHTML += `<option value="${y}">${y}</option>`;
     }
     if (currentVal) sel.value = currentVal;
@@ -5395,22 +5472,58 @@ async function closeYear() {
 
 function renderGrundbok() {
   const el = document.getElementById('grundbokContent');
-  if (_bkVerifications.length === 0) {
-    el.innerHTML = '<div style="padding:2rem;text-align:center;color:#aaa"><div style="margin-bottom:0.5rem"><span class="ico" style="font-size:1.5rem;color:var(--gold)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span></div><p>Inga verifikationer ännu.</p><p style="font-size:0.8rem;margin-top:0.3rem">Klicka <strong>+ Ny verifikation</strong> för att börja bokföra eller <strong>Autobokför</strong> för att bokföra dina fakturor automatiskt.</p></div>';
+  const q = (document.getElementById('bkSearch')?.value || '').toLowerCase().trim();
+
+  // Filter by search query
+  let vers = _bkVerifications;
+  if (q) {
+    vers = vers.filter(v => {
+      if (v.description?.toLowerCase().includes(q)) return true;
+      if (('v' + v.verification_number).includes(q)) return true;
+      if (v.verification_date?.includes(q)) return true;
+      const rows = _bkRows.filter(r => r.verification_id === v.id);
+      return rows.some(r => r.account_number?.includes(q) ||
+        (_bkAccounts.find(a => a.account_number === r.account_number)?.account_name?.toLowerCase().includes(q)));
+    });
+  }
+
+  if (vers.length === 0) {
+    el.innerHTML = q
+      ? `<div style="padding:2rem;text-align:center;color:#aaa">Inga verifikationer matchar "<strong>${q}</strong>".</div>`
+      : '<div style="padding:2rem;text-align:center;color:#aaa"><div style="margin-bottom:0.5rem"><span class="ico" style="font-size:1.5rem;color:var(--gold)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span></div><p>Inga verifikationer ännu.</p><p style="font-size:0.8rem;margin-top:0.3rem">Klicka <strong>+ Ny verifikation</strong> för att börja bokföra eller <strong>Autobokför</strong> för att bokföra dina fakturor automatiskt.</p></div>';
     return;
   }
+
   const fmt = n => Number(n).toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+  // Paginering — 50 verifikationer per sida (BFL kräver att hela perioden ska kunna presenteras; paginering är UI-hjälp)
+  const PAGE_SIZE = 50;
+  const totalPages = Math.ceil(vers.length / PAGE_SIZE);
+  if (!window._bkPage || window._bkPage > totalPages) window._bkPage = 1;
+  const page = window._bkPage;
+  const pageVers = vers.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  // Summering för hela perioden (inte bara sidan) — BFL kräver att summor är tillgängliga
+  const allRows = _bkRows.filter(r => vers.some(v => v.id === r.verification_id));
+  const grandDebet  = allRows.reduce((s, r) => s + (parseFloat(r.debit)  || 0), 0);
+  const grandKredit = allRows.reduce((s, r) => s + (parseFloat(r.credit) || 0), 0);
+
   // Desktop table
-  let html = '<table class="history-table bk-desktop-table"><thead><tr><th>Nr</th><th>Datum</th><th>Beskrivning</th><th style="text-align:right">Debet</th><th style="text-align:right">Kredit</th><th></th></tr></thead><tbody>';
-  _bkVerifications.forEach(v => {
+  let html = `<div style="font-size:0.8rem;color:#888;margin-bottom:0.5rem">
+    ${q ? `<strong>${vers.length}</strong> träffar · ` : `<strong>${vers.length}</strong> verifikationer · `}
+    Summa debet: <strong>${fmt(grandDebet)} kr</strong> · Summa kredit: <strong>${fmt(grandKredit)} kr</strong>
+    ${Math.abs(grandDebet - grandKredit) > 0.01 ? `<span style="color:#c62828;font-weight:600"> ⚠ Ej balans (diff ${fmt(Math.abs(grandDebet-grandKredit))} kr)</span>` : ''}
+  </div>`;
+
+  html += '<table class="history-table bk-desktop-table"><thead><tr><th>Nr</th><th>Datum</th><th>Beskrivning</th><th style="text-align:right">Debet</th><th style="text-align:right">Kredit</th><th></th></tr></thead><tbody>';
+  pageVers.forEach(v => {
     const rows = _bkRows.filter(r => r.verification_id === v.id);
     const totalDebet = rows.reduce((s, r) => s + parseFloat(r.debit || 0), 0);
     const isLocked = v.is_locked;
     html += `<tr style="background:${isLocked ? '#f9f9f7' : 'white'}">
       <td style="font-weight:700;font-size:0.8rem;white-space:nowrap">V${v.verification_number}</td>
       <td style="white-space:nowrap;font-size:0.8rem">${v.verification_date}</td>
-      <td>${v.description}${v.source_type !== 'manual' ? ' <span style="font-size:0.65rem;background:var(--cream);padding:0.1rem 0.4rem;border-radius:4px;color:var(--gold)">' + v.source_type + '</span>' : ''}${isLocked ? ' <span class="ico" style="font-size:0.7em;color:#999"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>' : ''}</td>
+      <td>${v.description}${v.source_type !== 'manual' ? ` <span style="font-size:0.65rem;background:var(--cream);padding:0.1rem 0.4rem;border-radius:4px;color:var(--gold)">${v.source_type}</span>` : ''}${isLocked ? ' <span class="ico" style="font-size:0.7em;color:#999"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>' : ''}</td>
       <td style="text-align:right;font-size:0.82rem">${fmt(totalDebet)}</td>
       <td style="text-align:right;font-size:0.82rem">${fmt(totalDebet)}</td>
       <td><button onclick="viewVerification('${v.id}')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:0.2rem 0.5rem;cursor:pointer;font-size:0.72rem;font-family:inherit;color:var(--gold)">Visa</button></td>
@@ -5422,33 +5535,49 @@ function renderGrundbok() {
         <td style="text-align:right">${parseFloat(r.credit) > 0 ? fmt(r.credit) : ''}</td><td></td></tr>`;
     });
   });
+  // Summeringsrad längst ner
+  html += `<tr style="border-top:2px solid var(--border);font-weight:700;font-size:0.82rem">
+    <td colspan="3" style="padding:0.5rem 0.4rem">Totalt (${vers.length} ver.)</td>
+    <td style="text-align:right;padding:0.5rem 0.4rem">${fmt(grandDebet)}</td>
+    <td style="text-align:right;padding:0.5rem 0.4rem">${fmt(grandKredit)}</td>
+    <td></td>
+  </tr>`;
   html += '</tbody></table>';
+
+  // Paginering UI
+  if (totalPages > 1) {
+    html += `<div style="display:flex;gap:0.4rem;align-items:center;margin-top:0.8rem;font-size:0.83rem">`;
+    html += `<button onclick="window._bkPage=Math.max(1,${page}-1);renderGrundbok()" ${page===1?'disabled':''} class="btn-sm btn-outline" style="padding:0.2rem 0.6rem">‹</button>`;
+    for (let p = 1; p <= totalPages; p++) {
+      if (p === 1 || p === totalPages || Math.abs(p - page) <= 1) {
+        html += `<button onclick="window._bkPage=${p};renderGrundbok()" class="btn-sm ${p===page?'gen-btn':'btn-outline'}" style="padding:0.2rem 0.6rem;min-width:28px">${p}</button>`;
+      } else if (Math.abs(p - page) === 2) {
+        html += `<span style="color:#aaa">…</span>`;
+      }
+    }
+    html += `<button onclick="window._bkPage=Math.min(${totalPages},${page}+1);renderGrundbok()" ${page===totalPages?'disabled':''} class="btn-sm btn-outline" style="padding:0.2rem 0.6rem">›</button>`;
+    html += `<span style="color:#888;margin-left:0.3rem">Sida ${page} av ${totalPages} (${PAGE_SIZE} per sida)</span></div>`;
+  }
 
   // Mobile cards
   html += '<div class="bk-mobile-cards">';
-  _bkVerifications.forEach(v => {
+  pageVers.forEach(v => {
     const rows = _bkRows.filter(r => r.verification_id === v.id);
     const totalDebet = rows.reduce((s, r) => s + parseFloat(r.debit || 0), 0);
     const isLocked = v.is_locked;
     const lockIcon = isLocked ? ' <span style="color:#999;font-size:0.7em">🔒</span>' : '';
     const srcBadge = v.source_type !== 'manual' ? `<span style="font-size:0.62rem;background:var(--cream);padding:0.1rem 0.4rem;border-radius:4px;color:var(--gold);margin-left:0.3rem">${v.source_type}</span>` : '';
     html += `<div class="bk-card" onclick="viewVerification('${v.id}')">
-      <div class="bk-card-top">
-        <span class="bk-card-nr">V${v.verification_number}</span>
-        <span class="bk-card-date">${v.verification_date}</span>
-      </div>
+      <div class="bk-card-top"><span class="bk-card-nr">V${v.verification_number}</span><span class="bk-card-date">${v.verification_date}</span></div>
       <div class="bk-card-desc">${v.description}${srcBadge}${lockIcon}</div>
       <div class="bk-card-rows">`;
     rows.forEach(r => {
       const accName = _bkAccounts.find(a => a.account_number === r.account_number)?.account_name || '';
-      const d = parseFloat(r.debit) || 0;
-      const c = parseFloat(r.credit) || 0;
+      const d = parseFloat(r.debit) || 0, c = parseFloat(r.credit) || 0;
       const fmtShort = n => Number(n).toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
       html += `<div class="bk-card-row"><span>${r.account_number} ${accName}</span><span>${d > 0 ? fmtShort(d) + ' D' : fmtShort(c) + ' K'}</span></div>`;
     });
-    html += `</div>
-      <div class="bk-card-total"><span>Summa</span><span>${Number(totalDebet).toLocaleString('sv-SE', {minimumFractionDigits:0, maximumFractionDigits:0})} kr</span></div>
-    </div>`;
+    html += `</div><div class="bk-card-total"><span>Summa</span><span>${Number(totalDebet).toLocaleString('sv-SE', {minimumFractionDigits:0, maximumFractionDigits:0})} kr</span></div></div>`;
   });
   html += '</div>';
 
@@ -5984,12 +6113,14 @@ function viewVerification(id) {
     return `<tr><td style="padding:0.4rem">${r.account_number} ${acc?.account_name || ''}</td><td style="text-align:right;padding:0.4rem">${parseFloat(r.debit) > 0 ? fmt(r.debit) : ''}</td><td style="text-align:right;padding:0.4rem">${parseFloat(r.credit) > 0 ? fmt(r.credit) : ''}</td></tr>`;
   }).join('');
 
-  const canDelete = !v.is_locked && v.source_type === 'manual';
-  const deleteBtn = canDelete
-    ? `<button onclick="deleteVerification('${v.id}', this)" style="background:none;border:1px solid #e05;color:#e05;border-radius:6px;padding:0.35rem 0.8rem;font-size:0.8rem;cursor:pointer;font-family:inherit">🗑 Radera</button>`
+  const canCorrect = !v.is_locked;
+  const isManual = v.source_type === 'manual';
+  // Enligt BFL: verifikationer får inte raderas eller ändras — rättelse görs via rättelseverifikation
+  const correctBtn = canCorrect
+    ? `<button onclick="openCorrectionVerification('${v.id}', this)" style="background:none;border:1px solid #e65100;color:#e65100;border-radius:6px;padding:0.35rem 0.8rem;font-size:0.8rem;cursor:pointer;font-family:inherit" title="Skapar en motbokning enligt bokföringslagen">↩ Rätta</button>`
     : '';
-  const lockedNote = v.is_locked ? '<span style="font-size:0.75rem;color:#999;background:#f5f5f5;padding:0.2rem 0.6rem;border-radius:4px">🔒 Låst – kan ej raderas</span>' : '';
-  const autoNote = !v.is_locked && v.source_type !== 'manual' ? '<span style="font-size:0.75rem;color:#999;background:#f5f5f5;padding:0.2rem 0.6rem;border-radius:4px">Autobokförd – radera ej</span>' : '';
+  const lockedNote = v.is_locked ? '<span style="font-size:0.75rem;color:#999;background:#f5f5f5;padding:0.2rem 0.6rem;border-radius:4px">🔒 Låst period</span>' : '';
+  const lawNote = '<span style="font-size:0.72rem;color:#888">BFL: rättelse sker via motbokning</span>';
 
   const popup = document.createElement('div');
   popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center';
@@ -6011,22 +6142,68 @@ function viewVerification(id) {
     </table>
     ${v.attachment_url ? `<div style="margin-top:1rem"><a href="#" onclick="downloadReceipt('${v.attachment_url}');return false" style="color:var(--gold);font-size:0.85rem">📎 Visa kvitto</a></div>` : ''}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.2rem;padding-top:0.8rem;border-top:1px solid var(--border)">
-      <div style="display:flex;gap:0.5rem;align-items:center">${lockedNote}${autoNote}</div>
-      ${deleteBtn}
+      <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">${lockedNote}${lawNote}</div>
+      ${correctBtn}
     </div>
   </div>`;
   document.body.appendChild(popup);
 }
 
-async function deleteVerification(id, btn) {
-  if (!confirm('Radera denna verifikation permanent?\n\nDetta kan inte ångras.')) return;
+async function openCorrectionVerification(id, btn) {
+  const v = _bkVerifications.find(x => x.id === id);
+  if (!v) return;
+  const rows = _bkRows.filter(r => r.verification_id === id);
+
+  const msg = `Rätta verifikation V${v.verification_number}?\n\n` +
+    `Enligt bokföringslagen (BFL 5 kap.) sker rättelse genom en motbokning — ` +
+    `en ny rättelseverifikation som väger upp den felaktiga.\n\n` +
+    `En rättelseverifikation skapas med omvända debet/kredit. ` +
+    `Bokför sedan rätt verifikation manuellt.\n\nFortsätt?`;
+
+  if (!confirm(msg)) return;
   btn.disabled = true;
-  btn.textContent = 'Raderar...';
-  await sb.from('verification_rows').delete().eq('verification_id', id);
-  const { error } = await sb.from('verifications').delete().eq('id', id);
-  if (error) { alert('Kunde inte radera: ' + error.message); btn.disabled = false; btn.textContent = '🗑 Radera'; return; }
+  btn.textContent = 'Skapar rättelse...';
+
+  const yr = parseInt(v.verification_date.slice(0, 4));
+  await sb.from('fiscal_years').upsert(
+    { user_id: currentUser.id, start_date: yr + '-01-01', end_date: yr + '-12-31' },
+    { onConflict: 'user_id,start_date', ignoreDuplicates: true }
+  );
+
+  const { data: numD } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: new Date().getFullYear() });
+  const verNum = numD || 1;
+  const today = new Date().toISOString().slice(0, 10);
+
+  const { data: ver, error } = await sb.from('verifications').insert({
+    user_id: currentUser.id,
+    verification_number: verNum,
+    verification_date: today,
+    description: `Rättelse av V${v.verification_number} – ${v.description}`,
+    source_type: 'correction',
+    created_by: currentUser.email
+  }).select().single();
+
+  if (error || !ver) { alert('Kunde inte skapa rättelse: ' + (error?.message || '')); btn.disabled = false; btn.textContent = '↩ Rätta'; return; }
+
+  // Omvända debet/kredit
+  await sb.from('verification_rows').insert(
+    rows.map(r => ({
+      verification_id: ver.id,
+      user_id: currentUser.id,
+      account_number: r.account_number,
+      debit: parseFloat(r.credit) || 0,
+      credit: parseFloat(r.debit) || 0
+    }))
+  );
+
+  await sb.from('bookkeeping_audit_log').insert({
+    user_id: currentUser.id, action: 'correction', entity_type: 'verification',
+    entity_id: ver.id, details: { corrects: id, original_number: v.verification_number }
+  });
+
   btn.closest('[style*=position]').remove();
-  loadBookkeeping();
+  await loadBookkeeping();
+  alert(`✓ Rättelseverifikation V${verNum} skapad (${today}).\n\nBokför nu rätt verifikation med + Ny verifikation.`);
 }
 
 async function downloadReceipt(path) {
@@ -6292,10 +6469,16 @@ async function renderBalans() {
   }
   html += `<div style="display:flex;justify-content:space-between;padding:0.5rem 0;font-weight:700;border-top:2px solid var(--ink);margin-top:0.5rem">SUMMA<span>${fmt(totS)} kr</span></div></div>`;
 
-  // Balansvarnig om T ≠ EK+S
+  // Balansvarning
   const diff = Math.abs(totT - totS);
   if (diff > 1) {
-    html += `<div style="grid-column:1/-1;padding:0.6rem 1rem;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;font-size:0.82rem;color:#856404">⚠ Balansräkningen är inte i balans (diff: ${fmt(diff)} kr). Kontrollera att alla verifikationer är korrekt bokförda.</div>`;
+    html += `<div style="grid-column:1/-1;padding:1rem 1.2rem;background:#fff3cd;border:1.5px solid #e65100;border-radius:10px;margin-top:0.5rem">
+      <div style="font-weight:700;color:#c62828;font-size:0.95rem;margin-bottom:0.3rem">⚠ Balansräkningen är inte i balans</div>
+      <div style="font-size:0.85rem;color:#5d4037">Tillgångar: <strong>${fmt(totT)} kr</strong> · Eget kapital &amp; skulder: <strong>${fmt(totS)} kr</strong> · Differens: <strong>${fmt(diff)} kr</strong></div>
+      <div style="font-size:0.78rem;color:#888;margin-top:0.4rem">Vanliga orsaker: saknade rättelseverifikationer, pågående period utan årsavslut, eller import med felaktiga IB-värden. Kontrollera att årets resultat syns under Eget kapital.</div>
+    </div>`;
+  } else {
+    html += `<div style="grid-column:1/-1;padding:0.5rem 1rem;background:#e8f5e9;border:1px solid #81c784;border-radius:8px;margin-top:0.5rem;font-size:0.82rem;color:#2e7d32;font-weight:600">✓ Balansräkningen balanserar (${fmt(totT)} kr)</div>`;
   }
   html += '</div>';
   document.getElementById('balansContent').innerHTML = html;
@@ -6495,6 +6678,67 @@ function exportSRU() {
   URL.revokeObjectURL(url);
 }
 
+// ===== MOMSRAPPORT PDF/PRINT =====
+function printMomsReport() {
+  const content = document.getElementById('momsContent')?.innerHTML;
+  if (!content || !window._momsData) {
+    alert('Generera momsrapporten först genom att välja år och period.');
+    return;
+  }
+  const d = window._momsData;
+  const p = currentProfile || {};
+  const periodLabel = { q1: 'Januari–Mars', q2: 'April–Juni', q3: 'Juli–September', q4: 'Oktober–December', all: 'Helår' }[d.period] || d.period;
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="utf-8">
+    <title>Momsdeklaration ${periodLabel} ${d.yr} – ${p.company_name || ''}</title>
+    <style>
+      body { font-family: Arial, sans-serif; font-size: 13px; color: #111; max-width: 560px; margin: 2rem auto; padding: 1rem; }
+      h2 { font-size: 1rem; margin-bottom: 0.2rem; }
+      .sub { font-size: 0.8rem; color: #666; margin-bottom: 1.5rem; }
+      .row { display: flex; justify-content: space-between; padding: 0.35rem 0; border-bottom: 1px solid #e0e0e0; }
+      .section-title { font-weight: bold; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: #555; margin: 1rem 0 0.4rem; border-bottom: 2px solid #111; padding-bottom: 0.2rem; }
+      .ruta { font-size: 0.65rem; background: #f5f0e0; padding: 1px 5px; border-radius: 3px; margin-right: 6px; font-weight: bold; }
+      .total { font-weight: bold; font-size: 1rem; padding: 0.8rem 0; border-top: 2px solid #111; margin-top: 0.5rem; }
+      .footer { margin-top: 2rem; font-size: 0.75rem; color: #888; border-top: 1px solid #ddd; padding-top: 0.8rem; }
+      @media print { body { margin: 0; } }
+    </style>
+  </head><body>
+    <h2>MOMSDEKLARATION – SKV 4700</h2>
+    <div class="sub">${periodLabel} ${d.yr} &nbsp;·&nbsp; ${p.company_name || ''} &nbsp;·&nbsp; ${p.org_number || ''}</div>
+
+    <div class="section-title">A. Momspliktig försäljning</div>
+    <div class="row"><span><span class="ruta">05</span>Försäljning 25%</span><span>${Number(d.rev25).toLocaleString('sv-SE')} kr</span></div>
+    <div class="row"><span><span class="ruta">06</span>Försäljning 12%</span><span>${Number(d.rev12).toLocaleString('sv-SE')} kr</span></div>
+    <div class="row"><span><span class="ruta">07</span>Försäljning 6%</span><span>${Number(d.rev6).toLocaleString('sv-SE')} kr</span></div>
+    <div class="row"><span><span class="ruta">08</span>Momsfri försäljning</span><span>${Number(d.rev0).toLocaleString('sv-SE')} kr</span></div>
+
+    <div class="section-title">B. Utgående moms</div>
+    <div class="row"><span><span class="ruta">10</span>Utgående moms 25%</span><span>${Number(d.utgMoms25).toLocaleString('sv-SE')} kr</span></div>
+    <div class="row"><span><span class="ruta">11</span>Utgående moms 12%</span><span>${Number(d.utgMoms12).toLocaleString('sv-SE')} kr</span></div>
+    <div class="row"><span><span class="ruta">12</span>Utgående moms 6%</span><span>${Number(d.utgMoms6).toLocaleString('sv-SE')} kr</span></div>
+    ${d.utgMomsEuTjanst ? `<div class="row"><span><span class="ruta">21</span>Utgående moms EU-tjänster</span><span>${Number(d.utgMomsEuTjanst).toLocaleString('sv-SE')} kr</span></div>` : ''}
+    ${d.utgMomsEuVara   ? `<div class="row"><span><span class="ruta">22</span>Utgående moms EU-varor</span><span>${Number(d.utgMomsEuVara).toLocaleString('sv-SE')} kr</span></div>` : ''}
+
+    <div class="section-title">C. Ingående moms</div>
+    <div class="row"><span><span class="ruta">30</span>Ingående moms 25%</span><span>${Number(d.ingMoms25).toLocaleString('sv-SE')} kr</span></div>
+    <div class="row"><span><span class="ruta">31</span>Ingående moms 12%</span><span>${Number(d.ingMoms12).toLocaleString('sv-SE')} kr</span></div>
+    <div class="row"><span><span class="ruta">32</span>Ingående moms 6%</span><span>${Number(d.ingMoms6).toLocaleString('sv-SE')} kr</span></div>
+    ${d.ingMomsEu ? `<div class="row"><span><span class="ruta">23</span>Ingående moms EU (reverse charge)</span><span>${Number(d.ingMomsEu).toLocaleString('sv-SE')} kr</span></div>` : ''}
+    <div class="row"><span><span class="ruta">48</span>Total ingående moms</span><span>${Number(d.ingMoms).toLocaleString('sv-SE')} kr</span></div>
+
+    <div class="total" style="color:${d.momsAttBetala >= 0 ? '#c62828' : '#2e7d32'}">
+      <span><span class="ruta">49</span>${d.momsAttBetala >= 0 ? 'Moms att betala' : 'Moms att få tillbaka'}</span>
+      <span style="float:right">${Math.abs(d.momsAttBetala).toLocaleString('sv-SE')} kr</span>
+    </div>
+
+    <div class="footer">Genererad av Offeria &nbsp;·&nbsp; ${new Date().toLocaleDateString('sv-SE')} &nbsp;·&nbsp; Offeria är inte ansvarigt för deklarationens riktighet – kontrollera alltid med Skatteverket.</div>
+    <script>window.onload = function(){ window.print(); }<\/script>
+  </body></html>`);
+  win.document.close();
+}
+
 // ===== KONTOPLAN =====
 function renderKontoplan() {
   const q = (document.getElementById('bkAccountSearch')?.value || '').toLowerCase();
@@ -6621,12 +6865,14 @@ function openNewSupplierInvoice() {
   document.getElementById('suppCategory').value = 'material';
   document.getElementById('suppDesc').value = '';
   document.getElementById('suppEditId').value = '';
+  document.querySelector('#suppInvOverlay .modal > div[style*="Fraunces"]').textContent = 'Ny leverantörsfaktura';
   document.getElementById('suppInvOverlay').style.display = 'flex';
 }
 
 function editSupplierInvoice(idx) {
   const s = _supplierData[idx];
   if (!s) return;
+  document.querySelector('#suppInvOverlay .modal > div[style*="Fraunces"]').textContent = 'Redigera leverantörsfaktura';
   document.getElementById('suppName').value = s.supplier_name || '';
   document.getElementById('suppInvNr').value = s.invoice_number || '';
   document.getElementById('suppDate').value = s.invoice_date || '';
@@ -7549,16 +7795,19 @@ function parseBankCSV(text, filename) {
     return -1;
   }
 
-  const colDate   = findCol('bokföringsdag', 'bokf.dag', 'datum', 'date', 'transaktionsdatum', 'värdedag');
-  const colDesc   = findCol('text', 'beskrivning', 'rubrik', 'avsändare', 'mottagare', 'kommentar', 'transaktion', 'meddelande');
-  const colAmount = findCol('belopp', 'amount', 'summa', 'kronor', 'transaktionsbelopp');
+  const colDate   = findCol('bokföringsdag', 'bokf.dag', 'bokföringsdatum', 'datum', 'date', 'transaktionsdatum', 'värdedag', 'kontoföringsdag');
+  const colDesc   = findCol('text', 'beskrivning', 'rubrik', 'avsändare', 'mottagare', 'kommentar', 'transaktion', 'meddelande', 'referens', 'avi', 'namn');
+  // Swedbank separates debit/credit into two columns — check for those first
+  const colDebit  = findCol('uttag', 'debet', 'debit');
+  const colCredit = findCol('insättning', 'kredit', 'credit', 'inbetalning');
+  const colAmount = colDebit !== -1 || colCredit !== -1 ? -1 : findCol('belopp', 'amount', 'summa', 'kronor', 'transaktionsbelopp', 'belopp (sek)');
 
-  if (colDate === -1 || colAmount === -1) {
+  // Validation: need date + (amount OR debit/credit columns)
+  if (colDate === -1 || (colAmount === -1 && colDebit === -1 && colCredit === -1)) {
     alert('Kunde inte tolka kolumner.\nHittade: ' + headers.join(', ') + '\n\nExportera filen som CSV direkt från din internetbank.');
     return;
   }
 
-  // Build duplicate detection set from existing verifications
   const existingKeys = new Set((_bkVerifications || []).map(v =>
     (v.description || '') + '|' + (v.verification_date || '')
   ));
@@ -7566,13 +7815,27 @@ function parseBankCSV(text, filename) {
   const rows = [];
   for (let i = headerIdx + 1; i < lines.length; i++) {
     const cols = splitLine(lines[i]);
-    if (cols.length < Math.max(colDate, colAmount) + 1) continue;
+    if (cols.length < 2) continue;
 
     let dateRaw = (cols[colDate] || '').trim();
     let descRaw = colDesc !== -1 ? (cols[colDesc] || '').trim() : '';
-    let amtRaw  = (cols[colAmount] || '').trim();
+    let amount;
 
-    // Normalise date formats: YYYY-MM-DD, YYYYMMDD, DD/MM/YYYY, DD-MM-YYYY
+    if (colDebit !== -1 || colCredit !== -1) {
+      const debitRaw  = colDebit  !== -1 ? (cols[colDebit]  || '').trim() : '';
+      const creditRaw = colCredit !== -1 ? (cols[colCredit] || '').trim() : '';
+      const debitVal  = parseFloat(debitRaw.replace(/\s/g, '').replace(',', '.'))  || 0;
+      const creditVal = parseFloat(creditRaw.replace(/\s/g, '').replace(',', '.')) || 0;
+      if (debitVal > 0)       amount = -debitVal;
+      else if (creditVal > 0) amount = creditVal;
+      else continue;
+    } else {
+      const amtRaw   = (cols[colAmount] || '').trim();
+      const amtClean = amtRaw.replace(/\s/g, '').replace(',', '.');
+      amount = parseFloat(amtClean);
+      if (isNaN(amount) || amount === 0) continue;
+    }
+
     let date = dateRaw.replace(/\//g, '-');
     if (/^\d{8}$/.test(date))
       date = date.slice(0,4) + '-' + date.slice(4,6) + '-' + date.slice(6,8);
@@ -7580,31 +7843,25 @@ function parseBankCSV(text, filename) {
       date = date.slice(6,10) + '-' + date.slice(3,5) + '-' + date.slice(0,2);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
 
-    // Normalise amount: Swedish thousands separator = space, decimal = comma
-    const amtClean = amtRaw.replace(/\s/g, '').replace(',', '.');
-    const amount = parseFloat(amtClean);
-    if (isNaN(amount) || amount === 0) continue;
-
     const desc = descRaw || (amount > 0 ? 'Inbetalning' : 'Utbetalning');
     const isDuplicate = existingKeys.has(desc + '|' + date);
 
-    // Suggest motkonto based on keywords
     const dl = desc.toLowerCase();
     let suggested = '';
-    if      (dl.includes('lön') || dl.includes('salary'))                                        suggested = '7010';
-    else if (dl.includes('skatteverket') || dl.includes('skatt'))                                suggested = '2510';
-    else if (dl.includes('moms'))                                                                suggested = '2650';
-    else if (dl.includes('hyra'))                                                                suggested = '5010';
+    if      (dl.includes('lön') || dl.includes('salary'))                                         suggested = '7010';
+    else if (dl.includes('skatteverket') || dl.includes('skatt'))                                 suggested = '2510';
+    else if (dl.includes('moms'))                                                                  suggested = '2650';
+    else if (dl.includes('hyra'))                                                                  suggested = '5010';
     else if (dl.includes('telefon') || dl.includes('tele2') || dl.includes('telia') || dl.includes('telenor')) suggested = '6210';
     else if (dl.includes('försäkring') || dl.includes('if ') || dl.includes('trygg') || dl.includes('folksam')) suggested = '6310';
-    else if (dl.includes('el ') || dl.includes('vattenfall') || dl.includes('fortum'))           suggested = '5020';
-    else if (dl.includes('okq8') || dl.includes('preem') || dl.includes('circle k') || dl.includes('st1'))    suggested = '5610';
-    else if (dl.includes('swish') && amount > 0)                                                 suggested = '3001';
-    else if (dl.includes('bankgiro') || dl.includes('plusgiro'))                                 suggested = amount > 0 ? '3001' : '6990';
-    else if (amount > 0)                                                                         suggested = '3001'; // Inkomst → Försäljning
-    else                                                                                         suggested = '6990'; // Utgift → Övriga kostnader
+    else if (dl.includes('el ') || dl.includes('vattenfall') || dl.includes('fortum'))            suggested = '5020';
+    else if (dl.includes('okq8') || dl.includes('preem') || dl.includes('circle k') || dl.includes('st1'))     suggested = '5610';
+    else if (dl.includes('swish') && amount > 0)                                                  suggested = '3001';
+    else if (dl.includes('bankgiro') || dl.includes('plusgiro'))                                  suggested = amount > 0 ? '3001' : '6990';
+    else if (amount > 0)                                                                          suggested = '3001';
+    else                                                                                          suggested = '6990';
 
-    rows.push({ date, desc, amount, suggested, isDuplicate, include: !isDuplicate });
+    rows.push({ date, desc, amount, suggested, isDuplicate, include: !isDuplicate, vatPct: 0 });
   }
 
   if (rows.length === 0) {
@@ -7622,10 +7879,19 @@ function renderBankImportTable() {
   if (!tbody) return;
   const accounts = (_bkAccounts || []);
 
-  // Build account options once
   const accOptions = accounts.map(a =>
     `<option value="${a.account_number}">${a.account_number} – ${a.account_name}</option>`
   ).join('');
+
+  // Update table header to include VAT column
+  const thead = tbody.closest('table')?.querySelector('thead tr');
+  if (thead && !thead.querySelector('.bank-vat-th')) {
+    const vatTh = document.createElement('th');
+    vatTh.className = 'bank-vat-th';
+    vatTh.style.cssText = 'padding:0.5rem 0.4rem;width:80px';
+    vatTh.textContent = 'Moms';
+    thead.children[4].after(vatTh);
+  }
 
   tbody.innerHTML = rows.map((r, i) => {
     const amtStyle = r.amount > 0 ? 'color:#2e7d32;font-weight:600' : 'color:#c62828;font-weight:600';
@@ -7633,23 +7899,25 @@ function renderBankImportTable() {
     const badge    = r.isDuplicate
       ? '<span style="font-size:0.72rem;background:#fff3cd;color:#856404;padding:2px 6px;border-radius:4px;white-space:nowrap">Dubblett?</span>'
       : '<span style="font-size:0.72rem;background:#e8f5e9;color:#2e7d32;padding:2px 6px;border-radius:4px">Ny</span>';
-
-    // Inject selected attribute into the matching option
     const opts = accOptions.replace(`value="${r.suggested}"`, `value="${r.suggested}" selected`);
+    const vatPct = r.vatPct ?? 0;
 
     return `<tr style="border-bottom:1px solid var(--border);${r.isDuplicate ? 'opacity:0.55' : ''}">
-      <td style="padding:0.4rem 0.3rem">
-        <input type="checkbox" ${r.include ? 'checked' : ''}
-          onchange="_bankImportRows[${i}].include=this.checked;_updateBankSummary()">
-      </td>
+      <td style="padding:0.4rem 0.3rem"><input type="checkbox" ${r.include ? 'checked' : ''} onchange="_bankImportRows[${i}].include=this.checked;_updateBankSummary()"></td>
       <td style="padding:0.4rem 0.3rem;white-space:nowrap">${r.date}</td>
-      <td style="padding:0.4rem 0.3rem;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.desc}">${r.desc}</td>
+      <td style="padding:0.4rem 0.3rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.desc}">${r.desc}</td>
       <td style="padding:0.4rem 0.3rem;text-align:right;white-space:nowrap"><span style="${amtStyle}">${amtStr}</span></td>
       <td style="padding:0.4rem 0.3rem">
-        <select onchange="_bankImportRows[${i}].suggested=this.value"
-          style="width:100%;padding:0.3rem 0.4rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.79rem">
-          <option value="">– välj konto –</option>
-          ${opts}
+        <select onchange="_bankImportRows[${i}].suggested=this.value" style="width:100%;padding:0.3rem 0.4rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.79rem">
+          <option value="">– välj konto –</option>${opts}
+        </select>
+      </td>
+      <td style="padding:0.4rem 0.3rem">
+        <select onchange="_bankImportRows[${i}].vatPct=parseInt(this.value)" style="width:100%;padding:0.3rem 0.3rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.79rem">
+          <option value="0" ${vatPct===0?'selected':''}>0%</option>
+          <option value="6" ${vatPct===6?'selected':''}>6%</option>
+          <option value="12" ${vatPct===12?'selected':''}>12%</option>
+          <option value="25" ${vatPct===25?'selected':''}>25%</option>
         </select>
       </td>
       <td style="padding:0.4rem 0.3rem">${badge}</td>
@@ -7709,18 +7977,42 @@ async function bankImportCommit() {
     const { data: numD } = await sb.rpc('get_next_verification_number', { p_user_id: uid, p_year: yr });
     const verNum = numD || 1;
     const absAmt = Math.abs(row.amount);
+    const vatPct = row.vatPct || 0;
 
-    // Positive = pengar in på bankkontot → debit bankkonto, credit motkonto
-    // Negative = pengar ut → debit motkonto, credit bankkonto
-    const verRows = row.amount > 0
-      ? [
-          { account_number: bankAccount,   debit: absAmt, credit: 0 },
-          { account_number: row.suggested, debit: 0,      credit: absAmt }
-        ]
-      : [
-          { account_number: row.suggested, debit: absAmt, credit: 0 },
-          { account_number: bankAccount,   debit: 0,      credit: absAmt }
-        ];
+    // Bygg verifikationsrader med eventuell momssplit
+    let verRows;
+    if (vatPct > 0 && row.amount < 0) {
+      // Utgift med moms — dela upp i netto + ingående moms
+      const netto = Math.round(absAmt / (1 + vatPct / 100) * 100) / 100;
+      const moms  = Math.round((absAmt - netto) * 100) / 100;
+      const vatAcc = vatPct === 25 ? '2640' : vatPct === 12 ? '2641' : '2642';
+      verRows = [
+        { account_number: row.suggested, debit: netto, credit: 0 },
+        { account_number: vatAcc,        debit: moms,  credit: 0 },
+        { account_number: bankAccount,   debit: 0,     credit: absAmt }
+      ];
+    } else if (vatPct > 0 && row.amount > 0) {
+      // Inkomst med moms — dela upp i netto + utgående moms
+      const netto = Math.round(absAmt / (1 + vatPct / 100) * 100) / 100;
+      const moms  = Math.round((absAmt - netto) * 100) / 100;
+      const vatAcc = vatPct === 25 ? '2611' : vatPct === 12 ? '2621' : '2631';
+      verRows = [
+        { account_number: bankAccount,   debit: absAmt, credit: 0 },
+        { account_number: row.suggested, debit: 0,      credit: netto },
+        { account_number: vatAcc,        debit: 0,      credit: moms }
+      ];
+    } else {
+      // Ingen momssplit — enkel debet/kredit
+      verRows = row.amount > 0
+        ? [
+            { account_number: bankAccount,   debit: absAmt, credit: 0 },
+            { account_number: row.suggested, debit: 0,      credit: absAmt }
+          ]
+        : [
+            { account_number: row.suggested, debit: absAmt, credit: 0 },
+            { account_number: bankAccount,   debit: 0,      credit: absAmt }
+          ];
+    }
 
     const { data: ver, error } = await sb.from('verifications').insert({
       user_id: uid,
@@ -7825,37 +8117,37 @@ async function sendAIMessage() {
       accounts_count: _bkAccounts?.length || 0
     };
 
-    const systemPrompt = `Du är en expert bokföringsassistent för svenska småföretag i appen Offeria.
+    const systemPrompt = `Du är en bokföringsassistent för svenska småföretag i Offeria. Du svarar ENDAST på frågor om bokföring, redovisning, moms och bokföringslagen (BFL 1999:1078). Avvisa artigt frågor utanför detta område.
 
-OFFERIA BOKFÖRING – AKTUELLA FUNKTIONER (${new Date().getFullYear()}):
-• Grundbok: verifikationer med löpnummer, datum, beskrivning, debet/kredit per konto
-• Kategorier: Försäljning (25%/12%/6%/0%), Material (4010), Underentreprenör (4600), Drivmedel (5610), Bil (5615), Hyra (5010), Verktyg (5410), Kontorsmaterial (6110), Porto (6250), Telefon (6210), IT/Programvara (6540), Reklam (5910), Redovisning (6530), Försäkring (6310), Bankkostnad (6570), Representation (6070, 50% momsavdrag), Lön (7010+7510), Eget kapital, EU reverse charge
-• Momskonton: Utgående 2611/2621/2631, Ingående 2640/2641/2642
-• Leverantörsfakturor: kontant- och fakturametoden, momssats väljs (25%/12%/6%/0%)
-• Kvittoskanning: AI-OCR med automatisk kategori och belopp, korrekt momskonto per sats
-• Autobokföring: bokför fakturor och betalningar automatiskt med korrekt datum
-• Bankimport: importera CSV från SEB, Swedbank, Handelsbanken, Nordea
-• SIE4-export och SIE4-import (kompatibelt med Fortnox, Bokio, Visma)
-• SRU-export för momsdeklaration (SKV 4700) inkl. EU reverse charge ruta 21/22/23
-• Perioder kan låsas. Årsavslut stänger räkenskapsår och för resultat till 2099
-• Balansräkning visar årets resultat automatiskt även utan årsavslut
-• Resultaträkning inkluderar finansiella poster (klass 8)
-• BAS-kontoplanen 2026 används som standard
-• Radera-funktion för olåsta manuella verifikationer
+FOKUSOMRÅDEN (svara bara på dessa):
+- Bokföringslagen (BFL), god redovisningssed, BAS-kontoplanen 2026
+- Hur man bokför specifika händelser i Offeria
+- Moms: utgående/ingående, EU reverse charge, SKV 4700
+- Debet/kredit, verifikationer, rättelseverifikationer
+- Resultat- och balansräkning, årsavslut
+- Leverantörsfakturor, faktura- vs kontantmetoden
 
-AKTUELL KONTEXT FÖR ANVÄNDAREN:
-Företag: ${context.company_name} (${context.org_number})
-År: ${context.year} | Verifikationer: ${context.verifications_count}
-Intäkter: ${context.intakter_kr} kr | Kostnader: ${context.kostnader_kr} kr | Resultat: ${context.resultat_kr} kr
-Moms att betala: ${context.moms_att_betala_kr} kr
-Kontoplan: ${context.accounts_count} konton
+AKTUELL KONTEXT:
+Företag: ${context.company_name} | År: ${context.year}
+Verifikationer: ${context.verifications_count} | Intäkter: ${context.intakter_kr} kr | Kostnader: ${context.kostnader_kr} kr
+Resultat: ${context.resultat_kr} kr | Moms att betala: ${context.moms_att_betala_kr} kr
 
-REGLER:
-- Svara alltid på svenska
-- Var konkret och praktisk — ge direkta svar, inte långa utläggningar
-- Om du hänvisar till konton, använd alltid kontonummer (t.ex. "konto 1930")
-- Påminn om att kontakta revisor vid komplexa skattefrågor
-- Du kan INTE ändra bokföringen direkt — hänvisa till rätt funktion i appen`;
+SVARSFORMAT — använd alltid detta:
+- Svara på svenska, kortfattat och konkret
+- Använd **fetstil** för viktiga begrepp och kontonummer
+- Använd numrerade listor (1. 2. 3.) för steg-för-steg
+- Använd punktlistor (- ) för alternativ eller uppräkningar  
+- Använd ### för rubrik om svaret har flera delar
+- Håll varje svar under 300 ord om möjligt
+- Hänvisa alltid till kontonummer: t.ex. **konto 1930** eller **2640**
+- Avsluta alltid med en kort not om revisor vid komplexa skattefrågor
+
+LAGAR ATT KÄNNA TILL:
+- BFL 5 kap: verifikationer får inte raderas — rättelse via rättelseverifikation (motbokning)
+- BFL: löpande bokföring, kontanta transaktioner senast nästa arbetsdag
+- Momslagen: utgående moms 2611/2621/2631, ingående 2640/2641/2642
+- Representation: 50% momsavdrag (konto 6070)
+- Arkivering: 7 år (BFL 7 kap.)`;
 
     const { data, error } = await sb.functions.invoke('super-task', {
       body: {
@@ -7894,33 +8186,46 @@ function addMessageToChat(role, content) {
   const messagesDiv = document.getElementById('aiChatMessages');
   const messageDiv = document.createElement('div');
   messageDiv.className = `ai-message ${role}`;
-  
+
   const avatar = document.createElement('div');
   avatar.className = 'ai-message-avatar';
   avatar.textContent = role === 'user' ? '👤' : '🤖';
-  
+
   const contentDiv = document.createElement('div');
   contentDiv.className = 'ai-message-content';
-  
-  // Konvertera markdown-liknande formatering till HTML
-  const formattedContent = content
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/\n- /g, '<li>')
-    .replace(/(<li>.*?)(?=\n|$)/g, '$1</li>');
-  
-  // Om det finns list items, wrap i ul
-  if (formattedContent.includes('<li>')) {
-    contentDiv.innerHTML = '<p>' + formattedContent.replace(/(<li>.*?<\/li>)+/g, '<ul>$&</ul>') + '</p>';
+
+  if (role === 'assistant') {
+    // Rikt markdown → HTML med radbrytningar och listor
+    let html = content
+      // Rubriker ### och ##
+      .replace(/^### (.+)$/gm, '<h4 style="margin:0.8rem 0 0.3rem;font-size:0.9rem;font-weight:700;color:var(--gold)">$1</h4>')
+      .replace(/^## (.+)$/gm, '<h3 style="margin:0.8rem 0 0.3rem;font-size:0.95rem;font-weight:700">$1</h3>')
+      // Fet text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      // Kursiv
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      // Inline kod
+      .replace(/`([^`]+)`/g, '<code style="background:#f0ede6;padding:1px 4px;border-radius:3px;font-size:0.88em;font-family:monospace">$1</code>')
+      // Numrerade listor: "1. " i början av rad
+      .replace(/^\d+\. (.+)$/gm, '<li style="margin:0.2rem 0">$1</li>')
+      // Punktlistor: "- " eller "• " i början av rad
+      .replace(/^[-•] (.+)$/gm, '<li style="margin:0.2rem 0">$1</li>')
+      // Wrap på li-sekvenser
+      .replace(/(<li[^>]*>.*?<\/li>\n?)+/gs, match => `<ul style="margin:0.4rem 0 0.4rem 1rem;padding:0">${match}</ul>`)
+      // Dubbla radbrytningar → nytt stycke
+      .replace(/\n\n+/g, '</p><p style="margin:0.5rem 0">')
+      // Enkla radbrytningar → <br>
+      .replace(/\n/g, '<br>');
+
+    contentDiv.innerHTML = `<p style="margin:0">${html}</p>`;
   } else {
-    contentDiv.innerHTML = '<p>' + formattedContent + '</p>';
+    contentDiv.textContent = content;
+    contentDiv.style.cssText = 'white-space:pre-wrap;word-break:break-word';
   }
-  
+
   messageDiv.appendChild(avatar);
   messageDiv.appendChild(contentDiv);
   messagesDiv.appendChild(messageDiv);
-  
-  // Scrolla till botten
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
@@ -7984,15 +8289,50 @@ async function getBookkeepingContext() {
 function updateAIChatVisibility() {
   const widget = document.getElementById('aiChatWidget');
   const currentPage = document.querySelector('.app-page.active');
-  
+
   if (currentPage && currentPage.id === 'page-bookkeeping') {
     widget.style.display = 'block';
+    updateAISuggestions();
   } else {
     widget.style.display = 'none';
-    // Stäng panelen om den är öppen
     const panel = document.getElementById('aiChatPanel');
     if (panel) panel.classList.remove('active');
   }
+}
+
+function updateAISuggestions() {
+  const btn = document.getElementById('aiSuggestionButtons');
+  if (!btn) return;
+
+  // Bygg kontextbaserade suggestions
+  const suggestions = [];
+
+  // Kolla aktuell period
+  const yr = document.getElementById('bkYear')?.value || new Date().getFullYear();
+  const mo = document.getElementById('bkMonth')?.value || 'all';
+
+  // Moms — föreslå momsrelaterat om moms är beräknad
+  if (window._momsData?.momsAttBetala > 0) {
+    suggestions.push(`Hur och när ska jag redovisa moms för ${yr}?`);
+  } else if (window._momsData?.momsAttBetala < 0) {
+    suggestions.push(`Jag har moms att få tillbaka — hur fungerar det?`);
+  } else {
+    suggestions.push('Hur fungerar moms vid EU-inköp (reverse charge)?');
+  }
+
+  // Verifikationer — om det finns verifikationer, föreslå rättelse
+  if (_bkVerifications?.length > 0) {
+    suggestions.push('Hur rättar jag en felaktig verifikation enligt bokföringslagen?');
+  } else {
+    suggestions.push('Hur bokför jag en leverantörsfaktura?');
+  }
+
+  // Alltid en generell BFL-fråga
+  suggestions.push('Vad säger bokföringslagen om arkivering av verifikationer?');
+
+  btn.innerHTML = suggestions.map(s =>
+    `<button class="ai-suggestion-btn" onclick="askSuggestion('${s.replace(/'/g, "\\'")}')">${s}</button>`
+  ).join('');
 }
 
 init();
