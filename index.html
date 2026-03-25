@@ -8518,7 +8518,7 @@ SVARSFORMAT:
       }
     } catch(e) {}
 
-    // Anropa Anthropic direkt via super-task med explicit system prompt
+    // Anropa super-task — systemprompt och RAG hanteras nu korrekt i edge-funktionen
     const { data: { session } } = await sb.auth.getSession();
     const aiRes = await fetch('https://yfnmmcrvzcwcinwopnlj.supabase.co/functions/v1/super-task', {
       method: 'POST',
@@ -8528,9 +8528,6 @@ SVARSFORMAT:
       },
       body: JSON.stringify({
         task: 'bookkeeping_assistant',
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 800,
-        system: ragPrefix + systemPrompt,
         question: question,
         history: aiChatHistory.slice(-6),
         context: context
@@ -8538,12 +8535,10 @@ SVARSFORMAT:
     });
     if (!aiRes.ok) throw new Error('Edge Function error: ' + aiRes.status);
     const data = await aiRes.json();
-    const error = null;
-
-    if (error) throw error;
+    if (data.error) throw new Error(data.error);
 
     removeTypingIndicator(typingId);
-    const answer = data?.answer || data?.content?.[0]?.text || 'Inget svar från AI.';
+    const answer = data?.answer || 'Inget svar från AI.';
     addMessageToChat('assistant', answer);
 
     // Spara i historik
