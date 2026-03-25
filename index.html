@@ -8506,36 +8506,44 @@ SVARSFORMAT:
 - Revisorsnot vid komplexa skattefrågor`
 
     // ── RAG: Sök i kunskapsdatabasen ──
-    let ragSystem = systemPrompt;
+    let ragPrefix = '';
     try {
       const { data: knowledgeRows } = await sb.rpc('search_bookkeeping_knowledge', {
         query: question,
         max_results: 2
       });
       if (knowledgeRows && knowledgeRows.length > 0) {
-        // Lägg RAG FÖRST i systemprompt — högst prioritet
-        const ragText = knowledgeRows.map(r =>
-          `Fråga: ${r.question}\nKORREKT SVAR: ${r.answer}`
-        ).join('\n---\n');
-        ragSystem = 'RÄTT SVAR FRÅN OFFERIA — FÖLJ EXAKT, ÄNDRA INGET:\n' +
-          ragText + '\n\n' + systemPrompt;
+        ragPrefix = 'RÄTT SVAR FRÅN OFFERIA — FÖLJ EXAKT:\n' +
+          knowledgeRows.map(r => r.answer).join('\n---\n') + '\n\n';
       }
     } catch(e) {}
 
-    const { data, error } = await sb.functions.invoke('super-task', {
-      body: {
+    // Anropa Anthropic direkt via super-task med explicit system prompt
+    const { data: { session } } = await sb.auth.getSession();
+    const aiRes = await fetch('https://yfnmmcrvzcwcinwopnlj.supabase.co/functions/v1/super-task', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token}`
+      },
+      body: JSON.stringify({
         task: 'bookkeeping_assistant',
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
+        system: ragPrefix + systemPrompt,
         question: question,
         history: aiChatHistory.slice(-6),
-        context: context,
-        system: ragSystem
-      }
+        context: context
+      })
     });
+    if (!aiRes.ok) throw new Error('Edge Function error: ' + aiRes.status);
+    const data = await aiRes.json();
+    const error = null;
 
     if (error) throw error;
 
     removeTypingIndicator(typingId);
-    const answer = data?.answer || 'Inget svar från AI.';
+    const answer = data?.answer || data?.content?.[0]?.text || 'Inget svar från AI.';
     addMessageToChat('assistant', answer);
 
     // Spara i historik
