@@ -4419,10 +4419,17 @@ async function goToStripe() {
   btn.disabled = true;
   errEl.style.display = 'none';
   try {
-    const { data: { session } } = await sb.auth.getSession();
+    let { data: { session } } = await sb.auth.getSession();
+    if (!session) {
+      const { data: refreshData } = await sb.auth.refreshSession();
+      session = refreshData?.session;
+    }
+    if (!session?.access_token) {
+      throw new Error('Du måste vara inloggad för att uppgradera.');
+    }
     const res = await fetch('https://yfnmmcrvzcwcinwopnlj.supabase.co/functions/v1/stripe-payments', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
       body: JSON.stringify({
         action: 'create_checkout',
         plan: plan,
@@ -4439,7 +4446,7 @@ async function goToStripe() {
   } catch(e) {
     errEl.textContent = e.message;
     errEl.style.display = 'block';
-    btn.textContent = 'Starta gratis provperiod \u2192';
+    btn.textContent = 'Starta gratis provperiod →';
     btn.disabled = false;
   }
 }
