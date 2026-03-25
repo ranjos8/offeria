@@ -4176,7 +4176,9 @@ function openQuoteModal() {
   document.getElementById('quoteModalOverlay').classList.add('open');
 }
 function closeQuoteModal() {
-  document.getElementById('quoteModalOverlay').classList.remove('open');
+  const el = document.getElementById('quoteModalOverlay');
+  el.classList.remove('open');
+  el.style.display = '';
 }
 
 async function saveQuoteEdits() {
@@ -8503,13 +8505,30 @@ SVARSFORMAT:
 - Steg-för-steg med nummer, hänvisa alltid till kategorinamnet i Offeria
 - Revisorsnot vid komplexa skattefrågor`
 
+    // ── RAG: Sök i kunskapsdatabasen först ──
+    let knowledgeContext = '';
+    try {
+      const { data: knowledgeRows } = await sb.rpc('search_bookkeeping_knowledge', {
+        query: question,
+        max_results: 3
+      });
+      if (knowledgeRows && knowledgeRows.length > 0) {
+        knowledgeContext = '\n\nVERIFIERADE SVAR FRÅN OFFERIA KUNSKAPSDATABAS (använd dessa framför allt annat):\n' +
+          knowledgeRows.map((r, i) =>
+            `--- Svar ${i+1} [${r.category}] ---\nFråga: ${r.question}\nSvar: ${r.answer}`
+          ).join('\n\n');
+      }
+    } catch(e) {
+      // Kunskapsdatabasen ej tillgänglig — fortsätt med systemprompt
+    }
+
     const { data, error } = await sb.functions.invoke('super-task', {
       body: {
         task: 'bookkeeping_assistant',
         question: question,
-        history: aiChatHistory.slice(-6), // skicka senaste 3 utbyten
+        history: aiChatHistory.slice(-6),
         context: context,
-        system: systemPrompt
+        system: systemPrompt + knowledgeContext
       }
     });
 
