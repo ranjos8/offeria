@@ -2389,22 +2389,28 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     <button class="modal-close" onclick="closeUpgradeModal()">✕</button>
     <div class="modal-head">
       <div style="font-family:'Fraunces',serif;font-size:1.2rem;color:var(--gold-light)">Uppgradera din plan</div>
-      <p>Välj en plan och betala säkert via Stripe</p>
+      <p style="color:#2e7d32;font-weight:600">✓ 30 dagars gratis provperiod — avbryt när som helst</p>
     </div>
     <div class="upgrade-plans">
       <div class="uplan sel" id="uplan-pro" onclick="selectUPlan('pro')">
         <div class="uplan-name">Pro</div>
         <div class="uplan-price">99 kr/mån</div>
+        <div style="font-size:0.75rem;color:#2e7d32;margin-bottom:0.5rem;font-weight:600">Gratis i 30 dagar</div>
         <div class="uplan-features">10 AI-offerter/månad<br>Fullständig företagsprofil<br>Egen logotyp<br>Kund- &amp; artikelregister<br>Offerthistorik<br>Ingen bindningstid</div>
       </div>
       <div class="uplan" id="uplan-komplett" onclick="selectUPlan('komplett')">
         <div class="uplan-name">Komplett</div>
         <div class="uplan-price">249 kr/mån</div>
+        <div style="font-size:0.75rem;color:#2e7d32;margin-bottom:0.5rem;font-weight:600">Gratis i 30 dagar</div>
         <div class="uplan-features">Obegränsade AI-offerter<br><strong>Fakturering &amp; kreditfaktura</strong><br><strong>Bokföring (BAS 2026)</strong><br><strong>Kvittoskanning</strong><br>Resultat- &amp; balansräkning<br>Momsrapport &amp; SIE-export<br>Dashboard &amp; statistik<br>ROT/RUT-avdrag<br>Ingen bindningstid</div>
       </div>
     </div>
-    <div class="stripe-note">Betalning hanteras säkert av Stripe. Du kan avbryta när som helst.</div>
-    <button class="stripe-btn" onclick="goToStripe()">Betala via Stripe →</button>
+    <div class="stripe-note">Betalning hanteras säkert av Stripe. Kortet debiteras inte förrän efter 30 dagar.</div>
+    <button class="stripe-btn" id="stripeCheckoutBtn" onclick="goToStripe()">Starta gratis provperiod →</button>
+    <div id="stripeCheckoutError" style="color:#c62828;font-size:0.82rem;margin-top:0.5rem;display:none"></div>
+    <div style="margin-top:1rem;text-align:center">
+      <button id="manageSubscriptionBtn" onclick="openCustomerPortal()" style="display:none;background:none;border:none;color:var(--gold);text-decoration:underline;cursor:pointer;font-family:inherit;font-size:0.85rem">Hantera abonnemang →</button>
+    </div>
   </div>
 </div>
 
@@ -2456,6 +2462,20 @@ Vill du fortsätta med export?`;
 let _loginHandled = false;
 
 async function init() {
+  // Hantera redirect från Stripe Checkout
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('payment') === 'success') {
+    const plan = urlParams.get('plan') || 'pro';
+    const planLabel = { pro: 'Pro', komplett: 'Komplett' }[plan] || plan;
+    setTimeout(() => {
+      alert(`🎉 Välkommen till ${planLabel}!\n\nDin 30-dagars gratisperiod har startat. Du behöver inte betala något förrän efter 30 dagar.`);
+    }, 1000);
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+  if (urlParams.get('payment') === 'cancelled') {
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+
   sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_OUT') { _loginHandled = false; onLogout(); }
   });
@@ -4330,22 +4350,65 @@ async function shareNative() {
 }
 
 
-function openUpgradeModal() { document.getElementById('upgradeOverlay').classList.add('open'); }
-function closeUpgradeModal() { document.getElementById('upgradeOverlay').classList.remove('open'); }
-function selectUPlan(p) {
-  selectedUPlan = p;
-  var creditEl = document.getElementById('uplan-credit');
-  if (creditEl) creditEl.classList.toggle('sel', p === 'credit');
-  document.getElementById('uplan-pro').classList.toggle('sel', p === 'pro');
-  document.getElementById('uplan-unlimited').classList.toggle('sel', p === 'unlimited');
+function openUpgradeModal() {
+  const modal = document.getElementById('upgradeOverlay');
+  modal.classList.add('open');
+  const plan = currentProfile?.plan;
+  const managBtn = document.getElementById('manageSubscriptionBtn');
+  if (managBtn) managBtn.style.display = (plan && plan !== 'free') ? 'block' : 'none';
 }
-function goToStripe() {
-  const link = STRIPE_LINKS[selectedUPlan];
-  if (!link || link.includes('LINK')) {
-    alert('Stripe-länkarna är inte konfigurerade ännu.\n\nSkapa produkter i ditt Stripe-konto och klistra in Payment Link-URL:erna i STRIPE_LINKS i koden.');
-    return;
+function closeUpgradeModal() { document.getElementById('upgradeOverlay').classList.remove('open'); }
+
+async function goToStripe() {
+  const btn = document.getElementById('stripeCheckoutBtn');
+  const errEl = document.getElementById('stripeCheckoutError');
+  const plan = window._selectedUPlan || 'pro';
+  btn.textContent = 'Laddar Stripe...';
+  btn.disabled = true;
+  errEl.style.display = 'none';
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch('https://yfnmmcrvzcwcinwopnlj.supabase.co/functions/v1/stripe-payments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+      body: JSON.stringify({
+        action: 'create_checkout',
+        plan: plan,
+        success_url: window.location.origin + '/?payment=success&plan=' + plan,
+        cancel_url: window.location.origin + '/?payment=cancelled'
+      })
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || 'Kunde inte starta betalning');
+    }
+  } catch(e) {
+    errEl.textContent = e.message;
+    errEl.style.display = 'block';
+    btn.textContent = 'Starta gratis provperiod \u2192';
+    btn.disabled = false;
   }
-  window.open(link + '?client_reference_id=' + currentUser.id, '_blank');
+}
+
+async function openCustomerPortal() {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch('https://yfnmmcrvzcwcinwopnlj.supabase.co/functions/v1/stripe-payments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ action: 'customer_portal', return_url: window.location.href })
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else alert('Kunde inte öppna kundportalen: ' + (data.error || ''));
+  } catch(e) { alert('Fel: ' + e.message); }
+}
+function selectUPlan(p) {
+  window._selectedUPlan = p;
+  document.getElementById('uplan-pro')?.classList.toggle('sel', p === 'pro');
+  document.getElementById('uplan-komplett')?.classList.toggle('sel', p === 'komplett');
 }
 
 // ===== QUOTE GENERATOR =====
