@@ -1306,8 +1306,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <div class="sidebar-item" id="sNav-bookkeeping" onclick="showPage('bookkeeping')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/></svg></span> Bokföring</div>
       <div class="sidebar-item" id="sNav-profile" onclick="showPage('profile')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/><path d="M9 22v-4h6v4"/></svg></span> Företagsprofil</div>
 
-      <div class="quota-box">
-        <div class="quota-label">Din plan</div>
+      <div style="display:none" id="sidebarPlanBox">
         <div class="quota-plan" id="sidebarPlan">Gratis</div>
         <div class="quota-count" id="sidebarQuotaCount">0 / 2 denna månad</div>
         <div class="quota-bar-bg"><div class="quota-bar-fill" id="sidebarQuotaBar" style="width:0%"></div></div>
@@ -2431,7 +2430,10 @@ async function onLogin(user) {
 
   updateUI(profile, monthlyUsed, total || 0);
   showView('app');
-  showPage('dashboard');
+  // Återställ senast besökta sida om F5 (sessionStorage), annars dashboard
+  const savedPage = (() => { try { return sessionStorage.getItem('offeria_page'); } catch(e) { return null; } })();
+  const validPages = ['dashboard','generate','invoices','suppliers','customers','articles','bookkeeping','profile'];
+  showPage(savedPage && validPages.includes(savedPage) ? savedPage : 'dashboard');
   fillProfileForm(profile);
   renderExamplePills();
 
@@ -2453,7 +2455,7 @@ async function onLogin(user) {
 
 function onLogout() {
   currentUser = null; currentProfile = null; monthlyUsed = 0;
-  // Close drawer if open
+  try { sessionStorage.removeItem('offeria_page'); } catch(e) {}
   closeDrawer();
   // Hide mobile tab toggle
   const toggle = document.getElementById('drawerToggle');
@@ -2620,7 +2622,9 @@ function showPage(p) {
   if (p === 'bookkeeping') initBookkeeping();
   if (p === 'suppliers') loadSuppliers();
   updateDrawerActive(p);
-  updateAIChatVisibility(); // Visa/dölj AI-chat baserat på sida
+  updateAIChatVisibility();
+  // Spara aktuell sida så F5 återvänder dit (inte dashboard)
+  try { sessionStorage.setItem('offeria_page', p); } catch(e) {}
 }
 
 function switchQuoteTab(tab) {
@@ -5844,8 +5848,12 @@ function applyVerCategory() {
       });
     }
   }
-  const cm = CATEGORY_MAP[cat];
-  if (cm && !document.getElementById('verDesc').value) document.getElementById('verDesc').value = cm.desc;
+  // Fyll i beskrivning automatiskt om den är tom ELLER innehåller föregående kategoris namn
+  const descEl = document.getElementById('verDesc');
+  const prevCats = VER_CATEGORIES.map(c => c.label);
+  const currentDesc = descEl.value.trim();
+  const isPrevCatDesc = prevCats.some(l => l === currentDesc);
+  if (cm && (!currentDesc || isPrevCatDesc)) descEl.value = cm.desc;
   
   // Uppdatera momsuppdelning
   updateVatBreakdown();
