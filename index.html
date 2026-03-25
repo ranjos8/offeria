@@ -1489,22 +1489,37 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <div class="field"><label>Förfallodatum *</label><input id="suppDue" type="date"></div>
           </div>
           <div class="grid2" style="gap:1.5rem">
-            <div class="field"><label>Belopp inkl. moms *</label><input id="suppAmount" type="number" step="0.01" placeholder="0"></div>
-            <div class="field"><label>Varav moms</label><input id="suppVat" type="number" step="0.01" placeholder="0"></div>
+            <div class="field"><label>Belopp inkl. moms *</label><input id="suppAmount" type="number" step="0.01" placeholder="0" oninput="suppAutoCalcVat()"></div>
+            <div class="field">
+              <label>Momssats</label>
+              <select id="suppVatPct" onchange="suppAutoCalcVat()" style="width:100%;padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.92rem">
+                <option value="25">25%</option>
+                <option value="12">12%</option>
+                <option value="6">6%</option>
+                <option value="0">0% (ingen moms)</option>
+              </select>
+            </div>
           </div>
+          <div class="field"><label>Varav moms (beräknas automatiskt)</label><input id="suppVat" type="number" step="0.01" placeholder="0"></div>
           <div class="field">
             <label>Kategori</label>
             <select id="suppCategory">
-              <option value="material">Material</option>
-              <option value="drivmedel">Drivmedel</option>
-              <option value="bil">Bil & fordon</option>
-              <option value="telefon">Telefon & internet</option>
-              <option value="forsakring">Försäkring</option>
-              <option value="hyra">Hyra & lokal</option>
-              <option value="kontorsmaterial">Kontorsmaterial</option>
-              <option value="underentreprenor">Underentreprenör</option>
-              <option value="verktyg">Verktyg & maskiner</option>
-              <option value="ovrigt">Övrigt</option>
+              <option value="material">Material & varor (4010)</option>
+              <option value="underentreprenor">Underentreprenör (4600)</option>
+              <option value="drivmedel">Drivmedel (5610)</option>
+              <option value="bil">Bil & fordon (5615)</option>
+              <option value="hyra">Hyra & lokal (5010)</option>
+              <option value="verktyg">Verktyg & maskiner (5410)</option>
+              <option value="kontorsmaterial">Kontorsmaterial (6110)</option>
+              <option value="porto">Porto & frakt (6250)</option>
+              <option value="telefon">Telefon & internet (6210)</option>
+              <option value="programvara">IT & programvara (6540)</option>
+              <option value="reklam">Reklam & marknadsföring (5910)</option>
+              <option value="redovisning">Redovisning & revision (6530)</option>
+              <option value="forsakring">Försäkring (6310)</option>
+              <option value="bankkostnad">Bankkostnad (6570)</option>
+              <option value="representation">Representation (6070)</option>
+              <option value="ovrigt">Övrigt (6990)</option>
             </select>
           </div>
           <div class="field"><label>Beskrivning</label><input id="suppDesc" placeholder="Vad gäller fakturan?"></div>
@@ -5964,19 +5979,52 @@ function viewVerification(id) {
   const fmt = n => Number(n).toLocaleString('sv-SE', { minimumFractionDigits: 2 });
   const rowsHtml = rows.map(r => {
     const acc = _bkAccounts.find(a => a.account_number === r.account_number);
-    return `<tr><td>${r.account_number} ${acc?.account_name || ''}</td><td style="text-align:right">${parseFloat(r.debit) > 0 ? fmt(r.debit) : ''}</td><td style="text-align:right">${parseFloat(r.credit) > 0 ? fmt(r.credit) : ''}</td></tr>`;
+    return `<tr><td style="padding:0.4rem">${r.account_number} ${acc?.account_name || ''}</td><td style="text-align:right;padding:0.4rem">${parseFloat(r.debit) > 0 ? fmt(r.debit) : ''}</td><td style="text-align:right;padding:0.4rem">${parseFloat(r.credit) > 0 ? fmt(r.credit) : ''}</td></tr>`;
   }).join('');
+
+  const canDelete = !v.is_locked && v.source_type === 'manual';
+  const deleteBtn = canDelete
+    ? `<button onclick="deleteVerification('${v.id}', this)" style="background:none;border:1px solid #e05;color:#e05;border-radius:6px;padding:0.35rem 0.8rem;font-size:0.8rem;cursor:pointer;font-family:inherit">🗑 Radera</button>`
+    : '';
+  const lockedNote = v.is_locked ? '<span style="font-size:0.75rem;color:#999;background:#f5f5f5;padding:0.2rem 0.6rem;border-radius:4px">🔒 Låst – kan ej raderas</span>' : '';
+  const autoNote = !v.is_locked && v.source_type !== 'manual' ? '<span style="font-size:0.75rem;color:#999;background:#f5f5f5;padding:0.2rem 0.6rem;border-radius:4px">Autobokförd – radera ej</span>' : '';
+
   const popup = document.createElement('div');
   popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center';
   popup.onclick = (e) => { if (e.target === popup) popup.remove(); };
-  popup.innerHTML = `<div style="background:white;border-radius:12px;max-width:500px;width:90%;padding:1.5rem;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem"><h3 style="margin:0">V${v.verification_number}</h3><button onclick="this.closest('[style*=position]').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer">✕</button></div>
+  popup.innerHTML = `<div style="background:white;border-radius:12px;max-width:520px;width:90%;padding:1.5rem;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h3 style="margin:0">V${v.verification_number}</h3>
+      <button onclick="this.closest('[style*=position]').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer">✕</button>
+    </div>
     <div style="font-size:0.85rem;color:#888;margin-bottom:0.3rem">${v.verification_date} · ${v.source_type}${v.is_locked ? ' · Låst' : ''}</div>
     <div style="font-size:0.95rem;margin-bottom:1rem">${v.description}</div>
-    <table style="width:100%;border-collapse:collapse;font-size:0.85rem"><thead><tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:0.4rem">Konto</th><th style="text-align:right;padding:0.4rem">Debet</th><th style="text-align:right;padding:0.4rem">Kredit</th></tr></thead><tbody>${rowsHtml}</tbody></table>
-    ${v.attachment_url ? '<div style="margin-top:1rem"><a href="#" onclick="downloadReceipt(\'' + v.attachment_url + '\');return false" style="color:var(--gold);font-size:0.85rem">Visa kvitto</a></div>' : ''}
+    <table style="width:100%;border-collapse:collapse;font-size:0.85rem">
+      <thead><tr style="border-bottom:2px solid var(--border)">
+        <th style="text-align:left;padding:0.4rem">Konto</th>
+        <th style="text-align:right;padding:0.4rem">Debet</th>
+        <th style="text-align:right;padding:0.4rem">Kredit</th>
+      </tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+    ${v.attachment_url ? `<div style="margin-top:1rem"><a href="#" onclick="downloadReceipt('${v.attachment_url}');return false" style="color:var(--gold);font-size:0.85rem">📎 Visa kvitto</a></div>` : ''}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.2rem;padding-top:0.8rem;border-top:1px solid var(--border)">
+      <div style="display:flex;gap:0.5rem;align-items:center">${lockedNote}${autoNote}</div>
+      ${deleteBtn}
+    </div>
   </div>`;
   document.body.appendChild(popup);
+}
+
+async function deleteVerification(id, btn) {
+  if (!confirm('Radera denna verifikation permanent?\n\nDetta kan inte ångras.')) return;
+  btn.disabled = true;
+  btn.textContent = 'Raderar...';
+  await sb.from('verification_rows').delete().eq('verification_id', id);
+  const { error } = await sb.from('verifications').delete().eq('id', id);
+  if (error) { alert('Kunde inte radera: ' + error.message); btn.disabled = false; btn.textContent = '🗑 Radera'; return; }
+  btn.closest('[style*=position]').remove();
+  loadBookkeeping();
 }
 
 async function downloadReceipt(path) {
@@ -6169,6 +6217,15 @@ async function renderResultat() {
     const val = saldoByAccount[a.account_number] || 0;
     if (val !== 0) { totalFin += val; }
   });
+
+  if (totalFin !== 0) {
+    html += '<div style="font-weight:700;font-size:0.9rem;margin:1rem 0 0.8rem;border-bottom:2px solid var(--ink);padding-bottom:0.4rem">FINANSIELLA POSTER</div>';
+    finans.forEach(a => {
+      const val = saldoByAccount[a.account_number] || 0;
+      if (val !== 0) html += `<div style="display:flex;justify-content:space-between;padding:0.25rem 0;font-size:0.85rem"><span>${a.account_number} ${a.account_name}</span><span>${fmt(val)} kr</span></div>`;
+    });
+    html += `<div style="display:flex;justify-content:space-between;padding:0.4rem 0;font-weight:700;border-top:1px solid var(--border);margin-top:0.3rem">Summa finansiellt<span>${fmt(totalFin)} kr</span></div>`;
+  }
 
   const resultat = totalInt + totalKost + totalFin;
   html += `<div style="display:flex;justify-content:space-between;padding:0.8rem 0;font-weight:700;font-size:1.1rem;border-top:2px solid var(--ink);margin-top:1rem;color:${resultat >= 0 ? '#2e7d32' : '#c62828'}">ÅRETS RESULTAT<span>${fmt(resultat)} kr</span></div>`;
@@ -6540,12 +6597,24 @@ function filterSuppliers() {
   renderSupplierList(filtered);
 }
 
+function suppAutoCalcVat() {
+  const amount = parseFloat(document.getElementById('suppAmount').value) || 0;
+  const pct = parseInt(document.getElementById('suppVatPct').value) || 0;
+  if (amount > 0 && pct > 0) {
+    const vat = Math.round(amount / (1 + pct / 100) * (pct / 100) * 100) / 100;
+    document.getElementById('suppVat').value = vat.toFixed(2);
+  } else {
+    document.getElementById('suppVat').value = '0';
+  }
+}
+
 function openNewSupplierInvoice() {
   document.getElementById('suppName').value = '';
   document.getElementById('suppInvNr').value = '';
   document.getElementById('suppDate').value = new Date().toISOString().slice(0, 10);
   document.getElementById('suppDue').value = '';
   document.getElementById('suppAmount').value = '';
+  document.getElementById('suppVatPct').value = '25';
   document.getElementById('suppVat').value = '';
   document.getElementById('suppCategory').value = 'material';
   document.getElementById('suppDesc').value = '';
@@ -6562,6 +6631,17 @@ function editSupplierInvoice(idx) {
   document.getElementById('suppDue').value = s.due_date || '';
   document.getElementById('suppAmount').value = s.total_amount || '';
   document.getElementById('suppVat').value = s.vat_amount || '';
+  // Try to infer VAT pct from stored amounts
+  const total = parseFloat(s.total_amount) || 0;
+  const vat = parseFloat(s.vat_amount) || 0;
+  if (total > 0 && vat > 0) {
+    const net = total - vat;
+    const pct = Math.round(vat / net * 100);
+    const closest = [25, 12, 6, 0].find(p => Math.abs(p - pct) <= 2) || 25;
+    document.getElementById('suppVatPct').value = String(closest);
+  } else {
+    document.getElementById('suppVatPct').value = '25';
+  }
   document.getElementById('suppCategory').value = s.category || 'material';
   document.getElementById('suppDesc').value = s.description || '';
   document.getElementById('suppEditId').value = s.id;
@@ -6580,7 +6660,7 @@ async function saveSupplierInvoice() {
     invoice_date: document.getElementById('suppDate').value || new Date().toISOString().slice(0, 10),
     due_date: due,
     total_amount: amount,
-    vat_amount: parseFloat(document.getElementById('suppVat').value) || Math.round(amount * 0.2),
+    vat_amount: parseFloat(document.getElementById('suppVat').value) || Math.round(amount / 1.25 * 0.25),
     category: document.getElementById('suppCategory').value,
     description: document.getElementById('suppDesc').value.trim()
   };
@@ -6604,15 +6684,22 @@ async function markSupplierPaid(idx) {
   const { data: profile } = await sb.from('profiles').select('accounting_method').eq('id', currentUser.id).single();
   const accountingMethod = profile?.accounting_method || 'kontant';
   
+  const payDate = new Date().toISOString().slice(0, 10);
+  const invoiceDate = s.invoice_date || payDate;
   const { error } = await sb.from('supplier_invoices').update({
-    status: 'paid', paid_date: new Date().toISOString().slice(0, 10)
+    status: 'paid', paid_date: payDate
   }).eq('id', s.id);
   if (error) return alert('Kunde inte uppdatera.');
 
   // Bokföringslogik
-  const catMap = { material:'4010', drivmedel:'5610', bil:'5615', telefon:'6210', forsakring:'6310', hyra:'5010', kontorsmaterial:'6110', underentreprenor:'4600', verktyg:'5410', ovrigt:'6990' };
+  const catMap = { 
+    material:'4010', underentreprenor:'4600',
+    drivmedel:'5610', bil:'5615', hyra:'5010', verktyg:'5410',
+    kontorsmaterial:'6110', porto:'6250', telefon:'6210', programvara:'6540',
+    reklam:'5910', redovisning:'6530', forsakring:'6310',
+    bankkostnad:'6570', representation:'6070', ovrigt:'6990'
+  };
   const debitAccount = catMap[s.category] || '6990';
-  const yr = new Date().getFullYear();
   const vatAmount = parseFloat(s.vat_amount) || 0;
   const netAmount = parseFloat(s.total_amount) - vatAmount;
   const totalAmount = parseFloat(s.total_amount);
@@ -6622,18 +6709,19 @@ async function markSupplierPaid(idx) {
     
     // STEG 1: Registrering (om inte redan gjord)
     if (!s.registration_verification_id) {
-      const { data: numD1 } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: yr });
+      const invYr = parseInt(invoiceDate.slice(0, 4));
+      const { data: numD1 } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: invYr });
       const verNum1 = numD1 || 1;
       
       const rows1 = [
-        { account_number: debitAccount, debit: netAmount, credit: 0 },   // Kostnad
-        { account_number: '2640', debit: vatAmount, credit: 0 },         // Ingående moms
-        { account_number: '2440', debit: 0, credit: totalAmount }        // Leverantörsskuld
+        { account_number: debitAccount, debit: netAmount, credit: 0 },
+        { account_number: '2640', debit: vatAmount, credit: 0 },
+        { account_number: '2440', debit: 0, credit: totalAmount }
       ];
 
       const { data: ver1 } = await sb.from('verifications').insert({
         user_id: currentUser.id, verification_number: verNum1,
-        verification_date: s.invoice_date || new Date().toISOString().slice(0, 10),
+        verification_date: invoiceDate,
         description: 'Leverantörsfaktura ' + s.supplier_name + (s.invoice_number ? ' #' + s.invoice_number : ''),
         source_type: 'supplier_registration', source_id: s.id, created_by: 'auto'
       }).select().single();
@@ -6644,18 +6732,19 @@ async function markSupplierPaid(idx) {
       }
     }
 
-    // STEG 2: Betalning (alltid när användaren markerar som betald)
-    const { data: numD2 } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: yr });
+    // STEG 2: Betalning
+    const payYr = parseInt(payDate.slice(0, 4));
+    const { data: numD2 } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: payYr });
     const verNum2 = numD2 || 1;
     
     const rows2 = [
-      { account_number: '2440', debit: totalAmount, credit: 0 },         // Minskar skuld
-      { account_number: '1930', debit: 0, credit: totalAmount }          // Minskar bank
+      { account_number: '2440', debit: totalAmount, credit: 0 },
+      { account_number: '1930', debit: 0, credit: totalAmount }
     ];
 
     const { data: ver2 } = await sb.from('verifications').insert({
       user_id: currentUser.id, verification_number: verNum2,
-      verification_date: new Date().toISOString().slice(0, 10),
+      verification_date: payDate,
       description: 'Betalning leverantör ' + s.supplier_name + (s.invoice_number ? ' #' + s.invoice_number : ''),
       source_type: 'supplier_payment', source_id: s.id, created_by: 'auto'
     }).select().single();
@@ -6667,7 +6756,8 @@ async function markSupplierPaid(idx) {
 
   } else {
     // ===== KONTANTMETODEN (1-STEGS) =====
-    const { data: numD } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: yr });
+    const payYr = parseInt(payDate.slice(0, 4));
+    const { data: numD } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: payYr });
     const verNum = numD || 1;
 
     const rows = [
@@ -6678,7 +6768,7 @@ async function markSupplierPaid(idx) {
 
     const { data: ver } = await sb.from('verifications').insert({
       user_id: currentUser.id, verification_number: verNum,
-      verification_date: new Date().toISOString().slice(0, 10),
+      verification_date: payDate,
       description: 'Leverantör ' + s.supplier_name + (s.invoice_number ? ' #' + s.invoice_number : ''),
       source_type: 'supplier', source_id: s.id, created_by: 'auto'
     }).select().single();
@@ -6713,9 +6803,16 @@ async function registerSupplierInvoice(idx) {
   if (error) return alert('Kunde inte uppdatera.');
 
   // STEG 1: Registrering (bokför mot 2440)
-  const catMap = { material:'4010', drivmedel:'5610', bil:'5615', telefon:'6210', forsakring:'6310', hyra:'5010', kontorsmaterial:'6110', underentreprenor:'4600', verktyg:'5410', ovrigt:'6990' };
+  const catMap = { 
+    material:'4010', underentreprenor:'4600',
+    drivmedel:'5610', bil:'5615', hyra:'5010', verktyg:'5410',
+    kontorsmaterial:'6110', porto:'6250', telefon:'6210', programvara:'6540',
+    reklam:'5910', redovisning:'6530', forsakring:'6310',
+    bankkostnad:'6570', representation:'6070', ovrigt:'6990'
+  };
   const debitAccount = catMap[s.category] || '6990';
-  const yr = new Date().getFullYear();
+  const invoiceDate = s.invoice_date || new Date().toISOString().slice(0, 10);
+  const yr = parseInt(invoiceDate.slice(0, 4));
   const vatAmount = parseFloat(s.vat_amount) || 0;
   const netAmount = parseFloat(s.total_amount) - vatAmount;
   const totalAmount = parseFloat(s.total_amount);
@@ -6731,7 +6828,7 @@ async function registerSupplierInvoice(idx) {
 
   const { data: ver } = await sb.from('verifications').insert({
     user_id: currentUser.id, verification_number: verNum,
-    verification_date: s.invoice_date || new Date().toISOString().slice(0, 10),
+    verification_date: invoiceDate,
     description: 'Leverantörsfaktura ' + s.supplier_name + (s.invoice_number ? ' #' + s.invoice_number : ''),
     source_type: 'supplier_registration', source_id: s.id, created_by: 'auto'
   }).select().single();
