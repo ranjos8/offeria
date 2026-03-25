@@ -1321,7 +1321,8 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <div class="app-page" id="page-generate">
         <div class="page-title">Offerter</div>
         <div class="tab-bar" style="display:flex;gap:0;margin-bottom:1.5rem;border-bottom:2px solid var(--border)">
-          <button class="tab-btn active" id="tabNewQuote" onclick="switchQuoteTab('new')">Ny offert</button>
+          <button class="tab-btn active" id="tabNewQuote" onclick="switchQuoteTab('new')">✦ AI-offert</button>
+          <button class="tab-btn" id="tabManualQuote" onclick="switchQuoteTab('manual')">Manuell offert</button>
           <button class="tab-btn" id="tabHistory" onclick="switchQuoteTab('history')">Historik</button>
         </div>
         <div id="quoteTabNew">
@@ -1411,6 +1412,73 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <!-- quote output -->
         <div class="quote-wrap" id="quoteWrap" style="display:none"></div>
         </div><!-- end quoteTabNew -->
+
+        <!-- MANUELL OFFERT -->
+        <div id="quoteTabManual" style="display:none">
+          <div class="gen-card" style="max-width:700px">
+            <div class="card-label">Offertuppgifter</div>
+            <div class="grid2">
+              <div class="field"><label>Kund / Företag *</label><input id="mqClient" placeholder="Kundens namn"></div>
+              <div class="field"><label>Offertdatum</label><input id="mqDate" type="date"></div>
+            </div>
+            <div class="grid2">
+              <div class="field"><label>Giltig till</label><input id="mqValidUntil" type="date"></div>
+              <div class="field"><label>Betalningsvillkor</label>
+                <select id="mqPayTerms" style="width:100%;padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.92rem">
+                  <option>30 dagar netto</option>
+                  <option>14 dagar netto</option>
+                  <option>10 dagar netto</option>
+                  <option>Förskott 50%, resten vid leverans</option>
+                </select>
+              </div>
+            </div>
+            <div class="field"><label>Rubrik / Uppdragsbeskrivning</label><input id="mqTitle" placeholder="t.ex. Badrumsrenovering Storgatan 5"></div>
+            <div class="grid2">
+              <div class="field"><label>Momssats</label>
+                <select id="mqVat" style="width:100%;padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.92rem">
+                  <option value="25">25%</option><option value="12">12%</option><option value="6">6%</option><option value="0">0%</option>
+                </select>
+              </div>
+              <div class="field"><label>ROT-avdrag</label>
+                <select id="mqRot" style="width:100%;padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.92rem">
+                  <option value="0">Nej</option>
+                  <option value="1">Ja – 30% på arbete</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="gen-card" style="max-width:700px;margin-top:1rem">
+            <div class="card-label">Rader</div>
+            <div style="display:grid;grid-template-columns:2.5fr 0.6fr 1fr 0.8fr 28px;gap:0.5rem;margin-bottom:0.4rem;align-items:end">
+              <span style="font-size:0.72rem;font-weight:600;color:#888">Beskrivning</span>
+              <span style="font-size:0.72rem;font-weight:600;color:#888">Antal</span>
+              <span style="font-size:0.72rem;font-weight:600;color:#888">À-pris (kr)</span>
+              <span style="font-size:0.72rem;font-weight:600;color:#888;text-align:right">Summa</span>
+              <span></span>
+            </div>
+            <div id="mqRows"></div>
+            <button onclick="addMqRow()" style="font-size:0.82rem;color:var(--gold);background:none;border:1px dashed var(--gold-light);border-radius:6px;padding:0.4rem 0.9rem;cursor:pointer;margin-top:0.5rem;font-family:inherit">+ Lägg till rad</button>
+            <div style="margin-top:1rem;padding-top:0.8rem;border-top:1px solid var(--border);text-align:right;font-size:0.9rem">
+              <div style="color:#888;margin-bottom:0.3rem">Netto: <span id="mqNetto">0 kr</span></div>
+              <div style="color:#888;margin-bottom:0.3rem">Moms: <span id="mqMomsAmt">0 kr</span></div>
+              <div id="mqRotRow" style="color:#888;margin-bottom:0.3rem;display:none">ROT-avdrag: <span id="mqRotAmt" style="color:#2e7d32">– 0 kr</span></div>
+              <div style="font-weight:700;font-size:1.1rem">Att betala: <span id="mqTotal" style="color:var(--gold)">0 kr</span></div>
+            </div>
+          </div>
+
+          <div class="gen-card" style="max-width:700px;margin-top:1rem">
+            <div class="card-label">Villkor (valfritt)</div>
+            <textarea id="mqTerms" style="width:100%;height:80px;resize:vertical;border:1.5px solid var(--border);border-radius:8px;padding:0.7rem 0.9rem;font-family:DM Sans,sans-serif;font-size:0.88rem;background:var(--paper)" placeholder="Betalningsvillkor, garantier, övriga villkor…"></textarea>
+          </div>
+
+          <div style="max-width:700px;margin-top:1rem">
+            <button onclick="generateManualQuote()" class="gen-btn" style="padding:0.75rem 2rem;font-size:0.95rem">
+              <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+              Skapa offert
+            </button>
+          </div>
+        </div><!-- end quoteTabManual -->
 
         <div id="quoteTabHistory" style="display:none">
           <div style="margin-bottom:1rem">
@@ -2628,23 +2696,171 @@ function showPage(p) {
 }
 
 function switchQuoteTab(tab) {
-  const newEl = document.getElementById('quoteTabNew');
-  const histEl = document.getElementById('quoteTabHistory');
-  const btnNew = document.getElementById('tabNewQuote');
-  const btnHist = document.getElementById('tabHistory');
-  if (tab === 'history') {
-    newEl.style.display = 'none';
-    histEl.style.display = 'block';
-    btnNew.classList.remove('active');
-    btnHist.classList.add('active');
-    loadHistory();
-  } else {
-    newEl.style.display = 'block';
-    histEl.style.display = 'none';
-    btnNew.classList.add('active');
-    btnHist.classList.remove('active');
-    renderExamplePills();
+  const tabs = { new: 'quoteTabNew', manual: 'quoteTabManual', history: 'quoteTabHistory' };
+  const btns = { new: 'tabNewQuote', manual: 'tabManualQuote', history: 'tabHistory' };
+  Object.keys(tabs).forEach(t => {
+    const el = document.getElementById(tabs[t]);
+    const btn = document.getElementById(btns[t]);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  if (tab === 'history') loadHistory();
+  if (tab === 'new') renderExamplePills();
+  if (tab === 'manual') initManualQuote();
+}
+
+// ===== MANUELL OFFERT =====
+function initManualQuote() {
+  const today = new Date().toISOString().slice(0, 10);
+  const validDate = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+  document.getElementById('mqDate').value = today;
+  document.getElementById('mqValidUntil').value = validDate;
+  // Förifyll från profil
+  if (currentProfile?.default_vat_rate) document.getElementById('mqVat').value = currentProfile.default_vat_rate;
+  if (currentProfile?.default_pay_terms) document.getElementById('mqPayTerms').value = currentProfile.default_pay_terms;
+  if (currentProfile?.warranty_text && !document.getElementById('mqTerms').value)
+    document.getElementById('mqTerms').value = currentProfile.warranty_text;
+  // Init rader om tomma
+  if (!document.getElementById('mqRows').children.length) {
+    addMqRow('Arbete', 1, 0, 'arbete');
+    addMqRow('Material', 1, 0, 'material');
   }
+  calcMqTotals();
+}
+
+function addMqRow(desc = '', qty = 1, price = 0, type = 'arbete') {
+  const container = document.getElementById('mqRows');
+  const row = document.createElement('div');
+  row.className = 'mq-row';
+  row.style.cssText = 'display:grid;grid-template-columns:2.5fr 0.6fr 1fr 0.8fr 28px;gap:0.5rem;margin-bottom:0.5rem;align-items:center';
+  row.innerHTML = `
+    <input placeholder="Beskrivning" value="${desc}" oninput="calcMqTotals()" style="padding:0.6rem 0.8rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
+    <input type="number" min="0" step="0.5" value="${qty}" oninput="calcMqTotals()" style="padding:0.6rem 0.5rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem;text-align:center">
+    <input type="number" min="0" step="1" value="${price || ''}" placeholder="0" oninput="calcMqTotals()" style="padding:0.6rem 0.8rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem;text-align:right">
+    <span class="mq-row-sum" style="font-size:0.88rem;text-align:right;font-weight:500;color:var(--gold)">0 kr</span>
+    <button onclick="this.closest('.mq-row').remove();calcMqTotals()" style="background:none;border:none;cursor:pointer;color:#c62828;font-size:1.1rem;line-height:1;padding:0">×</button>`;
+  row.dataset.type = type;
+  container.appendChild(row);
+  calcMqTotals();
+}
+
+function calcMqTotals() {
+  const vatPct = parseInt(document.getElementById('mqVat').value) || 25;
+  const inclRot = document.getElementById('mqRot').value === '1';
+  let subtotal = 0, arbete = 0;
+  document.querySelectorAll('.mq-row').forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const qty   = parseFloat(inputs[1]?.value) || 0;
+    const price = parseFloat(inputs[2]?.value) || 0;
+    const sum   = qty * price;
+    subtotal += sum;
+    if (row.dataset.type === 'arbete') arbete += sum;
+    row.querySelector('.mq-row-sum').textContent = sum.toLocaleString('sv-SE') + ' kr';
+  });
+  const moms = Math.round(subtotal * vatPct / 100);
+  const totalInkl = subtotal + moms;
+  const rot = inclRot ? Math.min(Math.round(arbete * 0.3), 50000) : 0;
+  const toPay = totalInkl - rot;
+  const fmt = n => n.toLocaleString('sv-SE') + ' kr';
+  document.getElementById('mqNetto').textContent   = fmt(subtotal);
+  document.getElementById('mqMomsAmt').textContent = fmt(moms);
+  document.getElementById('mqTotal').textContent   = fmt(toPay);
+  document.getElementById('mqRotRow').style.display = inclRot ? '' : 'none';
+  document.getElementById('mqRotAmt').textContent  = '– ' + fmt(rot);
+}
+
+async function generateManualQuote() {
+  const client  = document.getElementById('mqClient').value.trim();
+  const title   = document.getElementById('mqTitle').value.trim() || 'Offert';
+  const dateStr = document.getElementById('mqDate').value;
+  const validUntil = document.getElementById('mqValidUntil').value;
+  const payTerms   = document.getElementById('mqPayTerms').value;
+  const vatPct  = parseInt(document.getElementById('mqVat').value) || 25;
+  const inclRot = document.getElementById('mqRot').value === '1';
+  const terms   = document.getElementById('mqTerms').value.trim();
+
+  if (!client) { alert('Ange kundnamn.'); document.getElementById('mqClient').focus(); return; }
+
+  const rows = [];
+  document.querySelectorAll('.mq-row').forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const desc  = inputs[0]?.value.trim();
+    const qty   = parseFloat(inputs[1]?.value) || 0;
+    const price = parseFloat(inputs[2]?.value) || 0;
+    if (desc && (qty > 0 || price > 0)) rows.push({ desc, qty, price, type: row.dataset.type });
+  });
+  if (!rows.length) { alert('Lägg till minst en rad med beskrivning och pris.'); return; }
+
+  const subtotal = rows.reduce((s, r) => s + r.qty * r.price, 0);
+  const moms     = Math.round(subtotal * vatPct / 100);
+  const totalInkl = subtotal + moms;
+  const arbete   = rows.filter(r => r.type === 'arbete').reduce((s, r) => s + r.qty * r.price, 0);
+  const rot      = inclRot ? Math.min(Math.round(arbete * 0.3), 50000) : 0;
+  const toPay    = totalInkl - rot;
+  const fmt      = n => n.toLocaleString('sv-SE') + ' kr';
+  const p = currentProfile || {};
+  const logoHtml = p.logo_url
+    ? `<img src="${await (async () => { const {data} = await sb.storage.from('logos').createSignedUrl(p.logo_url,3600); return data?.signedUrl||''; })()}" style="max-height:70px;max-width:140px;object-fit:contain">`
+    : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:40px;height:40px;color:#888"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+
+  const rowsHtml = rows.map(r => `<tr>
+    <td style="padding:0.5rem 0.4rem">${r.desc}${inclRot ? ` <span style="font-size:0.7em;color:#888">(${r.type})</span>` : ''}</td>
+    <td style="padding:0.5rem 0.4rem;text-align:center">${r.qty} st</td>
+    <td style="padding:0.5rem 0.4rem;text-align:right">${r.price.toLocaleString('sv-SE')} kr</td>
+    <td style="padding:0.5rem 0.4rem;text-align:right;font-weight:500">${(r.qty * r.price).toLocaleString('sv-SE')} kr</td>
+  </tr>`).join('');
+
+  const vatNumber = p.org_number ? p.org_number.replace(/\D/g,'').replace(/^(\d{6})(\d{4})$/, 'SE$1$2') : '';
+  const bankInfo = p.bankgiro ? `<br>BG: ${p.bankgiro}` : '';
+
+  const html = `
+    <div class="q-header">
+      <div><div class="q-company-name">${p.company_name || ''}</div>
+      <div class="q-company-info">Org.nr: ${p.org_number || ''}${vatNumber ? '<br>Momsreg.nr: ' + vatNumber : ''}<br>${p.phone || ''}${p.phone&&p.email?' | ':''}${p.email || ''}${p.website ? '<br>' + p.website : ''}<br>${p.address || ''}${bankInfo}</div></div>
+      ${logoHtml}
+    </div>
+    <div class="q-meta-row">
+      <div class="q-offer-title">Offert – ${title}</div>
+      <div class="q-meta"><table style="border-collapse:collapse;font-size:0.8rem;text-align:left">
+        <tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>Datum:</strong></td><td>${dateStr}</td></tr>
+        ${validUntil ? `<tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>Giltig till:</strong></td><td>${validUntil}</td></tr>` : ''}
+        <tr><td style="color:#666;padding:0.15rem 0.8rem 0.15rem 0;white-space:nowrap"><strong>Betalningsvillkor:</strong></td><td>${payTerms}</td></tr>
+      </table></div>
+    </div>
+    <div class="q-client"><div class="lbl">KUND</div><strong>${client}</strong></div>
+    <table class="qt">
+      <thead><tr><th style="width:44%">Beskrivning</th><th>Antal</th><th style="text-align:right">À-pris</th><th style="text-align:right">Summa</th></tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+    <div class="q-totals"><div class="q-totals-box">
+      <div class="trow"><span>Netto (exkl. moms)</span><span>${fmt(subtotal)}</span></div>
+      <div class="trow"><span>Moms (${vatPct}%)</span><span>${fmt(moms)}</span></div>
+      ${inclRot && rot > 0 ? `<div class="trow"><span>Totalt (inkl. moms)</span><span>${fmt(totalInkl)}</span></div><div class="trow rot-row"><span>ROT-avdrag (30% av arbete)</span><span>– ${fmt(rot)}</span></div>` : ''}
+      <div class="trow final-row"><span>${inclRot && rot > 0 ? 'ATT BETALA (efter ROT)' : 'ATT BETALA'}</span><span id="tot-final">${fmt(toPay)}</span></div>
+    </div></div>
+    ${terms ? `<div class="q-terms"><h4>Villkor</h4><p class="editable" contenteditable="true">${terms}</p></div>` : ''}
+    ${p.fskatt || p.certifications ? `<div class="q-footer">${[p.fskatt, p.certifications].filter(Boolean).join(' · ')}</div>` : ''}`;
+
+  // Visa i modal
+  document.getElementById('quoteDoc').innerHTML = html;
+  document.getElementById('quoteModalOverlay').style.display = 'flex';
+
+  // Spara till DB
+  const shareId = crypto.randomUUID();
+  const cleanHtml = getCleanQuoteHTML(html);
+  await sb.from('quote_usage').insert({
+    user_id: currentUser.id,
+    title,
+    client_name: client,
+    total_amount: toPay,
+    quote_html: cleanHtml,
+    share_id: shareId,
+    shared_at: new Date().toISOString()
+  });
+  window._currentShareId = shareId;
+  monthlyUsed++;
+  const { count: total } = await sb.from('quote_usage').select('*',{count:'exact',head:true}).eq('user_id',currentUser.id);
+  updateUI(currentProfile, monthlyUsed, total||0);
 }
 
 // ===== PROFILE =====
@@ -8245,21 +8461,39 @@ Företag: ${context.company_name} | År: ${context.year}
 Verifikationer: ${context.verifications_count} | Intäkter: ${context.intakter_kr} kr | Kostnader: ${context.kostnader_kr} kr
 Resultat: ${context.resultat_kr} kr | Moms att betala: ${context.moms_att_betala_kr} kr
 
-SVARSFORMAT — använd alltid detta:
-- Svara på svenska, kortfattat och konkret
-- Använd **fetstil** för viktiga begrepp och kontonummer
-- Använd numrerade listor (1. 2. 3.) för steg-för-steg
-- Använd punktlistor (- ) för alternativ eller uppräkningar  
-- Använd ### för rubrik om svaret har flera delar
-- Håll varje svar under 300 ord om möjligt
-- Hänvisa alltid till kontonummer: t.ex. **konto 1930** eller **2640**
-- Avsluta alltid med en kort not om revisor vid komplexa skattefrågor
+HUR OFFERIA FUNGERAR — KRITISKT:
+När användaren frågar hur man bokför något i Offeria, hänvisa ALLTID till kategoriväljaren i "+ Ny verifikation". Offeria hanterar momssplittning, debet/kredit och rätt konton AUTOMATISKT när man väljer kategori. Säg ALDRIG att användaren ska välja "Ange konton manuellt" om det finns en passande kategori.
 
-LAGAR ATT KÄNNA TILL:
-- BFL 5 kap: verifikationer får inte raderas — rättelse via rättelseverifikation (motbokning)
-- BFL: löpande bokföring, kontanta transaktioner senast nästa arbetsdag
-- Momslagen: utgående moms 2611/2621/2631, ingående 2640/2641/2642
-- Representation: 50% momsavdrag (konto 6070)
+KATEGORIER OCH DERAS KONTON (Offeria sköter resten automatiskt):
+- Försäljning 25% → välj "Försäljning 25% moms" → bokför 3001, 2611, 1930 automatiskt
+- IT/programvara/AI-tjänster → välj "IT-tjänster/Programvara (6540)" → bokför 6540, **2640** (25% ingående moms), 1930
+- Material → välj "Inköp material (4010)" → 4010, 2640, 1930
+- Drivmedel → välj "Drivmedel (5610)" → 5610, 2640, 1930
+- Telefon/internet → välj "Telefon/Internet (6210)" → 6210, 2640, 1930
+- Hyra → välj "Lokalhyra (5010)" → 5010, 1930 (ingen moms)
+- Försäkring → välj "Försäkring (6310)" → 6310, 1930 (ingen moms)
+- Representation → välj "Representation (6070)" → 50% momsavdrag
+- Lön → välj "Lön till anställd" → 7010, 7510, 2710, 2731, 1930
+
+KORREKTA MOMSKONTON (BAS 2026):
+- Ingående moms 25% = **2640** (INTE 2641)
+- Ingående moms 12% = **2641**
+- Ingående moms 6%  = **2642**
+- Utgående moms 25% = **2611**
+- Utgående moms 12% = **2621**
+- Utgående moms 6%  = **2631**
+
+SVARSFORMAT:
+- Svara på svenska, kortfattat och konkret
+- Använd **fetstil** för kontonummer och viktiga begrepp
+- Steg-för-steg med numrerade listor (1. 2. 3.)
+- Hänvisa alltid till kategorin i Offeria istället för att räkna upp konton manuellt
+- Avsluta med revisorsnot vid komplexa skattefrågor
+
+LAGAR:
+- BFL 5 kap: rättelse via rättelseverifikation (motbokning), ej radering
+- Löpande bokföring, kontanta transaktioner senast nästa arbetsdag
+- Representation: max 300 kr/person inkl. moms, 50% momsavdrag
 - Arkivering: 7 år (BFL 7 kap.)`;
 
     const { data, error } = await sb.functions.invoke('super-task', {
