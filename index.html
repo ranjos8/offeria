@@ -7779,58 +7779,110 @@ function askSuggestion(question) {
 async function sendAIMessage() {
   const input = document.getElementById('aiChatInput');
   const question = input.value.trim();
-  
   if (!question) return;
-  
-  // Dölj suggestions efter första frågan
+
   document.getElementById('aiSuggestions').style.display = 'none';
-  
-  // Lägg till användarens meddelande
   addMessageToChat('user', question);
   input.value = '';
   input.style.height = 'auto';
-  
-  // Visa typing indicator
+
   const typingId = showTypingIndicator();
-  
-  // Disable input under AI-svar
   const sendBtn = document.getElementById('aiChatSend');
   sendBtn.disabled = true;
   input.disabled = true;
-  
+
   try {
-    console.log('Calling Edge Function with minimal payload...');
-    
-    // MINIMAL PAYLOAD - inga extra fält
+    // Build live context from current bookkeeping state
+    const yr = document.getElementById('bkYear')?.value || new Date().getFullYear();
+    const totalVers = _bkVerifications?.length || 0;
+    const totalDebet = (_bkRows || []).reduce((s, r) => s + (parseFloat(r.debit) || 0), 0);
+
+    // Compute running P&L from loaded rows
+    const saldo = {};
+    (_bkRows || []).forEach(r => {
+      if (!saldo[r.account_number]) saldo[r.account_number] = 0;
+      saldo[r.account_number] += (parseFloat(r.credit) || 0) - (parseFloat(r.debit) || 0);
+    });
+    const intakter  = Object.entries(saldo).filter(([k]) => k >= '3000' && k <= '3999').reduce((s,[,v]) => s + v, 0);
+    const kostnader = Object.entries(saldo).filter(([k]) => k >= '4000' && k <= '7999').reduce((s,[,v]) => s + v, 0);
+    const resultat  = intakter + kostnader;
+
+    const utgMoms = (saldo['2611']||0) + (saldo['2621']||0) + (saldo['2631']||0);
+    const ingMoms = -((saldo['2640']||0) + (saldo['2641']||0) + (saldo['2642']||0));
+    const momsAtt = utgMoms - ingMoms;
+
+    const fmt = n => Number(Math.round(n)).toLocaleString('sv-SE');
+
+    const context = {
+      company_name: currentProfile?.company_name || 'Ditt företag',
+      org_number: currentProfile?.org_number || '',
+      year: yr,
+      verifications_count: totalVers,
+      intakter_kr: fmt(intakter),
+      kostnader_kr: fmt(Math.abs(kostnader)),
+      resultat_kr: fmt(resultat),
+      moms_att_betala_kr: fmt(momsAtt),
+      accounts_count: _bkAccounts?.length || 0
+    };
+
+    const systemPrompt = `Du är en expert bokföringsassistent för svenska småföretag i appen Offeria.
+
+OFFERIA BOKFÖRING – AKTUELLA FUNKTIONER (${new Date().getFullYear()}):
+• Grundbok: verifikationer med löpnummer, datum, beskrivning, debet/kredit per konto
+• Kategorier: Försäljning (25%/12%/6%/0%), Material (4010), Underentreprenör (4600), Drivmedel (5610), Bil (5615), Hyra (5010), Verktyg (5410), Kontorsmaterial (6110), Porto (6250), Telefon (6210), IT/Programvara (6540), Reklam (5910), Redovisning (6530), Försäkring (6310), Bankkostnad (6570), Representation (6070, 50% momsavdrag), Lön (7010+7510), Eget kapital, EU reverse charge
+• Momskonton: Utgående 2611/2621/2631, Ingående 2640/2641/2642
+• Leverantörsfakturor: kontant- och fakturametoden, momssats väljs (25%/12%/6%/0%)
+• Kvittoskanning: AI-OCR med automatisk kategori och belopp, korrekt momskonto per sats
+• Autobokföring: bokför fakturor och betalningar automatiskt med korrekt datum
+• Bankimport: importera CSV från SEB, Swedbank, Handelsbanken, Nordea
+• SIE4-export och SIE4-import (kompatibelt med Fortnox, Bokio, Visma)
+• SRU-export för momsdeklaration (SKV 4700) inkl. EU reverse charge ruta 21/22/23
+• Perioder kan låsas. Årsavslut stänger räkenskapsår och för resultat till 2099
+• Balansräkning visar årets resultat automatiskt även utan årsavslut
+• Resultaträkning inkluderar finansiella poster (klass 8)
+• BAS-kontoplanen 2026 används som standard
+• Radera-funktion för olåsta manuella verifikationer
+
+AKTUELL KONTEXT FÖR ANVÄNDAREN:
+Företag: ${context.company_name} (${context.org_number})
+År: ${context.year} | Verifikationer: ${context.verifications_count}
+Intäkter: ${context.intakter_kr} kr | Kostnader: ${context.kostnader_kr} kr | Resultat: ${context.resultat_kr} kr
+Moms att betala: ${context.moms_att_betala_kr} kr
+Kontoplan: ${context.accounts_count} konton
+
+REGLER:
+- Svara alltid på svenska
+- Var konkret och praktisk — ge direkta svar, inte långa utläggningar
+- Om du hänvisar till konton, använd alltid kontonummer (t.ex. "konto 1930")
+- Påminn om att kontakta revisor vid komplexa skattefrågor
+- Du kan INTE ändra bokföringen direkt — hänvisa till rätt funktion i appen`;
+
     const { data, error } = await sb.functions.invoke('super-task', {
       body: {
         task: 'bookkeeping_assistant',
         question: question,
-        history: [],
-        context: {}
+        history: aiChatHistory.slice(-6), // skicka senaste 3 utbyten
+        context: context,
+        system: systemPrompt
       }
     });
-    
-    console.log('Edge Function response:', { data, error });
-    
-    if (error) {
-      console.error('Edge Function error:', error);
-      throw error;
-    }
-    
-    // Ta bort typing indicator
+
+    if (error) throw error;
+
     removeTypingIndicator(typingId);
-    
-    // Lägg till AI-svar
-    const answer = data?.answer || 'Inget svar från AI';
+    const answer = data?.answer || 'Inget svar från AI.';
     addMessageToChat('assistant', answer);
-    
+
+    // Spara i historik
+    aiChatHistory.push({ role: 'user', content: question });
+    aiChatHistory.push({ role: 'assistant', content: answer });
+    // Håll historiken begränsad
+    if (aiChatHistory.length > 20) aiChatHistory = aiChatHistory.slice(-20);
+
   } catch (error) {
     console.error('AI Chat error:', error);
-    console.error('Error type:', error.constructor.name);
-    console.error('Error message:', error.message);
     removeTypingIndicator(typingId);
-    addMessageToChat('assistant', 'Något gick fel. Försök igen senare. (Error: ' + error.message + ')');
+    addMessageToChat('assistant', 'Något gick fel. Försök igen senare. (' + error.message + ')');
   } finally {
     sendBtn.disabled = false;
     input.disabled = false;
