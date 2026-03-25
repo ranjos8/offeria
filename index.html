@@ -1702,6 +1702,22 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <button onclick="deleteAccount()" style="background:none;border:1px solid #e05;color:#e05;border-radius:8px;padding:0.5rem 1rem;font-size:0.78rem;cursor:pointer;font-family:DM Sans,sans-serif">Ta bort konto</button>
           </div>
         </div>
+
+        <!-- Plan-sektion -->
+        <div class="gen-card" style="max-width:600px;margin-top:1rem" id="planCard">
+          <div class="card-label">Din plan</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
+            <div>
+              <div style="font-size:1.1rem;font-weight:700" id="profilePlanName">Gratis</div>
+              <div style="font-size:0.82rem;color:#888;margin-top:0.2rem" id="profilePlanDesc">Uppgradera för fler funktioner</div>
+              <div style="font-size:0.78rem;color:#2e7d32;margin-top:0.3rem;display:none" id="profileTrialInfo"></div>
+            </div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+              <button onclick="openUpgradeModal()" class="gen-btn" style="padding:0.5rem 1.2rem;font-size:0.85rem" id="profileUpgradeBtn">Uppgradera →</button>
+              <button onclick="openCustomerPortal()" style="display:none;background:none;border:1px solid var(--border);border-radius:8px;padding:0.5rem 1.2rem;font-size:0.85rem;cursor:pointer;font-family:inherit" id="profilePortalBtn">Hantera abonnemang</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- DASHBOARD PAGE -->
@@ -2610,6 +2626,30 @@ function updateUI(profile, used, total) {
     if (banner) banner.style.display = 'none';
   }
   
+  // Uppdatera plan-sektionen i Företagsprofil
+  const planDescMap = {
+    free: 'Gratisplan — 2 AI-offerter/månad',
+    pro: 'Pro — 10 AI-offerter/månad · 99 kr/mån',
+    komplett: 'Komplett — Obegränsat · 249 kr/mån'
+  };
+  const profilePlanName = document.getElementById('profilePlanName');
+  const profilePlanDesc = document.getElementById('profilePlanDesc');
+  const profileUpgradeBtn = document.getElementById('profileUpgradeBtn');
+  const profilePortalBtn = document.getElementById('profilePortalBtn');
+  const profileTrialInfo = document.getElementById('profileTrialInfo');
+  if (profilePlanName) profilePlanName.textContent = PLAN_LABELS[plan];
+  if (profilePlanDesc) profilePlanDesc.textContent = planDescMap[plan] || '';
+  if (profileUpgradeBtn) profileUpgradeBtn.style.display = plan === 'komplett' ? 'none' : '';
+  if (profilePortalBtn) profilePortalBtn.style.display = plan !== 'free' ? '' : 'none';
+  if (profileTrialInfo && profile?.trial_ends_at) {
+    const trialEnd = new Date(profile.trial_ends_at);
+    const daysLeft = Math.ceil((trialEnd - Date.now()) / 86400000);
+    if (daysLeft > 0) {
+      profileTrialInfo.textContent = `✓ Gratisperiod — ${daysLeft} dagar kvar`;
+      profileTrialInfo.style.display = 'block';
+    }
+  }
+
   // Show mobile hamburger drawer
   const planName = PLAN_LABELS[profile?.plan] || 'Gratis';
   const drawerLimit = PLAN_LIMITS[profile?.plan || 'free'] === Infinity ? '∞' : PLAN_LIMITS[profile?.plan || 'free'];
@@ -2650,15 +2690,27 @@ async function doRegister() {
   if (!email || !pass) return showError('Fyll i e-post och lösenord.');
   const btn = document.getElementById('regBtn');
   btn.disabled = true; btn.textContent = 'Skapar konto…';
-  const { error } = await sb.auth.signUp({
+  const { data, error } = await sb.auth.signUp({
     email, password: pass,
     options: { data: { full_name: name, company_name: company } }
   });
   btn.disabled = false; btn.textContent = 'Skapa konto gratis →';
   if (error) return showError(error.message);
-  // update company name in profile
-  if (company && currentUser) {
-    await sb.from('profiles').update({ company_name: company, full_name: name }).eq('id', currentUser.id);
+
+  // Vänta lite och försök uppdatera profilen
+  if (data?.user) {
+    await new Promise(r => setTimeout(r, 1500));
+    try {
+      await sb.from('profiles').upsert({
+        id: data.user.id,
+        company_name: company || '',
+        full_name: name || '',
+        plan: 'free',
+        email: email
+      }, { onConflict: 'id', ignoreDuplicates: false });
+    } catch(e) {
+      // Profilen skapas av trigger — fortsätt ändå
+    }
   }
 }
 
