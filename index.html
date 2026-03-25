@@ -5649,6 +5649,120 @@ const CATEGORY_MAP = {
   },
 };
 
+// ===== CATEGORY SEARCH DROPDOWN =====
+const VER_CATEGORIES = [
+  { value: 'forsaljning_25',  label: 'Försäljning 25% moms',         account: '3001', group: 'Intäkter' },
+  { value: 'forsaljning_12',  label: 'Försäljning 12% moms',         account: '3002', group: 'Intäkter' },
+  { value: 'forsaljning_6',   label: 'Försäljning 6% moms',          account: '3003', group: 'Intäkter' },
+  { value: 'forsaljning_0',   label: 'Försäljning 0% moms',          account: '3106', group: 'Intäkter' },
+  { value: 'material',        label: 'Inköp material',               account: '4010', group: 'Inköp & Material' },
+  { value: 'underentreprenor',label: 'Underentreprenör',             account: '4600', group: 'Inköp & Material' },
+  { value: 'forbrukning',     label: 'Förbrukningsinventarier',      account: '5460', group: 'Inköp & Material' },
+  { value: 'bil',             label: 'Bilkostnad',                   account: '5615', group: 'Bil & Resa' },
+  { value: 'drivmedel',       label: 'Drivmedel',                    account: '5610', group: 'Bil & Resa' },
+  { value: 'resa',            label: 'Resekostnader',                account: '5800', group: 'Bil & Resa' },
+  { value: 'hyra',            label: 'Lokalhyra',                    account: '5010', group: 'Lokal' },
+  { value: 'reklam',          label: 'Reklam och PR',                account: '5910', group: 'Marknadsföring' },
+  { value: 'telefon',         label: 'Telefon/Internet',             account: '6210', group: 'Tele & IT' },
+  { value: 'programvara',     label: 'IT-tjänster/Programvara',      account: '6540', group: 'Tele & IT' },
+  { value: 'kontorsmaterial', label: 'Kontorsmaterial',              account: '6110', group: 'Kontorskostnader' },
+  { value: 'porto',           label: 'Porto/Frakt',                  account: '6250', group: 'Kontorskostnader' },
+  { value: 'forsakring',      label: 'Försäkring',                   account: '6310', group: 'Försäkring & Avgifter' },
+  { value: 'bank',            label: 'Bankkostnad',                  account: '6570', group: 'Försäkring & Avgifter' },
+  { value: 'redovisning',     label: 'Redovisning/Revision',         account: '6530', group: 'Externa tjänster' },
+  { value: 'representation',  label: 'Representation (50% moms)',    account: '6070', group: 'Externa tjänster' },
+  { value: 'ovrigt',          label: 'Övriga externa kostnader',     account: '6990', group: 'Externa tjänster' },
+  { value: 'eu_tjanst',       label: 'EU-tjänster (reverse charge)', account: '4010', group: 'EU-inköp' },
+  { value: 'eu_vara',         label: 'EU-varor (reverse charge)',    account: '4010', group: 'EU-inköp' },
+  { value: 'egen_insattning', label: 'Egen insättning',              account: '2013', group: 'Eget kapital' },
+  { value: 'eget_uttag',      label: 'Eget uttag',                   account: '2018', group: 'Eget kapital' },
+  { value: 'lon',             label: 'Lön till anställd (brutto)',   account: '7010', group: 'Lön' },
+  { value: 'custom',          label: 'Ange konton manuellt',         account: '',     group: 'Avancerat' },
+];
+
+let _verCatIndex = -1;
+
+function showVerCategoryDropdown() {
+  filterVerCategory(document.getElementById('verCategorySearch').value);
+}
+
+function filterVerCategory(q) {
+  const dd = document.getElementById('verCategoryDropdown');
+  const ql = q.toLowerCase().trim();
+
+  const matches = ql === ''
+    ? VER_CATEGORIES
+    : VER_CATEGORIES.filter(c =>
+        c.label.toLowerCase().includes(ql) ||
+        c.account.includes(ql) ||
+        c.group.toLowerCase().includes(ql) ||
+        c.value.includes(ql)
+      );
+
+  if (matches.length === 0) {
+    dd.innerHTML = '<div style="padding:0.7rem 1rem;font-size:0.85rem;color:#aaa">Ingen kategori matchar</div>';
+  } else {
+    let html = '';
+    let lastGroup = '';
+    matches.forEach((c, i) => {
+      if (c.group !== lastGroup) {
+        html += `<div style="padding:0.3rem 0.8rem;font-size:0.7rem;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.06em;background:#f9f9f7">${c.group}</div>`;
+        lastGroup = c.group;
+      }
+      html += `<div class="ver-cat-option" data-value="${c.value}" data-label="${c.label} (${c.account})" data-idx="${i}"
+        style="padding:0.55rem 1rem;font-size:0.88rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center"
+        onmouseenter="this.style.background='#fffaee'"
+        onmouseleave="this.style.background=''"
+        onclick="selectVerCategory('${c.value}', '${c.label}', '${c.account}')">
+        <span>${c.label}</span>
+        <span style="font-size:0.75rem;color:#aaa;font-family:monospace">${c.account}</span>
+      </div>`;
+    });
+    dd.innerHTML = html;
+  }
+
+  _verCatIndex = -1;
+  dd.style.display = 'block';
+}
+
+function selectVerCategory(value, label, account) {
+  document.getElementById('verCategory').value = value;
+  document.getElementById('verCategorySearch').value = label + (account ? ' (' + account + ')' : '');
+  document.getElementById('verCategoryDropdown').style.display = 'none';
+  applyVerCategory();
+}
+
+function verCategoryKeydown(e) {
+  const dd = document.getElementById('verCategoryDropdown');
+  const opts = dd.querySelectorAll('.ver-cat-option');
+  if (!opts.length) return;
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    _verCatIndex = Math.min(_verCatIndex + 1, opts.length - 1);
+    opts.forEach((o, i) => o.style.background = i === _verCatIndex ? '#fffaee' : '');
+    opts[_verCatIndex]?.scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    _verCatIndex = Math.max(_verCatIndex - 1, 0);
+    opts.forEach((o, i) => o.style.background = i === _verCatIndex ? '#fffaee' : '');
+    opts[_verCatIndex]?.scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'Enter' && _verCatIndex >= 0) {
+    e.preventDefault();
+    opts[_verCatIndex]?.click();
+  } else if (e.key === 'Escape') {
+    dd.style.display = 'none';
+  }
+}
+
+// Stäng dropdown vid klick utanför
+document.addEventListener('click', e => {
+  const wrapper = document.getElementById('verCategoryWrapper');
+  if (wrapper && !wrapper.contains(e.target)) {
+    document.getElementById('verCategoryDropdown').style.display = 'none';
+  }
+});
+
 function applyVerCategory() {
   const cat = document.getElementById('verCategory').value;
   const amountSection = document.getElementById('verAmountSection');
@@ -5860,6 +5974,8 @@ function openNewVerification() {
   document.getElementById('verEditId').value = '';
   document.getElementById('verDate').value = new Date().toISOString().slice(0, 10);
   document.getElementById('verCategory').value = '';
+  document.getElementById('verCategorySearch').value = '';
+  document.getElementById('verCategoryDropdown').style.display = 'none';
   document.getElementById('verDesc').value = '';
   document.getElementById('verCounterpart').value = '';
   document.getElementById('verFile').value = '';
@@ -8542,70 +8658,15 @@ init();
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem">
       <div class="field" style="margin:0"><label>Datum *</label><input id="verDate" type="date"></div>
       <div class="field" style="margin:0"><label>Kategori</label>
-        <select id="verCategory" onchange="applyVerCategory()" style="width:100%;padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.92rem">
-          <option value="">– Välj kategori –</option>
-          
-          <optgroup label="💰 INTÄKTER">
-            <option value="forsaljning_25">Försäljning 25% moms (3001)</option>
-            <option value="forsaljning_12">Försäljning 12% moms (3002)</option>
-            <option value="forsaljning_6">Försäljning 6% moms (3003)</option>
-            <option value="forsaljning_0">Försäljning 0% moms (3106)</option>
-          </optgroup>
-          
-          <optgroup label="📦 INKÖP & MATERIAL">
-            <option value="material">Inköp material (4010)</option>
-            <option value="underentreprenor">Underentreprenör (4600)</option>
-            <option value="forbrukning">Förbrukningsinventarier (5460)</option>
-          </optgroup>
-          
-          <optgroup label="🚗 BIL & RESA">
-            <option value="bil">Bilkostnad (5615)</option>
-            <option value="drivmedel">Drivmedel (5610)</option>
-            <option value="resa">Resekostnader (5800)</option>
-          </optgroup>
-          
-          <optgroup label="🏢 LOKAL">
-            <option value="hyra">Lokalhyra (5010)</option>
-          </optgroup>
-          
-          <optgroup label="📣 MARKNADSFÖRING">
-            <option value="reklam">Reklam och PR (5910)</option>
-          </optgroup>
-          
-          <optgroup label="💻 TELE & IT">
-            <option value="telefon">Telefon/Internet (6210)</option>
-            <option value="programvara">IT-tjänster/Programvara (6540)</option>
-          </optgroup>
-          
-          <optgroup label="📝 KONTORSKOSTNADER">
-            <option value="kontorsmaterial">Kontorsmaterial (6110)</option>
-            <option value="porto">Porto/Frakt (6250)</option>
-          </optgroup>
-          
-          <optgroup label="🛡️ FÖRSÄKRING & AVGIFTER">
-            <option value="forsakring">Försäkring (6310)</option>
-            <option value="bank">Bankkostnad (6570)</option>
-          </optgroup>
-          
-          <optgroup label="👔 EXTERNA TJÄNSTER">
-            <option value="redovisning">Redovisning/Revision (6530)</option>
-            <option value="representation">Representation (6070)</option>
-            <option value="ovrigt">Övriga externa kostnader (6990)</option>
-          </optgroup>
-          
-          <optgroup label="💼 EGET KAPITAL (Enskild firma)">
-            <option value="egen_insattning">Egen insättning (2013)</option>
-            <option value="eget_uttag">Eget uttag (2018)</option>
-          </optgroup>
-          
-          <optgroup label="👥 LÖN">
-            <option value="lon">Lön till anställd (brutto)</option>
-          </optgroup>
-          
-          <optgroup label="⚙️ AVANCERAT">
-            <option value="custom">Ange konton manuellt</option>
-          </optgroup>
-        </select>
+        <div style="position:relative" id="verCategoryWrapper">
+          <input id="verCategorySearch" type="text" placeholder="Sök kategori eller kontonr..." autocomplete="off"
+            oninput="filterVerCategory(this.value)"
+            onfocus="showVerCategoryDropdown()"
+            onkeydown="verCategoryKeydown(event)"
+            style="width:100%;padding:0.75rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.92rem;box-sizing:border-box">
+          <input type="hidden" id="verCategory">
+          <div id="verCategoryDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1.5px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:260px;overflow-y:auto;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,0.1)"></div>
+        </div>
       </div>
     </div>
     
