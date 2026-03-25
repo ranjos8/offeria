@@ -8505,32 +8505,30 @@ SVARSFORMAT:
 - Steg-för-steg med nummer, hänvisa alltid till kategorinamnet i Offeria
 - Revisorsnot vid komplexa skattefrågor`
 
-    // ── RAG: Sök i kunskapsdatabasen och injicera i frågan ──
-    let questionWithRag = question;
+    // ── RAG: Sök i kunskapsdatabasen ──
+    let ragSystem = systemPrompt;
     try {
       const { data: knowledgeRows } = await sb.rpc('search_bookkeeping_knowledge', {
         query: question,
-        max_results: 3
+        max_results: 2
       });
       if (knowledgeRows && knowledgeRows.length > 0) {
-        const ragAnswers = knowledgeRows.map(r => r.answer).join('\n\n---\n\n');
-        // Injicera RAG direkt i frågan som verifierad fakta — AI:n måste följa detta
-        questionWithRag =
-          '=== VERIFIERAT SVAR FRÅN OFFERIAS DATABAS — FÖLJ DETTA EXAKT ===\n' +
-          ragAnswers +
-          '\n=== SLUT PÅ VERIFIERAT SVAR ===\n\n' +
-          'Användarens fråga: ' + question + '\n\n' +
-          'Formatera svaret ovanför snyggt och konkret. Ändra INTE kontona eller instruktionerna.';
+        // Lägg RAG FÖRST i systemprompt — högst prioritet
+        const ragText = knowledgeRows.map(r =>
+          `Fråga: ${r.question}\nKORREKT SVAR: ${r.answer}`
+        ).join('\n---\n');
+        ragSystem = 'RÄTT SVAR FRÅN OFFERIA — FÖLJ EXAKT, ÄNDRA INGET:\n' +
+          ragText + '\n\n' + systemPrompt;
       }
     } catch(e) {}
 
     const { data, error } = await sb.functions.invoke('super-task', {
       body: {
         task: 'bookkeeping_assistant',
-        question: questionWithRag,
+        question: question,
         history: aiChatHistory.slice(-6),
         context: context,
-        system: systemPrompt
+        system: ragSystem
       }
     });
 
