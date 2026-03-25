@@ -4696,9 +4696,11 @@ async function loadDashboard() {
     const resultat = revenue - costs;
     const marginal = revenue > 0 ? Math.round((resultat / revenue) * 100) : 0;
 
-    // Moms
-    const utgMoms = (saldo['2610'] || 0) + (saldo['2620'] || 0) + (saldo['2630'] || 0);
-    const ingMoms = -(saldo['2640'] || 0);
+    // Moms — summera alla momssatser
+    const utgMoms = (saldo['2611'] || 0) + (saldo['2621'] || 0) + (saldo['2631'] || 0)
+                  + (saldo['2610'] || 0) + (saldo['2620'] || 0) + (saldo['2630'] || 0); // äldre konton
+    const ingMoms = -((saldo['2640'] || 0) + (saldo['2641'] || 0) + (saldo['2642'] || 0)
+                  + (saldo['2645'] || 0)); // inkl EU reverse charge
     const momsAtt = utgMoms - ingMoms;
 
     document.getElementById('dashResYear').textContent = yr;
@@ -6631,17 +6633,20 @@ function editSupplierInvoice(idx) {
   document.getElementById('suppDue').value = s.due_date || '';
   document.getElementById('suppAmount').value = s.total_amount || '';
   document.getElementById('suppVat').value = s.vat_amount || '';
-  // Try to infer VAT pct from stored amounts
-  const total = parseFloat(s.total_amount) || 0;
-  const vat = parseFloat(s.vat_amount) || 0;
-  if (total > 0 && vat > 0) {
-    const net = total - vat;
-    const pct = Math.round(vat / net * 100);
-    const closest = [25, 12, 6, 0].find(p => Math.abs(p - pct) <= 2) || 25;
-    document.getElementById('suppVatPct').value = String(closest);
-  } else {
-    document.getElementById('suppVatPct').value = '25';
+  // Use stored vat_pct, fall back to calculating from amounts
+  let inferredPct = parseInt(s.vat_pct) || 0;
+  if (!inferredPct) {
+    const total = parseFloat(s.total_amount) || 0;
+    const vat = parseFloat(s.vat_amount) || 0;
+    if (total > 0 && vat > 0) {
+      const net = total - vat;
+      const pct = Math.round(vat / net * 100);
+      inferredPct = [25, 12, 6, 0].find(p => Math.abs(p - pct) <= 2) || 25;
+    } else {
+      inferredPct = 25;
+    }
   }
+  document.getElementById('suppVatPct').value = String(inferredPct);
   document.getElementById('suppCategory').value = s.category || 'material';
   document.getElementById('suppDesc').value = s.description || '';
   document.getElementById('suppEditId').value = s.id;
@@ -6654,13 +6659,17 @@ async function saveSupplierInvoice() {
   const amount = parseFloat(document.getElementById('suppAmount').value) || 0;
   if (!name || !due || !amount) return alert('Fyll i leverantör, förfallodatum och belopp.');
 
+  const vatPct = parseInt(document.getElementById('suppVatPct').value) || 25;
+  const vatAmount = parseFloat(document.getElementById('suppVat').value) || Math.round(amount / (1 + vatPct / 100) * (vatPct / 100) * 100) / 100;
+
   const data = {
     supplier_name: name,
     invoice_number: document.getElementById('suppInvNr').value.trim(),
     invoice_date: document.getElementById('suppDate').value || new Date().toISOString().slice(0, 10),
     due_date: due,
     total_amount: amount,
-    vat_amount: parseFloat(document.getElementById('suppVat').value) || Math.round(amount / 1.25 * 0.25),
+    vat_amount: vatAmount,
+    vat_pct: vatPct,
     category: document.getElementById('suppCategory').value,
     description: document.getElementById('suppDesc').value.trim()
   };
@@ -6701,6 +6710,8 @@ async function markSupplierPaid(idx) {
   };
   const debitAccount = catMap[s.category] || '6990';
   const vatAmount = parseFloat(s.vat_amount) || 0;
+  const vatPct = parseInt(s.vat_pct) || 25;
+  const vatAccount = vatPct === 25 ? '2640' : vatPct === 12 ? '2641' : vatPct === 6 ? '2642' : null;
   const netAmount = parseFloat(s.total_amount) - vatAmount;
   const totalAmount = parseFloat(s.total_amount);
 
@@ -6715,7 +6726,7 @@ async function markSupplierPaid(idx) {
       
       const rows1 = [
         { account_number: debitAccount, debit: netAmount, credit: 0 },
-        { account_number: '2640', debit: vatAmount, credit: 0 },
+        ...(vatAccount && vatAmount > 0 ? [{ account_number: vatAccount, debit: vatAmount, credit: 0 }] : []),
         { account_number: '2440', debit: 0, credit: totalAmount }
       ];
 
@@ -6762,7 +6773,7 @@ async function markSupplierPaid(idx) {
 
     const rows = [
       { account_number: debitAccount, debit: netAmount, credit: 0 },
-      { account_number: '2640', debit: vatAmount, credit: 0 },
+      ...(vatAccount && vatAmount > 0 ? [{ account_number: vatAccount, debit: vatAmount, credit: 0 }] : []),
       { account_number: '1930', debit: 0, credit: totalAmount }
     ];
 
@@ -6814,6 +6825,8 @@ async function registerSupplierInvoice(idx) {
   const invoiceDate = s.invoice_date || new Date().toISOString().slice(0, 10);
   const yr = parseInt(invoiceDate.slice(0, 4));
   const vatAmount = parseFloat(s.vat_amount) || 0;
+  const vatPct    = parseInt(s.vat_pct) || 25;
+  const vatAccount = vatPct === 25 ? '2640' : vatPct === 12 ? '2641' : vatPct === 6 ? '2642' : null;
   const netAmount = parseFloat(s.total_amount) - vatAmount;
   const totalAmount = parseFloat(s.total_amount);
 
@@ -6821,9 +6834,9 @@ async function registerSupplierInvoice(idx) {
   const verNum = numD || 1;
   
   const rows = [
-    { account_number: debitAccount, debit: netAmount, credit: 0 },   // Kostnad
-    { account_number: '2640', debit: vatAmount, credit: 0 },         // Ingående moms
-    { account_number: '2440', debit: 0, credit: totalAmount }        // Leverantörsskuld
+    { account_number: debitAccount, debit: netAmount, credit: 0 },
+    ...(vatAccount && vatAmount > 0 ? [{ account_number: vatAccount, debit: vatAmount, credit: 0 }] : []),
+    { account_number: '2440', debit: 0, credit: totalAmount }
   ];
 
   const { data: ver } = await sb.from('verifications').insert({
@@ -7216,13 +7229,25 @@ async function saveReceiptVerification() {
   if (!cm) return alert('Ogiltig kategori.');
 
   const netto = Math.round(amount / (1 + vatPct / 100) * 100) / 100;
-  const moms = Math.round((amount - netto) * 100) / 100;
+  const moms  = Math.round((amount - netto) * 100) / 100;
 
-  const rows = [
-    { account_number: cm.debit, debit: netto, credit: 0 },
-    { account_number: '2640', debit: moms, credit: 0 },
-    { account_number: '1930', debit: 0, credit: amount }
-  ];
+  // Correct VAT account per rate
+  const vatAccount = vatPct === 25 ? '2640' : vatPct === 12 ? '2641' : vatPct === 6 ? '2642' : null;
+
+  // Handle 50% deductibility for representation
+  const vatDeductible = cm.vatDeductible || 1.0;
+  const deductibleVat = Math.round(moms * vatDeductible * 100) / 100;
+  const nonDeductibleVat = moms - deductibleVat;
+
+  const rows = [];
+  // Cost account: netto + non-deductible VAT portion
+  rows.push({ account_number: cm.debit, debit: netto + nonDeductibleVat, credit: 0 });
+  // Deductible VAT
+  if (deductibleVat > 0 && vatAccount) {
+    rows.push({ account_number: vatAccount, debit: deductibleVat, credit: 0 });
+  }
+  // Payment (bank)
+  rows.push({ account_number: '1930', debit: 0, credit: amount });
 
   const yr = parseInt(date.slice(0, 4));
   const { data: numD } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: yr });
@@ -7302,9 +7327,25 @@ async function exportSIE4() {
     saldoByAccount[r.account_number].credit += parseFloat(r.credit) || 0;
   });
 
-  // Opening balances (IB) - for first year, all zero
+  // Opening balances (IB) — fetch from previous year's closing balances
+  const prevYr = parseInt(yr) - 1;
+  const { data: prevVers } = await sb.from('verifications').select('id')
+    .eq('user_id', currentUser.id)
+    .gte('verification_date', prevYr + '-01-01')
+    .lte('verification_date', prevYr + '-12-31');
+  const prevVerIds = (prevVers || []).map(v => v.id);
+  const prevSaldo = {};
+  if (prevVerIds.length > 0) {
+    const { data: prevRows } = await sb.from('verification_rows').select('*')
+      .eq('user_id', currentUser.id).in('verification_id', prevVerIds);
+    (prevRows || []).forEach(r => {
+      if (!prevSaldo[r.account_number]) prevSaldo[r.account_number] = 0;
+      prevSaldo[r.account_number] += (parseFloat(r.debit) || 0) - (parseFloat(r.credit) || 0);
+    });
+  }
   _bkAccounts.filter(a => a.is_active && a.account_class <= 2).forEach(a => {
-    sie += `#IB 0 ${a.account_number} 0.00\n`;
+    const val = prevSaldo[a.account_number] || 0;
+    sie += `#IB 0 ${a.account_number} ${val.toFixed(2)}\n`;
   });
 
   // Closing balances (UB)
