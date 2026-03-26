@@ -2784,7 +2784,10 @@ async function init() {
   });
 
   try {
-    const { data: { session } } = await sb.auth.getSession();
+    // Timeout om getSession hänger (t.ex. pga tracking prevention i Edge)
+    const sessionPromise = sb.auth.getSession();
+    const timeoutPromise = new Promise(resolve => setTimeout(() => resolve({ data: { session: null } }), 3000));
+    const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]);
     if (session) {
       showView('app');
       showPage('dashboard');
