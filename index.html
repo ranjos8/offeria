@@ -2676,6 +2676,9 @@ Vill du fortsätta med export?`;
 let _loginHandled = false;
 
 async function init() {
+  // Visa landningssidan DIREKT — vänta inte på getSession (hänger i Edge)
+  showView('landing');
+
   // Hantera redirect från Stripe Checkout
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('payment') === 'success') {
@@ -2784,16 +2787,17 @@ async function init() {
   });
 
   try {
-    const { data: { session } } = await sb.auth.getSession();
+    const sessionResult = await Promise.race([
+      sb.auth.getSession(),
+      new Promise(resolve => setTimeout(() => resolve({ data: { session: null } }), 2000))
+    ]);
+    const session = sessionResult?.data?.session;
     if (session) {
       _loginHandled = true;
       await onLogin(session.user);
-    } else {
-      showView('landing');
     }
   } catch(e) {
     console.error('Init error:', e);
-    showView('landing');
   }
 }
 
