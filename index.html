@@ -2490,6 +2490,16 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <button class="msub" id="forgotBtn" onclick="doForgotPassword()">Skicka återställningslänk →</button>
         <div class="mfoot" style="text-align:center"><a onclick="showLoginTab()" style="cursor:pointer">← Tillbaka till inloggning</a></div>
       </div>
+
+      <div id="formResetPassword" style="display:none">
+        <div style="text-align:center;margin-bottom:1.2rem">
+          <div style="font-family:Fraunces,serif;font-size:1.1rem;margin-bottom:0.3rem">Välj nytt lösenord</div>
+          <div style="font-size:0.82rem;color:#888">Ange ditt nya lösenord nedan</div>
+        </div>
+        <div class="mfield"><label>Nytt lösenord</label><input type="password" id="newPass1" placeholder="Minst 6 tecken"></div>
+        <div class="mfield"><label>Bekräfta lösenord</label><input type="password" id="newPass2" placeholder="Upprepa lösenordet" onkeydown="if(event.key==='Enter')doResetPassword()"></div>
+        <button class="msub" id="resetPassBtn" onclick="doResetPassword()">Spara nytt lösenord →</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2587,8 +2597,69 @@ async function init() {
     window.history.replaceState({}, '', window.location.pathname);
   }
 
+  // Hantera lösenordsåterställning — stöd både hash-format och query-param-format
+  const hash = window.location.hash;
+  const isRecoveryHash = hash.includes('type=recovery');
+  const isRecoveryQuery = urlParams.get('type') === 'recovery';
+
+  if (isRecoveryHash || isRecoveryQuery) {
+    // Om token finns som query-param, låt Supabase hantera det
+    const token = urlParams.get('token');
+    const tokenHash = urlParams.get('token_hash') || token;
+
+    setTimeout(async () => {
+      let session = null;
+
+      if (tokenHash) {
+        // Nytt Supabase-format: verifiera token direkt
+        const { data, error } = await sb.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: 'recovery'
+        });
+        session = data?.session;
+        if (error) console.error('OTP verify error:', error);
+      } else {
+        // Gammalt format: session sätts från hash
+        const { data } = await sb.auth.getSession();
+        session = data?.session;
+      }
+
+      if (session) {
+        showView('landing');
+        document.getElementById('authOverlay').classList.add('open');
+        ['formRegister','formLogin','formForgot'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+        const resetForm = document.getElementById('formResetPassword');
+        if (resetForm) resetForm.style.display = 'block';
+        const modalSub = document.getElementById('modalSub');
+        if (modalSub) modalSub.textContent = 'Välj ett nytt lösenord';
+        const tabs = document.querySelector('.modal-tabs');
+        if (tabs) tabs.style.display = 'none';
+        window.history.replaceState({}, '', window.location.pathname);
+      } else {
+        // Token ogiltig eller utgången
+        showView('landing');
+        document.getElementById('authOverlay').classList.add('open');
+        showError('Återställningslänken har gått ut. Begär en ny.');
+      }
+    }, 300);
+  }
+
   sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_OUT') { _loginHandled = false; onLogout(); }
+    if (event === 'PASSWORD_RECOVERY') {
+      // Visa reset-formulär direkt
+      showView('landing');
+      document.getElementById('authOverlay').classList.add('open');
+      ['formRegister','formLogin','formForgot'].forEach(id => {
+        document.getElementById(id).style.display = 'none';
+      });
+      document.getElementById('formResetPassword').style.display = 'block';
+      document.getElementById('modalSub').textContent = 'Välj ett nytt lösenord';
+      document.querySelector('.modal-tabs').style.display = 'none';
+    }
   });
 
   try {
@@ -5179,6 +5250,43 @@ function showLoginTab() {
   document.getElementById('modalSub').textContent = 'Välkommen tillbaka';
 }
 
+async function doResetPassword() {
+  const p1 = document.getElementById('newPass1').value;
+  const p2 = document.getElementById('newPass2').value;
+  const btn = document.getElementById('resetPassBtn');
+  const errEl = document.getElementById('merror');
+
+  if (!p1 || p1.length < 6) { showError('Lösenordet måste vara minst 6 tecken.'); return; }
+  if (p1 !== p2) { showError('Lösenorden matchar inte.'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Sparar...';
+
+  const { error } = await sb.auth.updateUser({ password: p1 });
+
+  if (error) {
+    showError('Fel: ' + error.message);
+    btn.disabled = false;
+    btn.textContent = 'Spara nytt lösenord →';
+    return;
+  }
+
+  // Lösenord sparat — logga in automatiskt
+  btn.textContent = '✓ Lösenord sparat!';
+  btn.style.background = '#2a6e4e';
+  document.querySelector('.modal-tabs').style.display = '';
+  setTimeout(() => {
+    closeModal();
+    document.getElementById('formResetPassword').style.display = 'none';
+    document.getElementById('newPass1').value = '';
+    document.getElementById('newPass2').value = '';
+    document.getElementById('modalSub').textContent = 'Skapa ditt konto – gratis';
+    btn.disabled = false;
+    btn.textContent = 'Spara nytt lösenord →';
+    btn.style.background = '';
+  }, 1500);
+}
+
 async function doForgotPassword() {
   const email = document.getElementById('forgotEmail').value.trim();
   if (!email) { alert('Ange din e-postadress.'); return; }
@@ -5186,7 +5294,7 @@ async function doForgotPassword() {
   btn.disabled = true;
   btn.textContent = 'Skickar...';
   const { error } = await sb.auth.resetPasswordForEmail(email, {
-    redirectTo: 'https://offeria.se'
+    redirectTo: 'https://offeria.se/?reset=1'
   });
   if (error) {
     alert('Fel: ' + error.message);
