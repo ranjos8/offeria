@@ -1723,30 +1723,55 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
       <!-- ADMIN PAGE -->
       <div class="app-page" id="page-admin">
-        <div class="page-title">Kunskapsdatabas</div>
-        <div class="page-sub">Hantera AI-chattens svar — ändringar träder i kraft omedelbart</div>
+        <div class="page-title">Admin</div>
+        <div class="page-sub">Hantera AI-chatten och se vad kunder frågar</div>
 
-        <div class="gen-card" style="max-width:800px;margin-bottom:1rem">
-          <div style="display:flex;gap:0.8rem;flex-wrap:wrap;align-items:center">
-            <input id="kbSearch" type="text" placeholder="Sök fråga, svar eller nyckelord..." oninput="filterKB()" style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
-            <select id="kbCategoryFilter" onchange="filterKB()" style="padding:0.6rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
-              <option value="">Alla kategorier</option>
-              <option value="ui">UI & Navigation</option>
-              <option value="kategori">Kategorier & konton</option>
-              <option value="moms">Moms & EU</option>
-              <option value="lag">Bokföringslagen</option>
-              <option value="rapport">Rapporter</option>
-              <option value="faktura">Fakturor</option>
-              <option value="skatt">Skatter</option>
-              <option value="avskrivning">Avskrivningar</option>
-              <option value="avancerat">Avancerat</option>
-            </select>
-            <button onclick="openKBModal()" class="gen-btn" style="padding:0.5rem 1.2rem;font-size:0.85rem;white-space:nowrap">+ Nytt svar</button>
-          </div>
-          <div style="font-size:0.8rem;color:#888;margin-top:0.6rem" id="kbCount">Laddar...</div>
+        <!-- Flikar -->
+        <div class="tab-bar" style="margin-bottom:1.2rem">
+          <button class="tab-btn active" id="adminTabKB" onclick="switchAdminTab('kb')">Kunskapsdatabas</button>
+          <button class="tab-btn" id="adminTabLog" onclick="switchAdminTab('log')">Kundernas frågor</button>
         </div>
 
-        <div id="kbList" style="max-width:800px"></div>
+        <!-- FLIK 1: KUNSKAPSDATABAS -->
+        <div id="adminPanelKB">
+          <div class="gen-card" style="max-width:800px;margin-bottom:1rem">
+            <div style="display:flex;gap:0.8rem;flex-wrap:wrap;align-items:center">
+              <input id="kbSearch" type="text" placeholder="Sök fråga, svar eller nyckelord..." oninput="filterKB()" style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
+              <select id="kbCategoryFilter" onchange="filterKB()" style="padding:0.6rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
+                <option value="">Alla kategorier</option>
+                <option value="ui">UI & Navigation</option>
+                <option value="kategori">Kategorier & konton</option>
+                <option value="moms">Moms & EU</option>
+                <option value="lag">Bokföringslagen</option>
+                <option value="rapport">Rapporter</option>
+                <option value="faktura">Fakturor</option>
+                <option value="skatt">Skatter</option>
+                <option value="avskrivning">Avskrivningar</option>
+                <option value="avancerat">Avancerat</option>
+              </select>
+              <button onclick="openKBModal()" class="gen-btn" style="padding:0.5rem 1.2rem;font-size:0.85rem;white-space:nowrap">+ Nytt svar</button>
+            </div>
+            <div style="font-size:0.8rem;color:#888;margin-top:0.6rem" id="kbCount">Laddar...</div>
+          </div>
+          <div id="kbList" style="max-width:800px"></div>
+        </div>
+
+        <!-- FLIK 2: KUNDERNAS FRÅGOR -->
+        <div id="adminPanelLog" style="display:none">
+          <div class="gen-card" style="max-width:800px;margin-bottom:1rem">
+            <div style="display:flex;gap:0.8rem;flex-wrap:wrap;align-items:center">
+              <input id="logSearch" type="text" placeholder="Sök i frågor..." oninput="filterLog()" style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
+              <select id="logFilter" onchange="filterLog()" style="padding:0.6rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
+                <option value="all">Alla frågor</option>
+                <option value="unique">Unika frågor</option>
+                <option value="recent">Senaste 7 dagarna</option>
+              </select>
+              <button onclick="loadLog()" class="btn-sm btn-outline" style="padding:0.5rem 0.8rem;font-size:0.82rem">↻ Uppdatera</button>
+            </div>
+            <div style="font-size:0.8rem;color:#888;margin-top:0.6rem" id="logCount">Laddar...</div>
+          </div>
+          <div id="logList" style="max-width:800px"></div>
+        </div>
       </div>
 
       <!-- KB MODAL -->
@@ -2835,7 +2860,7 @@ function showPage(p) {
   if (p === 'articles') loadArticles();
   if (p === 'bookkeeping') initBookkeeping();
   if (p === 'suppliers') loadSuppliers();
-  if (p === 'admin') loadKB();
+  if (p === 'admin') { loadKB(); }
   updateDrawerActive(p);
   updateAIChatVisibility();
   // Spara aktuell sida så F5 återvänder dit (inte dashboard)
@@ -3013,6 +3038,16 @@ async function generateManualQuote() {
 // ===== ADMIN — KUNSKAPSDATABAS =====
 let _kbData = [];
 let _kbFiltered = [];
+let _logData = [];
+let _logFiltered = [];
+
+function switchAdminTab(tab) {
+  document.getElementById('adminPanelKB').style.display = tab === 'kb' ? 'block' : 'none';
+  document.getElementById('adminPanelLog').style.display = tab === 'log' ? 'block' : 'none';
+  document.getElementById('adminTabKB').classList.toggle('active', tab === 'kb');
+  document.getElementById('adminTabLog').classList.toggle('active', tab === 'log');
+  if (tab === 'log') loadLog();
+}
 
 async function loadKB() {
   const { data, error } = await sb
@@ -3023,6 +3058,94 @@ async function loadKB() {
   if (error) { console.error('KB load error:', error); return; }
   _kbData = data || [];
   filterKB();
+}
+
+async function loadLog() {
+  const countEl = document.getElementById('logCount');
+  const listEl = document.getElementById('logList');
+  if (countEl) countEl.textContent = 'Laddar...';
+
+  const { data, error } = await sb
+    .from('bookkeeping_ai_log')
+    .select('id, question, answer_length, created_at, user_id')
+    .order('created_at', { ascending: false })
+    .limit(200);
+
+  if (error) {
+    if (listEl) listEl.innerHTML = '<div style="padding:2rem;color:#c62828">Kunde inte ladda loggar: ' + error.message + '</div>';
+    return;
+  }
+  _logData = data || [];
+  filterLog();
+}
+
+function filterLog() {
+  const q = (document.getElementById('logSearch')?.value || '').toLowerCase();
+  const filter = document.getElementById('logFilter')?.value || 'all';
+  const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+
+  let filtered = _logData;
+  if (filter === 'recent') filtered = filtered.filter(r => r.created_at > sevenDaysAgo);
+  if (filter === 'unique') {
+    const seen = new Set();
+    filtered = filtered.filter(r => {
+      const key = r.question?.toLowerCase().trim();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+  if (q) filtered = filtered.filter(r => r.question?.toLowerCase().includes(q));
+  _logFiltered = filtered;
+  renderLogList();
+}
+
+function renderLogList() {
+  const el = document.getElementById('logList');
+  const countEl = document.getElementById('logCount');
+  if (!el) return;
+
+  // Räkna frågefrekvens
+  const freq = {};
+  _logData.forEach(r => {
+    const k = r.question?.toLowerCase().trim();
+    freq[k] = (freq[k] || 0) + 1;
+  });
+
+  countEl.textContent = `${_logFiltered.length} frågor visas av ${_logData.length} totalt`;
+
+  if (_logFiltered.length === 0) {
+    el.innerHTML = '<div style="padding:2rem;text-align:center;color:#aaa">Inga frågor ännu — kunder som använder AI-chatten syns här.</div>';
+    return;
+  }
+
+  el.innerHTML = _logFiltered.map(r => {
+    const count = freq[r.question?.toLowerCase().trim()] || 1;
+    const date = new Date(r.created_at).toLocaleDateString('sv-SE', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+    const inDB = _kbData.some(k => k.question?.toLowerCase().trim() === r.question?.toLowerCase().trim());
+
+    return `<div style="background:white;border:1px solid var(--border);border-radius:10px;padding:0.9rem 1.2rem;margin-bottom:0.5rem;${inDB ? 'opacity:0.6' : ''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.8rem">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:600;font-size:0.88rem;margin-bottom:0.3rem">${r.question || '—'}</div>
+          <div style="font-size:0.75rem;color:#888;display:flex;gap:0.8rem;flex-wrap:wrap">
+            <span>${date}</span>
+            ${count > 1 ? `<span style="color:#b8902e;font-weight:600">Frågad ${count} gånger</span>` : ''}
+            ${inDB ? '<span style="color:#2e7d32">✓ Finns i databasen</span>' : '<span style="color:#c62828">Ej i databasen</span>'}
+          </div>
+        </div>
+        ${!inDB ? `<button onclick="addLogToKB('${r.id}')" class="gen-btn" style="padding:0.3rem 0.8rem;font-size:0.78rem;white-space:nowrap;flex-shrink:0">+ Lägg till svar</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addLogToKB(logId) {
+  const entry = _logData.find(r => r.id === logId);
+  if (!entry) return;
+  // Öppna KB-modal med frågan förifylld
+  switchAdminTab('kb');
+  setTimeout(() => openKBModal({ question: entry.question, category: 'kategori', answer: '', keywords: [] }), 100);
 }
 
 function filterKB() {
@@ -3062,7 +3185,7 @@ function renderKBList() {
             <span style="font-size:0.68rem;font-weight:700;color:white;background:${catColors[r.category]||'#555'};padding:0.15rem 0.5rem;border-radius:4px">${catLabels[r.category]||r.category}</span>
             <span style="font-weight:600;font-size:0.88rem">${r.question}</span>
           </div>
-          <div style="font-size:0.8rem;color:#555;white-space:pre-wrap;line-height:1.5;max-height:80px;overflow:hidden;text-overflow:ellipsis">${r.answer?.substring(0, 200)}${r.answer?.length > 200 ? '...' : ''}</div>
+          <div style="font-size:0.8rem;color:#555;white-space:pre-wrap;line-height:1.5;max-height:80px;overflow:hidden">${r.answer?.substring(0, 200)}${r.answer?.length > 200 ? '...' : ''}</div>
           ${r.keywords?.length ? `<div style="margin-top:0.4rem;display:flex;flex-wrap:wrap;gap:0.3rem">${r.keywords.map(k => `<span style="font-size:0.68rem;background:#f5f5f3;border:1px solid var(--border);padding:0.1rem 0.4rem;border-radius:4px;color:#666">${k}</span>`).join('')}</div>` : ''}
         </div>
         <div style="display:flex;gap:0.4rem;flex-shrink:0">
@@ -3075,7 +3198,7 @@ function renderKBList() {
 }
 
 function openKBModal(entry = null) {
-  document.getElementById('kbModalTitle').textContent = entry ? 'Redigera svar' : 'Nytt svar';
+  document.getElementById('kbModalTitle').textContent = entry?.id ? 'Redigera svar' : 'Nytt svar';
   document.getElementById('kbEditId').value = entry?.id || '';
   document.getElementById('kbCategory').value = entry?.category || 'kategori';
   document.getElementById('kbQuestion').value = entry?.question || '';
@@ -3083,7 +3206,7 @@ function openKBModal(entry = null) {
   document.getElementById('kbKeywords').value = (entry?.keywords || []).join(', ');
   document.getElementById('kbSaveError').style.display = 'none';
   document.getElementById('kbModalOverlay').classList.add('open');
-  setTimeout(() => document.getElementById('kbQuestion').focus(), 100);
+  setTimeout(() => document.getElementById('kbAnswer').focus(), 100);
 }
 
 function closeKBModal() {
@@ -3117,7 +3240,6 @@ async function saveKBEntry() {
   }
 
   if (error) { errEl.textContent = 'Fel: ' + error.message; errEl.style.display = 'block'; return; }
-
   closeKBModal();
   await loadKB();
 }
