@@ -2603,48 +2603,64 @@ async function init() {
   const isRecoveryQuery = urlParams.get('type') === 'recovery';
 
   if (isRecoveryHash || isRecoveryQuery) {
-    // Om token finns som query-param, låt Supabase hantera det
     const token = urlParams.get('token');
     const tokenHash = urlParams.get('token_hash') || token;
 
-    setTimeout(async () => {
-      let session = null;
+    window._resetPasswordPending = true;
 
-      if (tokenHash) {
-        // Nytt Supabase-format: verifiera token direkt
+    const showResetForm = () => {
+      showView('landing');
+      document.getElementById('authOverlay').classList.add('open');
+      ['formRegister','formLogin','formForgot'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      const resetForm = document.getElementById('formResetPassword');
+      if (resetForm) resetForm.style.display = 'block';
+      const modalSub = document.getElementById('modalSub');
+      if (modalSub) modalSub.textContent = 'Välj ett nytt lösenord';
+      const tabs = document.querySelector('.modal-tabs');
+      if (tabs) tabs.style.display = 'none';
+      window.history.replaceState({}, '', window.location.pathname);
+    };
+
+    if (tokenHash) {
+      // Nytt Supabase-format: verifiera OTP och spara sessionen
+      try {
         const { data, error } = await sb.auth.verifyOtp({
           token_hash: tokenHash,
           type: 'recovery'
         });
-        session = data?.session;
-        if (error) console.error('OTP verify error:', error);
-      } else {
-        // Gammalt format: session sätts från hash
+        if (error || !data?.session) {
+          showView('landing');
+          document.getElementById('authOverlay').classList.add('open');
+          showError('Återställningslänken har gått ut. Begär en ny.');
+          window._resetPasswordPending = false;
+        } else {
+          // Spara sessionen explicit så att updateUser fungerar
+          window._recoverySession = data.session;
+          showResetForm();
+        }
+      } catch(e) {
+        showView('landing');
+        document.getElementById('authOverlay').classList.add('open');
+        showError('Kunde inte verifiera länken. Begär en ny.');
+        window._resetPasswordPending = false;
+      }
+    } else {
+      // Gammalt hash-format — vänta på att Supabase sätter sessionen
+      setTimeout(async () => {
         const { data } = await sb.auth.getSession();
-        session = data?.session;
-      }
-
-      if (session) {
-        showView('landing');
-        document.getElementById('authOverlay').classList.add('open');
-        ['formRegister','formLogin','formForgot'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.style.display = 'none';
-        });
-        const resetForm = document.getElementById('formResetPassword');
-        if (resetForm) resetForm.style.display = 'block';
-        const modalSub = document.getElementById('modalSub');
-        if (modalSub) modalSub.textContent = 'Välj ett nytt lösenord';
-        const tabs = document.querySelector('.modal-tabs');
-        if (tabs) tabs.style.display = 'none';
-        window.history.replaceState({}, '', window.location.pathname);
-      } else {
-        // Token ogiltig eller utgången
-        showView('landing');
-        document.getElementById('authOverlay').classList.add('open');
-        showError('Återställningslänken har gått ut. Begär en ny.');
-      }
-    }, 300);
+        if (data?.session) {
+          showResetForm();
+        } else {
+          showView('landing');
+          document.getElementById('authOverlay').classList.add('open');
+          showError('Återställningslänken har gått ut. Begär en ny.');
+          window._resetPasswordPending = false;
+        }
+      }, 500);
+    }
   }
 
   sb.auth.onAuthStateChange(async (event, session) => {
@@ -5276,18 +5292,25 @@ async function doResetPassword() {
   btn.disabled = true;
   btn.textContent = 'Sparar...';
 
-  // Kontrollera att sessionen fortfarande finns
-  const { data: { session: currentSession } } = await sb.auth.getSession();
+  // Kontrollera session — använd sparad recovery-session om vanlig session saknas
+  let { data: { session: currentSession } } = await sb.auth.getSession();
+  if (!currentSession && window._recoverySession) {
+    // Sätt sessionen manuellt från recovery
+    await sb.auth.setSession({
+      access_token: window._recoverySession.access_token,
+      refresh_token: window._recoverySession.refresh_token
+    });
+    const { data } = await sb.auth.getSession();
+    currentSession = data?.session;
+  }
   if (!currentSession) {
     showError('Länken har gått ut. Begär en ny återställningslänk.');
     btn.disabled = false;
     btn.textContent = 'Spara nytt lösenord →';
-    // Visa glömt-lösenord-formulär istället
     setTimeout(() => {
       document.getElementById('formResetPassword').style.display = 'none';
       document.getElementById('formForgot').style.display = 'block';
       document.getElementById('modalSub').textContent = 'Begär ny återställningslänk';
-      document.querySelector('.modal-tabs').style.display = 'none';
     }, 2000);
     return;
   }
