@@ -1724,16 +1724,106 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <!-- ADMIN PAGE -->
       <div class="app-page" id="page-admin">
         <div class="page-title">Admin</div>
-        <div class="page-sub">Hantera AI-chatten och se vad kunder frågar</div>
+        <div class="page-sub">Hantera Offeria — användare, AI, utskick och statistik</div>
 
         <!-- Flikar -->
-        <div class="tab-bar" style="margin-bottom:1.2rem">
-          <button class="tab-btn active" id="adminTabKB" onclick="switchAdminTab('kb')">Kunskapsdatabas</button>
+        <div class="tab-bar" style="margin-bottom:1.2rem;flex-wrap:wrap;gap:0.3rem">
+          <button class="tab-btn active" id="adminTabDash" onclick="switchAdminTab('dash')">📊 Översikt</button>
+          <button class="tab-btn" id="adminTabUsers" onclick="switchAdminTab('users')">👥 Användare</button>
+          <button class="tab-btn" id="adminTabEmail" onclick="switchAdminTab('email')">📧 Utskick</button>
+          <button class="tab-btn" id="adminTabKB" onclick="switchAdminTab('kb')">Kunskapsdatabas</button>
           <button class="tab-btn" id="adminTabLog" onclick="switchAdminTab('log')">Kundernas frågor</button>
         </div>
 
-        <!-- FLIK 1: KUNSKAPSDATABAS -->
-        <div id="adminPanelKB">
+        <!-- FLIK: ÖVERSIKT -->
+        <div id="adminPanelDash">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;max-width:900px;margin-bottom:1.5rem" id="adminStatsGrid">
+            <div class="gen-card" style="text-align:center;padding:1.2rem">
+              <div style="font-size:2rem;font-weight:700;color:var(--gold)" id="statTotalUsers">—</div>
+              <div style="font-size:0.78rem;color:#888;margin-top:0.3rem">Totalt användare</div>
+            </div>
+            <div class="gen-card" style="text-align:center;padding:1.2rem">
+              <div style="font-size:2rem;font-weight:700;color:#888" id="statFreeUsers">—</div>
+              <div style="font-size:0.78rem;color:#888;margin-top:0.3rem">Gratis</div>
+            </div>
+            <div class="gen-card" style="text-align:center;padding:1.2rem">
+              <div style="font-size:2rem;font-weight:700;color:#1565c0" id="statProUsers">—</div>
+              <div style="font-size:0.78rem;color:#888;margin-top:0.3rem">Pro</div>
+            </div>
+            <div class="gen-card" style="text-align:center;padding:1.2rem">
+              <div style="font-size:2rem;font-weight:700;color:#2e7d32" id="statKomplettUsers">—</div>
+              <div style="font-size:0.78rem;color:#888;margin-top:0.3rem">Komplett</div>
+            </div>
+            <div class="gen-card" style="text-align:center;padding:1.2rem">
+              <div style="font-size:2rem;font-weight:700;color:#b8902e" id="statTrialUsers">—</div>
+              <div style="font-size:0.78rem;color:#888;margin-top:0.3rem">I provperiod</div>
+            </div>
+            <div class="gen-card" style="text-align:center;padding:1.2rem">
+              <div style="font-size:2rem;font-weight:700;color:#2e7d32" id="statMRR">—</div>
+              <div style="font-size:0.78rem;color:#888;margin-top:0.3rem">MRR (kr/mån)</div>
+            </div>
+          </div>
+          <div class="gen-card" style="max-width:900px">
+            <div class="card-label">Nya användare senaste 14 dagarna</div>
+            <div id="adminNewUsersChart" style="height:120px;display:flex;align-items:flex-end;gap:4px;padding-top:0.5rem"></div>
+            <div id="adminNewUsersLabels" style="display:flex;gap:4px;margin-top:0.3rem;font-size:0.65rem;color:#aaa"></div>
+          </div>
+        </div>
+
+        <!-- FLIK: ANVÄNDARE -->
+        <div id="adminPanelUsers" style="display:none">
+          <div class="gen-card" style="max-width:900px;margin-bottom:1rem">
+            <div style="display:flex;gap:0.8rem;flex-wrap:wrap;align-items:center">
+              <input id="userSearch" type="text" placeholder="Sök namn, e-post..." oninput="filterUsers()" style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
+              <select id="userPlanFilter" onchange="filterUsers()" style="padding:0.6rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
+                <option value="">Alla planer</option>
+                <option value="free">Gratis</option>
+                <option value="pro">Pro</option>
+                <option value="komplett">Komplett</option>
+              </select>
+              <button onclick="exportUsersCSV()" class="btn-sm btn-outline" style="padding:0.5rem 0.8rem;font-size:0.82rem">↓ Exportera CSV</button>
+            </div>
+            <div style="font-size:0.8rem;color:#888;margin-top:0.5rem" id="userCount">Laddar...</div>
+          </div>
+          <div id="userList" style="max-width:900px"></div>
+        </div>
+
+        <!-- FLIK: UTSKICK -->
+        <div id="adminPanelEmail" style="display:none">
+          <div class="gen-card" style="max-width:700px">
+            <div class="card-label">Skicka mejl till användare</div>
+            <div class="field"><label>Mottagare</label>
+              <select id="emailTarget" style="width:100%;padding:0.7rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.9rem">
+                <option value="all">Alla användare</option>
+                <option value="free">Gratisanvändare</option>
+                <option value="pro">Pro-användare</option>
+                <option value="komplett">Komplett-användare</option>
+                <option value="paid">Betalande (Pro + Komplett)</option>
+                <option value="trial">Användare i provperiod</option>
+              </select>
+            </div>
+            <div class="field"><label>Ämne *</label>
+              <input id="emailSubject" placeholder="T.ex. Ny funktion: Bankimport med momssplit" style="width:100%;padding:0.7rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.9rem;box-sizing:border-box">
+            </div>
+            <div class="field"><label>Meddelande * <span style="font-size:0.75rem;color:#888;font-weight:400">(HTML stöds)</span></label>
+              <textarea id="emailBody" rows="10" placeholder="Hej,&#10;&#10;Vi har precis lanserat en ny funktion..." style="width:100%;padding:0.7rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem;resize:vertical;box-sizing:border-box"></textarea>
+            </div>
+            <div style="background:#f5f5f3;border-radius:8px;padding:0.8rem 1rem;font-size:0.8rem;color:#666;margin-bottom:1rem">
+              <strong>Tillgängliga variabler:</strong> {{name}} — kundens namn, {{company}} — företagsnamn, {{plan}} — nuvarande plan
+            </div>
+            <div style="display:flex;gap:0.8rem">
+              <button onclick="previewEmail()" class="btn-sm btn-outline" style="padding:0.6rem 1.2rem">Förhandsgranska</button>
+              <button onclick="sendBulkEmail()" class="gen-btn" style="padding:0.6rem 1.5rem" id="sendEmailBtn">Skicka utskick</button>
+            </div>
+            <div id="emailSendResult" style="margin-top:0.8rem;font-size:0.85rem;display:none"></div>
+          </div>
+          <div id="emailPreviewBox" style="display:none;max-width:700px;margin-top:1rem">
+            <div class="gen-card">
+              <div class="card-label">Förhandsgranskning</div>
+              <div style="border:1px solid var(--border);border-radius:8px;padding:1.2rem;background:white" id="emailPreviewContent"></div>
+            </div>
+          </div>
+        </div>
           <div class="gen-card" style="max-width:800px;margin-bottom:1rem">
             <div style="display:flex;gap:0.8rem;flex-wrap:wrap;align-items:center">
               <input id="kbSearch" type="text" placeholder="Sök fråga, svar eller nyckelord..." oninput="filterKB()" style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
@@ -2967,7 +3057,7 @@ function showPage(p) {
   if (p === 'articles') loadArticles();
   if (p === 'bookkeeping') initBookkeeping();
   if (p === 'suppliers') loadSuppliers();
-  if (p === 'admin') { loadKB(); }
+  if (p === 'admin') { loadAdminDash(); loadKB(); }
   updateDrawerActive(p);
   updateAIChatVisibility();
   // Spara aktuell sida så F5 återvänder dit (inte dashboard)
@@ -3149,11 +3239,255 @@ let _logData = [];
 let _logFiltered = [];
 
 function switchAdminTab(tab) {
-  document.getElementById('adminPanelKB').style.display = tab === 'kb' ? 'block' : 'none';
-  document.getElementById('adminPanelLog').style.display = tab === 'log' ? 'block' : 'none';
-  document.getElementById('adminTabKB').classList.toggle('active', tab === 'kb');
-  document.getElementById('adminTabLog').classList.toggle('active', tab === 'log');
+  const panels = { dash:'adminPanelDash', users:'adminPanelUsers', email:'adminPanelEmail', kb:'adminPanelKB', log:'adminPanelLog' };
+  const tabs = { dash:'adminTabDash', users:'adminTabUsers', email:'adminTabEmail', kb:'adminTabKB', log:'adminTabLog' };
+  Object.keys(panels).forEach(t => {
+    const p = document.getElementById(panels[t]);
+    const b = document.getElementById(tabs[t]);
+    if (p) p.style.display = t === tab ? 'block' : 'none';
+    if (b) b.classList.toggle('active', t === tab);
+  });
+  if (tab === 'dash') loadAdminDash();
+  if (tab === 'users') loadAdminUsers();
   if (tab === 'log') loadLog();
+  if (tab === 'kb') {} // already loaded
+}
+
+// ── ADMIN DASHBOARD ──
+async function loadAdminDash() {
+  const { data: profiles } = await sb.from('profiles').select('plan, trial_ends_at, created_at');
+  if (!profiles) return;
+
+  const total = profiles.length;
+  const free = profiles.filter(p => !p.plan || p.plan === 'free').length;
+  const pro = profiles.filter(p => p.plan === 'pro').length;
+  const komplett = profiles.filter(p => p.plan === 'komplett').length;
+  const now = new Date();
+  const trial = profiles.filter(p => p.trial_ends_at && new Date(p.trial_ends_at) > now && p.plan !== 'free').length;
+  const mrr = pro * 99 + komplett * 249;
+
+  document.getElementById('statTotalUsers').textContent = total;
+  document.getElementById('statFreeUsers').textContent = free;
+  document.getElementById('statProUsers').textContent = pro;
+  document.getElementById('statKomplettUsers').textContent = komplett;
+  document.getElementById('statTrialUsers').textContent = trial;
+  document.getElementById('statMRR').textContent = mrr.toLocaleString('sv-SE') + ' kr';
+
+  // Diagram — nya användare per dag senaste 14 dagarna
+  const days = [];
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    days.push(d.toISOString().slice(0, 10));
+  }
+  const counts = days.map(day => profiles.filter(p => p.created_at?.slice(0, 10) === day).length);
+  const max = Math.max(...counts, 1);
+
+  const chart = document.getElementById('adminNewUsersChart');
+  const labels = document.getElementById('adminNewUsersLabels');
+  if (chart) {
+    chart.innerHTML = counts.map((c, i) => `
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+        <div style="font-size:0.65rem;color:#888">${c || ''}</div>
+        <div style="width:100%;background:var(--gold);border-radius:3px 3px 0 0;height:${Math.max(4, c/max*100)}px;opacity:${c>0?1:0.2}"></div>
+      </div>`).join('');
+  }
+  if (labels) {
+    labels.innerHTML = days.map(d => `<div style="flex:1;text-align:center">${d.slice(5)}</div>`).join('');
+  }
+}
+
+// ── ADMIN ANVÄNDARE ──
+let _adminUsers = [];
+let _adminUsersFiltered = [];
+
+async function loadAdminUsers() {
+  const countEl = document.getElementById('userCount');
+  if (countEl) countEl.textContent = 'Laddar...';
+
+  const { data } = await sb.from('profiles')
+    .select('id, email, full_name, company_name, plan, trial_ends_at, created_at, stripe_customer_id')
+    .order('created_at', { ascending: false });
+
+  _adminUsers = data || [];
+  filterUsers();
+}
+
+function filterUsers() {
+  const q = (document.getElementById('userSearch')?.value || '').toLowerCase();
+  const plan = document.getElementById('userPlanFilter')?.value || '';
+  _adminUsersFiltered = _adminUsers.filter(u => {
+    const matchPlan = !plan || u.plan === plan || (!u.plan && plan === 'free');
+    const matchQ = !q || u.email?.toLowerCase().includes(q) ||
+      u.full_name?.toLowerCase().includes(q) ||
+      u.company_name?.toLowerCase().includes(q);
+    return matchPlan && matchQ;
+  });
+  renderUserList();
+}
+
+function renderUserList() {
+  const el = document.getElementById('userList');
+  const countEl = document.getElementById('userCount');
+  if (!el) return;
+
+  countEl.textContent = `${_adminUsersFiltered.length} av ${_adminUsers.length} användare`;
+
+  const planColor = { free:'#888', pro:'#1565c0', komplett:'#2e7d32' };
+  const planLabel = { free:'Gratis', pro:'Pro', komplett:'Komplett' };
+  const now = new Date();
+
+  el.innerHTML = `<div style="background:white;border:1px solid var(--border);border-radius:10px;overflow:hidden">
+    <table style="width:100%;border-collapse:collapse;font-size:0.83rem">
+      <thead><tr style="background:#f9f9f7;border-bottom:1px solid var(--border)">
+        <th style="padding:0.7rem 1rem;text-align:left;font-weight:600">Användare</th>
+        <th style="padding:0.7rem 1rem;text-align:left;font-weight:600">Plan</th>
+        <th style="padding:0.7rem 1rem;text-align:left;font-weight:600">Registrerad</th>
+        <th style="padding:0.7rem 1rem;text-align:left;font-weight:600">Trial</th>
+        <th style="padding:0.7rem 1rem;text-align:right;font-weight:600">Åtgärd</th>
+      </tr></thead>
+      <tbody>
+        ${_adminUsersFiltered.map((u, idx) => {
+          const plan = u.plan || 'free';
+          const trialEnd = u.trial_ends_at ? new Date(u.trial_ends_at) : null;
+          const inTrial = trialEnd && trialEnd > now;
+          const daysLeft = inTrial ? Math.ceil((trialEnd - now) / 86400000) : 0;
+          const regDate = u.created_at ? new Date(u.created_at).toLocaleDateString('sv-SE') : '—';
+
+          return `<tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:0.7rem 1rem">
+              <div style="font-weight:600">${u.company_name || u.full_name || '—'}</div>
+              <div style="font-size:0.75rem;color:#888">${u.email || ''}</div>
+            </td>
+            <td style="padding:0.7rem 1rem">
+              <span style="font-size:0.72rem;font-weight:700;color:white;background:${planColor[plan]||'#888'};padding:0.15rem 0.5rem;border-radius:4px">${planLabel[plan]||plan}</span>
+            </td>
+            <td style="padding:0.7rem 1rem;color:#888">${regDate}</td>
+            <td style="padding:0.7rem 1rem">
+              ${inTrial ? `<span style="font-size:0.75rem;color:#b8902e">${daysLeft} dagar kvar</span>` : '<span style="color:#ccc;font-size:0.75rem">—</span>'}
+            </td>
+            <td style="padding:0.7rem 1rem;text-align:right">
+              <select onchange="changeUserPlan('${u.id}', this.value, this)" style="padding:0.25rem 0.5rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.75rem;cursor:pointer">
+                <option value="">Ändra plan...</option>
+                <option value="free">→ Gratis</option>
+                <option value="pro">→ Pro (gratis)</option>
+                <option value="komplett">→ Komplett (gratis)</option>
+              </select>
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+async function changeUserPlan(userId, newPlan, selectEl) {
+  if (!newPlan) return;
+  const user = _adminUsers.find(u => u.id === userId);
+  if (!confirm(`Ändra ${user?.email} till plan "${newPlan}"?\n\nDetta är gratis — ingen Stripe-faktura skapas.`)) {
+    selectEl.value = '';
+    return;
+  }
+  const { error } = await sb.from('profiles').update({ plan: newPlan }).eq('id', userId);
+  if (error) { alert('Fel: ' + error.message); selectEl.value = ''; return; }
+  // Uppdatera lokalt
+  const u = _adminUsers.find(x => x.id === userId);
+  if (u) u.plan = newPlan;
+  filterUsers();
+}
+
+function exportUsersCSV() {
+  const rows = [['E-post','Namn','Företag','Plan','Registrerad']];
+  _adminUsersFiltered.forEach(u => {
+    rows.push([u.email||'', u.full_name||'', u.company_name||'', u.plan||'free',
+      u.created_at ? new Date(u.created_at).toLocaleDateString('sv-SE') : '']);
+  });
+  const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8'}));
+  a.download = 'offeria-anvandare-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+// ── ADMIN E-POSTUTSKICK ──
+function previewEmail() {
+  const subject = document.getElementById('emailSubject').value;
+  const body = document.getElementById('emailBody').value;
+  const target = document.getElementById('emailTarget').value;
+  const targetLabels = { all:'Alla användare', free:'Gratisanvändare', pro:'Pro-användare',
+    komplett:'Komplett-användare', paid:'Betalande användare', trial:'Provperiod-användare' };
+
+  const previewBox = document.getElementById('emailPreviewBox');
+  const previewContent = document.getElementById('emailPreviewContent');
+  const sampleName = 'Erik Svensson';
+  const sampleCompany = 'Svenssons Bygg AB';
+  const samplePlan = targetLabels[target] || 'Pro';
+
+  const rendered = body
+    .replace(/{{name}}/g, sampleName)
+    .replace(/{{company}}/g, sampleCompany)
+    .replace(/{{plan}}/g, samplePlan)
+    .replace(/\n/g, '<br>');
+
+  previewContent.innerHTML = `
+    <div style="font-size:0.8rem;color:#888;margin-bottom:0.8rem">
+      <strong>Till:</strong> ${targetLabels[target]} &nbsp;·&nbsp; <strong>Ämne:</strong> ${subject}
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:0.8rem">${rendered}</div>`;
+  previewBox.style.display = 'block';
+}
+
+async function sendBulkEmail() {
+  const subject = document.getElementById('emailSubject').value.trim();
+  const body = document.getElementById('emailBody').value.trim();
+  const target = document.getElementById('emailTarget').value;
+  const resultEl = document.getElementById('emailSendResult');
+  const btn = document.getElementById('sendEmailBtn');
+
+  if (!subject) { alert('Ange ett ämne.'); return; }
+  if (!body) { alert('Skriv ett meddelande.'); return; }
+
+  // Hämta mottagare
+  let recipients = _adminUsers;
+  const now = new Date();
+  if (target === 'free') recipients = _adminUsers.filter(u => !u.plan || u.plan === 'free');
+  if (target === 'pro') recipients = _adminUsers.filter(u => u.plan === 'pro');
+  if (target === 'komplett') recipients = _adminUsers.filter(u => u.plan === 'komplett');
+  if (target === 'paid') recipients = _adminUsers.filter(u => u.plan === 'pro' || u.plan === 'komplett');
+  if (target === 'trial') recipients = _adminUsers.filter(u => u.trial_ends_at && new Date(u.trial_ends_at) > now);
+
+  if (!recipients.length) { alert('Inga användare matchar vald grupp.'); return; }
+  if (!confirm(`Skicka till ${recipients.length} användare?\n\nÄmne: ${subject}`)) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Skickar...';
+  resultEl.style.display = 'none';
+
+  let sent = 0, failed = 0;
+  for (const user of recipients) {
+    if (!user.email) continue;
+    const personalBody = body
+      .replace(/{{name}}/g, user.full_name || user.company_name || 'Hej')
+      .replace(/{{company}}/g, user.company_name || '')
+      .replace(/{{plan}}/g, user.plan || 'gratis');
+    try {
+      const { error } = await sb.functions.invoke('super-task', {
+        body: {
+          task: 'send_email',
+          to: user.email,
+          subject: subject,
+          html: personalBody.replace(/\n/g, '<br>')
+        }
+      });
+      if (error) failed++;
+      else sent++;
+    } catch(e) { failed++; }
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Skicka utskick';
+  resultEl.style.cssText = `display:block;padding:0.8rem 1rem;border-radius:8px;background:${failed?'#fff3cd':'#e8f5e9'};color:${failed?'#856404':'#2e7d32'}`;
+  resultEl.textContent = `✓ Skickat till ${sent} användare${failed ? ` · ${failed} misslyckades` : ''}`;
 }
 
 async function loadKB() {
