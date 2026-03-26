@@ -932,7 +932,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 </div>
 
 <!-- ===== LANDING VIEW ===== -->
-<div class="view active" id="viewLanding" style="display:none">
+<div class="view active" id="viewLanding">
 
   <section class="hero">
     <div class="hero-badge"><span class="ico"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.09 6.26L20.18 9.27l-5.09 3.88L16.18 20 12 16.77 7.82 20l1.09-6.85L3.82 9.27l6.09-1.01z"/></svg></span> AI-offert · Faktura · Auto-bokföring</div>
@@ -2676,9 +2676,6 @@ Vill du fortsätta med export?`;
 let _loginHandled = false;
 
 async function init() {
-  // Visa landningssidan DIREKT — vänta inte på getSession (hänger i Edge)
-  showView('landing');
-
   // Hantera redirect från Stripe Checkout
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('payment') === 'success') {
