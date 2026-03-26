@@ -2884,6 +2884,12 @@ function updateUI(profile, used, total) {
   document.getElementById('navUserName').textContent = profile?.company_name || profile?.full_name || profile?.email || '';
   document.getElementById('navPlanBadge').textContent = PLAN_LABELS[plan];
 
+  // Uppdatera mobilmeny logged in/out state
+  const mli = document.getElementById('mobileLoggedIn');
+  const mlo = document.getElementById('mobileLoggedOut');
+  if (mli) mli.style.display = 'block';
+  if (mlo) mlo.style.display = 'none';
+
   // Visa admin-länk bara för admins
   const adminNav = document.getElementById('sNav-admin');
   if (adminNav) adminNav.style.display = profile?.is_admin ? 'flex' : 'none';
