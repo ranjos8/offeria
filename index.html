@@ -3119,7 +3119,7 @@ function renderLogList() {
     return;
   }
 
-  el.innerHTML = _logFiltered.map(r => {
+  el.innerHTML = _logFiltered.map((r, idx) => {
     const count = freq[r.question?.toLowerCase().trim()] || 1;
     const date = new Date(r.created_at).toLocaleDateString('sv-SE', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
     const inDB = _kbData.some(k => k.question?.toLowerCase().trim() === r.question?.toLowerCase().trim());
@@ -3134,18 +3134,17 @@ function renderLogList() {
             ${inDB ? '<span style="color:#2e7d32">✓ Finns i databasen</span>' : '<span style="color:#c62828">Ej i databasen</span>'}
           </div>
         </div>
-        ${!inDB ? `<button onclick="addLogToKB('${r.id}')" class="gen-btn" style="padding:0.3rem 0.8rem;font-size:0.78rem;white-space:nowrap;flex-shrink:0">+ Lägg till svar</button>` : ''}
+        ${!inDB ? `<button onclick="addLogToKB(${idx})" class="gen-btn" style="padding:0.3rem 0.8rem;font-size:0.78rem;white-space:nowrap;flex-shrink:0">+ Lägg till svar</button>` : ''}
       </div>
     </div>`;
   }).join('');
 }
 
-function addLogToKB(logId) {
-  const entry = _logData.find(r => r.id === logId);
+function addLogToKB(idx) {
+  const entry = _logFiltered[idx];
   if (!entry) return;
-  // Öppna KB-modal med frågan förifylld
   switchAdminTab('kb');
-  setTimeout(() => openKBModal({ question: entry.question, category: 'kategori', answer: '', keywords: [] }), 100);
+  setTimeout(() => openKBModal({ question: entry.question, category: 'kategori', answer: '', keywords: [] }), 150);
 }
 
 function filterKB() {
