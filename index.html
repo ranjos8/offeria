@@ -2597,15 +2597,12 @@ async function init() {
     window.history.replaceState({}, '', window.location.pathname);
   }
 
-  // Hantera lösenordsåterställning — stöd både hash-format och query-param-format
+  // Hantera lösenordsåterställning
   const hash = window.location.hash;
-  const isRecoveryHash = hash.includes('type=recovery');
-  const isRecoveryQuery = urlParams.get('type') === 'recovery';
+  const isRecoveryHash = hash.includes('type=recovery') || hash.includes('access_token');
+  const isRecoveryQuery = urlParams.get('type') === 'recovery' || urlParams.get('reset') === '1';
 
   if (isRecoveryHash || isRecoveryQuery) {
-    const token = urlParams.get('token');
-    const tokenHash = urlParams.get('token_hash') || token;
-
     window._resetPasswordPending = true;
 
     const showResetForm = () => {
@@ -2624,43 +2621,24 @@ async function init() {
       window.history.replaceState({}, '', window.location.pathname);
     };
 
-    if (tokenHash) {
-      // Nytt Supabase-format: verifiera OTP och spara sessionen
-      try {
-        const { data, error } = await sb.auth.verifyOtp({
-          token_hash: tokenHash,
-          type: 'recovery'
-        });
-        if (error || !data?.session) {
-          showView('landing');
-          document.getElementById('authOverlay').classList.add('open');
-          showError('Återställningslänken har gått ut. Begär en ny.');
-          window._resetPasswordPending = false;
-        } else {
-          // Spara sessionen explicit så att updateUser fungerar
-          window._recoverySession = data.session;
-          showResetForm();
-        }
-      } catch(e) {
+    // Vänta på att Supabase sätter sessionen från hash-fragmentet
+    let attempts = 0;
+    const waitForSession = async () => {
+      const { data } = await sb.auth.getSession();
+      if (data?.session) {
+        window._recoverySession = data.session;
+        showResetForm();
+      } else if (attempts < 10) {
+        attempts++;
+        setTimeout(waitForSession, 300);
+      } else {
         showView('landing');
         document.getElementById('authOverlay').classList.add('open');
-        showError('Kunde inte verifiera länken. Begär en ny.');
+        showError('Återställningslänken har gått ut. Begär en ny.');
         window._resetPasswordPending = false;
       }
-    } else {
-      // Gammalt hash-format — vänta på att Supabase sätter sessionen
-      setTimeout(async () => {
-        const { data } = await sb.auth.getSession();
-        if (data?.session) {
-          showResetForm();
-        } else {
-          showView('landing');
-          document.getElementById('authOverlay').classList.add('open');
-          showError('Återställningslänken har gått ut. Begär en ny.');
-          window._resetPasswordPending = false;
-        }
-      }, 500);
-    }
+    };
+    setTimeout(waitForSession, 200);
   }
 
   sb.auth.onAuthStateChange(async (event, session) => {
@@ -5355,7 +5333,7 @@ async function doForgotPassword() {
   btn.disabled = true;
   btn.textContent = 'Skickar...';
   const { error } = await sb.auth.resetPasswordForEmail(email, {
-    redirectTo: 'https://offeria.se/?reset=1'
+    redirectTo: 'https://offeria.se/'
   });
   if (error) {
     alert('Fel: ' + error.message);
