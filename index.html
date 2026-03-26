@@ -2648,17 +2648,24 @@ async function init() {
   }
 
   sb.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_OUT') { _loginHandled = false; onLogout(); }
+    if (event === 'SIGNED_OUT') { _loginHandled = false; window._resetPasswordPending = false; onLogout(); }
     if (event === 'PASSWORD_RECOVERY') {
-      // Visa reset-formulär direkt
+      // Markera att lösenordsåterställning pågår — blockera inloggning
+      window._resetPasswordPending = true;
       showView('landing');
       document.getElementById('authOverlay').classList.add('open');
       ['formRegister','formLogin','formForgot'].forEach(id => {
-        document.getElementById(id).style.display = 'none';
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
       });
       document.getElementById('formResetPassword').style.display = 'block';
       document.getElementById('modalSub').textContent = 'Välj ett nytt lösenord';
       document.querySelector('.modal-tabs').style.display = 'none';
+    }
+    if (event === 'SIGNED_IN' && !_loginHandled && !window._resetPasswordPending) {
+      // Normalt inloggning — hantera bara om det inte är recovery
+      _loginHandled = true;
+      if (session?.user) await onLogin(session.user);
     }
   });
 
@@ -2837,7 +2844,15 @@ function openModal(tab) {
   switchTab(tab);
   showError('');
 }
-function closeModal() { document.getElementById('authOverlay').classList.remove('open'); }
+function closeModal() {
+  // Om lösenordsåterställningsformuläret är öppet och stängs utan att spara — logga ut
+  const resetForm = document.getElementById('formResetPassword');
+  if (resetForm && resetForm.style.display !== 'none') {
+    sb.auth.signOut();
+    window._resetPasswordPending = false;
+  }
+  document.getElementById('authOverlay').classList.remove('open');
+}
 function closeModalOutside(e) { if (e.target.id === 'authOverlay') closeModal(); }
 function switchTab(tab) {
   document.getElementById('tab-reg').classList.toggle('on', tab === 'register');
@@ -5271,12 +5286,13 @@ async function doResetPassword() {
     return;
   }
 
-  // Lösenord sparat — logga in automatiskt
+  // Lösenord sparat — rensa recovery-flagga och logga in
+  window._resetPasswordPending = false;
   btn.textContent = '✓ Lösenord sparat!';
   btn.style.background = '#2a6e4e';
   document.querySelector('.modal-tabs').style.display = '';
-  setTimeout(() => {
-    closeModal();
+  setTimeout(async () => {
+    document.getElementById('authOverlay').classList.remove('open');
     document.getElementById('formResetPassword').style.display = 'none';
     document.getElementById('newPass1').value = '';
     document.getElementById('newPass2').value = '';
@@ -5284,6 +5300,13 @@ async function doResetPassword() {
     btn.disabled = false;
     btn.textContent = 'Spara nytt lösenord →';
     btn.style.background = '';
+    // Logga in automatiskt efter lösenordsbyte
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user) {
+      _loginHandled = true;
+      showView('app');
+      await onLogin(session.user);
+    }
   }, 1500);
 }
 
