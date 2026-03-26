@@ -2600,7 +2600,8 @@ async function init() {
   // Hantera lösenordsåterställning
   const hash = window.location.hash;
   const isRecoveryHash = hash.includes('type=recovery') || hash.includes('access_token');
-  const isRecoveryQuery = urlParams.get('type') === 'recovery' || urlParams.get('reset') === '1';
+  const tokenHash = urlParams.get('token_hash');
+  const isRecoveryQuery = urlParams.get('type') === 'recovery' || urlParams.get('reset') === '1' || !!tokenHash;
 
   if (isRecoveryHash || isRecoveryQuery) {
     window._resetPasswordPending = true;
@@ -2621,24 +2622,50 @@ async function init() {
       window.history.replaceState({}, '', window.location.pathname);
     };
 
-    // Vänta på att Supabase sätter sessionen från hash-fragmentet
-    let attempts = 0;
-    const waitForSession = async () => {
-      const { data } = await sb.auth.getSession();
-      if (data?.session) {
-        window._recoverySession = data.session;
-        showResetForm();
-      } else if (attempts < 10) {
-        attempts++;
-        setTimeout(waitForSession, 300);
-      } else {
+    if (tokenHash) {
+      // Ny metod: token_hash i query-param — verifiera direkt
+      try {
+        const { data, error } = await sb.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: 'recovery'
+        });
+        if (error || !data?.session) {
+          showView('landing');
+          document.getElementById('authOverlay').classList.add('open');
+          showError('Återställningslänken har gått ut. Begär en ny.');
+          window._resetPasswordPending = false;
+        } else {
+          window._recoverySession = data.session;
+          _loginHandled = true; // Förhindra att onLogin körs
+          showResetForm();
+        }
+      } catch(e) {
         showView('landing');
         document.getElementById('authOverlay').classList.add('open');
-        showError('Återställningslänken har gått ut. Begär en ny.');
+        showError('Kunde inte verifiera länken. Begär en ny.');
         window._resetPasswordPending = false;
       }
-    };
-    setTimeout(waitForSession, 200);
+      return; // Avbryt resten av init — återställning hanteras separat
+    } else {
+      // Fallback: vänta på session från hash
+      let attempts = 0;
+      const waitForSession = async () => {
+        const { data } = await sb.auth.getSession();
+        if (data?.session) {
+          window._recoverySession = data.session;
+          showResetForm();
+        } else if (attempts < 10) {
+          attempts++;
+          setTimeout(waitForSession, 300);
+        } else {
+          showView('landing');
+          document.getElementById('authOverlay').classList.add('open');
+          showError('Återställningslänken har gått ut. Begär en ny.');
+          window._resetPasswordPending = false;
+        }
+      };
+      setTimeout(waitForSession, 200);
+    }
   }
 
   sb.auth.onAuthStateChange(async (event, session) => {
