@@ -2717,8 +2717,8 @@ async function onLogin(user) {
   // Welcome flow for new users
   if ((total || 0) === 0 && !localStorage.getItem('offeria_welcomed_' + user.id)) {
     document.getElementById('welcomeBanner').style.display = 'block';
-    // Send welcome email (only once)
-    if (!localStorage.getItem('offeria_welcome_sent_' + user.id)) {
+    // Skicka välkomstmejl bara en gång och INTE vid lösenordsåterställning
+    if (!localStorage.getItem('offeria_welcome_sent_' + user.id) && !window._resetPasswordPending) {
       sendWelcomeEmail(user.email, profile?.full_name || profile?.company_name || '');
       localStorage.setItem('offeria_welcome_sent_' + user.id, '1');
     }
@@ -5269,13 +5269,28 @@ async function doResetPassword() {
   const p1 = document.getElementById('newPass1').value;
   const p2 = document.getElementById('newPass2').value;
   const btn = document.getElementById('resetPassBtn');
-  const errEl = document.getElementById('merror');
 
   if (!p1 || p1.length < 6) { showError('Lösenordet måste vara minst 6 tecken.'); return; }
   if (p1 !== p2) { showError('Lösenorden matchar inte.'); return; }
 
   btn.disabled = true;
   btn.textContent = 'Sparar...';
+
+  // Kontrollera att sessionen fortfarande finns
+  const { data: { session: currentSession } } = await sb.auth.getSession();
+  if (!currentSession) {
+    showError('Länken har gått ut. Begär en ny återställningslänk.');
+    btn.disabled = false;
+    btn.textContent = 'Spara nytt lösenord →';
+    // Visa glömt-lösenord-formulär istället
+    setTimeout(() => {
+      document.getElementById('formResetPassword').style.display = 'none';
+      document.getElementById('formForgot').style.display = 'block';
+      document.getElementById('modalSub').textContent = 'Begär ny återställningslänk';
+      document.querySelector('.modal-tabs').style.display = 'none';
+    }, 2000);
+    return;
+  }
 
   const { error } = await sb.auth.updateUser({ password: p1 });
 
