@@ -3340,48 +3340,57 @@ function renderUserList() {
   const planLabel = { free:'Gratis', pro:'Pro', komplett:'Komplett' };
   const now = new Date();
 
-  el.innerHTML = `<div style="background:white;border:1px solid var(--border);border-radius:10px;overflow:hidden">
-    <table style="width:100%;border-collapse:collapse;font-size:0.83rem">
-      <thead><tr style="background:#f9f9f7;border-bottom:1px solid var(--border)">
-        <th style="padding:0.7rem 1rem;text-align:left;font-weight:600">Användare</th>
-        <th style="padding:0.7rem 1rem;text-align:left;font-weight:600">Plan</th>
-        <th style="padding:0.7rem 1rem;text-align:left;font-weight:600">Registrerad</th>
-        <th style="padding:0.7rem 1rem;text-align:left;font-weight:600">Trial</th>
-        <th style="padding:0.7rem 1rem;text-align:right;font-weight:600">Åtgärd</th>
-      </tr></thead>
-      <tbody>
-        ${_adminUsersFiltered.map((u, idx) => {
-          const plan = u.plan || 'free';
-          const trialEnd = u.trial_ends_at ? new Date(u.trial_ends_at) : null;
-          const inTrial = trialEnd && trialEnd > now;
-          const daysLeft = inTrial ? Math.ceil((trialEnd - now) / 86400000) : 0;
-          const regDate = u.created_at ? new Date(u.created_at).toLocaleDateString('sv-SE') : '—';
+  // Bygg tabellen med createElement för att undvika HTML-injection och quote-konflikter
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'background:white;border:1px solid var(--border);border-radius:10px;overflow:hidden';
+  
+  const table = document.createElement('table');
+  table.style.cssText = 'width:100%;border-collapse:collapse;font-size:0.83rem';
+  table.innerHTML = `<thead><tr style="background:#f9f9f7;border-bottom:1px solid var(--border)">
+    <th style="padding:0.7rem 1rem;text-align:left;font-weight:600">Användare</th>
+    <th style="padding:0.7rem 1rem;text-align:left;font-weight:600">Plan</th>
+    <th style="padding:0.7rem 1rem;text-align:left;font-weight:600">Registrerad</th>
+    <th style="padding:0.7rem 1rem;text-align:left;font-weight:600">Trial</th>
+    <th style="padding:0.7rem 1rem;text-align:right;font-weight:600">Åtgärd</th>
+  </tr></thead>`;
 
-          return `<tr style="border-bottom:1px solid var(--border)">
-            <td style="padding:0.7rem 1rem">
-              <div style="font-weight:600">${u.company_name || u.full_name || '—'}</div>
-              <div style="font-size:0.75rem;color:#888">${u.email || ''}</div>
-            </td>
-            <td style="padding:0.7rem 1rem">
-              <span style="font-size:0.72rem;font-weight:700;color:white;background:${planColor[plan]||'#888'};padding:0.15rem 0.5rem;border-radius:4px">${planLabel[plan]||plan}</span>
-            </td>
-            <td style="padding:0.7rem 1rem;color:#888">${regDate}</td>
-            <td style="padding:0.7rem 1rem">
-              ${inTrial ? `<span style="font-size:0.75rem;color:#b8902e">${daysLeft} dagar kvar</span>` : '<span style="color:#ccc;font-size:0.75rem">—</span>'}
-            </td>
-            <td style="padding:0.7rem 1rem;text-align:right">
-              <select onchange="changeUserPlan('${u.id}', this.value, this)" style="padding:0.25rem 0.5rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.75rem;cursor:pointer">
-                <option value="">Ändra plan...</option>
-                <option value="free">→ Gratis</option>
-                <option value="pro">→ Pro (gratis)</option>
-                <option value="komplett">→ Komplett (gratis)</option>
-              </select>
-            </td>
-          </tr>`;
-        }).join('')}
-      </tbody>
-    </table>
-  </div>`;
+  const tbody = document.createElement('tbody');
+  _adminUsersFiltered.forEach(u => {
+    const plan = u.plan || 'free';
+    const trialEnd = u.trial_ends_at ? new Date(u.trial_ends_at) : null;
+    const inTrial = trialEnd && trialEnd > now;
+    const daysLeft = inTrial ? Math.ceil((trialEnd - now) / 86400000) : 0;
+    const regDate = u.created_at ? new Date(u.created_at).toLocaleDateString('sv-SE') : '—';
+
+    const tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid var(--border)';
+    tr.innerHTML = `
+      <td style="padding:0.7rem 1rem">
+        <div style="font-weight:600">${u.company_name || u.full_name || '—'}</div>
+        <div style="font-size:0.75rem;color:#888">${u.email || ''}</div>
+      </td>
+      <td style="padding:0.7rem 1rem">
+        <span style="font-size:0.72rem;font-weight:700;color:white;background:${planColor[plan]||'#888'};padding:0.15rem 0.5rem;border-radius:4px">${planLabel[plan]||plan}</span>
+      </td>
+      <td style="padding:0.7rem 1rem;color:#888">${regDate}</td>
+      <td style="padding:0.7rem 1rem">
+        ${inTrial ? '<span style="font-size:0.75rem;color:#b8902e">'+daysLeft+' dagar kvar</span>' : '<span style="color:#ccc;font-size:0.75rem">—</span>'}
+      </td>
+      <td style="padding:0.7rem 1rem;text-align:right"></td>`;
+
+    // Skapa select separat för att undvika quote-problem
+    const td = tr.querySelector('td:last-child');
+    const sel = document.createElement('select');
+    sel.style.cssText = 'padding:0.25rem 0.5rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.75rem;cursor:pointer';
+    sel.innerHTML = '<option value="">Ändra plan...</option><option value="free">→ Gratis</option><option value="pro">→ Pro (gratis)</option><option value="komplett">→ Komplett (gratis)</option>';
+    sel.addEventListener('change', function() { changeUserPlan(u.id, this.value, this); });
+    td.appendChild(sel);
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  wrapper.appendChild(table);
+  el.innerHTML = '';
+  el.appendChild(wrapper);
 }
 
 async function changeUserPlan(userId, newPlan, selectEl) {
