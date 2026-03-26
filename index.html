@@ -2784,13 +2784,9 @@ async function init() {
   });
 
   try {
-    // Timeout om getSession hänger (t.ex. pga tracking prevention i Edge)
-    const sessionPromise = sb.auth.getSession();
-    const timeoutPromise = new Promise(resolve => setTimeout(() => resolve({ data: { session: null } }), 3000));
-    const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]);
+    const { data: { session } } = await sb.auth.getSession();
     if (session) {
-      showView('app');
-      showPage('dashboard');
+      _loginHandled = true;
       await onLogin(session.user);
     } else {
       showView('landing');
