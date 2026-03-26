@@ -3292,14 +3292,11 @@ async function loadAdminDash() {
   const chart = document.getElementById('adminNewUsersChart');
   const labels = document.getElementById('adminNewUsersLabels');
   if (chart) {
-    chart.innerHTML = counts.map(function(c) {
-      var h = Math.max(4, c/max*100);
-      var op = c > 0 ? 1 : 0.2;
-      return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">' +
-        '<div style="font-size:0.65rem;color:#888">' + (c || '') + '</div>' +
-        '<div style="width:100%;background:var(--gold);border-radius:3px 3px 0 0;height:' + h + 'px;opacity:' + op + '"></div>' +
-        '</div>';
-    }).join('');
+    chart.innerHTML = counts.map((c, i) => `
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+        <div style="font-size:0.65rem;color:#888">${c || ''}</div>
+        <div style="width:100%;background:var(--gold);border-radius:3px 3px 0 0;height:${Math.max(4, c/max*100)}px;opacity:${c>0?1:0.2}"></div>
+      </div>`).join('');
   }
   if (labels) {
     labels.innerHTML = days.map(d => `<div style="flex:1;text-align:center">${d.slice(5)}</div>`).join('');
