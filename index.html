@@ -932,7 +932,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 </div>
 
 <!-- ===== LANDING VIEW ===== -->
-<div class="view active" id="viewLanding">
+<div class="view active" id="viewLanding" style="display:none">
 
   <section class="hero">
     <div class="hero-badge"><span class="ico"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.09 6.26L20.18 9.27l-5.09 3.88L16.18 20 12 16.77 7.82 20l1.09-6.85L3.82 9.27l6.09-1.01z"/></svg></span> AI-offert · Faktura · Auto-bokföring</div>
@@ -2783,12 +2783,15 @@ async function init() {
     }
   });
 
+  // Visa landningssidan direkt via CSS (tar bort inline display:none)
+  const landingEl = document.getElementById('viewLanding');
+  if (landingEl) landingEl.style.display = '';
+
   try {
-    const sessionResult = await Promise.race([
-      sb.auth.getSession(),
-      new Promise(resolve => setTimeout(() => resolve({ data: { session: null } }), 2000))
-    ]);
-    const session = sessionResult?.data?.session;
+    const sessionPromise = sb.auth.getSession();
+    const timeoutPromise = new Promise(resolve => setTimeout(() => resolve({ data: { session: null } }), 1500));
+    const result = await Promise.race([sessionPromise, timeoutPromise]);
+    const session = result?.data?.session;
     if (session) {
       _loginHandled = true;
       await onLogin(session.user);
@@ -2880,12 +2883,6 @@ function updateUI(profile, used, total) {
   document.getElementById('mobileMenu').style.display = 'none';
   document.getElementById('navUserName').textContent = profile?.company_name || profile?.full_name || profile?.email || '';
   document.getElementById('navPlanBadge').textContent = PLAN_LABELS[plan];
-
-  // Uppdatera mobilmeny logged in/out state
-  const mli = document.getElementById('mobileLoggedIn');
-  const mlo = document.getElementById('mobileLoggedOut');
-  if (mli) mli.style.display = 'block';
-  if (mlo) mlo.style.display = 'none';
 
   // Visa admin-länk bara för admins
   const adminNav = document.getElementById('sNav-admin');
