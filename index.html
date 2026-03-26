@@ -2764,6 +2764,7 @@ async function init() {
   sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_OUT') { _loginHandled = false; window._resetPasswordPending = false; onLogout(); }
     if (event === 'PASSWORD_RECOVERY') {
+      // Markera att lösenordsåterställning pågår — blockera inloggning
       window._resetPasswordPending = true;
       showView('landing');
       document.getElementById('authOverlay').classList.add('open');
@@ -2775,22 +2776,29 @@ async function init() {
       document.getElementById('modalSub').textContent = 'Välj ett nytt lösenord';
       document.querySelector('.modal-tabs').style.display = 'none';
     }
-    if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && !_loginHandled && !window._resetPasswordPending) {
-      if (session?.user) {
-        _loginHandled = true;
-        await onLogin(session.user);
-      } else if (event === 'INITIAL_SESSION' && !session) {
-        showView('landing');
-      }
+    if (event === 'SIGNED_IN' && !_loginHandled && !window._resetPasswordPending) {
+      // Normalt inloggning — hantera bara om det inte är recovery
+      _loginHandled = true;
+      if (session?.user) await onLogin(session.user);
     }
   });
 
-  // Fallback: visa landningssidan om ingen session efter 2 sekunder
-  setTimeout(() => {
-    if (!_loginHandled && !window._resetPasswordPending) {
+  try {
+    // Timeout om getSession hänger (t.ex. pga tracking prevention i Edge)
+    const sessionPromise = sb.auth.getSession();
+    const timeoutPromise = new Promise(resolve => setTimeout(() => resolve({ data: { session: null } }), 3000));
+    const { data: { session } } = await Promise.race([sessionPromise, timeoutPromise]);
+    if (session) {
+      showView('app');
+      showPage('dashboard');
+      await onLogin(session.user);
+    } else {
       showView('landing');
     }
-  }, 2000);
+  } catch(e) {
+    console.error('Init error:', e);
+    showView('landing');
+  }
 }
 
 async function onLogin(user) {
@@ -3284,11 +3292,14 @@ async function loadAdminDash() {
   const chart = document.getElementById('adminNewUsersChart');
   const labels = document.getElementById('adminNewUsersLabels');
   if (chart) {
-    chart.innerHTML = counts.map((c, i) => `
-      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
-        <div style="font-size:0.65rem;color:#888">${c || ''}</div>
-        <div style="width:100%;background:var(--gold);border-radius:3px 3px 0 0;height:${Math.max(4, c/max*100)}px;opacity:${c>0?1:0.2}"></div>
-      </div>`).join('');
+    chart.innerHTML = counts.map(function(c) {
+      var h = Math.max(4, c/max*100);
+      var op = c > 0 ? 1 : 0.2;
+      return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">' +
+        '<div style="font-size:0.65rem;color:#888">' + (c || '') + '</div>' +
+        '<div style="width:100%;background:var(--gold);border-radius:3px 3px 0 0;height:' + h + 'px;opacity:' + op + '"></div>' +
+        '</div>';
+    }).join('');
   }
   if (labels) {
     labels.innerHTML = days.map(d => `<div style="flex:1;text-align:center">${d.slice(5)}</div>`).join('');
