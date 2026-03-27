@@ -2647,7 +2647,13 @@ const PLAN_LIMITS = { free: 2, pro: 10, komplett: Infinity };
 const INVOICE_LIMITS = { free: 0, pro: 0, komplett: Infinity };
 const PLAN_LABELS = { free: 'Gratis', pro: 'Pro', komplett: 'Komplett' };
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
 let currentUser = null;
 let currentProfile = null;
 let monthlyUsed = 0;
@@ -2789,9 +2795,24 @@ async function init() {
   if (landingEl) landingEl.style.display = '';
 
   try {
-    const sessionPromise = sb.auth.getSession();
-    const timeoutPromise = new Promise(resolve => setTimeout(() => resolve({ data: { session: null } }), 1500));
-    const result = await Promise.race([sessionPromise, timeoutPromise]);
+    // Läs session direkt från localStorage — getSession() hänger pga browser-tillägg
+    const raw = localStorage.getItem('sb-yfnmmcrvzcwcinwopnlj-auth-token');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const now = Math.floor(Date.now() / 1000);
+      if (parsed?.access_token && parsed?.expires_at > now && parsed?.user) {
+        // Sätt sessionen manuellt
+        try { await sb.auth.setSession({ access_token: parsed.access_token, refresh_token: parsed.refresh_token }); } catch(e) {}
+        _loginHandled = true;
+        await onLogin(parsed.user);
+        return;
+      }
+    }
+    // Fallback: vanlig getSession med timeout
+    const result = await Promise.race([
+      sb.auth.getSession(),
+      new Promise(resolve => setTimeout(() => resolve({ data: { session: null } }), 2000))
+    ]);
     const session = result?.data?.session;
     if (session) {
       _loginHandled = true;
