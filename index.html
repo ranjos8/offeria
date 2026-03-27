@@ -2657,6 +2657,31 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
 let currentUser = null;
 let currentProfile = null;
 let monthlyUsed = 0;
+let _userInitiatedSignOut = false;
+
+/**
+ * Säker getSession — med timeout och localStorage-fallback.
+ * Alla ställen som behöver session ska använda denna istället för sb.auth.getSession().
+ */
+async function safeGetSession() {
+  try {
+    const result = await Promise.race([
+      sb.auth.getSession(),
+      new Promise(resolve => setTimeout(() => resolve(null), 4000))
+    ]);
+    if (result?.data?.session) return result.data.session;
+  } catch(e) { console.warn('getSession failed:', e); }
+  // Fallback: läs token från localStorage
+  try {
+    const raw = localStorage.getItem('sb-yfnmmcrvzcwcinwopnlj-auth-token');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const now = Math.floor(Date.now() / 1000);
+      if (parsed?.access_token && parsed?.expires_at > now) return parsed;
+    }
+  } catch(e) {}
+  return null;
+}
 
 // ===== SECURITY & VALIDATION UTILITIES =====
 
@@ -2750,9 +2775,9 @@ async function init() {
       // Fallback: vänta på session från hash
       let attempts = 0;
       const waitForSession = async () => {
-        const { data } = await sb.auth.getSession();
-        if (data?.session) {
-          window._recoverySession = data.session;
+        const session = await safeGetSession();
+        if (session) {
+          window._recoverySession = session;
           showResetForm();
         } else if (attempts < 10) {
           attempts++;
@@ -2769,7 +2794,31 @@ async function init() {
   }
 
   sb.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_OUT') { _loginHandled = false; window._resetPasswordPending = false; onLogout(); }
+    if (event === 'SIGNED_OUT') {
+      if (_userInitiatedSignOut) {
+        _loginHandled = false; window._resetPasswordPending = false; onLogout();
+        _userInitiatedSignOut = false;
+      } else {
+        // Token refresh failure — försök återhämta istället för att logga ut
+        console.warn('SIGNED_OUT utan explicit utloggning — försöker återhämta session');
+        try {
+          const raw = localStorage.getItem('sb-yfnmmcrvzcwcinwopnlj-auth-token');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            const now = Math.floor(Date.now() / 1000);
+            if (parsed?.access_token && parsed?.expires_at > now) {
+              await sb.auth.setSession({ access_token: parsed.access_token, refresh_token: parsed.refresh_token });
+              return; // Återhämtad — logga INTE ut
+            }
+          }
+        } catch(e) {}
+        // Kunde inte återhämta — nu logga ut på riktigt
+        _loginHandled = false; window._resetPasswordPending = false; onLogout();
+      }
+    }
+    if (event === 'TOKEN_REFRESHED' && session?.user) {
+      currentUser = session.user;
+    }
     if (event === 'PASSWORD_RECOVERY') {
       // Markera att lösenordsåterställning pågår — blockera inloggning
       window._resetPasswordPending = true;
@@ -3021,11 +3070,14 @@ function openModal(tab) {
   showError('');
 }
 function closeModal() {
-  // Om lösenordsåterställningsformuläret är öppet och stängs utan att spara — logga ut
-  const resetForm = document.getElementById('formResetPassword');
-  if (resetForm && resetForm.style.display !== 'none') {
-    sb.auth.signOut();
-    window._resetPasswordPending = false;
+  // Om lösenordsåterställning pågår OCH formuläret stängs utan att spara — logga ut
+  if (window._resetPasswordPending) {
+    const resetForm = document.getElementById('formResetPassword');
+    if (resetForm && resetForm.style.display === 'block') {
+      _userInitiatedSignOut = true;
+      sb.auth.signOut();
+      window._resetPasswordPending = false;
+    }
   }
   document.getElementById('authOverlay').classList.remove('open');
 }
@@ -3090,7 +3142,7 @@ async function doLogin() {
   }
 }
 
-async function signOut() { await sb.auth.signOut(); onLogout(); }
+async function signOut() { _userInitiatedSignOut = true; await sb.auth.signOut(); onLogout(); }
 
 // ===== VIEWS =====
 function showView(v) {
@@ -5248,11 +5300,7 @@ async function goToStripe() {
   btn.disabled = true;
   errEl.style.display = 'none';
   try {
-    let { data: { session } } = await sb.auth.getSession();
-    if (!session) {
-      const { data: refreshData } = await sb.auth.refreshSession();
-      session = refreshData?.session;
-    }
+    let session = await safeGetSession();
     if (!session?.access_token) {
       throw new Error('Du måste vara inloggad för att uppgradera.');
     }
@@ -5282,7 +5330,7 @@ async function goToStripe() {
 
 async function openCustomerPortal() {
   try {
-    const { data: { session } } = await sb.auth.getSession();
+    const session = await safeGetSession();
     const res = await fetch('https://yfnmmcrvzcwcinwopnlj.supabase.co/functions/v1/stripe-payments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
@@ -5370,7 +5418,7 @@ async function generateQuote() {
   }
 
   try {
-    const { data: { session } } = await sb.auth.getSession();
+    const session = await safeGetSession();
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 45000);
     const res = await fetch('https://yfnmmcrvzcwcinwopnlj.supabase.co/functions/v1/super-task', {
@@ -5703,15 +5751,16 @@ async function doResetPassword() {
   btn.textContent = 'Sparar...';
 
   // Kontrollera session — använd sparad recovery-session om vanlig session saknas
-  let { data: { session: currentSession } } = await sb.auth.getSession();
+  let currentSession = await safeGetSession();
   if (!currentSession && window._recoverySession) {
     // Sätt sessionen manuellt från recovery
-    await sb.auth.setSession({
-      access_token: window._recoverySession.access_token,
-      refresh_token: window._recoverySession.refresh_token
-    });
-    const { data } = await sb.auth.getSession();
-    currentSession = data?.session;
+    try {
+      await sb.auth.setSession({
+        access_token: window._recoverySession.access_token,
+        refresh_token: window._recoverySession.refresh_token
+      });
+      currentSession = await safeGetSession();
+    } catch(e) { console.error('Recovery setSession failed:', e); }
   }
   if (!currentSession) {
     showError('Länken har gått ut. Begär en ny återställningslänk.');
@@ -5749,10 +5798,9 @@ async function doResetPassword() {
     btn.textContent = 'Spara nytt lösenord →';
     btn.style.background = '';
     // Logga in automatiskt efter lösenordsbyte
-    const { data: { session } } = await sb.auth.getSession();
+    const session = await safeGetSession();
     if (session?.user) {
       _loginHandled = true;
-      showView('app');
       await onLogin(session.user);
     }
   }, 1500);
@@ -5792,7 +5840,8 @@ async function deleteAccount() {
   if (email !== currentUser.email) { alert('E-postadressen stämmer inte.'); return; }
   
   try {
-    const session = (await sb.auth.getSession()).data.session;
+    const session = await safeGetSession();
+    if (!session?.access_token) { alert('Sessionen har gått ut. Ladda om sidan.'); return; }
     const res = await fetch(SUPABASE_URL + '/functions/v1/delete-account', {
       method: 'POST',
       headers: {
@@ -5802,6 +5851,7 @@ async function deleteAccount() {
     });
     const result = await res.json();
     if (!res.ok) throw new Error(result.error || 'Kunde inte radera kontot');
+    _userInitiatedSignOut = true;
     await sb.auth.signOut();
     alert('Ditt konto och alla dina uppgifter har raderats. Välkommen tillbaka om du ändrar dig!');
     location.reload();
@@ -9537,7 +9587,7 @@ SVARSFORMAT:
     } catch(e) {}
 
     // Anropa super-task — systemprompt och RAG hanteras nu korrekt i edge-funktionen
-    const { data: { session } } = await sb.auth.getSession();
+    const session = await safeGetSession();
     const aiRes = await fetch('https://yfnmmcrvzcwcinwopnlj.supabase.co/functions/v1/super-task', {
       method: 'POST',
       headers: {
