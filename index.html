@@ -2849,11 +2849,8 @@ async function init() {
   })();
 
   if (_hasToken && !window._resetPasswordPending) {
-    // Inloggad — visa app direkt, dölj landing
+    // Inloggad — visa app-skalet direkt (utan att trigga dataladding)
     showView('app');
-    const savedPage = (() => { try { return sessionStorage.getItem('offeria_page'); } catch(e) { return null; } })();
-    const validPages = ['dashboard','generate','invoices','suppliers','customers','articles','bookkeeping','profile'];
-    showPage(savedPage && validPages.includes(savedPage) ? savedPage : 'dashboard');
     document.getElementById('navUserArea').style.display = 'flex';
     document.getElementById('navAuthBtns').style.display = 'none';
   } else {
@@ -2889,7 +2886,7 @@ async function onLogin(user) {
   currentUser = user;
   closeModal();
 
-  // Uppdatera header och visa app DIREKT — innan några asynkrona anrop
+  // Uppdatera header DIREKT — synkront
   document.getElementById('navUserArea').style.display = 'flex';
   document.getElementById('navAuthBtns').style.display = 'none';
   document.getElementById('mobileMenu').style.display = 'none';
@@ -2898,48 +2895,48 @@ async function onLogin(user) {
   if(_mli)_mli.style.display='block';
   if(_mlo)_mlo.style.display='none';
 
+  // Visa app-skal (utan att trigga page-specifik dataladdning)
   showView('app');
-  const savedPage = (() => { try { return sessionStorage.getItem('offeria_page'); } catch(e) { return null; } })();
-  const validPages = ['dashboard','generate','invoices','suppliers','customers','articles','bookkeeping','profile'];
-  showPage(savedPage && validPages.includes(savedPage) ? savedPage : 'dashboard');
 
+  // Ladda ALL data parallellt — med 5s timeout per query
   let profile = null;
   let used = 0;
   let total = 0;
 
+  const timeout = (ms) => new Promise(resolve => setTimeout(() => resolve(null), ms));
+  
   try {
-    const pResult = await Promise.race([
-      sb.from('profiles').select('*').eq('id', user.id).single(),
-      new Promise(resolve => setTimeout(() => resolve({ data: null, error: 'timeout' }), 5000))
+    const [pResult, uResult, tResult] = await Promise.all([
+      Promise.race([
+        sb.from('profiles').select('*').eq('id', user.id).single(),
+        timeout(5000)
+      ]),
+      Promise.race([
+        sb.from('quote_usage').select('*', { count: 'exact', head: true }).eq('user_id', user.id).gte('created_at', getMonthStart().toISOString()),
+        timeout(5000)
+      ]),
+      Promise.race([
+        sb.from('quote_usage').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+        timeout(5000)
+      ])
     ]);
-    if (pResult?.error && pResult.error !== 'timeout') console.error('Profile load error:', pResult.error);
-    profile = pResult?.data;
-  } catch(e) { console.error('Profile load failed:', e); }
+    if (pResult?.data) profile = pResult.data;
+    if (pResult?.error) console.error('Profile load error:', pResult.error);
+    used = uResult?.count || 0;
+    total = tResult?.count || 0;
+  } catch(e) { console.error('Data load failed:', e); }
 
   currentProfile = profile;
-
-  try {
-    const weekStart = getMonthStart();
-    const uResult = await Promise.race([
-      sb.from('quote_usage').select('*', { count: 'exact', head: true }).eq('user_id', user.id).gte('created_at', weekStart.toISOString()),
-      new Promise(resolve => setTimeout(() => resolve({ count: 0, error: 'timeout' }), 5000))
-    ]);
-    if (uResult?.error && uResult.error !== 'timeout') console.error('Usage load error:', uResult.error);
-    used = uResult?.count || 0;
-  } catch(e) { console.error('Usage load failed:', e); }
-
   monthlyUsed = used;
 
-  try {
-    const tResult = await Promise.race([
-      sb.from('quote_usage').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
-      new Promise(resolve => setTimeout(() => resolve({ count: 0, error: 'timeout' }), 5000))
-    ]);
-    if (tResult?.error && tResult.error !== 'timeout') console.error('Total load error:', tResult.error);
-    total = tResult?.count || 0;
-  } catch(e) { console.error('Total load failed:', e); }
-
+  // Uppdatera UI med riktig data (plan, namn, quota)
   try { updateUI(profile, used, total); } catch(e) { console.error('updateUI error:', e); }
+
+  // NU visa rätt sida — data finns, loadDashboard/loadInvoices får riktig data
+  const savedPage = (() => { try { return sessionStorage.getItem('offeria_page'); } catch(e) { return null; } })();
+  const validPages = ['dashboard','generate','invoices','suppliers','customers','articles','bookkeeping','profile'];
+  showPage(savedPage && validPages.includes(savedPage) ? savedPage : 'dashboard');
+  
   try { fillProfileForm(profile); } catch(e) {}
   renderExamplePills();
 
