@@ -2838,48 +2838,28 @@ async function init() {
     }
   });
 
-  // Kolla localStorage SYNKRONT — avgör om vi visar app eller landing direkt
-  const _hasToken = (() => {
+  // Kolla localStorage SYNKRONT — kör onLogin DIREKT om token finns
+  const _storedToken = (() => {
     try {
       const raw = localStorage.getItem('sb-yfnmmcrvzcwcinwopnlj-auth-token');
-      if (!raw) return false;
+      if (!raw) return null;
       const parsed = JSON.parse(raw);
-      return parsed?.access_token && parsed?.expires_at > Math.floor(Date.now() / 1000) && parsed?.user;
-    } catch(e) { return false; }
+      if (parsed?.access_token && parsed?.expires_at > Math.floor(Date.now() / 1000) && parsed?.user) return parsed;
+      return null;
+    } catch(e) { return null; }
   })();
 
-  if (_hasToken && !window._resetPasswordPending) {
-    // Inloggad — visa app-skalet direkt (utan att trigga dataladding)
-    showView('app');
-    document.getElementById('navUserArea').style.display = 'flex';
-    document.getElementById('navAuthBtns').style.display = 'none';
+  if (_storedToken && !window._resetPasswordPending) {
+    // Inloggad — kör onLogin direkt med cached user, vänta INTE på INITIAL_SESSION
+    _loginHandled = true;
+    // Sätt sessionen i bakgrunden (behövs för API-anrop)
+    sb.auth.setSession({ access_token: _storedToken.access_token, refresh_token: _storedToken.refresh_token }).catch(e => console.warn('setSession:', e));
+    await onLogin(_storedToken.user);
   } else {
     // Inte inloggad — visa landing
     const landingEl = document.getElementById('viewLanding');
     if (landingEl) landingEl.style.display = '';
   }
-
-  // Säkerhetsnät: om INITIAL_SESSION inte triggade inom 3s, läs localStorage direkt
-  setTimeout(async () => {
-    if (_loginHandled || window._resetPasswordPending) return;
-    try {
-      const raw = localStorage.getItem('sb-yfnmmcrvzcwcinwopnlj-auth-token');
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const now = Math.floor(Date.now() / 1000);
-        if (parsed?.access_token && parsed?.expires_at > now && parsed?.user) {
-          console.warn('INITIAL_SESSION timeout — fallback till localStorage');
-          try { await sb.auth.setSession({ access_token: parsed.access_token, refresh_token: parsed.refresh_token }); } catch(e) {}
-          if (!_loginHandled) {
-            _loginHandled = true;
-            await onLogin(parsed.user);
-          }
-        }
-      }
-    } catch(e) {
-      console.error('Fallback init error:', e);
-    }
-  }, 3000);
 }
 
 async function onLogin(user) {
