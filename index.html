@@ -2789,9 +2789,29 @@ async function init() {
     }
   });
 
-  // Visa landningssidan direkt via CSS (tar bort inline display:none)
-  const landingEl = document.getElementById('viewLanding');
-  if (landingEl) landingEl.style.display = '';
+  // Kolla localStorage SYNKRONT — avgör om vi visar app eller landing direkt
+  const _hasToken = (() => {
+    try {
+      const raw = localStorage.getItem('sb-yfnmmcrvzcwcinwopnlj-auth-token');
+      if (!raw) return false;
+      const parsed = JSON.parse(raw);
+      return parsed?.access_token && parsed?.expires_at > Math.floor(Date.now() / 1000) && parsed?.user;
+    } catch(e) { return false; }
+  })();
+
+  if (_hasToken && !window._resetPasswordPending) {
+    // Inloggad — visa app direkt, dölj landing
+    showView('app');
+    const savedPage = (() => { try { return sessionStorage.getItem('offeria_page'); } catch(e) { return null; } })();
+    const validPages = ['dashboard','generate','invoices','suppliers','customers','articles','bookkeeping','profile'];
+    showPage(savedPage && validPages.includes(savedPage) ? savedPage : 'dashboard');
+    document.getElementById('navUserArea').style.display = 'flex';
+    document.getElementById('navAuthBtns').style.display = 'none';
+  } else {
+    // Inte inloggad — visa landing
+    const landingEl = document.getElementById('viewLanding');
+    if (landingEl) landingEl.style.display = '';
+  }
 
   // Säkerhetsnät: om INITIAL_SESSION inte triggade inom 3s, läs localStorage direkt
   setTimeout(async () => {
