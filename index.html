@@ -86,43 +86,149 @@ nav {
 /* ===== LANDING ===== */
 .hero {
   min-height: calc(100vh - 65px);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center; padding: 4rem 2rem;
+  display: flex; align-items: center; justify-content: center;
+  padding: 3rem 2rem 2rem;
   background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(184,144,46,0.1) 0%, transparent 60%);
+  overflow: hidden;
 }
+.hero-inner {
+  max-width: 1200px; width: 100%; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1.15fr; gap: 3rem; align-items: center;
+}
+.hero-text { animation: fadeUp 0.6s ease both; }
 .hero-badge {
   display: inline-flex; align-items: center; gap: 0.4rem;
   background: white; border: 1px solid var(--border); border-radius: 20px;
-  padding: 0.35rem 1rem; font-size: 0.75rem; font-weight: 600;
+  padding: 0.35rem 1rem; font-size: 0.72rem; font-weight: 600;
   color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase;
-  margin-bottom: 1.5rem; animation: fadeUp 0.5s ease both;
+  margin-bottom: 1.5rem;
 }
+.hero-badge svg { width: 14px; height: 14px; }
 .hero h1 {
-  font-family: 'Fraunces', serif; font-size: clamp(2.3rem, 5vw, 4rem);
-  line-height: 1.15; letter-spacing: -1.5px; max-width: 750px;
+  font-family: 'Fraunces', serif; font-size: clamp(2rem, 3.5vw, 3.2rem);
+  line-height: 1.15; letter-spacing: -1.5px;
   animation: fadeUp 0.5s 0.1s ease both;
 }
-.hero h1 em { font-style: italic; color: var(--gold); }
-.hero h1 .highlight { color: var(--gold-light); }
-.hero p {
-  font-size: 1rem; color: var(--muted); max-width: 460px;
-  line-height: 1.75; margin: 1.5rem auto 2.5rem;
+.hero h1 .hl { color: var(--gold-light); font-style: italic; }
+.hero-sub {
+  font-size: 1.05rem; color: var(--muted); line-height: 1.75;
+  margin: 1.2rem 0 0.6rem; max-width: 440px;
   animation: fadeUp 0.5s 0.2s ease both;
 }
-.hero-btns { display: flex; gap: 1rem; justify-content: center; animation: fadeUp 0.5s 0.3s ease both; }
+.hero-steps { display: flex; flex-direction: column; gap: 0.5rem; margin: 1.5rem 0 2rem; }
+.hero-step { display: flex; align-items: center; gap: 0.7rem; font-size: 0.9rem; color: var(--ink); }
+.hero-step-num {
+  width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: var(--gold-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 700; flex-shrink: 0;
+}
+.hero-btns { display: flex; gap: 1rem; animation: fadeUp 0.5s 0.3s ease both; }
 .btn-hero {
-  background: var(--ink); color: var(--gold-light); border: none;
-  border-radius: 10px; padding: 0.9rem 2.2rem;
-  font-family: 'Fraunces', serif; font-size: 1.05rem;
-  cursor: pointer; transition: all 0.15s;
+  background: var(--ink); color: var(--gold-light); border: none; border-radius: 10px; padding: 0.9rem 2.2rem;
+  font-family: 'Fraunces', serif; font-size: 1.05rem; cursor: pointer; transition: all 0.15s;
 }
 .btn-hero:hover { background: #2a2a28; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
 .btn-hero-sec {
-  background: transparent; color: var(--ink);
-  border: 1.5px solid var(--border); border-radius: 10px; padding: 0.9rem 2rem;
-  font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.15s;
+  background: transparent; color: var(--ink); border: 1.5px solid var(--border); border-radius: 10px;
+  padding: 0.9rem 2rem; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.15s;
 }
 .btn-hero-sec:hover { border-color: var(--ink); }
+
+/* Hero devices */
+.hero-devices { position: relative; animation: fadeUp 0.6s 0.2s ease both; }
+.device-laptop {
+  background: var(--ink); border-radius: 12px; padding: 10px 10px 0;
+  position: relative; box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+}
+.laptop-cam { width: 6px; height: 6px; border-radius: 50%; background: #333; margin: 0 auto 8px; border: 1px solid #444; }
+.laptop-screen { background: white; border-radius: 6px 6px 0 0; overflow: hidden; aspect-ratio: 16/10; }
+.laptop-base { background: #2a2a28; height: 14px; border-radius: 0 0 8px 8px; margin: 0 -2px; position: relative; }
+.laptop-base::after { content: ''; position: absolute; top: 2px; left: 50%; transform: translateX(-50%); width: 50px; height: 4px; background: #333; border-radius: 2px; }
+.screen-content { padding: 16px; height: 100%; display: flex; flex-direction: column; font-size: 0.68rem; }
+.sc-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 1.5px solid var(--border); margin-bottom: 12px; }
+.sc-logo { font-family: 'Fraunces', serif; font-size: 0.85rem; font-weight: 700; }
+.sc-logo span { color: var(--gold); }
+.sc-nav { display: flex; gap: 8px; }
+.sc-nav span { font-size: 0.55rem; color: var(--muted); padding: 3px 8px; border-radius: 4px; background: var(--paper); }
+.sc-nav span.active { background: var(--gold); color: white; }
+.sc-title { font-family: 'Fraunces', serif; font-size: 0.9rem; margin-bottom: 2px; }
+.sc-sub { font-size: 0.6rem; color: var(--muted); margin-bottom: 12px; }
+.sc-textarea { background: var(--paper); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px; font-size: 0.72rem; color: var(--ink); min-height: 44px; margin-bottom: 10px; line-height: 1.5; }
+.sc-cursor { border-right: 2px solid var(--gold); animation: blink 0.8s step-end infinite; }
+@keyframes blink { 50% { border-color: transparent; } }
+.sc-gen-btn { display: inline-flex; align-items: center; gap: 4px; background: var(--ink); color: var(--gold-light); border: none; border-radius: 6px; padding: 6px 14px; font-size: 0.65rem; font-weight: 600; font-family: 'DM Sans', sans-serif; }
+.sc-gen-btn svg { width: 12px; height: 12px; }
+.sc-result { margin-top: 10px; background: white; border: 1px solid var(--border); border-radius: 8px; padding: 10px; opacity: 0; transform: translateY(10px); transition: all 0.5s ease; }
+.sc-result.visible { opacity: 1; transform: translateY(0); }
+.sc-result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1.5px solid var(--gold-light); }
+.sc-result-title { font-weight: 700; font-size: 0.7rem; }
+.sc-result-badge { font-size: 0.5rem; background: #e8f5e9; color: #2e7d32; padding: 2px 6px; border-radius: 3px; font-weight: 600; }
+.sc-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.62rem; color: #666; border-bottom: 1px solid #f5f2ec; opacity: 0; transform: translateX(-10px); transition: all 0.3s ease; }
+.sc-row.visible { opacity: 1; transform: translateX(0); }
+.sc-row-amount { font-weight: 600; color: var(--ink); }
+.sc-total { display: flex; justify-content: space-between; padding-top: 6px; margin-top: 4px; border-top: 2px solid var(--ink); font-weight: 700; font-size: 0.72rem; }
+.sc-total-amount { color: var(--gold); font-family: 'Fraunces', serif; font-size: 0.85rem; }
+
+/* Phone */
+.device-phone { position: absolute; bottom: -20px; right: -30px; width: 120px; background: var(--ink); border-radius: 18px; padding: 6px; box-shadow: 0 15px 40px rgba(0,0,0,0.25); z-index: 2; }
+.phone-notch { width: 40px; height: 12px; background: var(--ink); border-radius: 0 0 8px 8px; position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 2; }
+.phone-screen { background: white; border-radius: 14px; overflow: hidden; aspect-ratio: 9/16; padding: 14px 8px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.phone-label { font-size: 0.45rem; color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+.phone-sign-check { width: 32px; height: 32px; border-radius: 50%; background: #e8f5e9; color: #2e7d32; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700; margin-bottom: 6px; opacity: 0; transform: scale(0.5); }
+.phone-sign-check.pop { animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+@keyframes popIn { to { opacity: 1; transform: scale(1); } }
+.phone-sign-text { font-size: 0.5rem; font-weight: 700; color: #2e7d32; margin-bottom: 2px; }
+.phone-sign-name { font-size: 0.42rem; color: #888; }
+.phone-sign-date { font-size: 0.38rem; color: #aaa; margin-top: 1px; }
+
+/* Tablet: Bokföring */
+.device-tablet { position: absolute; top: -15px; left: -50px; width: 170px; background: var(--ink); border-radius: 14px; padding: 8px; box-shadow: 0 15px 40px rgba(0,0,0,0.22); z-index: 2; }
+.tablet-screen { background: white; border-radius: 8px; overflow: hidden; padding: 10px; }
+.tab-label { font-size: 0.48rem; color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+.tab-receipt-flow { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; padding: 6px; background: var(--paper); border-radius: 6px; }
+.tab-receipt-icon { width: 28px; height: 34px; background: #f0ede6; border-radius: 4px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; overflow: hidden; }
+.tab-receipt-icon svg { width: 14px; height: 14px; stroke: #999; }
+.tab-scan-line { position: absolute; left: 0; right: 0; height: 2px; background: var(--gold); opacity: 0; animation: scanLine 2s 1s ease-in-out infinite; }
+@keyframes scanLine { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+.tab-receipt-arrow { color: var(--gold); font-weight: 700; font-size: 0.7rem; flex-shrink: 0; }
+.tab-receipt-result { flex: 1; }
+.tab-receipt-result div { font-size: 0.42rem; color: #555; padding: 1px 0; opacity: 0; transform: translateX(-5px); }
+.tab-receipt-result div.visible { opacity: 1; transform: translateX(0); transition: all 0.3s ease; }
+.tab-receipt-result div span:first-child { font-weight: 700; color: var(--ink); margin-right: 3px; }
+.tab-receipt-result .re-label { font-size: 0.4rem; color: #2e7d32; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; opacity: 1; transform: none; }
+.tab-resultat { border-top: 1px solid var(--border); padding-top: 8px; margin-top: 2px; }
+.tab-res-title { font-size: 0.48rem; font-weight: 700; color: var(--ink); margin-bottom: 5px; display: flex; align-items: center; gap: 3px; }
+.tab-res-title .yr { color: var(--gold); font-weight: 600; }
+.tab-res-row { display: flex; justify-content: space-between; font-size: 0.44rem; padding: 2.5px 0; color: #666; }
+.tab-res-row span:last-child { font-weight: 600; color: var(--ink); }
+.tab-res-divider { border-top: 1.5px solid var(--ink); margin: 3px 0; }
+.tab-res-row.total { font-weight: 700; font-size: 0.48rem; }
+.tab-res-row.total span:last-child { color: #2e7d32; }
+.tab-moms { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); }
+.tab-moms-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 0.4rem; background: var(--ink); color: var(--gold-light); padding: 2px 6px; border-radius: 3px; font-weight: 600; }
+.tab-moms-badge svg { width: 8px; height: 8px; fill: var(--gold-light); }
+.tab-moms-row { display: flex; justify-content: space-between; font-size: 0.42rem; padding: 2px 0; color: #666; margin-top: 3px; }
+.tab-moms-row span:last-child { font-weight: 600; color: var(--ink); }
+
+.flow-arrow { position: absolute; z-index: 3; font-size: 1.2rem; color: var(--gold); opacity: 0; }
+.flow-arrow-1 { bottom: 60px; right: -10px; animation: arrowPulse1 2s 4s ease infinite; }
+.flow-arrow-2 { top: 50px; left: -25px; animation: arrowPulse2 2.5s 3s ease infinite; }
+@keyframes arrowPulse1 { 0%,100% { opacity: 0; transform: rotate(-30deg) translateX(0); } 50% { opacity: 0.7; transform: rotate(-30deg) translateX(4px); } }
+@keyframes arrowPulse2 { 0%,100% { opacity: 0; transform: rotate(20deg) translateX(0); } 50% { opacity: 0.7; transform: rotate(20deg) translateX(-4px); } }
+
+@media (max-width: 900px) {
+  .hero-inner { grid-template-columns: 1fr; text-align: center; }
+  .hero-text { order: 1; } .hero-devices { order: 2; max-width: 500px; margin: 0 auto; }
+  .hero-sub { margin-left: auto; margin-right: auto; }
+  .hero-steps { align-items: center; } .hero-btns { justify-content: center; }
+  .device-phone { right: -10px; bottom: -10px; width: 100px; }
+  .device-tablet { left: -20px; top: 0; width: 150px; }
+}
+@media (max-width: 640px) {
+  .hero { padding: 2rem 1.2rem; }
+  .device-tablet { display: none; } .device-phone { width: 90px; right: -5px; }
+  .hero-btns { flex-direction: column; align-items: center; }
+}
 
 /* pricing */
 .pricing-wrap { padding: 5rem 2rem; background: var(--ink); }
@@ -522,122 +628,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .supp-mobile-cards { display: none; flex-direction: column; gap: 0.6rem; }
 
 /* ===== DEMO SECTION ===== */
-.demo-wrap { padding: 4rem 2rem; text-align: center; background: var(--cream); }
-.demo-phone {
-  max-width: 320px; margin: 2.5rem auto 0; background: var(--ink); border-radius: 32px;
-  padding: 12px; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.18);
-}
-.demo-notch {
-  width: 100px; height: 24px; background: var(--ink); border-radius: 0 0 14px 14px;
-  position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 2;
-}
-.demo-screen {
-  background: white; border-radius: 22px; min-height: 380px; overflow: hidden;
-  position: relative;
-}
-.demo-step {
-  position: absolute; inset: 0; padding: 2.2rem 1.5rem 1.5rem;
-  display: flex; flex-direction: column; align-items: center;
-  opacity: 0; transform: translateX(40px);
-  transition: opacity 0.45s ease, transform 0.45s ease;
-  pointer-events: none;
-}
-.demo-step.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
-.demo-step.exit { opacity: 0; transform: translateX(-40px); }
-.ds-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gold); font-weight: 600; margin-bottom: 0.3rem; }
-.ds-title { font-family: 'Fraunces', serif; font-size: 1.05rem; margin-bottom: 1.2rem; color: var(--ink); }
-.ds-mockup { width: 100%; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-
-/* Step 1 - typing */
-.ds-input-mock {
-  width: 100%; background: var(--paper); border: 1.5px solid var(--border); border-radius: 10px;
-  padding: 0.9rem 1rem; text-align: left; font-size: 0.82rem; color: var(--ink);
-  min-height: 70px; margin-bottom: 0.8rem; position: relative; line-height: 1.6;
-}
-.ds-cursor { border-right: 2px solid var(--gold); animation: blink 0.8s step-end infinite; }
-@keyframes blink { 50% { border-color: transparent; } }
-.ds-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
-.ds-chip { font-size: 0.68rem; padding: 0.3rem 0.7rem; border-radius: 20px; background: white; border: 1px solid var(--border); color: #888; }
-.ds-chip.sel { background: var(--gold); color: white; border-color: var(--gold); }
-
-/* Step 2 - document */
-.ds-doc { width: 100%; background: white; border: 1px solid var(--border); border-radius: 10px; padding: 1rem; text-align: left; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-.ds-doc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--gold-light); }
-.ds-doc-logo { width: 32px; height: 32px; border-radius: 6px; background: var(--cream); }
-.ds-doc-title-bar { width: 100px; height: 10px; background: var(--cream); border-radius: 4px; }
-.ds-doc-rows { margin-bottom: 0.8rem; }
-.ds-doc-row { display: flex; justify-content: space-between; padding: 0.45rem 0; border-bottom: 1px solid #f0ede6; }
-.ds-doc-row span:first-child { width: 60%; height: 8px; background: #e8e4da; border-radius: 3px; }
-.ds-doc-row span:last-child { width: 50px; height: 8px; background: #e8e4da; border-radius: 3px; }
-.ds-doc-row.reveal span { animation: rowReveal 0.4s ease forwards; }
-@keyframes rowReveal { from { width: 0; opacity: 0; } to { opacity: 1; } }
-.ds-doc-total { display: flex; justify-content: space-between; padding-top: 0.6rem; border-top: 2px solid var(--ink); font-size: 0.75rem; font-weight: 700; }
-.ds-amount { color: var(--gold); font-family: 'Fraunces', serif; font-size: 0.95rem; }
-
-/* Step 3 - share */
-.ds-share-btns { display: flex; gap: 0.8rem; }
-.ds-share-btn {
-  width: 72px; height: 72px; border-radius: 14px; background: var(--paper); border: 1.5px solid var(--border);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.3rem;
-  transition: transform 0.2s, border-color 0.2s;
-}
-.ds-share-btn svg { width: 22px; height: 22px; stroke: var(--ink); }
-.ds-share-btn span { font-size: 0.62rem; color: #888; }
-.ds-share-btn.pulse { transform: scale(1.08); border-color: var(--gold); }
-
-/* Step 4 - signature */
-.ds-sign-mock { text-align: center; }
-.ds-sign-check {
-  width: 52px; height: 52px; border-radius: 50%; background: #e8f5e9; color: #2e7d32;
-  display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700;
-  margin: 0 auto 0.8rem; opacity: 0; transform: scale(0.5);
-}
-.ds-sign-check.pop { animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
-@keyframes popIn { to { opacity: 1; transform: scale(1); } }
-.ds-sign-text { font-weight: 700; color: #2e7d32; font-size: 0.9rem; margin-bottom: 0.5rem; }
-.ds-sign-name { font-size: 0.82rem; color: #555; }
-.ds-sign-date { font-size: 0.72rem; color: #999; margin-top: 0.15rem; }
-
-/* Step 5 - invoice */
-.ds-invoice-mock { width: 100%; text-align: left; }
-.ds-inv-badge {
-  display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.25rem 0.7rem;
-  background: var(--ink); color: white; border-radius: 5px; margin-bottom: 0.8rem;
-}
-.ds-inv-row { display: flex; justify-content: space-between; font-size: 0.78rem; padding: 0.4rem 0; border-bottom: 1px solid #f0ede6; color: #555; }
-.ds-inv-total { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; padding-top: 0.6rem; margin-top: 0.3rem; border-top: 2px solid var(--ink); }
-.ds-inv-status {
-  display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 0.2rem 0.6rem;
-  background: #e3f2fd; color: #1565c0; border-radius: 4px; margin-top: 0.7rem;
-}
-
-/* Step 6 - receipt */
-.ds-receipt-mock { display: flex; align-items: center; gap: 0.6rem; width: 100%; }
-.ds-receipt-img {
-  width: 60px; height: 72px; background: #f5f5f5; border-radius: 8px; border: 1px solid #ddd;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.ds-receipt-img svg { width: 26px; height: 26px; stroke: #999; }
-.ds-receipt-arrow { font-size: 1.2rem; color: var(--gold); font-weight: 700; flex-shrink: 0; }
-.ds-receipt-entry { flex: 1; text-align: left; }
-.ds-re-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: #2e7d32; font-weight: 600; margin-bottom: 0.4rem; }
-.ds-re-row { display: flex; gap: 0.5rem; font-size: 0.72rem; padding: 0.25rem 0; color: #555; }
-.ds-re-row span:first-child { font-weight: 700; color: var(--ink); min-width: 30px; }
-.ds-re-row span:last-child { margin-left: auto; font-weight: 600; }
-
-/* Demo dots */
-.demo-dots { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem; padding-bottom: 0.3rem; }
-.demo-dot {
-  width: 10px; height: 10px; border-radius: 50%; background: #555; cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
-}
-.demo-dot.active { background: var(--gold); transform: scale(1.3); }
-
-@media (max-width: 640px) {
-  .demo-phone { max-width: 280px; }
-  .demo-screen { min-height: 340px; }
-  .ds-title { font-size: 0.95rem; }
-}
+/* Demo removed — replaced by hero devices */
 
 /* invoice */
 .inv-status { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.18rem 0.6rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -936,125 +927,102 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 <div class="view active" id="viewLanding" style="display:none">
 
   <section class="hero">
-    <div class="hero-badge"><span class="ico"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.09 6.26L20.18 9.27l-5.09 3.88L16.18 20 12 16.77 7.82 20l1.09-6.85L3.82 9.27l6.09-1.01z"/></svg></span> AI-offert · Faktura · Auto-bokföring</div>
-    <h1><span class="highlight">Smartare</span> offerter.<br><span class="highlight">Snabbare</span> fakturor.<br><span class="highlight">Komplett</span> bokföring.</h1>
-    <p>Med hjälp av AI. Fota kvitton och bokför automatiskt. Momsrapport med ett klick. Allt i mobilen, byggt för svenska hantverkare.</p>
-    <div class="hero-btns">
-      <button class="btn-hero" onclick="openModal('register')">Kom igång gratis →</button>
-      <button class="btn-hero-sec" onclick="document.getElementById('pricingSection').scrollIntoView({behavior:'smooth'})">Se priser</button>
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="hero-badge"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.09 6.26L20.18 9.27l-5.09 3.88L16.18 20 12 16.77 7.82 20l1.09-6.85L3.82 9.27l6.09-1.01z"/></svg> Byggd för svenska hantverkare</div>
+        <h1><span class="hl">Beskriv jobbet.</span><br>Offeria sköter resten.</h1>
+        <p class="hero-sub">AI skapar offerten. Kunden signerar direkt. Fakturan skickas automatiskt. Bokföringen sköter sig själv.</p>
+        <div class="hero-steps">
+          <div class="hero-step"><span class="hero-step-num">1</span> Beskriv jobbet med text eller röst</div>
+          <div class="hero-step"><span class="hero-step-num">2</span> AI skapar offert med priser och material</div>
+          <div class="hero-step"><span class="hero-step-num">3</span> Kunden signerar → faktura → bokfört</div>
+        </div>
+        <div class="hero-btns">
+          <button class="btn-hero" onclick="openModal('register')">Kom igång gratis →</button>
+          <button class="btn-hero-sec" onclick="document.getElementById('pricingSection').scrollIntoView({behavior:'smooth'})">Se priser</button>
+        </div>
+      </div>
+
+      <div class="hero-devices" id="heroDevices">
+        <!-- TABLET: Bokföring -->
+        <div class="device-tablet">
+          <div class="tablet-screen">
+            <div class="tab-label">Bokföring</div>
+            <div class="tab-receipt-flow">
+              <div class="tab-receipt-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <div class="tab-scan-line"></div>
+              </div>
+              <div class="tab-receipt-arrow">→</div>
+              <div class="tab-receipt-result" id="receiptResult">
+                <div class="re-label">AI bokför automatiskt</div>
+                <div id="rr1"><span>4010</span> Material 3 040 kr</div>
+                <div id="rr2"><span>2640</span> Ing. moms 760 kr</div>
+                <div id="rr3"><span>1930</span> Bank −3 800 kr</div>
+              </div>
+            </div>
+            <div class="tab-resultat">
+              <div class="tab-res-title">Resultat <span class="yr">2026</span></div>
+              <div class="tab-res-row"><span>Intäkter (klass 3)</span><span>342 600 kr</span></div>
+              <div class="tab-res-row"><span>Kostnader (klass 4-7)</span><span>−54 158 kr</span></div>
+              <div class="tab-res-divider"></div>
+              <div class="tab-res-row total"><span>Resultat</span><span>288 442 kr</span></div>
+            </div>
+            <div class="tab-moms">
+              <div class="tab-moms-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg> Momsdeklaration</div>
+              <div class="tab-moms-row"><span>Utgående moms</span><span>68 520 kr</span></div>
+              <div class="tab-moms-row"><span>Ingående moms</span><span>−10 068 kr</span></div>
+              <div class="tab-moms-row" style="font-weight:700;color:var(--ink)"><span>Att betala</span><span>58 452 kr</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LAPTOP: Offertgenerering -->
+        <div class="device-laptop">
+          <div class="laptop-cam"></div>
+          <div class="laptop-screen">
+            <div class="screen-content">
+              <div class="sc-header">
+                <div class="sc-logo">☐ <span>Offeria</span></div>
+                <div class="sc-nav"><span class="active">Offerter</span><span>Fakturor</span><span>Bokföring</span></div>
+              </div>
+              <div class="sc-title">Ny offert</div>
+              <div class="sc-sub">Beskriv uppdraget — AI:n skapar resten</div>
+              <div class="sc-textarea" id="heroTyping"><span class="sc-cursor" id="heroCursor"></span></div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="sc-gen-btn"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.09 6.26L20.18 9.27l-5.09 3.88L16.18 20 12 16.77 7.82 20l1.09-6.85L3.82 9.27l6.09-1.01z"/></svg> Generera offert</div>
+                <span style="font-size:0.55rem;color:var(--muted)">∞ offerter kvar</span>
+              </div>
+              <div class="sc-result" id="heroResult">
+                <div class="sc-result-header"><span class="sc-result-title">Offert — Renovera badrum</span><span class="sc-result-badge">AI-genererad</span></div>
+                <div class="sc-row" id="hr1"><span>Rivning befintligt kakel</span><span class="sc-row-amount">4 200 kr</span></div>
+                <div class="sc-row" id="hr2"><span>Nytt kakel 6 kvm (material)</span><span class="sc-row-amount">8 400 kr</span></div>
+                <div class="sc-row" id="hr3"><span>Kakelsättning inkl. fog</span><span class="sc-row-amount">12 600 kr</span></div>
+                <div class="sc-row" id="hr4"><span>VVS-arbete (blandare, golvbrunn)</span><span class="sc-row-amount">9 800 kr</span></div>
+                <div class="sc-total"><span>Totalt inkl. moms</span><span class="sc-total-amount">43 750 kr</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="laptop-base"></div>
+        </div>
+
+        <!-- PHONE: E-signering -->
+        <div class="device-phone">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-label">E-signering</div>
+            <div class="phone-sign-check" id="phoneCheck">✓</div>
+            <div class="phone-sign-text">Godkänd</div>
+            <div class="phone-sign-name">Erik Svensson</div>
+            <div class="phone-sign-date">14 mars 2026, 10:32</div>
+          </div>
+        </div>
+
+        <div class="flow-arrow flow-arrow-1">→</div>
+        <div class="flow-arrow flow-arrow-2">←</div>
+      </div>
     </div>
   </section>
-
-  <!-- ANIMATED DEMO -->
-  <div class="demo-wrap" id="demoSection">
-    <div class="eyebrow">Så fungerar det</div>
-    <div class="section-h">Från jobbeskrivning till bokfört</div>
-    <div class="demo-phone">
-      <div class="demo-notch"></div>
-      <div class="demo-screen" id="demoScreen">
-        <!-- Step 1: Describe job -->
-        <div class="demo-step active" id="ds1">
-          <div class="ds-label">Steg 1</div>
-          <div class="ds-title">Beskriv jobbet</div>
-          <div class="ds-mockup">
-            <div class="ds-input-mock">
-              <span class="ds-cursor" id="dsCursor1"></span>
-            </div>
-            <div class="ds-chips">
-              <span class="ds-chip">Bygg &amp; snickeri</span>
-              <span class="ds-chip sel">VVS</span>
-              <span class="ds-chip">El</span>
-            </div>
-          </div>
-        </div>
-        <!-- Step 2: AI generates -->
-        <div class="demo-step" id="ds2">
-          <div class="ds-label">Steg 2</div>
-          <div class="ds-title">AI skapar offerten</div>
-          <div class="ds-mockup">
-            <div class="ds-doc">
-              <div class="ds-doc-header">
-                <div class="ds-doc-logo"></div>
-                <div class="ds-doc-title-bar"></div>
-              </div>
-              <div class="ds-doc-rows">
-                <div class="ds-doc-row"><span></span><span></span></div>
-                <div class="ds-doc-row"><span></span><span></span></div>
-                <div class="ds-doc-row"><span></span><span></span></div>
-              </div>
-              <div class="ds-doc-total"><span>Totalt inkl. moms</span><span class="ds-amount">24 800 kr</span></div>
-            </div>
-          </div>
-        </div>
-        <!-- Step 3: Send -->
-        <div class="demo-step" id="ds3">
-          <div class="ds-label">Steg 3</div>
-          <div class="ds-title">Skicka till kund</div>
-          <div class="ds-mockup">
-            <div class="ds-share-btns">
-              <div class="ds-share-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg><span>E-post</span></div>
-              <div class="ds-share-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg><span>Länk</span></div>
-              <div class="ds-share-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>PDF</span></div>
-            </div>
-          </div>
-        </div>
-        <!-- Step 4: Customer signs -->
-        <div class="demo-step" id="ds4">
-          <div class="ds-label">Steg 4</div>
-          <div class="ds-title">Kund signerar</div>
-          <div class="ds-mockup">
-            <div class="ds-sign-mock">
-              <div class="ds-sign-check">✓</div>
-              <div class="ds-sign-text">Offerten godkänd</div>
-              <div class="ds-sign-name">Erik Svensson</div>
-              <div class="ds-sign-date">14 mars 2026, 10:32</div>
-            </div>
-          </div>
-        </div>
-        <!-- Step 5: Invoice -->
-        <div class="demo-step" id="ds5">
-          <div class="ds-label">Steg 5</div>
-          <div class="ds-title">Fakturera med ett klick</div>
-          <div class="ds-mockup">
-            <div class="ds-invoice-mock">
-              <div class="ds-inv-badge">FA-1024</div>
-              <div class="ds-inv-row"><span>Byte av blandare kök</span><span>4 200 kr</span></div>
-              <div class="ds-inv-row"><span>Material (Mora MMIX)</span><span>3 800 kr</span></div>
-              <div class="ds-inv-total"><span>Att betala</span><span>10 000 kr</span></div>
-              <div class="ds-inv-status">Skickad</div>
-            </div>
-          </div>
-        </div>
-        <!-- Step 6: Receipt & bookkeeping -->
-        <div class="demo-step" id="ds6">
-          <div class="ds-label">Steg 6</div>
-          <div class="ds-title">Fota kvitto — AI bokför</div>
-          <div class="ds-mockup">
-            <div class="ds-receipt-mock">
-              <div class="ds-receipt-img">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-              </div>
-              <div class="ds-receipt-arrow">→</div>
-              <div class="ds-receipt-entry">
-                <div class="ds-re-label">AI bokför automatiskt</div>
-                <div class="ds-re-row"><span>4010</span><span>Material</span><span>3 040 kr</span></div>
-                <div class="ds-re-row"><span>2640</span><span>Moms</span><span>760 kr</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Progress dots -->
-      <div class="demo-dots">
-        <span class="demo-dot active" onclick="goDemo(0)"></span>
-        <span class="demo-dot" onclick="goDemo(1)"></span>
-        <span class="demo-dot" onclick="goDemo(2)"></span>
-        <span class="demo-dot" onclick="goDemo(3)"></span>
-        <span class="demo-dot" onclick="goDemo(4)"></span>
-        <span class="demo-dot" onclick="goDemo(5)"></span>
-      </div>
-    </div>
-  </div>
 
   <div class="pricing-wrap" id="pricingSection">
     <div class="pricing-inner">
@@ -4982,93 +4950,71 @@ function toggleFaq(el) {
 }
 
 // ===== DEMO ANIMATION =====
-let _demoStep = 0;
-let _demoTimer = null;
-let _demoTyping = null;
-
-function goDemo(idx) {
-  const steps = document.querySelectorAll('.demo-step');
-  const dots = document.querySelectorAll('.demo-dot');
-  if (!steps.length) return;
-
-  // Exit current
-  steps[_demoStep]?.classList.remove('active');
-  steps[_demoStep]?.classList.add('exit');
-
-  _demoStep = idx;
-
-  // Enter new
-  setTimeout(() => {
-    steps.forEach(s => { s.classList.remove('active', 'exit'); });
-    steps[_demoStep]?.classList.add('active');
-    dots.forEach((d, i) => d.classList.toggle('active', i === _demoStep));
-    triggerStepAnimation(_demoStep);
-  }, 200);
-
-  // Reset auto-advance timer
-  clearInterval(_demoTimer);
-  _demoTimer = setInterval(() => goDemo((_demoStep + 1) % 6), 4500);
-}
-
-function triggerStepAnimation(idx) {
-  if (idx === 0) startTypingAnimation();
-  if (idx === 1) animateDocRows();
-  if (idx === 2) animateShareBtns();
-  if (idx === 3) { const ck = document.querySelector('.ds-sign-check'); if (ck) { ck.classList.remove('pop'); void ck.offsetWidth; ck.classList.add('pop'); } }
-}
-
-function startTypingAnimation() {
-  clearInterval(_demoTyping);
-  const cursor = document.getElementById('dsCursor1');
-  if (!cursor) return;
-  const text = 'Byta blandare i kök, Mora MMIX, inkl. material och arbete';
+// ===== HERO DEVICE ANIMATIONS =====
+let _heroTypingTimer = null;
+function startHeroTyping() {
+  clearInterval(_heroTypingTimer);
+  const container = document.getElementById('heroTyping');
+  const result = document.getElementById('heroResult');
+  if (!container) return;
+  container.innerHTML = '<span class="sc-cursor" id="heroCursor"></span>';
+  result.classList.remove('visible');
+  document.querySelectorAll('.sc-row').forEach(r => r.classList.remove('visible'));
+  const text = 'Renovera badrum 6 kvm, nytt kakel, byta blandare och golvbrunn';
   let i = 0;
-  cursor.parentElement.innerHTML = '<span class="ds-cursor" id="dsCursor1"></span>';
-  const c2 = document.getElementById('dsCursor1');
-  _demoTyping = setInterval(() => {
-    if (i < text.length) {
-      c2.insertAdjacentText('beforebegin', text[i]);
-      i++;
-    } else {
-      clearInterval(_demoTyping);
+  const cursor = document.getElementById('heroCursor');
+  _heroTypingTimer = setInterval(() => {
+    if (i < text.length) { cursor.insertAdjacentText('beforebegin', text[i]); i++; }
+    else {
+      clearInterval(_heroTypingTimer);
+      setTimeout(() => {
+        result.classList.add('visible');
+        ['hr1','hr2','hr3','hr4'].forEach((id, idx) => {
+          setTimeout(() => { const el = document.getElementById(id); if (el) el.classList.add('visible'); }, idx * 200);
+        });
+      }, 600);
+      setTimeout(() => startHeroTyping(), 8000);
     }
-  }, 45);
+  }, 40);
 }
-
-function animateDocRows() {
-  document.querySelectorAll('.ds-doc-row').forEach((r, i) => {
-    r.querySelectorAll('span').forEach(s => { s.classList.remove('reveal'); });
-    setTimeout(() => {
-      r.querySelectorAll('span').forEach(s => s.classList.add('reveal'));
-    }, i * 250);
+function startReceiptAnim() {
+  const rows = ['rr1','rr2','rr3'];
+  rows.forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('visible'); });
+  rows.forEach((id, idx) => {
+    setTimeout(() => { const el = document.getElementById(id); if (el) el.classList.add('visible'); }, 1500 + idx * 400);
   });
+  setTimeout(startReceiptAnim, 6000);
 }
-
-function animateShareBtns() {
-  document.querySelectorAll('.ds-share-btn').forEach((btn, i) => {
-    btn.classList.remove('pulse');
-    setTimeout(() => { btn.classList.add('pulse'); setTimeout(() => btn.classList.remove('pulse'), 600); }, i * 300);
-  });
+function startPhoneAnim() {
+  const check = document.getElementById('phoneCheck');
+  if (!check) return;
+  check.classList.remove('pop'); void check.offsetWidth; check.classList.add('pop');
+  setTimeout(startPhoneAnim, 8000);
 }
-
-// Start demo when section is visible
-function initDemoObserver() {
-  const demoEl = document.getElementById('demoSection');
-  if (!demoEl || !('IntersectionObserver' in window)) return;
-  let started = false;
-  const obs = new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting && !started) {
-      started = true;
-      goDemo(0);
-    }
-  }, { threshold: 0.3 });
-  obs.observe(demoEl);
+function initHeroObserver() {
+  const heroEl = document.getElementById('heroDevices');
+  if (!heroEl) return;
+  if ('IntersectionObserver' in window) {
+    let started = false;
+    const obs = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !started) {
+        started = true;
+        startHeroTyping();
+        startReceiptAnim();
+        setTimeout(startPhoneAnim, 3500);
+      }
+    }, { threshold: 0.3 });
+    obs.observe(heroEl);
+  } else {
+    startHeroTyping();
+    startReceiptAnim();
+    setTimeout(startPhoneAnim, 3500);
+  }
 }
-// Init on page load
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initDemoObserver);
+  document.addEventListener('DOMContentLoaded', initHeroObserver);
 } else {
-  initDemoObserver();
+  initHeroObserver();
 }
 
 function dismissWelcome() {
