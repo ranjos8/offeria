@@ -2820,7 +2820,7 @@ async function onLogin(user) {
   currentUser = user;
   closeModal();
 
-  // Uppdatera header DIREKT — innan några asynkrona anrop
+  // Uppdatera header och visa app DIREKT — innan några asynkrona anrop
   document.getElementById('navUserArea').style.display = 'flex';
   document.getElementById('navAuthBtns').style.display = 'none';
   document.getElementById('mobileMenu').style.display = 'none';
@@ -2829,55 +2829,56 @@ async function onLogin(user) {
   if(_mli)_mli.style.display='block';
   if(_mlo)_mlo.style.display='none';
 
+  showView('app');
+  const savedPage = (() => { try { return sessionStorage.getItem('offeria_page'); } catch(e) { return null; } })();
+  const validPages = ['dashboard','generate','invoices','suppliers','customers','articles','bookkeeping','profile'];
+  showPage(savedPage && validPages.includes(savedPage) ? savedPage : 'dashboard');
+
   let profile = null;
   let used = 0;
   let total = 0;
 
   try {
-    // load profile
-    const { data: pData, error: pErr } = await sb.from('profiles').select('*').eq('id', user.id).single();
-    if (pErr) console.error('Profile load error:', pErr);
-    profile = pData;
+    const pResult = await Promise.race([
+      sb.from('profiles').select('*').eq('id', user.id).single(),
+      new Promise(resolve => setTimeout(() => resolve({ data: null, error: 'timeout' }), 5000))
+    ]);
+    if (pResult?.error && pResult.error !== 'timeout') console.error('Profile load error:', pResult.error);
+    profile = pResult?.data;
   } catch(e) { console.error('Profile load failed:', e); }
 
   currentProfile = profile;
 
   try {
-    // load monthly usage
     const weekStart = getMonthStart();
-    const { count, error: uErr } = await sb.from('quote_usage')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .gte('created_at', weekStart.toISOString());
-    if (uErr) console.error('Usage load error:', uErr);
-    used = count || 0;
+    const uResult = await Promise.race([
+      sb.from('quote_usage').select('*', { count: 'exact', head: true }).eq('user_id', user.id).gte('created_at', weekStart.toISOString()),
+      new Promise(resolve => setTimeout(() => resolve({ count: 0, error: 'timeout' }), 5000))
+    ]);
+    if (uResult?.error && uResult.error !== 'timeout') console.error('Usage load error:', uResult.error);
+    used = uResult?.count || 0;
   } catch(e) { console.error('Usage load failed:', e); }
 
   monthlyUsed = used;
 
   try {
-    // load total
-    const { count: totalCount, error: tErr } = await sb.from('quote_usage')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id);
-    if (tErr) console.error('Total load error:', tErr);
-    total = totalCount || 0;
+    const tResult = await Promise.race([
+      sb.from('quote_usage').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+      new Promise(resolve => setTimeout(() => resolve({ count: 0, error: 'timeout' }), 5000))
+    ]);
+    if (tResult?.error && tResult.error !== 'timeout') console.error('Total load error:', tResult.error);
+    total = tResult?.count || 0;
   } catch(e) { console.error('Total load failed:', e); }
 
-  updateUI(profile, used, total);
-  showView('app');
-  // Återställ senast besökta sida om F5 (sessionStorage), annars dashboard
-  const savedPage = (() => { try { return sessionStorage.getItem('offeria_page'); } catch(e) { return null; } })();
-  const validPages = ['dashboard','generate','invoices','suppliers','customers','articles','bookkeeping','profile'];
-  showPage(savedPage && validPages.includes(savedPage) ? savedPage : 'dashboard');
-  fillProfileForm(profile);
+  try { updateUI(profile, used, total); } catch(e) { console.error('updateUI error:', e); }
+  try { fillProfileForm(profile); } catch(e) {}
   renderExamplePills();
 
   // Welcome flow for new users — bara om kontot är skapat inom senaste timmen
   const accountAgeMinutes = profile?.created_at ? (Date.now() - new Date(profile.created_at).getTime()) / 60000 : 999;
   if (total === 0 && accountAgeMinutes < 60) {
-    document.getElementById('welcomeBanner').style.display = 'block';
-    // Skicka välkomstmejl bara en gång och INTE vid lösenordsåterställning
+    const wb = document.getElementById('welcomeBanner');
+    if (wb) wb.style.display = 'block';
     if (!localStorage.getItem('offeria_welcome_sent_' + user.id) && !window._resetPasswordPending) {
       sendWelcomeEmail(user.email, profile?.full_name || profile?.company_name || '');
       localStorage.setItem('offeria_welcome_sent_' + user.id, '1');
