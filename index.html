@@ -2649,10 +2649,9 @@ const PLAN_LABELS = { free: 'Gratis', pro: 'Pro', komplett: 'Komplett' };
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: {
-    persistSession: true,
+    persistSession: false,
     autoRefreshToken: true,
-    detectSessionInUrl: true,
-    storage: window.sessionStorage
+    detectSessionInUrl: true
   }
 });
 let currentUser = null;
@@ -2795,33 +2794,8 @@ async function init() {
   const landingEl = document.getElementById('viewLanding');
   if (landingEl) landingEl.style.display = '';
 
-  try {
-    // Läs session direkt från localStorage — getSession() hänger pga browser-tillägg
-    const raw = localStorage.getItem('sb-yfnmmcrvzcwcinwopnlj-auth-token');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      const now = Math.floor(Date.now() / 1000);
-      if (parsed?.access_token && parsed?.expires_at > now && parsed?.user) {
-        // Sätt sessionen manuellt
-        try { await sb.auth.setSession({ access_token: parsed.access_token, refresh_token: parsed.refresh_token }); } catch(e) {}
-        _loginHandled = true;
-        await onLogin(parsed.user);
-        return;
-      }
-    }
-    // Fallback: vanlig getSession med timeout
-    const result = await Promise.race([
-      sb.auth.getSession(),
-      new Promise(resolve => setTimeout(() => resolve({ data: { session: null } }), 2000))
-    ]);
-    const session = result?.data?.session;
-    if (session) {
-      _loginHandled = true;
-      await onLogin(session.user);
-    }
-  } catch(e) {
-    console.error('Init error:', e);
-  }
+  // persistSession: false → ingen storage, ingen hängning
+  // Användare loggar in manuellt varje session
 }
 
 async function onLogin(user) {
