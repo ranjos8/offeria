@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
+<script>if(location.hostname==="offeria.se"){location.replace("https://www.offeria.se"+location.pathname+location.search+location.hash);}</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Offeria – Offert, faktura och bokföring för hantverkare</title>
@@ -2831,8 +2832,9 @@ async function onLogin(user) {
   fillProfileForm(profile);
   renderExamplePills();
 
-  // Welcome flow for new users
-  if ((total || 0) === 0 && !localStorage.getItem('offeria_welcomed_' + user.id)) {
+  // Welcome flow for new users — bara om kontot är skapat inom senaste timmen
+  const accountAgeMinutes = profile?.created_at ? (Date.now() - new Date(profile.created_at).getTime()) / 60000 : 999;
+  if ((total || 0) === 0 && accountAgeMinutes < 60) {
     document.getElementById('welcomeBanner').style.display = 'block';
     // Skicka välkomstmejl bara en gång och INTE vid lösenordsåterställning
     if (!localStorage.getItem('offeria_welcome_sent_' + user.id) && !window._resetPasswordPending) {
