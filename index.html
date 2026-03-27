@@ -2783,8 +2783,7 @@ async function init() {
       document.getElementById('modalSub').textContent = 'Välj ett nytt lösenord';
       document.querySelector('.modal-tabs').style.display = 'none';
     }
-    if (event === 'SIGNED_IN' && !_loginHandled && !window._resetPasswordPending) {
-      // Normalt inloggning — hantera bara om det inte är recovery
+    if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && !_loginHandled && !window._resetPasswordPending) {
       _loginHandled = true;
       if (session?.user) await onLogin(session.user);
     }
@@ -2794,32 +2793,27 @@ async function init() {
   const landingEl = document.getElementById('viewLanding');
   if (landingEl) landingEl.style.display = '';
 
-  try {
-    // Läs session direkt från localStorage — getSession() hänger pga browser-tillägg
-    const raw = localStorage.getItem('sb-yfnmmcrvzcwcinwopnlj-auth-token');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      const now = Math.floor(Date.now() / 1000);
-      if (parsed?.access_token && parsed?.expires_at > now && parsed?.user) {
-        try { await sb.auth.setSession({ access_token: parsed.access_token, refresh_token: parsed.refresh_token }); } catch(e) {}
-        _loginHandled = true;
-        await onLogin(parsed.user);
-        return;
+  // Säkerhetsnät: om INITIAL_SESSION inte triggade inom 3s, läs localStorage direkt
+  setTimeout(async () => {
+    if (_loginHandled || window._resetPasswordPending) return;
+    try {
+      const raw = localStorage.getItem('sb-yfnmmcrvzcwcinwopnlj-auth-token');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const now = Math.floor(Date.now() / 1000);
+        if (parsed?.access_token && parsed?.expires_at > now && parsed?.user) {
+          console.warn('INITIAL_SESSION timeout — fallback till localStorage');
+          try { await sb.auth.setSession({ access_token: parsed.access_token, refresh_token: parsed.refresh_token }); } catch(e) {}
+          if (!_loginHandled) {
+            _loginHandled = true;
+            await onLogin(parsed.user);
+          }
+        }
       }
+    } catch(e) {
+      console.error('Fallback init error:', e);
     }
-    // Fallback: vanlig getSession med timeout
-    const result = await Promise.race([
-      sb.auth.getSession(),
-      new Promise(resolve => setTimeout(() => resolve({ data: { session: null } }), 2000))
-    ]);
-    const session = result?.data?.session;
-    if (session) {
-      _loginHandled = true;
-      await onLogin(session.user);
-    }
-  } catch(e) {
-    console.error('Init error:', e);
-  }
+  }, 3000);
 }
 
 async function onLogin(user) {
