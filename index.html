@@ -141,10 +141,10 @@ nav {
   position: relative; box-shadow: 0 25px 60px rgba(0,0,0,0.2);
 }
 .laptop-cam { width: 6px; height: 6px; border-radius: 50%; background: #333; margin: 0 auto 8px; border: 1px solid #444; }
-.laptop-screen { background: white; border-radius: 6px 6px 0 0; overflow: hidden; aspect-ratio: 16/10; }
+.laptop-screen { background: white; border-radius: 6px 6px 0 0; overflow: hidden; aspect-ratio: 16/10; position: relative; }
 .laptop-base { background: #2a2a28; height: 14px; border-radius: 0 0 8px 8px; margin: 0 -2px; position: relative; }
 .laptop-base::after { content: ''; position: absolute; top: 2px; left: 50%; transform: translateX(-50%); width: 50px; height: 4px; background: #333; border-radius: 2px; }
-.screen-content { padding: 16px; height: 100%; display: flex; flex-direction: column; font-size: 0.68rem; overflow: hidden; }
+.screen-content { position: absolute; inset: 0; padding: 16px; display: flex; flex-direction: column; font-size: 0.68rem; overflow: hidden; }
 .sc-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 1.5px solid var(--border); margin-bottom: 12px; }
 .sc-logo { font-family: 'Fraunces', serif; font-size: 0.85rem; font-weight: 700; }
 .sc-logo span { color: var(--gold); }
@@ -193,11 +193,13 @@ nav {
   .hero-sub { margin-left: auto; margin-right: auto; }
   .hero-steps { align-items: center; } .hero-btns { justify-content: center; }
   .device-phone { right: -10px; bottom: -10px; width: 100px; }
+  .sc-result { display: none !important; }
 }
 @media (max-width: 640px) {
   .hero { padding: 2rem 1.2rem; }
-  .device-phone { width: 90px; right: -5px; }
+  .device-phone { width: 80px; right: -5px; bottom: -5px; }
   .hero-btns { flex-direction: column; align-items: center; }
+  .hero-devices { max-width: 85%; }
 }
 
 /* pricing */
