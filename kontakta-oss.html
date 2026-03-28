@@ -125,13 +125,13 @@
           <label>Ämne</label>
           <select id="cSubject">
             <option value="">Välj ämne...</option>
-            <option value="skraddarsydd">Skräddarsydd lösning</option>
-            <option value="bokforing">Bokföring / SIE-import</option>
-            <option value="integration">Integration / API</option>
-            <option value="support">Teknisk support</option>
-            <option value="pris">Fråga om priser</option>
-            <option value="samarbete">Samarbete / partnerskap</option>
-            <option value="ovrigt">Övrigt</option>
+            <option value="Skräddarsydd lösning">Skräddarsydd lösning</option>
+            <option value="Bokföring / SIE-import">Bokföring / SIE-import</option>
+            <option value="Integration / API">Integration / API</option>
+            <option value="Teknisk support">Teknisk support</option>
+            <option value="Fråga om priser">Fråga om priser</option>
+            <option value="Samarbete / partnerskap">Samarbete / partnerskap</option>
+            <option value="Övrigt">Övrigt</option>
           </select>
         </div>
         <div class="field"><label>Meddelande</label><textarea id="cMessage" placeholder="Beskriv vad du behöver hjälp med..."></textarea></div>
@@ -173,11 +173,18 @@ async function sendContact() {
   const message = document.getElementById('cMessage').value.trim();
   const company = document.getElementById('cCompany').value.trim();
   if (!name || !email || !message || !subject) { alert('Fyll i namn, e-post, ämne och meddelande.'); return; }
-  const subjectLabels = { skraddarsydd:'Skräddarsydd lösning', bokforing:'Bokföring / SIE-import', integration:'Integration / API', support:'Teknisk support', pris:'Fråga om priser', samarbete:'Samarbete / partnerskap', ovrigt:'Övrigt' };
+
   const btn = document.getElementById('submitBtn');
   btn.disabled = true; btn.textContent = 'Skickar...';
   try {
-    await emailjs.send('service_f5de23t', 'template_fbh7cng', { name, email, company: company||'–', subject: subjectLabels[subject]||subject, message });
+    await emailjs.send('service_f5de23t', 'template_fbh7cng', {
+      to_email: 'info@offeria.se',
+      name: name,
+      email: email,
+      company: company || '–',
+      subject: subject,
+      message: message
+    });
     document.getElementById('confirmedEmail').textContent = email;
     document.getElementById('formWrap').style.display = 'none';
     document.getElementById('successMsg').style.display = 'block';
