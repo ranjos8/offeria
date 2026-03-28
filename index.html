@@ -142,44 +142,88 @@ nav {
 }
 .laptop-cam { width: 6px; height: 6px; border-radius: 50%; background: #333; margin: 0 auto 8px; border: 1px solid #444; }
 .laptop-screen { background: white; border-radius: 6px 6px 0 0; overflow: hidden; aspect-ratio: 16/10; position: relative; }
-.laptop-base { background: #2a2a28; height: 14px; border-radius: 0 0 8px 8px; margin: 0 -2px; position: relative; }
-.laptop-base::after { content: ''; position: absolute; top: 2px; left: 50%; transform: translateX(-50%); width: 50px; height: 4px; background: #333; border-radius: 2px; }
-.screen-content { position: absolute; inset: 0; padding: 16px; display: flex; flex-direction: column; font-size: 0.68rem; overflow: hidden; }
-.sc-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 1.5px solid var(--border); margin-bottom: 12px; }
+.sc-bar { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 10px 16px 8px; border-bottom: 1.5px solid var(--border); background: white; z-index: 2; }
 .sc-logo { font-family: 'Fraunces', serif; font-size: 0.85rem; font-weight: 700; }
 .sc-logo span { color: var(--gold); }
-.sc-nav { display: flex; gap: 8px; }
-.sc-nav span { font-size: 0.55rem; color: var(--muted); padding: 3px 8px; border-radius: 4px; background: var(--paper); }
+.sc-nav { display: flex; gap: 6px; }
+.sc-nav span { font-size: 0.55rem; color: var(--muted); padding: 3px 8px; border-radius: 4px; background: var(--paper); transition: all 0.3s; }
 .sc-nav span.active { background: var(--gold); color: white; }
+.sc-panel { position: absolute; top: 38px; left: 0; right: 0; bottom: 0; padding: 12px 16px; display: flex; flex-direction: column; font-size: 0.68rem; overflow: hidden; opacity: 0; transform: translateX(30px); transition: opacity 0.4s ease, transform 0.4s ease; pointer-events: none; }
+.sc-panel.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
+.sc-panel.exit { opacity: 0; transform: translateX(-30px); }
 .sc-title { font-family: 'Fraunces', serif; font-size: 0.9rem; margin-bottom: 2px; }
-.sc-sub { font-size: 0.6rem; color: var(--muted); margin-bottom: 12px; }
-.sc-textarea { background: var(--paper); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px; font-size: 0.72rem; color: var(--ink); height: 44px; overflow: hidden; margin-bottom: 10px; line-height: 1.5; }
+.sc-sub { font-size: 0.6rem; color: var(--muted); margin-bottom: 10px; }
+.sc-textarea { background: var(--paper); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px; font-size: 0.72rem; color: var(--ink); height: 40px; overflow: hidden; margin-bottom: 8px; line-height: 1.5; }
 .sc-cursor { border-right: 2px solid var(--gold); animation: blink 0.8s step-end infinite; }
 @keyframes blink { 50% { border-color: transparent; } }
-.sc-gen-btn { display: inline-flex; align-items: center; gap: 4px; background: var(--ink); color: var(--gold-light); border: none; border-radius: 6px; padding: 6px 14px; font-size: 0.65rem; font-weight: 600; font-family: 'DM Sans', sans-serif; }
-.sc-gen-btn svg { width: 12px; height: 12px; }
-.sc-result { margin-top: 10px; background: white; border: 1px solid var(--border); border-radius: 8px; padding: 10px; opacity: 0; transform: translateY(10px); transition: all 0.5s ease; }
+.sc-gen-btn { display: inline-flex; align-items: center; gap: 4px; background: var(--ink); color: var(--gold-light); border: none; border-radius: 6px; padding: 5px 12px; font-size: 0.6rem; font-weight: 600; font-family: 'DM Sans', sans-serif; margin-bottom: 6px; }
+.sc-gen-btn svg { width: 10px; height: 10px; }
+.sc-result { background: white; border: 1px solid var(--border); border-radius: 6px; padding: 8px; opacity: 0; transform: translateY(8px); transition: all 0.4s ease; }
 .sc-result.visible { opacity: 1; transform: translateY(0); }
-.sc-result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1.5px solid var(--gold-light); }
-.sc-result-title { font-weight: 700; font-size: 0.7rem; }
-.sc-result-badge { font-size: 0.5rem; background: #e8f5e9; color: #2e7d32; padding: 2px 6px; border-radius: 3px; font-weight: 600; }
-.sc-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.62rem; color: #666; border-bottom: 1px solid #f5f2ec; opacity: 0; transform: translateX(-10px); transition: all 0.3s ease; }
+.sc-result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1.5px solid var(--gold-light); }
+.sc-result-title { font-weight: 700; font-size: 0.65rem; }
+.sc-result-badge { font-size: 0.45rem; background: #e8f5e9; color: #2e7d32; padding: 2px 5px; border-radius: 3px; font-weight: 600; }
+.sc-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 0.58rem; color: #666; border-bottom: 1px solid #f5f2ec; opacity: 0; transform: translateX(-8px); transition: all 0.3s ease; }
 .sc-row.visible { opacity: 1; transform: translateX(0); }
 .sc-row-amount { font-weight: 600; color: var(--ink); }
-.sc-total { display: flex; justify-content: space-between; padding-top: 6px; margin-top: 4px; border-top: 2px solid var(--ink); font-weight: 700; font-size: 0.72rem; }
-.sc-total-amount { color: var(--gold); font-family: 'Fraunces', serif; font-size: 0.85rem; }
+.sc-total { display: flex; justify-content: space-between; padding-top: 5px; margin-top: 3px; border-top: 2px solid var(--ink); font-weight: 700; font-size: 0.65rem; }
+.sc-total-amount { color: var(--gold); font-family: 'Fraunces', serif; font-size: 0.78rem; }
 
-/* Phone */
-.device-phone { position: absolute; bottom: -20px; right: -30px; width: 120px; background: var(--ink); border-radius: 18px; padding: 6px; box-shadow: 0 15px 40px rgba(0,0,0,0.25); z-index: 2; }
-.phone-notch { width: 40px; height: 12px; background: var(--ink); border-radius: 0 0 8px 8px; position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 2; }
-.phone-screen { background: white; border-radius: 14px; overflow: hidden; aspect-ratio: 9/16; padding: 14px 8px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.phone-label { font-size: 0.45rem; color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
-.phone-sign-check { width: 32px; height: 32px; border-radius: 50%; background: #e8f5e9; color: #2e7d32; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700; margin-bottom: 6px; opacity: 0; transform: scale(0.5); }
-.phone-sign-check.pop { animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
-@keyframes popIn { to { opacity: 1; transform: scale(1); } }
-.phone-sign-text { font-size: 0.5rem; font-weight: 700; color: #2e7d32; margin-bottom: 2px; }
-.phone-sign-name { font-size: 0.42rem; color: #888; }
-.phone-sign-date { font-size: 0.38rem; color: #aaa; margin-top: 1px; }
+/* Panel 2: Faktura */
+.sc-inv-card { background: var(--paper); border: 1px solid var(--border); border-radius: 6px; padding: 8px; }
+.sc-inv-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.sc-inv-badge-nr { font-size: 0.6rem; font-weight: 700; background: var(--ink); color: white; padding: 2px 6px; border-radius: 4px; }
+.sc-inv-status-tag { font-size: 0.45rem; font-weight: 700; padding: 2px 6px; border-radius: 3px; }
+.sc-inv-status-tag.sent { background: #e3f2fd; color: #1565c0; }
+.sc-inv-client { font-size: 0.58rem; color: #555; margin-bottom: 6px; font-weight: 500; }
+.sc-inv-from { font-size: 0.5rem; color: #2e7d32; font-weight: 600; margin-top: 8px; text-align: center; }
+
+/* Panel 3: Bokföring */
+.sc-book-flow { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 8px; background: var(--paper); border-radius: 6px; }
+.sc-book-receipt { width: 36px; height: 44px; background: #f0ede6; border-radius: 5px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; overflow: hidden; }
+.sc-book-receipt svg { width: 16px; height: 16px; stroke: #999; }
+.sc-book-scan { position: absolute; left: 0; right: 0; height: 2px; background: var(--gold); opacity: 0; animation: scanLine 2s ease-in-out infinite; }
+@keyframes scanLine { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+.sc-book-arrow { color: var(--gold); font-weight: 700; font-size: 0.8rem; flex-shrink: 0; }
+.sc-book-entries { flex: 1; }
+.sc-book-label { font-size: 0.45rem; color: #2e7d32; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.sc-book-row { display: flex; gap: 4px; font-size: 0.52rem; padding: 2px 0; color: #555; opacity: 0; transform: translateX(-5px); transition: all 0.3s ease; }
+.sc-book-row.visible { opacity: 1; transform: translateX(0); }
+.sc-book-acct { font-weight: 700; color: var(--ink); min-width: 24px; }
+.sc-book-row span:last-child { margin-left: auto; font-weight: 600; }
+.sc-book-verified { font-size: 0.52rem; color: #2e7d32; font-weight: 600; text-align: center; opacity: 0; transition: opacity 0.4s ease; }
+.sc-book-verified.visible { opacity: 1; }
+
+/* Panel 2: Signering */
+.sc-sign-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
+.sc-sign-doc { font-size: 0.65rem; font-weight: 600; color: var(--ink); margin-bottom: 10px; padding: 6px 10px; background: var(--paper); border-radius: 6px; border: 1px solid var(--border); }
+.sc-sign-check { width: 36px; height: 36px; border-radius: 50%; background: #e8f5e9; color: #2e7d32; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 700; margin: 0 auto 6px; opacity: 0; transform: scale(0.5); }
+.sc-sign-check.pop { animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+.sc-sign-text { font-weight: 700; color: #2e7d32; font-size: 0.7rem; margin-bottom: 3px; }
+.sc-sign-name { font-size: 0.6rem; color: #555; }
+.sc-sign-date { font-size: 0.5rem; color: #999; margin-bottom: 8px; }
+.sc-sign-cta { font-size: 0.55rem; font-weight: 700; color: var(--gold); cursor: default; }
+
+/* Phone panels */
+.phone-screen { background: white; border-radius: 14px; overflow: hidden; aspect-ratio: 9/16; position: relative; }
+.ph-panel { position: absolute; inset: 0; padding: 18px 10px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; opacity: 0; transform: translateY(10px); transition: opacity 0.4s ease, transform 0.4s ease; pointer-events: none; }
+.ph-panel.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.ph-label { font-size: 0.42rem; color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
+.ph-mini-input { font-size: 0.38rem; color: var(--ink); background: var(--paper); border: 1px solid var(--border); border-radius: 4px; padding: 4px 6px; margin-bottom: 5px; width: 100%; text-align: left; }
+.ph-mini-result { width: 100%; }
+.ph-mini-row { display: flex; justify-content: space-between; font-size: 0.38rem; color: #666; padding: 2px 0; border-bottom: 1px solid #f0ede6; }
+.ph-mini-row span { font-weight: 600; color: var(--ink); }
+.ph-mini-row.ph-total { border-top: 1.5px solid var(--ink); border-bottom: none; font-weight: 700; font-size: 0.42rem; margin-top: 2px; padding-top: 3px; }
+.ph-mini-row.ph-total span { color: var(--gold); }
+.ph-sign-check { width: 26px; height: 26px; border-radius: 50%; background: #e8f5e9; color: #2e7d32; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px; opacity: 0; transform: scale(0.5); }
+.ph-sign-check.pop { animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+.ph-sign-text { font-size: 0.42rem; font-weight: 700; color: #2e7d32; margin-bottom: 2px; }
+.ph-sign-name { font-size: 0.36rem; color: #888; }
+.ph-inv-nr { font-size: 0.42rem; font-weight: 700; background: var(--ink); color: white; padding: 2px 6px; border-radius: 3px; margin-bottom: 5px; }
+.ph-inv-status { font-size: 0.36rem; font-weight: 700; background: #e3f2fd; color: #1565c0; padding: 2px 5px; border-radius: 3px; margin-top: 4px; }
+.ph-book-row { font-size: 0.38rem; color: #555; padding: 1.5px 0; width: 100%; text-align: left; }
+.ph-book-row span { font-weight: 700; color: var(--ink); margin-right: 3px; }
+.ph-book-ok { font-size: 0.4rem; font-weight: 700; color: #2e7d32; margin-top: 4px; }
 
 /* Tablet removed */
 
@@ -189,13 +233,16 @@ nav {
 
 @media (max-width: 900px) {
   .hero-inner { grid-template-columns: 1fr; text-align: center; }
-  .hero-text { order: 1; }
-  .hero-devices { display: none; }
+  .hero-text { order: 1; } .hero-devices { order: 2; max-width: 420px; margin: 0 auto; }
   .hero-sub { margin-left: auto; margin-right: auto; }
   .hero-steps { align-items: center; } .hero-btns { justify-content: center; }
+  .device-phone { right: -10px; bottom: -10px; width: 100px; }
+  .sc-cursor { display: none !important; }
 }
 @media (max-width: 640px) {
   .hero { padding: 2rem 1.2rem; }
+  .hero-devices { max-width: 88%; }
+  .device-phone { width: 85px; right: -5px; bottom: -5px; }
   .hero-btns { flex-direction: column; align-items: center; }
 }
 
@@ -914,44 +961,115 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
       <div class="hero-devices" id="heroDevices">
 
-        <!-- LAPTOP: Offertgenerering -->
+        <!-- LAPTOP: 4-steg carousel -->
         <div class="device-laptop">
           <div class="laptop-cam"></div>
           <div class="laptop-screen">
-            <div class="screen-content">
-              <div class="sc-header">
-                <div class="sc-logo">☐ <span>Offeria</span></div>
-                <div class="sc-nav"><span class="active">Offerter</span><span>Fakturor</span><span>Bokföring</span></div>
-              </div>
+            <div class="sc-bar">
+              <div class="sc-logo">☐ <span>Offeria</span></div>
+              <div class="sc-nav" id="scNav"><span class="active" data-tab="0">Offerter</span><span data-tab="1">Fakturor</span><span data-tab="2">Bokföring</span></div>
+            </div>
+
+            <!-- Steg 1: Offert -->
+            <div class="sc-panel active" id="scPanel0">
               <div class="sc-title">Ny offert</div>
               <div class="sc-sub">Beskriv uppdraget — AI:n skapar resten</div>
               <div class="sc-textarea" id="heroTyping"><span class="sc-cursor" id="heroCursor"></span></div>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <div class="sc-gen-btn"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.09 6.26L20.18 9.27l-5.09 3.88L16.18 20 12 16.77 7.82 20l1.09-6.85L3.82 9.27l6.09-1.01z"/></svg> Generera offert</div>
-                <span style="font-size:0.55rem;color:var(--muted)">∞ offerter kvar</span>
-              </div>
+              <div class="sc-gen-btn"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.09 6.26L20.18 9.27l-5.09 3.88L16.18 20 12 16.77 7.82 20l1.09-6.85L3.82 9.27l6.09-1.01z"/></svg> Generera offert</div>
               <div class="sc-result" id="heroResult">
                 <div class="sc-result-header"><span class="sc-result-title">Offert — Renovera badrum</span><span class="sc-result-badge">AI-genererad</span></div>
-                <div class="sc-row" id="hr1"><span>Rivning befintligt kakel</span><span class="sc-row-amount">4 200 kr</span></div>
-                <div class="sc-row" id="hr2"><span>Nytt kakel 6 kvm (material)</span><span class="sc-row-amount">8 400 kr</span></div>
-                <div class="sc-row" id="hr3"><span>Kakelsättning inkl. fog</span><span class="sc-row-amount">12 600 kr</span></div>
-                <div class="sc-row" id="hr4"><span>VVS-arbete (blandare, golvbrunn)</span><span class="sc-row-amount">9 800 kr</span></div>
+                <div class="sc-row" id="hr1"><span>Rivning kakel</span><span class="sc-row-amount">4 200 kr</span></div>
+                <div class="sc-row" id="hr2"><span>Nytt kakel 6 kvm</span><span class="sc-row-amount">8 400 kr</span></div>
+                <div class="sc-row" id="hr3"><span>Kakelsättning</span><span class="sc-row-amount">12 600 kr</span></div>
                 <div class="sc-total"><span>Totalt inkl. moms</span><span class="sc-total-amount">43 750 kr</span></div>
               </div>
+            </div>
+
+            <!-- Steg 2: E-signering (Offerter-fliken aktiv) -->
+            <div class="sc-panel" id="scPanel1">
+              <div class="sc-sign-wrap">
+                <div class="sc-sign-doc">Offert — Renovera badrum<br><span style="font-size:0.5rem;color:var(--muted)">Erik Svensson · 43 750 kr</span></div>
+                <div class="sc-sign-check" id="scSignCheck">✓</div>
+                <div class="sc-sign-text">Offerten godkänd</div>
+                <div class="sc-sign-name">Erik Svensson</div>
+                <div class="sc-sign-date">14 mars 2026, 10:32</div>
+                <div class="sc-sign-cta">→ Skapa faktura</div>
+              </div>
+            </div>
+
+            <!-- Steg 3: Faktura -->
+            <div class="sc-panel" id="scPanel2">
+              <div class="sc-title">Fakturor</div>
+              <div class="sc-sub">Skapad från godkänd offert med ett klick</div>
+              <div class="sc-inv-card">
+                <div class="sc-inv-top"><span class="sc-inv-badge-nr">FA-1024</span><span class="sc-inv-status-tag sent">Skickad</span></div>
+                <div class="sc-inv-client">Erik Svensson — Renovera badrum</div>
+                <div class="sc-row visible"><span>Rivning kakel</span><span class="sc-row-amount">4 200 kr</span></div>
+                <div class="sc-row visible"><span>Nytt kakel 6 kvm</span><span class="sc-row-amount">8 400 kr</span></div>
+                <div class="sc-row visible"><span>Kakelsättning</span><span class="sc-row-amount">12 600 kr</span></div>
+                <div class="sc-total"><span>Att betala</span><span class="sc-total-amount">43 750 kr</span></div>
+              </div>
+            </div>
+
+            <!-- Steg 4: Bokföring -->
+            <div class="sc-panel" id="scPanel3">
+              <div class="sc-title">Bokföring</div>
+              <div class="sc-sub">Fota kvittot — AI:n bokför automatiskt</div>
+              <div class="sc-book-flow">
+                <div class="sc-book-receipt">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  <div class="sc-book-scan"></div>
+                </div>
+                <div class="sc-book-arrow">→</div>
+                <div class="sc-book-entries">
+                  <div class="sc-book-label">AI bokför automatiskt</div>
+                  <div class="sc-book-row" id="br1"><span class="sc-book-acct">4010</span><span>Material</span><span>3 040 kr</span></div>
+                  <div class="sc-book-row" id="br2"><span class="sc-book-acct">2640</span><span>Ing. moms</span><span>760 kr</span></div>
+                  <div class="sc-book-row" id="br3"><span class="sc-book-acct">1930</span><span>Bank</span><span>−3 800 kr</span></div>
+                </div>
+              </div>
+              <div class="sc-book-verified">✓ Verifikation #47 skapad</div>
             </div>
           </div>
           <div class="laptop-base"></div>
         </div>
 
-        <!-- PHONE: E-signering -->
+        <!-- PHONE: Synkad med laptop -->
         <div class="device-phone">
           <div class="phone-notch"></div>
           <div class="phone-screen">
-            <div class="phone-label">E-signering</div>
-            <div class="phone-sign-check" id="phoneCheck">✓</div>
-            <div class="phone-sign-text">Godkänd</div>
-            <div class="phone-sign-name">Erik Svensson</div>
-            <div class="phone-sign-date">14 mars 2026, 10:32</div>
+            <!-- Steg 1: Offert mini -->
+            <div class="ph-panel active" id="phPanel0">
+              <div class="ph-label">Ny offert</div>
+              <div class="ph-mini-input">Renovera badrum 6 kvm...</div>
+              <div class="ph-mini-result">
+                <div class="ph-mini-row">Kakel <span>8 400 kr</span></div>
+                <div class="ph-mini-row ph-total">Totalt <span>43 750 kr</span></div>
+              </div>
+            </div>
+            <!-- Steg 2: Signering mini -->
+            <div class="ph-panel" id="phPanel1">
+              <div class="ph-label">E-signering</div>
+              <div class="ph-sign-check" id="phSignCheck">✓</div>
+              <div class="ph-sign-text">Godkänd</div>
+              <div class="ph-sign-name">Erik Svensson</div>
+            </div>
+            <!-- Steg 3: Faktura mini -->
+            <div class="ph-panel" id="phPanel2">
+              <div class="ph-label">Faktura</div>
+              <div class="ph-inv-nr">FA-1024</div>
+              <div class="ph-mini-row">Kakel <span>8 400 kr</span></div>
+              <div class="ph-mini-row ph-total">Att betala <span>43 750 kr</span></div>
+              <div class="ph-inv-status">Skickad</div>
+            </div>
+            <!-- Steg 4: Bokföring mini -->
+            <div class="ph-panel" id="phPanel3">
+              <div class="ph-label">Bokföring</div>
+              <div class="ph-book-row"><span>4010</span> 3 040 kr</div>
+              <div class="ph-book-row"><span>2640</span> 760 kr</div>
+              <div class="ph-book-row"><span>1930</span> −3 800 kr</div>
+              <div class="ph-book-ok">✓ Bokfört</div>
+            </div>
           </div>
         </div>
 
@@ -4886,39 +5004,100 @@ function toggleFaq(el) {
 }
 
 // ===== DEMO ANIMATION =====
-// ===== HERO DEVICE ANIMATIONS =====
+// ===== HERO DEVICE CAROUSEL (4 steps, synced laptop + phone) =====
 let _heroTypingTimer = null;
-function startHeroTyping() {
+let _heroCarouselTimer = null;
+let _heroStep = 0;
+const HERO_TEXT = 'Renovera badrum 6 kvm, nytt kakel, byta blandare';
+// Map step → nav tab index (0=Offerter, 1=Fakturor, 2=Bokföring)
+const STEP_TO_TAB = [0, 0, 1, 2]; // steps 0+1 = Offerter, step 2 = Fakturor, step 3 = Bokföring
+
+function heroShowStep(idx) {
+  const scPanels = document.querySelectorAll('.sc-panel');
+  const phPanels = document.querySelectorAll('.ph-panel');
+  const navTabs = document.querySelectorAll('#scNav span');
+  if (!scPanels.length) return;
+
+  // Exit current
+  scPanels[_heroStep]?.classList.remove('active');
+  scPanels[_heroStep]?.classList.add('exit');
+  phPanels[_heroStep]?.classList.remove('active');
+
+  _heroStep = idx;
+
+  setTimeout(() => {
+    scPanels.forEach(p => p.classList.remove('active', 'exit'));
+    phPanels.forEach(p => p.classList.remove('active'));
+    scPanels[_heroStep]?.classList.add('active');
+    phPanels[_heroStep]?.classList.add('active');
+    // Update nav tabs
+    const tabIdx = STEP_TO_TAB[_heroStep];
+    navTabs.forEach((t, i) => t.classList.toggle('active', i === tabIdx));
+    heroAnimateStep(_heroStep);
+  }, 150);
+}
+
+function heroAnimateStep(idx) {
+  const isMobile = window.innerWidth <= 900;
   clearInterval(_heroTypingTimer);
-  const container = document.getElementById('heroTyping');
-  const result = document.getElementById('heroResult');
-  if (!container) return;
-  container.innerHTML = '<span class="sc-cursor" id="heroCursor"></span>';
-  result.classList.remove('visible');
-  document.querySelectorAll('.sc-row').forEach(r => r.classList.remove('visible'));
-  const text = 'Renovera badrum 6 kvm, nytt kakel, byta blandare och golvbrunn';
-  let i = 0;
-  const cursor = document.getElementById('heroCursor');
-  _heroTypingTimer = setInterval(() => {
-    if (i < text.length) { cursor.insertAdjacentText('beforebegin', text[i]); i++; }
-    else {
-      clearInterval(_heroTypingTimer);
-      setTimeout(() => {
-        result.classList.add('visible');
-        ['hr1','hr2','hr3','hr4'].forEach((id, idx) => {
-          setTimeout(() => { const el = document.getElementById(id); if (el) el.classList.add('visible'); }, idx * 200);
-        });
-      }, 600);
-      setTimeout(() => startHeroTyping(), 8000);
+
+  if (idx === 0) {
+    // Offert
+    const container = document.getElementById('heroTyping');
+    const result = document.getElementById('heroResult');
+    if (!container) return;
+    if (isMobile) {
+      container.textContent = HERO_TEXT;
+      result.classList.add('visible');
+      document.querySelectorAll('#scPanel0 .sc-row').forEach(r => r.classList.add('visible'));
+    } else {
+      container.innerHTML = '<span class="sc-cursor" id="heroCursor"></span>';
+      result.classList.remove('visible');
+      document.querySelectorAll('#scPanel0 .sc-row').forEach(r => r.classList.remove('visible'));
+      let i = 0;
+      const cursor = document.getElementById('heroCursor');
+      _heroTypingTimer = setInterval(() => {
+        if (i < HERO_TEXT.length) { cursor.insertAdjacentText('beforebegin', HERO_TEXT[i]); i++; }
+        else {
+          clearInterval(_heroTypingTimer);
+          setTimeout(() => {
+            result.classList.add('visible');
+            ['hr1','hr2','hr3'].forEach((id, j) => {
+              setTimeout(() => { const el = document.getElementById(id); if (el) el.classList.add('visible'); }, j * 120);
+            });
+          }, 300);
+        }
+      }, 30);
     }
-  }, 40);
+  } else if (idx === 1) {
+    // Signering — pop check marks
+    const scCheck = document.getElementById('scSignCheck');
+    const phCheck = document.getElementById('phSignCheck');
+    if (scCheck) { scCheck.classList.remove('pop'); void scCheck.offsetWidth; scCheck.classList.add('pop'); }
+    if (phCheck) { phCheck.classList.remove('pop'); void phCheck.offsetWidth; phCheck.classList.add('pop'); }
+  } else if (idx === 2) {
+    // Faktura — static content
+  } else if (idx === 3) {
+    // Bokföring — animate rows
+    const rows = ['br1','br2','br3'];
+    const verified = document.querySelector('.sc-book-verified');
+    rows.forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('visible'); });
+    if (verified) verified.classList.remove('visible');
+    rows.forEach((id, j) => {
+      setTimeout(() => { const el = document.getElementById(id); if (el) el.classList.add('visible'); }, 300 + j * 250);
+    });
+    setTimeout(() => { if (verified) verified.classList.add('visible'); }, 1200);
+  }
 }
-function startPhoneAnim() {
-  const check = document.getElementById('phoneCheck');
-  if (!check) return;
-  check.classList.remove('pop'); void check.offsetWidth; check.classList.add('pop');
-  setTimeout(startPhoneAnim, 8000);
+
+function startHeroCarousel() {
+  clearInterval(_heroCarouselTimer);
+  heroShowStep(0);
+  _heroCarouselTimer = setInterval(() => {
+    heroShowStep((_heroStep + 1) % 4);
+  }, 3000);
 }
+
 function initHeroObserver() {
   const heroEl = document.getElementById('heroDevices');
   if (!heroEl) return;
@@ -4927,14 +5106,12 @@ function initHeroObserver() {
     const obs = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && !started) {
         started = true;
-        startHeroTyping();
-        setTimeout(startPhoneAnim, 3500);
+        startHeroCarousel();
       }
     }, { threshold: 0.3 });
     obs.observe(heroEl);
   } else {
-    startHeroTyping();
-    setTimeout(startPhoneAnim, 3500);
+    startHeroCarousel();
   }
 }
 if (document.readyState === 'loading') {
