@@ -240,17 +240,54 @@ nav {
 
 @media (max-width: 900px) {
   .hero-inner { grid-template-columns: 1fr; text-align: center; }
-  .hero-text { order: 1; } .hero-devices { order: 2; max-width: 420px; margin: 0 auto; }
+  .hero-text { order: 1; }
+  .hero-devices { order: 2; max-width: 480px; margin: 0 auto; padding-bottom: 30px; }
   .hero-sub { margin-left: auto; margin-right: auto; }
-  .hero-steps { align-items: center; } .hero-btns { justify-content: center; }
-  .device-phone { right: -10px; bottom: -10px; width: 100px; }
+  .hero-steps { align-items: center; }
+  .hero-btns { justify-content: center; }
+  .device-phone { right: -15px; bottom: -15px; width: 95px; }
   .sc-cursor { display: none !important; }
+  .flow-arrow { display: none; }
 }
 @media (max-width: 640px) {
-  .hero { padding: 2rem 1.2rem; }
-  .hero-devices { max-width: 88%; }
-  .device-phone { width: 85px; right: -5px; bottom: -5px; }
+  .hero { padding: 2rem 1rem 1rem; }
+  .hero-devices { max-width: 75%; padding-bottom: 25px; }
+  .device-phone { width: 80px; right: -10px; bottom: -10px; }
   .hero-btns { flex-direction: column; align-items: center; }
+  .sc-bar { padding: 6px 10px 5px; }
+  .sc-logo { font-size: 0.7rem; }
+  .sc-nav span { font-size: 0.45rem; padding: 2px 5px; }
+  .sc-panel { top: 30px; padding: 8px 10px; }
+  .sc-title { font-size: 0.72rem; }
+  .sc-sub { font-size: 0.48rem; margin-bottom: 6px; }
+  .sc-textarea { height: 30px; padding: 6px; font-size: 0.55rem; margin-bottom: 5px; }
+  .sc-gen-btn { padding: 3px 8px; font-size: 0.48rem; margin-bottom: 4px; }
+  .sc-gen-btn svg { width: 8px; height: 8px; }
+  .sc-result { padding: 5px; margin-top: 4px; }
+  .sc-result-header { margin-bottom: 3px; padding-bottom: 2px; }
+  .sc-result-title { font-size: 0.5rem; }
+  .sc-result-badge { font-size: 0.38rem; padding: 1px 3px; }
+  .sc-row { font-size: 0.45rem; padding: 2px 0; }
+  .sc-total { font-size: 0.5rem; padding-top: 3px; margin-top: 2px; }
+  .sc-total-amount { font-size: 0.6rem; }
+  .sc-sign-doc { font-size: 0.5rem; padding: 4px 6px; margin-bottom: 6px; }
+  .sc-sign-check { width: 28px; height: 28px; font-size: 0.9rem; }
+  .sc-sign-text { font-size: 0.55rem; }
+  .sc-sign-name { font-size: 0.48rem; }
+  .sc-sign-date { font-size: 0.4rem; }
+  .sc-sign-cta { font-size: 0.45rem; }
+  .sc-inv-card { padding: 5px; }
+  .sc-inv-badge-nr { font-size: 0.48rem; padding: 1px 4px; }
+  .sc-inv-status-tag { font-size: 0.38rem; }
+  .sc-inv-client { font-size: 0.45rem; margin-bottom: 3px; }
+  .sc-inv-from { font-size: 0.4rem; margin-top: 4px; }
+  .sc-book-flow { padding: 5px; gap: 4px; margin-bottom: 4px; }
+  .sc-book-receipt { width: 26px; height: 30px; }
+  .sc-book-receipt svg { width: 12px; height: 12px; }
+  .sc-book-arrow { font-size: 0.6rem; }
+  .sc-book-label { font-size: 0.36rem; }
+  .sc-book-row { font-size: 0.42rem; }
+  .sc-book-verified { font-size: 0.42rem; }
 }
 
 /* pricing */
