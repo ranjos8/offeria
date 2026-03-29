@@ -9068,13 +9068,25 @@ async function saveReceiptVerification() {
 }
 
 // ===== ADMIN BACKUP FUNCTIONS =====
+
+// Get fresh access token (refreshes if needed)
+async function getAdminToken() {
+  try {
+    const { data, error } = await sb.auth.refreshSession();
+    if (data?.session?.access_token) return data.session.access_token;
+  } catch(e) {}
+  // Fallback
+  const session = await safeGetSession();
+  return session?.access_token || null;
+}
+
 async function loadBackupList() {
   try {
-    const session = await safeGetSession();
-    if (!session?.access_token) return;
+    const token = await getAdminToken();
+    if (!token) return;
     const res = await fetch(SUPABASE_URL + '/functions/v1/backup-bookkeeping', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ action: 'list_backups' })
     });
     const data = await res.json();
@@ -9084,7 +9096,6 @@ async function loadBackupList() {
     document.getElementById('backupTotalSize').textContent = data.total_size_mb + ' MB';
     document.getElementById('backupStorageUsed').textContent = Math.round(data.total_size_mb / data.storage_limit_mb * 100) + '%';
 
-    // Find latest backup date
     if (data.backups.length > 0) {
       const latest = data.backups.sort((a, b) => b.date.localeCompare(a.date))[0];
       document.getElementById('backupLastRun').textContent = latest.date;
@@ -9092,14 +9103,12 @@ async function loadBackupList() {
       document.getElementById('backupLastRun').textContent = 'Aldrig';
     }
 
-    // Render table
     const tbody = document.getElementById('backupTableBody');
     if (data.backups.length === 0) {
       tbody.innerHTML = '<tr><td colspan="4" style="padding:1rem;color:#888;text-align:center">Inga backups ännu. Klicka "Kör backup nu" för att skapa den första.</td></tr>';
       return;
     }
 
-    // Sort by date desc
     const sorted = data.backups.sort((a, b) => b.date.localeCompare(a.date));
     tbody.innerHTML = sorted.map(b => `
       <tr style="border-bottom:1px solid var(--border)">
@@ -9125,12 +9134,14 @@ async function runManualBackup() {
   statusEl.textContent = 'Backup körs... Detta kan ta en stund.';
 
   try {
-    const session = await safeGetSession();
+    const token = await getAdminToken();
+    if (!token) throw new Error('Kunde inte hämta session. Logga in igen.');
     const res = await fetch(SUPABASE_URL + '/functions/v1/backup-bookkeeping', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ action: 'run_backup' })
     });
+    if (res.status === 401) throw new Error('Unauthorized — logga ut och in igen, eller kontrollera att Edge Function är korrekt deployad.');
     const data = await res.json();
     if (data.success) {
       statusEl.style.background = '#e8f5e9'; statusEl.style.color = '#2e7d32';
@@ -9150,10 +9161,10 @@ async function runManualBackup() {
 
 async function downloadBackup(userId, date) {
   try {
-    const session = await safeGetSession();
+    const token = await getAdminToken();
     const res = await fetch(SUPABASE_URL + '/functions/v1/backup-bookkeeping', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ action: 'download_backup', user_id: userId, date: date })
     });
     const blob = await res.blob();
@@ -9169,10 +9180,10 @@ async function downloadBackup(userId, date) {
 async function cleanupOldBackups() {
   if (!confirm('Rensa dagliga backups äldre än 30 dagar?\n\nMånatliga backups (1:a varje månad) behålls.')) return;
   try {
-    const session = await safeGetSession();
+    const token = await getAdminToken();
     const res = await fetch(SUPABASE_URL + '/functions/v1/backup-bookkeeping', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ action: 'cleanup_old' })
     });
     const data = await res.json();
