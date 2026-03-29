@@ -1953,7 +1953,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             </div>
           </div>
 
-          <!-- Stats -->
+          <!-- Backup Stats -->
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;max-width:900px;margin-bottom:1.2rem">
             <div class="gen-card" style="text-align:center;padding:1rem">
               <div style="font-size:1.8rem;font-weight:700;color:var(--gold)" id="backupTotalFiles">—</div>
@@ -1961,15 +1961,32 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             </div>
             <div class="gen-card" style="text-align:center;padding:1rem">
               <div style="font-size:1.8rem;font-weight:700;color:var(--gold)" id="backupTotalSize">—</div>
-              <div style="font-size:0.75rem;color:#888;margin-top:0.2rem">Total storlek</div>
-            </div>
-            <div class="gen-card" style="text-align:center;padding:1rem">
-              <div style="font-size:1.8rem;font-weight:700;color:var(--gold)" id="backupStorageUsed">—</div>
-              <div style="font-size:0.75rem;color:#888;margin-top:0.2rem">Lagring använd</div>
+              <div style="font-size:0.75rem;color:#888;margin-top:0.2rem">Backup-storlek</div>
             </div>
             <div class="gen-card" style="text-align:center;padding:1rem">
               <div style="font-size:1.8rem;font-weight:700;color:#2e7d32" id="backupLastRun">—</div>
               <div style="font-size:0.75rem;color:#888;margin-top:0.2rem">Senaste backup</div>
+            </div>
+          </div>
+
+          <!-- Total Storage Overview -->
+          <div class="gen-card" style="max-width:900px;margin-bottom:1.2rem">
+            <div style="font-weight:600;font-size:0.9rem;margin-bottom:0.8rem">Total lagring — Supabase Storage</div>
+            <div style="display:flex;align-items:center;gap:1rem;margin-bottom:0.8rem">
+              <div style="flex:1;height:20px;background:#f0ede6;border-radius:10px;overflow:hidden">
+                <div id="storageBar" style="height:100%;background:var(--gold);border-radius:10px;transition:width 0.5s;width:0%"></div>
+              </div>
+              <div style="font-size:0.85rem;font-weight:700;white-space:nowrap" id="storagePercent">—</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.8rem;margin-bottom:0.8rem" id="storageBuckets">
+              <div style="text-align:center;padding:0.6rem;background:var(--paper);border-radius:8px">
+                <div style="font-size:0.65rem;color:#888;text-transform:uppercase;letter-spacing:0.08em">Laddar...</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:0.6rem;border-top:1px solid var(--border);font-size:0.8rem">
+              <span style="color:#888">Total: <strong id="storageTotalSize" style="color:var(--ink)">—</strong></span>
+              <span style="color:#888">Gräns: <strong style="color:var(--ink)">1 GB (gratis)</strong></span>
+              <span style="color:#888">Uppskattad kostnad: <strong id="storageCost" style="color:var(--ink)">—</strong></span>
             </div>
           </div>
 
@@ -9083,42 +9100,74 @@ async function loadBackupList() {
   try {
     const token = await getAdminToken();
     if (!token) return;
-    const res = await fetch(SUPABASE_URL + '/functions/v1/backup-bookkeeping', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({ action: 'list_backups' })
-    });
-    const data = await res.json();
-    if (!data.success) { console.error('Backup list error:', data.error); return; }
 
-    document.getElementById('backupTotalFiles').textContent = data.total_files;
-    document.getElementById('backupTotalSize').textContent = data.total_size_mb + ' MB';
-    document.getElementById('backupStorageUsed').textContent = Math.round(data.total_size_mb / data.storage_limit_mb * 100) + '%';
+    // Fetch backup list and storage overview in parallel
+    const [listRes, storageRes] = await Promise.all([
+      fetch(SUPABASE_URL + '/functions/v1/backup-bookkeeping', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ action: 'list_backups' })
+      }),
+      fetch(SUPABASE_URL + '/functions/v1/backup-bookkeeping', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ action: 'storage_overview' })
+      })
+    ]);
 
-    if (data.backups.length > 0) {
-      const latest = data.backups.sort((a, b) => b.date.localeCompare(a.date))[0];
-      document.getElementById('backupLastRun').textContent = latest.date;
-    } else {
-      document.getElementById('backupLastRun').textContent = 'Aldrig';
+    const data = await listRes.json();
+    if (data.success) {
+      document.getElementById('backupTotalFiles').textContent = data.total_files;
+      document.getElementById('backupTotalSize').textContent = data.total_size_mb + ' MB';
+
+      if (data.backups.length > 0) {
+        const latest = data.backups.sort((a, b) => b.date.localeCompare(a.date))[0];
+        document.getElementById('backupLastRun').textContent = latest.date;
+      } else {
+        document.getElementById('backupLastRun').textContent = 'Aldrig';
+      }
+
+      const tbody = document.getElementById('backupTableBody');
+      if (data.backups.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="padding:1rem;color:#888;text-align:center">Inga backups ännu. Klicka "Kör backup nu" för att skapa den första.</td></tr>';
+      } else {
+        const sorted = data.backups.sort((a, b) => b.date.localeCompare(a.date));
+        tbody.innerHTML = sorted.map(b => `
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:0.5rem 0.4rem">${b.date}</td>
+            <td style="padding:0.5rem 0.4rem">${b.company}</td>
+            <td style="padding:0.5rem 0.4rem;text-align:right">${b.size_kb} KB</td>
+            <td style="padding:0.5rem 0.4rem;text-align:right">
+              <button onclick="downloadBackup('${b.user_id}','${b.date}')" class="btn-sm btn-outline" style="padding:0.25rem 0.5rem;font-size:0.72rem">⬇ Ladda ner</button>
+            </td>
+          </tr>
+        `).join('');
+      }
     }
 
-    const tbody = document.getElementById('backupTableBody');
-    if (data.backups.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" style="padding:1rem;color:#888;text-align:center">Inga backups ännu. Klicka "Kör backup nu" för att skapa den första.</td></tr>';
-      return;
-    }
+    // Storage overview
+    const storageData = await storageRes.json();
+    if (storageData.success) {
+      const bucketLabels = { backups: '💾 Backups', receipts: '🧾 Kvitton', logos: '🖼 Logotyper' };
+      const bucketColors = { backups: 'var(--gold)', receipts: '#2e7d32', logos: '#1565c0' };
 
-    const sorted = data.backups.sort((a, b) => b.date.localeCompare(a.date));
-    tbody.innerHTML = sorted.map(b => `
-      <tr style="border-bottom:1px solid var(--border)">
-        <td style="padding:0.5rem 0.4rem">${b.date}</td>
-        <td style="padding:0.5rem 0.4rem">${b.company}</td>
-        <td style="padding:0.5rem 0.4rem;text-align:right">${b.size_kb} KB</td>
-        <td style="padding:0.5rem 0.4rem;text-align:right">
-          <button onclick="downloadBackup('${b.user_id}','${b.date}')" class="btn-sm btn-outline" style="padding:0.25rem 0.5rem;font-size:0.72rem">⬇ Ladda ner</button>
-        </td>
-      </tr>
-    `).join('');
+      document.getElementById('storageBar').style.width = Math.min(100, storageData.used_percent) + '%';
+      document.getElementById('storageBar').style.background = storageData.used_percent > 80 ? '#c62828' : 'var(--gold)';
+      document.getElementById('storagePercent').textContent = storageData.used_percent + '%';
+      document.getElementById('storageTotalSize').textContent = storageData.total_size_mb + ' MB';
+      document.getElementById('storageCost').textContent = storageData.total_size_mb <= 1024
+        ? '0 kr (gratis)'
+        : '~' + Math.round((storageData.total_size_mb - 1024) / 1024 * 0.22 * 100) / 100 + ' kr/mån';
+
+      const bucketsEl = document.getElementById('storageBuckets');
+      bucketsEl.innerHTML = storageData.buckets.map(b => `
+        <div style="text-align:center;padding:0.7rem;background:var(--paper);border-radius:8px">
+          <div style="font-size:1.3rem;font-weight:700;color:${bucketColors[b.bucket] || 'var(--ink)'}">${b.size_mb} MB</div>
+          <div style="font-size:0.7rem;color:#888;margin-top:0.2rem">${bucketLabels[b.bucket] || b.bucket}</div>
+          <div style="font-size:0.65rem;color:#aaa">${b.files} filer</div>
+        </div>
+      `).join('');
+    }
   } catch(e) {
     console.error('Load backup list failed:', e);
   }
