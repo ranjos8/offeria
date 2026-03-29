@@ -5972,26 +5972,25 @@ async function doForgotPassword() {
 
 async function deleteAccount() {
   if (!currentUser) return;
-  const confirmed = confirm('Är du säker på att du vill ta bort ditt konto?\n\nAlla dina offerter och uppgifter raderas permanent. Detta går inte att ångra.');
+  const confirmed = confirm(
+    'Vill du ta bort ditt konto?\n\n' +
+    '• Dina personuppgifter (namn, e-post, företag) raderas enligt GDPR\n' +
+    '• Bokföringsdata (verifikationer, fakturor) behålls anonymiserat i 7 år enligt bokföringslagen\n' +
+    '• Du kan exportera din bokföring som SIE-fil innan du tar bort kontot\n\n' +
+    'Detta går inte att ångra.'
+  );
   if (!confirmed) return;
   const email = prompt('Bekräfta med din e-postadress:');
   if (email !== currentUser.email) { alert('E-postadressen stämmer inte.'); return; }
   
   try {
-    const session = await safeGetSession();
-    if (!session?.access_token) { alert('Sessionen har gått ut. Ladda om sidan.'); return; }
-    const res = await fetch(SUPABASE_URL + '/functions/v1/delete-account', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + session.access_token,
-        'Content-Type': 'application/json'
-      }
-    });
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.error || 'Kunde inte radera kontot');
+    // Anropa GDPR-säker borttagning (anonymiserar profil, behåller bokföring)
+    const { error } = await sb.rpc('gdpr_delete_account', { p_user_id: currentUser.id });
+    if (error) throw new Error(error.message);
+    
     _userInitiatedSignOut = true;
     await sb.auth.signOut();
-    alert('Ditt konto och alla dina uppgifter har raderats. Välkommen tillbaka om du ändrar dig!');
+    alert('Ditt konto har tagits bort.\n\nDina personuppgifter är raderade. Bokföringsdata behålls anonymiserat i 7 år enligt bokföringslagen.\n\nVälkommen tillbaka om du ändrar dig!');
     location.reload();
   } catch(err) {
     alert('Något gick fel: ' + err.message);
