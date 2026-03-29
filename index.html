@@ -1804,6 +1804,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <button class="tab-btn" id="adminTabEmail" onclick="switchAdminTab('email')">📧 Utskick</button>
           <button class="tab-btn" id="adminTabKB" onclick="switchAdminTab('kb')">Kunskapsdatabas</button>
           <button class="tab-btn" id="adminTabLog" onclick="switchAdminTab('log')">Kundernas frågor</button>
+          <button class="tab-btn" id="adminTabBackup" onclick="switchAdminTab('backup')">💾 Backups</button>
         </div>
 
         <!-- FLIK: ÖVERSIKT -->
@@ -1935,6 +1936,68 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <div style="font-size:0.8rem;color:#888;margin-top:0.6rem" id="logCount">Laddar...</div>
           </div>
           <div id="logList" style="max-width:800px"></div>
+        </div>
+
+        <!-- FLIK: BACKUPS -->
+        <div id="adminPanelBackup" style="display:none">
+          <div class="gen-card" style="max-width:900px;margin-bottom:1rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.8rem">
+              <div>
+                <div style="font-family:'Fraunces',serif;font-size:1.1rem;margin-bottom:0.3rem">Bokförings-backup</div>
+                <div style="font-size:0.8rem;color:#888">Daglig backup av alla kunders bokföringsdata. Lagras i 7 år enligt bokföringslagen.</div>
+              </div>
+              <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+                <button onclick="runManualBackup()" id="backupRunBtn" class="gen-btn" style="padding:0.5rem 1rem;font-size:0.85rem">▶ Kör backup nu</button>
+                <button onclick="cleanupOldBackups()" class="btn-sm btn-outline" style="padding:0.5rem 0.8rem;font-size:0.78rem">🧹 Rensa gamla</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;max-width:900px;margin-bottom:1.2rem">
+            <div class="gen-card" style="text-align:center;padding:1rem">
+              <div style="font-size:1.8rem;font-weight:700;color:var(--gold)" id="backupTotalFiles">—</div>
+              <div style="font-size:0.75rem;color:#888;margin-top:0.2rem">Backup-filer</div>
+            </div>
+            <div class="gen-card" style="text-align:center;padding:1rem">
+              <div style="font-size:1.8rem;font-weight:700;color:var(--gold)" id="backupTotalSize">—</div>
+              <div style="font-size:0.75rem;color:#888;margin-top:0.2rem">Total storlek</div>
+            </div>
+            <div class="gen-card" style="text-align:center;padding:1rem">
+              <div style="font-size:1.8rem;font-weight:700;color:var(--gold)" id="backupStorageUsed">—</div>
+              <div style="font-size:0.75rem;color:#888;margin-top:0.2rem">Lagring använd</div>
+            </div>
+            <div class="gen-card" style="text-align:center;padding:1rem">
+              <div style="font-size:1.8rem;font-weight:700;color:#2e7d32" id="backupLastRun">—</div>
+              <div style="font-size:0.75rem;color:#888;margin-top:0.2rem">Senaste backup</div>
+            </div>
+          </div>
+
+          <!-- Status message -->
+          <div id="backupStatus" style="display:none;max-width:900px;margin-bottom:1rem;padding:0.8rem 1rem;border-radius:8px;font-size:0.85rem"></div>
+
+          <!-- Backup list -->
+          <div class="gen-card" style="max-width:900px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem">
+              <div style="font-weight:600;font-size:0.9rem">Backup-historik</div>
+              <button onclick="loadBackupList()" class="btn-sm btn-outline" style="padding:0.4rem 0.7rem;font-size:0.78rem">↻ Uppdatera</button>
+            </div>
+            <div style="overflow-x:auto">
+              <table style="width:100%;border-collapse:collapse;font-size:0.82rem" id="backupTable">
+                <thead>
+                  <tr style="border-bottom:2px solid var(--border);text-align:left">
+                    <th style="padding:0.5rem 0.4rem">Datum</th>
+                    <th style="padding:0.5rem 0.4rem">Företag</th>
+                    <th style="padding:0.5rem 0.4rem;text-align:right">Storlek</th>
+                    <th style="padding:0.5rem 0.4rem;text-align:right">Åtgärd</th>
+                  </tr>
+                </thead>
+                <tbody id="backupTableBody">
+                  <tr><td colspan="4" style="padding:1rem;color:#888;text-align:center">Laddar...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -3400,8 +3463,8 @@ let _logData = [];
 let _logFiltered = [];
 
 function switchAdminTab(tab) {
-  const panels = { dash:'adminPanelDash', users:'adminPanelUsers', email:'adminPanelEmail', kb:'adminPanelKB', log:'adminPanelLog' };
-  const tabs = { dash:'adminTabDash', users:'adminTabUsers', email:'adminTabEmail', kb:'adminTabKB', log:'adminTabLog' };
+  const panels = { dash:'adminPanelDash', users:'adminPanelUsers', email:'adminPanelEmail', kb:'adminPanelKB', log:'adminPanelLog', backup:'adminPanelBackup' };
+  const tabs = { dash:'adminTabDash', users:'adminTabUsers', email:'adminTabEmail', kb:'adminTabKB', log:'adminTabLog', backup:'adminTabBackup' };
   Object.keys(panels).forEach(t => {
     const p = document.getElementById(panels[t]);
     const b = document.getElementById(tabs[t]);
@@ -3411,6 +3474,7 @@ function switchAdminTab(tab) {
   if (tab === 'dash') loadAdminDash();
   if (tab === 'users') loadAdminUsers();
   if (tab === 'log') loadLog();
+  if (tab === 'backup') loadBackupList();
   if (tab === 'kb') {} // already loaded
 }
 
@@ -9001,6 +9065,124 @@ async function saveReceiptVerification() {
   closeReceiptScan();
   loadBookkeeping();
   alert(`✓ Verifikation V${verNum} skapad från kvitto!`);
+}
+
+// ===== ADMIN BACKUP FUNCTIONS =====
+async function loadBackupList() {
+  try {
+    const session = await safeGetSession();
+    if (!session?.access_token) return;
+    const res = await fetch(SUPABASE_URL + '/functions/v1/backup-bookkeeping', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      body: JSON.stringify({ action: 'list_backups' })
+    });
+    const data = await res.json();
+    if (!data.success) { console.error('Backup list error:', data.error); return; }
+
+    document.getElementById('backupTotalFiles').textContent = data.total_files;
+    document.getElementById('backupTotalSize').textContent = data.total_size_mb + ' MB';
+    document.getElementById('backupStorageUsed').textContent = Math.round(data.total_size_mb / data.storage_limit_mb * 100) + '%';
+
+    // Find latest backup date
+    if (data.backups.length > 0) {
+      const latest = data.backups.sort((a, b) => b.date.localeCompare(a.date))[0];
+      document.getElementById('backupLastRun').textContent = latest.date;
+    } else {
+      document.getElementById('backupLastRun').textContent = 'Aldrig';
+    }
+
+    // Render table
+    const tbody = document.getElementById('backupTableBody');
+    if (data.backups.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="padding:1rem;color:#888;text-align:center">Inga backups ännu. Klicka "Kör backup nu" för att skapa den första.</td></tr>';
+      return;
+    }
+
+    // Sort by date desc
+    const sorted = data.backups.sort((a, b) => b.date.localeCompare(a.date));
+    tbody.innerHTML = sorted.map(b => `
+      <tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:0.5rem 0.4rem">${b.date}</td>
+        <td style="padding:0.5rem 0.4rem">${b.company}</td>
+        <td style="padding:0.5rem 0.4rem;text-align:right">${b.size_kb} KB</td>
+        <td style="padding:0.5rem 0.4rem;text-align:right">
+          <button onclick="downloadBackup('${b.user_id}','${b.date}')" class="btn-sm btn-outline" style="padding:0.25rem 0.5rem;font-size:0.72rem">⬇ Ladda ner</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch(e) {
+    console.error('Load backup list failed:', e);
+  }
+}
+
+async function runManualBackup() {
+  const btn = document.getElementById('backupRunBtn');
+  btn.disabled = true; btn.textContent = 'Kör backup...';
+  const statusEl = document.getElementById('backupStatus');
+  statusEl.style.display = 'block';
+  statusEl.style.background = '#fff3e0'; statusEl.style.color = '#e65100';
+  statusEl.textContent = 'Backup körs... Detta kan ta en stund.';
+
+  try {
+    const session = await safeGetSession();
+    const res = await fetch(SUPABASE_URL + '/functions/v1/backup-bookkeeping', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      body: JSON.stringify({ action: 'run_backup' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      statusEl.style.background = '#e8f5e9'; statusEl.style.color = '#2e7d32';
+      statusEl.textContent = `✓ Backup klar! ${data.users_backed_up} användare backupade, ${data.total_size_kb} KB totalt.` +
+        (data.users_failed > 0 ? ` ⚠ ${data.users_failed} misslyckades.` : '');
+      loadBackupList();
+    } else {
+      statusEl.style.background = '#fce4ec'; statusEl.style.color = '#c62828';
+      statusEl.textContent = '✕ Backup misslyckades: ' + (data.error || 'Okänt fel');
+    }
+  } catch(e) {
+    statusEl.style.background = '#fce4ec'; statusEl.style.color = '#c62828';
+    statusEl.textContent = '✕ Fel: ' + e.message;
+  }
+  btn.disabled = false; btn.textContent = '▶ Kör backup nu';
+}
+
+async function downloadBackup(userId, date) {
+  try {
+    const session = await safeGetSession();
+    const res = await fetch(SUPABASE_URL + '/functions/v1/backup-bookkeeping', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      body: JSON.stringify({ action: 'download_backup', user_id: userId, date: date })
+    });
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `backup_${userId}_${date}.json`; a.click();
+    URL.revokeObjectURL(url);
+  } catch(e) {
+    alert('Kunde inte ladda ner: ' + e.message);
+  }
+}
+
+async function cleanupOldBackups() {
+  if (!confirm('Rensa dagliga backups äldre än 30 dagar?\n\nMånatliga backups (1:a varje månad) behålls.')) return;
+  try {
+    const session = await safeGetSession();
+    const res = await fetch(SUPABASE_URL + '/functions/v1/backup-bookkeeping', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      body: JSON.stringify({ action: 'cleanup_old' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert(`✓ ${data.deleted} gamla backup-filer raderade.`);
+      loadBackupList();
+    } else {
+      alert('Fel: ' + data.error);
+    }
+  } catch(e) { alert('Fel: ' + e.message); }
 }
 
 // ===== SIE4 EXPORT =====
