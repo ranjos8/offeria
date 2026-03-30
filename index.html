@@ -1145,6 +1145,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     <div class="pricing-inner">
       <div class="eyebrow">Priser</div>
       <div class="section-h">Välj din plan</div>
+      <div style="color:#ccc;font-size:0.95rem;margin-top:0.5rem;margin-bottom:0.5rem">Alla betalplaner inkluderar <strong style="color:var(--gold-light)">30 dagars gratis provperiod</strong> — ingen betalning krävs förrän provperioden är slut.</div>
       <div class="plans">
         <div class="plan">
           <div class="plan-name">Gratis</div>
@@ -1172,7 +1173,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <li>Dela via länk &amp; PDF</li>
             <li>Ingen bindningstid</li>
           </ul>
-          <button class="plan-cta" onclick="openModal('register')">Välj Pro</button>
+          <button class="plan-cta" onclick="openModal('register')">Prova Pro gratis i 30 dagar</button>
         </div>
         <div class="plan featured">
           <div class="plan-name">Komplett</div>
@@ -1199,7 +1200,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <li>Egen logotyp</li>
             <li>Ingen bindningstid</li>
           </ul>
-          <button class="plan-cta" onclick="openModal('register')">Välj Komplett</button>
+          <button class="plan-cta" onclick="openModal('register')">Prova Komplett gratis i 30 dagar</button>
         </div>
         <div class="plan">
           <div class="plan-name">Skräddarsydd</div>
@@ -2376,6 +2377,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <button class="tab-btn" id="adminTabKB" onclick="switchAdminTab('kb')">Kunskapsdatabas</button>
           <button class="tab-btn" id="adminTabLog" onclick="switchAdminTab('log')">Kundernas frågor</button>
           <button class="tab-btn" id="adminTabBackup" onclick="switchAdminTab('backup')">💾 Backups</button>
+          <button class="tab-btn" id="adminTabCosts" onclick="switchAdminTab('costs')">💰 Kostnader</button>
         </div>
 
         <!-- FLIK: ÖVERSIKT -->
@@ -2584,6 +2586,108 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
                   <tr><td colspan="4" style="padding:1rem;color:#888;text-align:center">Laddar...</td></tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- FLIK: KOSTNADER -->
+        <div id="adminPanelCosts" style="display:none">
+          <div class="gen-card" style="max-width:900px;margin-bottom:1rem">
+            <div style="font-family:'Fraunces',serif;font-size:1.1rem;margin-bottom:0.3rem">Driftkostnader — Offeria</div>
+            <div style="font-size:0.8rem;color:#888">Alla utgifter för att driva plattformen. Uppdateras manuellt — fyll i dina faktiska kostnader.</div>
+          </div>
+
+          <!-- AI Kostnader (automatisk) -->
+          <div class="gen-card" style="max-width:900px;margin-bottom:1rem">
+            <div style="font-weight:600;font-size:0.9rem;margin-bottom:0.8rem">🤖 AI-kostnader (Anthropic / Claude API)</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.8rem;margin-bottom:0.8rem">
+              <div style="text-align:center;padding:0.7rem;background:var(--paper);border-radius:8px">
+                <div style="font-size:1.5rem;font-weight:700;color:var(--gold)" id="costAiCalls">—</div>
+                <div style="font-size:0.7rem;color:#888">API-anrop denna månad</div>
+              </div>
+              <div style="text-align:center;padding:0.7rem;background:var(--paper);border-radius:8px">
+                <div style="font-size:1.5rem;font-weight:700;color:var(--gold)" id="costAiEstimate">—</div>
+                <div style="font-size:0.7rem;color:#888">Uppskattad kostnad</div>
+              </div>
+              <div style="text-align:center;padding:0.7rem;background:var(--paper);border-radius:8px">
+                <div style="font-size:1.5rem;font-weight:700;color:#2e7d32" id="costAiBalance">—</div>
+                <div style="font-size:0.7rem;color:#888">API-saldo kvar</div>
+              </div>
+            </div>
+            <div style="font-size:0.75rem;color:#888">Baserat på ~3 000 tokens per offert × $3/M input + $15/M output (Claude Sonnet). AI-chatten kostar ~500 tokens per fråga.</div>
+          </div>
+
+          <!-- Fasta kostnader (manuell input) -->
+          <div class="gen-card" style="max-width:900px;margin-bottom:1rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem">
+              <div style="font-weight:600;font-size:0.9rem">📋 Fasta månadskostnader</div>
+              <button onclick="saveCostSettings()" class="btn-sm btn-outline" style="padding:0.3rem 0.7rem;font-size:0.75rem">💾 Spara</button>
+            </div>
+            <div style="font-size:0.78rem;color:#888;margin-bottom:1rem">Fyll i dina faktiska kostnader. Sparas i din profil.</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem 1rem;font-size:0.85rem" id="costInputs">
+              <div>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">🌐 Domän (one.com)</label>
+                <input type="number" id="costDomain" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem"> 
+              </div>
+              <div>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">☁️ Supabase</label>
+                <input type="number" id="costSupabase" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
+              </div>
+              <div>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">⚡ Cloudflare</label>
+                <input type="number" id="costCloudflare" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
+              </div>
+              <div>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">💳 Stripe (avgifter)</label>
+                <input type="number" id="costStripe" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
+              </div>
+              <div>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">📧 EmailJS</label>
+                <input type="number" id="costEmail" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
+              </div>
+              <div>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">🤖 AI (Anthropic)</label>
+                <input type="number" id="costAi" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
+              </div>
+              <div>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">🏦 Bank & konto</label>
+                <input type="number" id="costBank" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
+              </div>
+              <div>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">📊 Redovisningskonsult</label>
+                <input type="number" id="costAccountant" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
+              </div>
+              <div>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">📋 Revisor</label>
+                <input type="number" id="costAuditor" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
+              </div>
+              <div>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">📦 Övrigt</label>
+                <input type="number" id="costOther" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
+              </div>
+            </div>
+          </div>
+
+          <!-- Sammanfattning -->
+          <div class="gen-card" style="max-width:900px">
+            <div style="font-weight:600;font-size:0.9rem;margin-bottom:0.8rem">📊 Sammanfattning</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.8rem">
+              <div style="text-align:center;padding:0.8rem;background:var(--paper);border-radius:8px">
+                <div style="font-size:1.6rem;font-weight:700;color:#c62828" id="costTotalMonthly">0 kr</div>
+                <div style="font-size:0.7rem;color:#888">Totala kostnader/mån</div>
+              </div>
+              <div style="text-align:center;padding:0.8rem;background:var(--paper);border-radius:8px">
+                <div style="font-size:1.6rem;font-weight:700;color:#2e7d32" id="costMRR">0 kr</div>
+                <div style="font-size:0.7rem;color:#888">Intäkter (MRR)</div>
+              </div>
+              <div style="text-align:center;padding:0.8rem;background:var(--paper);border-radius:8px">
+                <div style="font-size:1.6rem;font-weight:700" id="costProfit">0 kr</div>
+                <div style="font-size:0.7rem;color:#888">Vinst/mån</div>
+              </div>
+              <div style="text-align:center;padding:0.8rem;background:var(--paper);border-radius:8px">
+                <div style="font-size:1.6rem;font-weight:700" id="costMargin">0%</div>
+                <div style="font-size:0.7rem;color:#888">Marginal</div>
+              </div>
             </div>
           </div>
         </div>
@@ -4051,8 +4155,8 @@ let _logData = [];
 let _logFiltered = [];
 
 function switchAdminTab(tab) {
-  const panels = { dash:'adminPanelDash', users:'adminPanelUsers', email:'adminPanelEmail', kb:'adminPanelKB', log:'adminPanelLog', backup:'adminPanelBackup' };
-  const tabs = { dash:'adminTabDash', users:'adminTabUsers', email:'adminTabEmail', kb:'adminTabKB', log:'adminTabLog', backup:'adminTabBackup' };
+  const panels = { dash:'adminPanelDash', users:'adminPanelUsers', email:'adminPanelEmail', kb:'adminPanelKB', log:'adminPanelLog', backup:'adminPanelBackup', costs:'adminPanelCosts' };
+  const tabs = { dash:'adminTabDash', users:'adminTabUsers', email:'adminTabEmail', kb:'adminTabKB', log:'adminTabLog', backup:'adminTabBackup', costs:'adminTabCosts' };
   Object.keys(panels).forEach(t => {
     const p = document.getElementById(panels[t]);
     const b = document.getElementById(tabs[t]);
@@ -4063,6 +4167,7 @@ function switchAdminTab(tab) {
   if (tab === 'users') loadAdminUsers();
   if (tab === 'log') loadLog();
   if (tab === 'backup') loadBackupList();
+  if (tab === 'costs') loadCosts();
   if (tab === 'kb') {} // already loaded
 }
 
@@ -6793,6 +6898,53 @@ async function loadDashboard() {
     inv.filter(i => i.status === 'draft').forEach(i => {
       todos.push({ color: '#888', text: `Utkast: ${i.title || 'Faktura'} – ${i.client_name || 'Okänd'}`, action: 'Bekräfta', page: 'invoices' });
     });
+
+    // === MOMS & SKATTEDATUM ===
+    const now2 = new Date();
+    const curMonth = now2.getMonth(); // 0-11
+    const curYear = now2.getFullYear();
+    
+    // Momsdeklaration deadlines (kvartal, senast 12:e i 2:a månaden efter kvartal)
+    const vatDeadlines = [
+      { q: 'Q1 (jan-mar)', month: 4, day: 12 },  // 12 maj
+      { q: 'Q2 (apr-jun)', month: 7, day: 12 },  // 12 aug
+      { q: 'Q3 (jul-sep)', month: 10, day: 12 }, // 12 nov
+      { q: 'Q4 (okt-dec)', month: 1, day: 12 },  // 12 feb (nästa år)
+    ];
+    vatDeadlines.forEach(vd => {
+      const deadlineYear = vd.month < 3 && curMonth > 6 ? curYear + 1 : curYear;
+      const deadline = new Date(deadlineYear, vd.month, vd.day);
+      const daysUntil = Math.floor((deadline - now2) / 86400000);
+      if (daysUntil >= 0 && daysUntil <= 30) {
+        const urgency = daysUntil <= 7 ? '#c62828' : daysUntil <= 14 ? '#e65100' : '#1565c0';
+        todos.push({ color: urgency, text: `📋 Momsdeklaration ${vd.q} — senast ${deadline.toLocaleDateString('sv-SE')} (${daysUntil === 0 ? 'idag!' : 'om ' + daysUntil + ' dagar'})`, action: 'Moms', page: 'bookkeeping' });
+      }
+    });
+
+    // Arbetsgivardeklaration — 12:e varje månad (om man har anställda, visa generellt)
+    const agDeadline = new Date(curYear, curMonth + 1, 12);
+    const agDays = Math.floor((agDeadline - now2) / 86400000);
+    if (agDays >= 0 && agDays <= 14) {
+      todos.push({ color: agDays <= 5 ? '#e65100' : '#1565c0', text: `📋 Skattedeklaration (AGI/moms) — senast ${agDeadline.toLocaleDateString('sv-SE')} (om ${agDays} dagar)`, action: 'Info', page: 'help' });
+    }
+
+    // Preliminärskatt — betalas 12:e varje månad
+    if (agDays >= 0 && agDays <= 7) {
+      todos.push({ color: '#e65100', text: `💰 Preliminärskatt (F-skatt) — betalas senast ${agDeadline.toLocaleDateString('sv-SE')}`, action: 'Info', page: 'help' });
+    }
+
+    // Inkomstdeklaration (enskild firma) — senast 2 maj
+    const inkDeadline = new Date(curYear, 4, 2); // 2 maj
+    const inkDays = Math.floor((inkDeadline - now2) / 86400000);
+    if (inkDays >= 0 && inkDays <= 60) {
+      const inkUrgency = inkDays <= 14 ? '#c62828' : inkDays <= 30 ? '#e65100' : '#1565c0';
+      todos.push({ color: inkUrgency, text: `📋 Inkomstdeklaration ${curYear - 1} — senast 2 maj ${curYear} (om ${inkDays} dagar)`, action: 'Info', page: 'help' });
+    }
+
+    // Årsavslut — påminnelse i januari
+    if (curMonth === 0) {
+      todos.push({ color: '#1565c0', text: `📊 Dags för årsavslut ${curYear - 1} — stäm av bokföringen och lås alla perioder`, action: 'Bokföring', page: 'bookkeeping' });
+    }
 
     const todoEl = document.getElementById('dashTodoList');
     if (todos.length === 0) {
@@ -9842,6 +9994,112 @@ async function cleanupOldBackups() {
       alert('Fel: ' + data.error);
     }
   } catch(e) { alert('Fel: ' + e.message); }
+}
+
+// ===== ADMIN COSTS =====
+const COST_FIELDS = ['Domain','Supabase','Cloudflare','Stripe','Email','Ai','Bank','Accountant','Auditor','Other'];
+
+async function loadCosts() {
+  // Load saved costs from profile
+  const { data: profile } = await sb.from('profiles').select('admin_costs').eq('id', currentUser.id).single();
+  const costs = profile?.admin_costs ? (typeof profile.admin_costs === 'string' ? JSON.parse(profile.admin_costs) : profile.admin_costs) : {};
+  
+  COST_FIELDS.forEach(f => {
+    const el = document.getElementById('cost' + f);
+    if (el && costs[f.toLowerCase()]) el.value = costs[f.toLowerCase()];
+  });
+
+  // Load AI usage stats
+  await loadAiCosts();
+  
+  // Calculate summary
+  calculateCostSummary();
+  
+  // Add live calculation on input change
+  document.querySelectorAll('#adminPanelCosts input[type=number]').forEach(el => {
+    el.addEventListener('input', calculateCostSummary);
+  });
+}
+
+async function loadAiCosts() {
+  try {
+    // Count AI calls this month from bookkeeping_ai_log + quote_usage
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    
+    const [aiLogRes, quoteRes] = await Promise.all([
+      sb.from('bookkeeping_ai_log').select('id', { count: 'exact', head: true }).gte('created_at', monthStart),
+      sb.from('quote_usage').select('id', { count: 'exact', head: true }).gte('created_at', monthStart)
+    ]);
+    
+    const aiChats = aiLogRes.count || 0;
+    const quotes = quoteRes.count || 0;
+    const totalCalls = aiChats + quotes;
+    
+    // Estimate cost: ~3000 tokens per quote, ~500 per chat
+    // Claude Sonnet: $3/M input, $15/M output, assume 50/50 split
+    // Average ~2000 tokens per call → ~$0.018 per call → ~0.19 SEK per call
+    const estimatedCostSEK = Math.round(totalCalls * 0.19 * 100) / 100;
+    
+    document.getElementById('costAiCalls').textContent = totalCalls;
+    document.getElementById('costAiEstimate').textContent = estimatedCostSEK + ' kr';
+    
+    // AI balance — this needs to be set manually since Anthropic doesn't have a balance API
+    // Read from saved costs
+    const balanceEl = document.getElementById('costAiBalance');
+    const savedAiInput = document.getElementById('costAi');
+    if (savedAiInput?.value) {
+      balanceEl.textContent = 'Se Anthropic';
+    } else {
+      balanceEl.textContent = 'Se Anthropic';
+    }
+    balanceEl.style.cursor = 'pointer';
+    balanceEl.title = 'Kolla saldo på console.anthropic.com → Billing';
+    balanceEl.onclick = () => window.open('https://console.anthropic.com/settings/billing', '_blank');
+  } catch(e) {
+    console.error('Load AI costs error:', e);
+  }
+}
+
+async function saveCostSettings() {
+  const costs = {};
+  COST_FIELDS.forEach(f => {
+    const el = document.getElementById('cost' + f);
+    if (el) costs[f.toLowerCase()] = parseFloat(el.value) || 0;
+  });
+  
+  const { error } = await sb.from('profiles').update({ admin_costs: costs }).eq('id', currentUser.id);
+  if (error) {
+    alert('Kunde inte spara: ' + error.message);
+  } else {
+    alert('✓ Kostnader sparade!');
+    calculateCostSummary();
+  }
+}
+
+function calculateCostSummary() {
+  let total = 0;
+  COST_FIELDS.forEach(f => {
+    const el = document.getElementById('cost' + f);
+    if (el) total += parseFloat(el.value) || 0;
+  });
+  
+  // Get MRR from admin dash stats
+  const mrrEl = document.getElementById('statMRR');
+  const mrr = mrrEl ? parseInt(mrrEl.textContent.replace(/[^\d]/g, '')) || 0 : 0;
+  const profit = mrr - total;
+  const margin = mrr > 0 ? Math.round(profit / mrr * 100) : 0;
+  
+  document.getElementById('costTotalMonthly').textContent = total.toLocaleString('sv-SE') + ' kr';
+  document.getElementById('costMRR').textContent = mrr.toLocaleString('sv-SE') + ' kr';
+  
+  const profitEl = document.getElementById('costProfit');
+  profitEl.textContent = profit.toLocaleString('sv-SE') + ' kr';
+  profitEl.style.color = profit >= 0 ? '#2e7d32' : '#c62828';
+  
+  const marginEl = document.getElementById('costMargin');
+  marginEl.textContent = margin + '%';
+  marginEl.style.color = margin >= 0 ? '#2e7d32' : '#c62828';
 }
 
 // ===== SIE4 EXPORT =====
