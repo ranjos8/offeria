@@ -6341,6 +6341,10 @@ Rimliga svenska priser 2025.` }]
       })
     });
     clearTimeout(timeoutId);
+    if (res.status === 429) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || 'Du har nått gränsen för antal AI-offerter per timme. Försök igen om en stund.');
+    }
     const data = await res.json();
     console.log('Edge function response:', JSON.stringify(data));
     if (data.error) throw new Error('Edge function fel: ' + data.error);
@@ -10774,6 +10778,12 @@ SVARSFORMAT:
         context: context
       })
     });
+    if (aiRes.status === 429) {
+      const errData = await aiRes.json().catch(() => ({}));
+      removeTypingIndicator(typingId);
+      addMessageToChat('assistant', errData.error || 'Du har ställt för många frågor. Vänta en stund och försök igen.');
+      return;
+    }
     if (!aiRes.ok) throw new Error('Edge Function error: ' + aiRes.status);
     const data = await aiRes.json();
     if (data.error) throw new Error(data.error);
