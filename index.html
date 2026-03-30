@@ -3457,6 +3457,17 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ===== CONFIG =====
 const SUPABASE_URL = 'https://yfnmmcrvzcwcinwopnlj.supabase.co';
+
+// XSS-skydd: sanitera all user-generated HTML
+function sanitize(dirty) {
+  if (typeof DOMPurify !== 'undefined') return DOMPurify.sanitize(dirty, { ALLOWED_TAGS: ['b','strong','em','i','br','p','div','span','table','tr','td','th','thead','tbody','ul','ol','li','h1','h2','h3','h4','img','a','hr','sup','sub'], ALLOWED_ATTR: ['style','class','href','src','alt','colspan','rowspan','target'] });
+  // Fallback: strip all tags
+  const el = document.createElement('div'); el.textContent = dirty; return el.innerHTML;
+}
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmbm1tY3J2emN3Y2lud29wbmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MzY4NjQsImV4cCI6MjA4NzUxMjg2NH0.MpF3oRLWwXkmrjEGJ0Qqrsw_87FixbaNHmHmPxFyXKc';
 
 //  Stripe payment links – ersätt med dina riktiga länkar från Stripe Dashboard
@@ -4127,7 +4138,7 @@ async function generateManualQuote() {
     ${p.fskatt || p.certifications ? `<div class="q-footer">${[p.fskatt, p.certifications].filter(Boolean).join(' · ')}</div>` : ''}`;
 
   // Visa i modal
-  document.getElementById('quoteDoc').innerHTML = html;
+  document.getElementById('quoteDoc').innerHTML = sanitize(html);
   document.getElementById('quoteModalOverlay').style.display = 'flex';
 
   // Spara till DB
@@ -5304,7 +5315,7 @@ function openInvoiceView(idx) {
   const inv = _invoiceData[idx];
   if (!inv) return;
   _currentInvoice = inv;
-  document.getElementById('invoiceDoc').innerHTML = inv.invoice_html || '<p>Ingen fakturadata</p>';
+  document.getElementById('invoiceDoc').innerHTML = sanitize(inv.invoice_html || '<p>Ingen fakturadata</p>');
   const status = getInvoiceStatus(inv);
   document.getElementById('invModalStatus').innerHTML = statusLabel(status);
   
@@ -6090,7 +6101,7 @@ function openHistoryQuote(i) {
   window._currentShareId = r.share_id || null;
   showPage('generate');
   openQuoteModal();
-  document.getElementById('quoteDoc').innerHTML = r.quote_html;
+  document.getElementById('quoteDoc').innerHTML = sanitize(r.quote_html);
   document.getElementById('quoteDoc').querySelectorAll('.editable').forEach(el => {
     el.setAttribute('contenteditable', 'true');
     el.addEventListener('blur', () => recalc());
@@ -6586,6 +6597,8 @@ function renderQuote(q) {
 
     </div>
     ${currentProfile?.plan === 'free' ? '<div style="text-align:center;margin-top:1.2rem;padding-top:1rem;border-top:1px solid #f0ebe0"><span style="font-size:0.68rem;color:#ccc;letter-spacing:0.08em">Skapad med </span><a href="https://offeria.se" target="_blank" style="font-family:Fraunces,serif;font-style:italic;font-size:0.75rem;color:#b8902e;text-decoration:none;font-weight:700">Offeria</a></div>' : ''}`;
+
+  document.getElementById('quoteDoc').innerHTML = sanitize(document.getElementById('quoteDoc').innerHTML);
 
   document.querySelectorAll('#itemsTbody tr').forEach(tr => attachListeners(tr));
   openQuoteModal();
@@ -10844,7 +10857,7 @@ function addMessageToChat(role, content) {
       // Enkla radbrytningar → <br>
       .replace(/\n/g, '<br>');
 
-    contentDiv.innerHTML = `<p style="margin:0">${html}</p>`;
+    contentDiv.innerHTML = sanitize(`<p style="margin:0">${html}</p>`);
   } else {
     contentDiv.textContent = content;
     contentDiv.style.cssText = 'white-space:pre-wrap;word-break:break-word';
