@@ -668,6 +668,21 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .faq-item.open .faq-icon { transform: rotate(45deg); }
 .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; }
 .faq-item.open .faq-a { max-height: 500px; }
+
+/* Help page */
+.help-section { display: none; }
+.help-section.active { display: block; }
+.help-step { display: flex; gap: 1rem; margin-bottom: 1.2rem; align-items: flex-start; }
+.help-step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--ink); color: var(--gold-light); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; margin-top: 0.1rem; }
+.help-step-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.3rem; }
+.help-step p { font-size: 0.88rem; color: #555; line-height: 1.6; }
+.help-block { margin-bottom: 1.5rem; }
+.help-block h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--ink); }
+.help-block p { font-size: 0.88rem; color: #555; line-height: 1.65; }
+.help-list { padding-left: 1.2rem; margin: 0; }
+.help-list li { font-size: 0.88rem; color: #555; line-height: 1.65; margin-bottom: 0.4rem; }
+.help-context-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: var(--paper); border: 1px solid var(--border); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; color: var(--gold); font-weight: 700; transition: background 0.15s; z-index: 5; }
+.help-context-btn:hover { background: var(--gold); color: white; }
 .faq-a-inner { padding: 0 0 1.2rem; font-size: 0.88rem; color: #666; line-height: 1.7; }
 .faq-category { font-family: 'Fraunces', serif; font-size: 1rem; color: var(--ink); margin: 2rem 0 0.8rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--gold-light); }
 .faq-category:first-child { margin-top: 0; }
@@ -1376,6 +1391,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <div class="sidebar-item" id="sNav-articles" onclick="showPage('articles')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span> Artiklar</div>
       <div class="sidebar-item" id="sNav-bookkeeping" onclick="showPage('bookkeeping')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/></svg></span> Bokföring</div>
       <div class="sidebar-item" id="sNav-profile" onclick="showPage('profile')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/><path d="M9 22v-4h6v4"/></svg></span> Företagsprofil</div>
+      <div class="sidebar-item" id="sNav-help" onclick="showPage('help')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Hjälp</div>
       <div class="sidebar-item" id="sNav-admin" onclick="showPage('admin')" style="display:none"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span> Admin</div>
 
       <div style="display:none" id="sidebarPlanBox">
@@ -1391,7 +1407,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
       <!-- GENERATE PAGE -->
       <div class="app-page" id="page-generate">
-        <div class="page-title">Offerter</div>
+        <div class="page-title" style="position:relative">Offerter <button class="help-context-btn" onclick="openContextHelp('generate')" title="Hjälp om offerter">?</button></div>
         <div class="tab-bar" style="display:flex;gap:0;margin-bottom:1.5rem;border-bottom:2px solid var(--border)">
           <button class="tab-btn active" id="tabNewQuote" onclick="switchQuoteTab('new')">✦ AI-offert</button>
           <button class="tab-btn" id="tabManualQuote" onclick="switchQuoteTab('manual')">Manuell offert</button>
@@ -1562,7 +1578,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
       <!-- INVOICES PAGE -->
       <div class="app-page" id="page-invoices">
-        <div class="page-title">Fakturor</div>
+        <div class="page-title" style="position:relative">Fakturor <button class="help-context-btn" onclick="openContextHelp('invoices')" title="Hjälp om fakturor">?</button></div>
         <div class="page-sub">Hantera och följ upp dina fakturor</div>
 
         <div class="inv-summary" id="invSummary">
@@ -1590,7 +1606,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
       <!-- SUPPLIER INVOICES PAGE -->
       <div class="app-page" id="page-suppliers">
-        <div class="page-title">Leverantörsfakturor</div>
+        <div class="page-title" style="position:relative">Leverantörsfakturor <button class="help-context-btn" onclick="openContextHelp('suppliers')" title="Hjälp om leverantörsfakturor">?</button></div>
         <div class="page-sub">Registrera inköp och håll koll på vad du är skyldig</div>
 
         <div class="inv-summary" id="suppSummary">
@@ -1671,7 +1687,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
       <!-- PROFILE PAGE -->
       <div class="app-page" id="page-profile">
-        <div class="page-title">Företagsprofil</div>
+        <div class="page-title" style="position:relative">Företagsprofil <button class="help-context-btn" onclick="openContextHelp('profile')" title="Hjälp om företagsprofil">?</button></div>
         <div class="page-sub">Sparas automatiskt i dina offerter</div>
         <div class="gen-card" style="max-width:600px">
           <div class="card-label"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></span> Företagsuppgifter</div>
@@ -1787,6 +1803,331 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
               <button onclick="openUpgradeModal()" class="gen-btn" style="padding:0.5rem 1.2rem;font-size:0.85rem" id="profileUpgradeBtn">Uppgradera →</button>
               <button onclick="openCustomerPortal()" style="display:none;background:none;border:1px solid var(--border);border-radius:8px;padding:0.5rem 1.2rem;font-size:0.85rem;cursor:pointer;font-family:inherit" id="profilePortalBtn">Hantera abonnemang</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HELP PAGE -->
+      <div class="app-page" id="page-help">
+        <div class="page-title">Hjälp & lathund</div>
+        <div class="page-sub">Steg-för-steg-guider för att komma igång med Offeria</div>
+
+        <!-- Help navigation -->
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.5rem">
+          <button class="tab-btn active" onclick="showHelpSection('start',this)">🚀 Kom igång</button>
+          <button class="tab-btn" onclick="showHelpSection('quotes',this)">📝 Offerter</button>
+          <button class="tab-btn" onclick="showHelpSection('invoices',this)">📄 Fakturor</button>
+          <button class="tab-btn" onclick="showHelpSection('suppliers',this)">📦 Leverantörsfakturor</button>
+          <button class="tab-btn" onclick="showHelpSection('bookkeeping',this)">📊 Bokföring</button>
+          <button class="tab-btn" onclick="showHelpSection('receipts',this)">🧾 Kvittoskanning</button>
+          <button class="tab-btn" onclick="showHelpSection('vat',this)">🏛 Moms & SRU</button>
+          <button class="tab-btn" onclick="showHelpSection('customers',this)">👥 Kunder & artiklar</button>
+          <button class="tab-btn" onclick="showHelpSection('company',this)">🏢 Företagsprofil</button>
+        </div>
+
+        <!-- KOM IGÅNG -->
+        <div class="help-section active" id="helpStart">
+          <div class="gen-card" style="max-width:800px">
+            <h3 style="font-family:'Fraunces',serif;font-size:1.2rem;margin-bottom:1rem">Välkommen till Offeria!</h3>
+            <p style="color:#666;margin-bottom:1.2rem">Följ dessa steg för att komma igång. Det tar cirka 5 minuter.</p>
+            
+            <div class="help-step">
+              <div class="help-step-num">1</div>
+              <div>
+                <div class="help-step-title">Fyll i företagsuppgifter</div>
+                <p>Gå till <strong>Företagsprofil</strong> i menyn. Fyll i företagsnamn, org.nummer, adress och bankgiro. Ladda upp din logotyp — den visas på alla offerter och fakturor.</p>
+              </div>
+            </div>
+            
+            <div class="help-step">
+              <div class="help-step-num">2</div>
+              <div>
+                <div class="help-step-title">Välj bransch och momssats</div>
+                <p>Under Företagsprofil, välj din bransch (t.ex. Bygg & Snickeri) och standardmomssats (vanligtvis 25%). Dessa sparas och används automatiskt i nya offerter.</p>
+              </div>
+            </div>
+            
+            <div class="help-step">
+              <div class="help-step-num">3</div>
+              <div>
+                <div class="help-step-title">Skapa din första offert</div>
+                <p>Gå till <strong>Offerter</strong> och beskriv jobbet med egna ord, t.ex. "Renovera badrum 6 kvm, nytt kakel och byta blandare". Klicka <strong>Generera offert</strong> — AI:n skapar en komplett offert med materiallistor och priser. Redigera raderna om du vill.</p>
+              </div>
+            </div>
+            
+            <div class="help-step">
+              <div class="help-step-num">4</div>
+              <div>
+                <div class="help-step-title">Skicka till kund</div>
+                <p>Dela offerten via länk eller ladda ner som PDF. Kunden kan signera digitalt direkt i länken.</p>
+              </div>
+            </div>
+            
+            <div class="help-step">
+              <div class="help-step-num">5</div>
+              <div>
+                <div class="help-step-title">Fakturera och bokför</div>
+                <p>När kunden godkänt — skapa faktura med ett klick. Bokföringen sker automatiskt. Fota kvitton för inköp — AI:n bokför dem åt dig.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OFFERTER -->
+        <div class="help-section" id="helpQuotes" style="display:none">
+          <div class="gen-card" style="max-width:800px">
+            <h3 style="font-family:'Fraunces',serif;font-size:1.2rem;margin-bottom:1rem">Offerter</h3>
+            
+            <div class="help-block">
+              <h4>Skapa AI-offert</h4>
+              <ol class="help-list">
+                <li>Gå till <strong>Offerter → AI-offert</strong></li>
+                <li>Välj bransch, momssats och betalningsvillkor (sparas automatiskt)</li>
+                <li>Välj vad som ska inkluderas: ROT-avdrag, garanti, material, tidplan</li>
+                <li>Beskriv jobbet med egna ord — ju mer detaljer desto bättre priser. Exempel: "Bygga trädäck 20 kvm med räcke, tryckimpregnerat virke"</li>
+                <li>Klicka <strong>★ Generera offert</strong> eller använd <strong>🎤 Prata in</strong> för att diktera</li>
+                <li>AI:n skapar en komplett offert med rader, material, arbete och priser</li>
+              </ol>
+            </div>
+
+            <div class="help-block">
+              <h4>Redigera offert</h4>
+              <p>Alla rader i offerten är redigerbara. Klicka på text, antal eller pris för att ändra. Du kan lägga till och ta bort rader. Klicka <strong>Uppdatera</strong> för att spara ändringarna.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Skicka och dela</h4>
+              <p>Dela offerten via <strong>länk</strong> (kunden öppnar i mobilen), <strong>e-post</strong> eller <strong>PDF</strong>. Kunden kan signera digitalt direkt i länken utan att skapa konto.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>E-signering</h4>
+              <p>När du delar via länk kan kunden granska offerten och signera med sitt namn. Du får ett meddelande när offerten är signerad. Signeringen sparas med tidsstämpel.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Manuell offert</h4>
+              <p>Under fliken <strong>Manuell offert</strong> kan du skapa en offert helt utan AI — fyll i rader manuellt med egna beskrivningar och priser.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Offerthistorik</h4>
+              <p>Alla offerter sparas under fliken <strong>Historik</strong>. Du kan se status (väntande/signerad), öppna, redigera och skapa faktura från en godkänd offert.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAKTUROR -->
+        <div class="help-section" id="helpInvoices" style="display:none">
+          <div class="gen-card" style="max-width:800px">
+            <h3 style="font-family:'Fraunces',serif;font-size:1.2rem;margin-bottom:1rem">Fakturor</h3>
+            
+            <div class="help-block">
+              <h4>Skapa faktura från offert</h4>
+              <ol class="help-list">
+                <li>Gå till <strong>Offerter → Historik</strong></li>
+                <li>Klicka på en godkänd offert</li>
+                <li>Klicka <strong>Skapa faktura</strong> — alla rader kopieras automatiskt</li>
+                <li>Fakturanummer tilldelas automatiskt (FA-1001, FA-1002 osv.)</li>
+                <li>Fakturan bokförs automatiskt om du har Komplett-planen</li>
+              </ol>
+            </div>
+
+            <div class="help-block">
+              <h4>ROT/RUT-avdrag</h4>
+              <p>När du skapar en offert eller faktura med ROT/RUT beräknas avdraget automatiskt. Arbetskostnad och materialkostnad separeras. Kunden ser vad de betalar efter avdrag. Avdraget visas tydligt på fakturan.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Påminnelser</h4>
+              <p>Öppna en förfallen faktura och klicka <strong>Påminnelse</strong>. En påminnelse genereras med förfallodatum, belopp och eventuell påminnelseavgift (60 kr från andra påminnelsen). E-postklienten öppnas med färdigt meddelande.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Kreditfaktura</h4>
+              <p>Behöver du rätta en faktura? Öppna fakturan och klicka <strong>Kreditera</strong>. En kreditfaktura skapas som motbokar den ursprungliga. Bokföringen hanteras automatiskt.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- LEVERANTÖRSFAKTUROR -->
+        <div class="help-section" id="helpSuppliers" style="display:none">
+          <div class="gen-card" style="max-width:800px">
+            <h3 style="font-family:'Fraunces',serif;font-size:1.2rem;margin-bottom:1rem">Leverantörsfakturor</h3>
+            
+            <div class="help-block">
+              <h4>Registrera leverantörsfaktura</h4>
+              <ol class="help-list">
+                <li>Gå till <strong>Leverantörer</strong> i menyn</li>
+                <li>Klicka <strong>+ Ny leverantörsfaktura</strong></li>
+                <li>Fyll i leverantörens namn, fakturanummer, datum och belopp</li>
+                <li>Välj konto (t.ex. 4010 Material, 5410 Förbrukningsinventarier)</li>
+                <li>Klicka <strong>Spara</strong> — fakturan bokförs automatiskt med rätt moms</li>
+              </ol>
+            </div>
+
+            <div class="help-block">
+              <h4>Fakturametoden vs kontantmetoden</h4>
+              <p><strong>Fakturametoden</strong> (standard): Bokför när fakturan mottas. Betalningen registreras separat.<br>
+              <strong>Kontantmetoden</strong>: Bokför först när fakturan betalas. Väljs under Företagsprofil.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Markera som betald</h4>
+              <p>Klicka <strong>Betala</strong> på en leverantörsfaktura. Betalningen bokförs automatiskt (kredit bank, debit leverantörsskuld).</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOKFÖRING -->
+        <div class="help-section" id="helpBookkeeping" style="display:none">
+          <div class="gen-card" style="max-width:800px">
+            <h3 style="font-family:'Fraunces',serif;font-size:1.2rem;margin-bottom:1rem">Bokföring</h3>
+            
+            <div class="help-block">
+              <h4>Hur bokföringen fungerar</h4>
+              <p>Offeria bokför automatiskt när du skapar fakturor, leverantörsfakturor och skannar kvitton. Varje händelse skapar en <strong>verifikation</strong> med debet- och kreditrader enligt BAS 2026-kontoplanen.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Grundbok</h4>
+              <p>Visar alla verifikationer i datumordning (kronologiskt). Varje verifikation har ett löpnummer (V1, V2, V3...) och visar vilka konton som debiterats och krediterats.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Huvudbok</h4>
+              <p>Visar samma verifikationer men sorterade per konto. T.ex. alla rader på konto 3010 (Försäljning) samlade, med ingående och utgående saldo.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Resultat- och balansräkning</h4>
+              <p>Klicka <strong>Resultaträkning</strong> eller <strong>Balansräkning</strong> för att se sammanställning. Resultaträkningen visar intäkter minus kostnader. Balansräkningen visar tillgångar, skulder och eget kapital.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Manuell verifikation</h4>
+              <p>Klicka <strong>+ Ny verifikation</strong> för att bokföra något som inte hanteras automatiskt, t.ex. en privat insättning, banköverföring eller justering.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Lås period</h4>
+              <p>När en månad är klar, klicka <strong>Lås period</strong>. Låsta verifikationer kan inte ändras — rättelse sker via ny rättelseverifikation (motbokning), i enlighet med bokföringslagen.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Rättelseverifikation</h4>
+              <p>Öppna en verifikation och klicka <strong>↩ Rätta</strong>. En ny verifikation skapas med omvända debet/kredit som motbokar den felaktiga — enligt bokföringslagen (BFL 5 kap.).</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- KVITTOSKANNING -->
+        <div class="help-section" id="helpReceipts" style="display:none">
+          <div class="gen-card" style="max-width:800px">
+            <h3 style="font-family:'Fraunces',serif;font-size:1.2rem;margin-bottom:1rem">Kvittoskanning</h3>
+            
+            <div class="help-block">
+              <h4>Fota och bokför kvitto</h4>
+              <ol class="help-list">
+                <li>Gå till <strong>Bokföring</strong></li>
+                <li>Klicka <strong>📷 Skanna kvitto</strong></li>
+                <li>Fota kvittot med mobilen eller välj en bild</li>
+                <li>AI:n läser av butik, datum, belopp och moms automatiskt (OCR)</li>
+                <li>Välj rätt kontokategori om den inte stämmer</li>
+                <li>Klicka <strong>Bokför</strong> — verifikation skapas med rätt konton</li>
+              </ol>
+            </div>
+
+            <div class="help-block">
+              <h4>Tips för bättre resultat</h4>
+              <p>• Fota kvittot rakt framifrån med god belysning<br>
+              • Se till att hela kvittot syns<br>
+              • Undvik skrynkliga eller blekta kvitton<br>
+              • Bilden komprimeras automatiskt till max 200 KB</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- MOMS & SRU -->
+        <div class="help-section" id="helpVat" style="display:none">
+          <div class="gen-card" style="max-width:800px">
+            <h3 style="font-family:'Fraunces',serif;font-size:1.2rem;margin-bottom:1rem">Momsdeklaration & SRU-export</h3>
+            
+            <div class="help-block">
+              <h4>Momsdeklaration</h4>
+              <ol class="help-list">
+                <li>Gå till <strong>Bokföring</strong></li>
+                <li>Klicka <strong>Momsrapport</strong></li>
+                <li>Välj period (kvartal eller månad beroende på din redovisningsperiod)</li>
+                <li>Rapporten visar utgående moms, ingående moms och moms att betala/få tillbaka</li>
+                <li>Rutorna motsvarar SKV 4700 — fyll i samma siffror på skatteverket.se</li>
+              </ol>
+            </div>
+
+            <div class="help-block">
+              <h4>SRU-export</h4>
+              <p>Klicka <strong>SRU-export</strong> för att ladda ner en fil som kan importeras direkt till Skatteverkets e-tjänst. Filen innehåller alla momsuppgifter i rätt format.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>SIE-export till revisor</h4>
+              <p>Klicka <strong>SIE-export</strong> för att ladda ner din bokföring som SIE4-fil. Skicka filen till din revisor eller importera i annat bokföringsprogram (Fortnox, Bokio, Visma).</p>
+            </div>
+
+            <div class="help-block">
+              <h4>SIE-import</h4>
+              <p>Byter du från ett annat bokföringsprogram? Klicka <strong>SIE-import</strong> och välj din SIE-fil. Konton och verifikationer läses in automatiskt.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- KUNDER & ARTIKLAR -->
+        <div class="help-section" id="helpCustomers" style="display:none">
+          <div class="gen-card" style="max-width:800px">
+            <h3 style="font-family:'Fraunces',serif;font-size:1.2rem;margin-bottom:1rem">Kunder & artiklar</h3>
+            
+            <div class="help-block">
+              <h4>Kundregister</h4>
+              <p>Gå till <strong>Kunder</strong> för att lägga till och hantera dina kunder. Spara namn, e-post, telefon och adress. Kunder kan väljas direkt när du skapar offerter och fakturor.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Artikelregister</h4>
+              <p>Gå till <strong>Artiklar</strong> för att skapa återanvändbara artiklar med fasta priser. T.ex. "Timpris snickeri — 550 kr/h" eller "Golvslipning per kvm — 120 kr". Artiklarna kan väljas direkt i offerter.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- FÖRETAGSPROFIL -->
+        <div class="help-section" id="helpCompany" style="display:none">
+          <div class="gen-card" style="max-width:800px">
+            <h3 style="font-family:'Fraunces',serif;font-size:1.2rem;margin-bottom:1rem">Företagsprofil</h3>
+            
+            <div class="help-block">
+              <h4>Grunduppgifter</h4>
+              <p>Fyll i företagsnamn, organisationsnummer, adress, telefon, e-post och webbplats. Dessa visas på alla offerter och fakturor.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Bankuppgifter</h4>
+              <p>Fyll i bankgiro — visas på fakturor så kunden vet var de ska betala.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Logotyp</h4>
+              <p>Ladda upp din logotyp (PNG eller JPG). Den visas i övre vänstra hörnet på offerter och fakturor.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Bransch och standardinställningar</h4>
+              <p>Välj en eller flera branscher. Standardmomssats och betalningsvillkor sparas och används automatiskt i nya offerter. Du kan alltid ändra per offert.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Bokföringsmetod</h4>
+              <p><strong>Fakturametoden</strong>: Bokför intäkter/kostnader när fakturan skickas/mottas. Standard för de flesta företag.<br>
+              <strong>Kontantmetoden</strong>: Bokför först vid betalning. Tillåtet för företag med omsättning under 3 mkr.</p>
             </div>
           </div>
         </div>
@@ -2130,7 +2471,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
       <!-- CUSTOMERS PAGE -->
       <div class="app-page" id="page-customers">
-        <div class="page-title">Kunder</div>
+        <div class="page-title" style="position:relative">Kunder <button class="help-context-btn" onclick="openContextHelp('customers')" title="Hjälp om kunder">?</button></div>
         <div class="page-sub">Alla dina kunder samlade</div>
         <div style="display:flex;gap:0.8rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
           <input id="customerSearch" type="text" placeholder="Sök kund..." oninput="filterCustomers()" style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit">
@@ -2141,7 +2482,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
       <!-- ARTICLES PAGE -->
       <div class="app-page" id="page-articles">
-        <div class="page-title">Artiklar & Prislista</div>
+        <div class="page-title" style="position:relative">Artiklar & Prislista <button class="help-context-btn" onclick="openContextHelp('articles')" title="Hjälp om artiklar">?</button></div>
         <div class="page-sub">Dina egna priser – plocka enkelt in i offerter och fakturor</div>
         <div style="display:flex;gap:0.8rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
           <input id="articleSearch" type="text" placeholder="Sök artikel..." oninput="filterArticles()" style="flex:1;min-width:200px;padding:0.6rem 1rem;border-radius:8px;border:1px solid var(--border);font-size:0.9rem;font-family:inherit">
@@ -2152,7 +2493,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
       <!-- BOOKKEEPING PAGE -->
       <div class="app-page" id="page-bookkeeping">
-        <div class="page-title">Bokföring</div>
+        <div class="page-title" style="position:relative">Bokföring <button class="help-context-btn" onclick="openContextHelp('bookkeeping')" title="Hjälp om bokföring">?</button></div>
         <div class="page-sub">Grundbok, huvudbok och rapporter</div>
 
         <div class="tab-bar" style="display:flex;gap:0;margin-bottom:1.5rem;border-bottom:2px solid var(--border)">
@@ -3064,7 +3405,7 @@ async function onLogin(user) {
 
   // NU visa rätt sida — data finns, loadDashboard/loadInvoices får riktig data
   const savedPage = (() => { try { return sessionStorage.getItem('offeria_page'); } catch(e) { return null; } })();
-  const validPages = ['dashboard','generate','invoices','suppliers','customers','articles','bookkeeping','profile'];
+  const validPages = ['dashboard','generate','invoices','suppliers','customers','articles','bookkeeping','profile','help'];
   showPage(savedPage && validPages.includes(savedPage) ? savedPage : 'dashboard');
   
   try { fillProfileForm(profile); } catch(e) {}
@@ -5252,6 +5593,35 @@ if (document.readyState === 'loading') {
 function dismissWelcome() {
   document.getElementById('welcomeBanner').style.display = 'none';
   if (currentUser) localStorage.setItem('offeria_welcomed_' + currentUser.id, '1');
+}
+
+// ===== HELP PAGE =====
+function showHelpSection(id, btn) {
+  const sections = { start:'helpStart', quotes:'helpQuotes', invoices:'helpInvoices', suppliers:'helpSuppliers', bookkeeping:'helpBookkeeping', receipts:'helpReceipts', vat:'helpVat', customers:'helpCustomers', company:'helpCompany' };
+  Object.values(sections).forEach(s => {
+    const el = document.getElementById(s);
+    if (el) { el.style.display = 'none'; el.classList.remove('active'); }
+  });
+  const target = document.getElementById(sections[id]);
+  if (target) { target.style.display = 'block'; target.classList.add('active'); }
+  if (btn) {
+    btn.closest('.tab-bar, [style*="flex"]').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+}
+
+function openContextHelp(section) {
+  showPage('help');
+  setTimeout(() => {
+    const allBtns = document.querySelectorAll('#page-help .tab-btn');
+    const sectionMap = { generate:'quotes', invoices:'invoices', suppliers:'suppliers', bookkeeping:'bookkeeping', customers:'customers', articles:'customers', profile:'company' };
+    const mapped = sectionMap[section] || 'start';
+    allBtns.forEach(b => {
+      b.classList.remove('active');
+      if (b.textContent.toLowerCase().includes(mapped.slice(0,4))) b.classList.add('active');
+    });
+    showHelpSection(mapped, null);
+  }, 100);
 }
 
 async function sendWelcomeEmail(toEmail, name) {
@@ -10436,8 +10806,10 @@ init();
     <button onclick="closeDrawer();showView('app');showPage('profile')" id="dNav-profile" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
       <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/><path d="M9 22v-4h6v4"/></svg></span> Företagsprofil
     </button>
-    <div style="border-top:1px solid #222;margin:0.5rem 0.5rem"></div>
-    <a href="/om-oss.html" style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
+    <button onclick="closeDrawer();showView('app');showPage('help')" id="dNav-help" style="width:100%;background:none;border:none;color:#ccc;text-align:left;padding:0.9rem 1rem;font-size:0.95rem;font-family:DM Sans,sans-serif;cursor:pointer;border-radius:8px;display:flex;align-items:center;gap:0.8rem">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Hjälp
+    </button>
+    <div style="border-top:1px solid #222;margin:0.5rem 0.5rem"></div> style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
       <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span> Om oss
     </a>
     <a href="/kontakta-oss.html" style="display:flex;align-items:center;gap:0.8rem;color:#888;text-decoration:none;padding:0.8rem 1rem;font-size:0.88rem;border-radius:8px">
