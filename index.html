@@ -2889,6 +2889,15 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div class="card-label">Att göra</div>
           <div id="dashTodoList" style="margin-top:0.5rem"><div style="padding:1rem;color:#aaa;font-size:0.85rem">Laddar...</div></div>
         </div>
+
+        <!-- Row 5: Personal notes -->
+        <div class="dash-card-wide" style="margin-top:1rem">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="card-label">📝 Mina anteckningar</div>
+            <button id="dashNoteSaveBtn" onclick="saveDashNotes()" style="background:var(--ink);color:var(--gold-light);border:none;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.72rem;cursor:pointer;font-family:inherit;display:none">Spara</button>
+          </div>
+          <textarea id="dashNotes" placeholder="Skriv egna anteckningar här... (sparas automatiskt)" oninput="document.getElementById('dashNoteSaveBtn').style.display='inline-block'" style="width:100%;min-height:80px;padding:0.6rem;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.85rem;resize:vertical;margin-top:0.5rem;background:white;line-height:1.6"></textarea>
+        </div>
       </div>
 
       <!-- CUSTOMERS PAGE -->
@@ -4490,6 +4499,7 @@ function openUserActions(userId) {
             <option value="365">1 år</option>
           </select>
           <button onclick="adminGiveTrial('${userId}')" class="gen-btn" style="padding:0.4rem 0.8rem;font-size:0.78rem">Aktivera →</button>
+          <button onclick="adminResetTrial('${userId}')" style="background:none;border:1px solid #c62828;color:#c62828;padding:0.4rem 0.8rem;border-radius:6px;font-size:0.78rem;cursor:pointer;font-family:inherit">Nollställ trial</button>
         </div>
       </div>
 
@@ -4561,6 +4571,17 @@ async function adminGiveTrial(userId) {
   document.getElementById('userActionModal')?.remove();
   filterUsers();
   alert(`✓ ${u?.email} har nu ${days} dagars gratis ${plan}`);
+}
+
+async function adminResetTrial(userId) {
+  const u = _adminUsers.find(x => x.id === userId);
+  if (!confirm(`Nollställ trial för ${u?.email}?\n\nDetta sätter plan till Gratis och tar bort provperioden.`)) return;
+  const { error } = await sb.from('profiles').update({ plan: 'free', trial_ends_at: null }).eq('id', userId);
+  if (error) { alert('Fel: ' + error.message); return; }
+  if (u) { u.plan = 'free'; u.trial_ends_at = null; }
+  document.getElementById('userActionModal')?.remove();
+  filterUsers();
+  alert(`✓ Trial nollställd för ${u?.email} — nu på Gratis`);
 }
 
 async function adminToggleFlag(userId, flag) {
@@ -7315,7 +7336,28 @@ async function loadDashboard() {
     window._chartYear = window._chartYear || yr;
     renderCharts();
 
+    // Load personal notes
+    loadDashNotes();
+
   } catch(e) { console.error('Dashboard error:', e); }
+}
+
+async function loadDashNotes() {
+  try {
+    const { data } = await sb.from('profiles').select('dashboard_notes').eq('id', currentUser.id).single();
+    const el = document.getElementById('dashNotes');
+    if (el && data?.dashboard_notes) el.value = data.dashboard_notes;
+  } catch(e) {}
+}
+
+async function saveDashNotes() {
+  const btn = document.getElementById('dashNoteSaveBtn');
+  const notes = document.getElementById('dashNotes').value;
+  btn.textContent = 'Sparar...';
+  const { error } = await sb.from('profiles').update({ dashboard_notes: notes }).eq('id', currentUser.id);
+  if (error) { alert('Fel: ' + error.message); btn.textContent = 'Spara'; return; }
+  btn.textContent = '✓ Sparat';
+  setTimeout(() => { btn.style.display = 'none'; btn.textContent = 'Spara'; }, 1500);
 }
 
 let _chartYear = new Date().getFullYear();
