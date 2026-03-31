@@ -681,8 +681,8 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .help-block p { font-size: 0.88rem; color: #555; line-height: 1.65; }
 .help-list { padding-left: 1.2rem; margin: 0; }
 .help-list li { font-size: 0.88rem; color: #555; line-height: 1.65; margin-bottom: 0.4rem; }
-.help-context-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: var(--paper); border: 1px solid var(--border); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; color: var(--gold); font-weight: 700; transition: background 0.15s; z-index: 5; }
-.help-context-btn:hover { background: var(--gold); color: white; }
+.help-context-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: var(--gold); border: none; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; color: white; font-weight: 700; transition: background 0.15s; z-index: 5; box-shadow: 0 2px 6px rgba(184,144,46,0.3); }
+.help-context-btn:hover { background: var(--ink); }
 .faq-a-inner { padding: 0 0 1.2rem; font-size: 0.88rem; color: #666; line-height: 1.7; }
 .faq-category { font-family: 'Fraunces', serif; font-size: 1rem; color: var(--ink); margin: 2rem 0 0.8rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--gold-light); }
 .faq-category:first-child { margin-top: 0; }
@@ -6926,7 +6926,7 @@ async function loadDashboard() {
       const deadlineYear = vd.month < 3 && curMonth > 6 ? curYear + 1 : curYear;
       const deadline = new Date(deadlineYear, vd.month, vd.day);
       const daysUntil = Math.floor((deadline - now2) / 86400000);
-      if (daysUntil >= 0 && daysUntil <= 30) {
+      if (daysUntil >= 0 && daysUntil <= 45) {
         const urgency = daysUntil <= 7 ? '#c62828' : daysUntil <= 14 ? '#e65100' : '#1565c0';
         todos.push({ color: urgency, text: `📋 Momsdeklaration ${vd.q} — senast ${deadline.toLocaleDateString('sv-SE')} (${daysUntil === 0 ? 'idag!' : 'om ' + daysUntil + ' dagar'})`, action: 'Moms', page: 'bookkeeping' });
       }
