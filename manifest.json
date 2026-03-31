@@ -1,21 +1,27 @@
 {
   "name": "Offeria",
   "short_name": "Offeria",
-  "description": "AI-driven offertgenerering",
+  "description": "Offert, faktura och bokföring för hantverkare",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f7f4ee",
+  "background_color": "#0d0d0b",
   "theme_color": "#0d0d0b",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "categories": ["business", "finance"],
+  "lang": "sv",
+  "dir": "ltr"
 }
