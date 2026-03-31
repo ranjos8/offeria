@@ -1478,13 +1478,30 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <div class="field"><label>Bransch</label>
               <select id="industry" onchange="renderExamplePills(this.value)">
                 <option value="Bygg & Snickeri">Bygg & Snickeri</option>
-                <option value="El"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span> El</option>
-                <option value="VVS"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></span> VVS</option>
-                <option value="Städ"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z"/></svg></span> Städ</option>
+                <option value="El">El & Elinstallation</option>
+                <option value="VVS">VVS & Rör</option>
+                <option value="Måleri">Måleri & Tapetsering</option>
+                <option value="Plattsättning">Plattsättning & Kakel</option>
+                <option value="Golv">Golv & Parkett</option>
+                <option value="Tak">Tak & Plåt</option>
                 <option value="Mark & Trädgård">Mark & Trädgård</option>
-                <option value="Måleri"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.37 2.63L14 7l-1.59-1.59a2 2 0 00-2.82 0L8 7l9 9 1.59-1.59a2 2 0 000-2.82L17 10l4.37-4.37a2.12 2.12 0 10-3-3z"/><path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7"/></svg></span> Måleri</option>
-                <option value="Transport"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Transport</option>
-                <option value="Konsult / IT"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></span> Konsult / IT</option>
+                <option value="Städ">Städ & Hemservice</option>
+                <option value="Flytt & Transport">Flytt & Transport</option>
+                <option value="Lås & Säkerhet">Lås & Säkerhet</option>
+                <option value="Glas & Fönster">Glas & Fönster</option>
+                <option value="Ventilation">Ventilation & Kyla</option>
+                <option value="Solenergi">Solceller & Solenergi</option>
+                <option value="Fasad & Isolering">Fasad & Isolering</option>
+                <option value="Pool & Spa">Pool & Spa</option>
+                <option value="Demolering">Rivning & Demolering</option>
+                <option value="Stukatur">Stukatur & Puts</option>
+                <option value="Smide">Smide & Svetsning</option>
+                <option value="Möbelsnickeri">Möbelsnickeri & Inredning</option>
+                <option value="Konsult / IT">Konsult / IT</option>
+                <option value="Redovisning">Redovisning & Ekonomi</option>
+                <option value="Foto & Video">Foto & Video</option>
+                <option value="Event">Event & Catering</option>
+                <option value="Annan">Annan bransch</option>
               </select>
             </div>
             <div class="field"><label>Momssats</label>
@@ -1736,17 +1753,35 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
             <div class="card-label"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span> Bransch &amp; prissättning <span style="font-size:0.7rem;font-weight:400;color:#aaa;margin-left:0.5rem">Förväljs automatiskt vid ny offert</span></div>
             <div style="margin-bottom:1rem">
-              <label style="font-size:0.76rem;font-weight:600;color:#555;display:block;margin-bottom:0.5rem">Mina branscher (välj en eller flera)</label>
-              <div class="chips" id="profileIndustryChips">
-                <label class="chip" id="pchip-bygg"><input type="checkbox" value="Bygg &amp; Snickeri" onchange="toggleProfileChip('pchip-bygg',this)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/><path d="M9 22v-4h6v4"/></svg></span> Bygg &amp; Snickeri</label>
-                <label class="chip" id="pchip-el"><input type="checkbox" value="El" onchange="toggleProfileChip('pchip-el',this)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span> El</label>
-                <label class="chip" id="pchip-vvs"><input type="checkbox" value="VVS" onchange="toggleProfileChip('pchip-vvs',this)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></span> VVS</label>
-                <label class="chip" id="pchip-stad"><input type="checkbox" value="Städ" onchange="toggleProfileChip('pchip-stad',this)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z"/></svg></span> Städ</label>
-                <label class="chip" id="pchip-mark"><input type="checkbox" value="Mark &amp; Trädgård" onchange="toggleProfileChip('pchip-mark',this)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg></span> Mark &amp; Trädgård</label>
-                <label class="chip" id="pchip-maleri"><input type="checkbox" value="Måleri" onchange="toggleProfileChip('pchip-maleri',this)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.37 2.63L14 7l-1.59-1.59a2 2 0 00-2.82 0L8 7l9 9 1.59-1.59a2 2 0 000-2.82L17 10l4.37-4.37a2.12 2.12 0 10-3-3z"/><path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7"/></svg></span> Måleri</label>
-                <label class="chip" id="pchip-transport"><input type="checkbox" value="Transport" onchange="toggleProfileChip('pchip-transport',this)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Transport</label>
-                <label class="chip" id="pchip-konsult"><input type="checkbox" value="Konsult / IT" onchange="toggleProfileChip('pchip-konsult',this)"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></span> Konsult / IT</label>
-              </div>
+              <label style="font-size:0.76rem;font-weight:600;color:#555;display:block;margin-bottom:0.5rem">Min bransch</label>
+              <select id="profileIndustry" style="width:100%;padding:0.6rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem;background:white">
+                <option value="">Välj bransch...</option>
+                <option value="Bygg & Snickeri">Bygg & Snickeri</option>
+                <option value="El">El & Elinstallation</option>
+                <option value="VVS">VVS & Rör</option>
+                <option value="Måleri">Måleri & Tapetsering</option>
+                <option value="Plattsättning">Plattsättning & Kakel</option>
+                <option value="Golv">Golv & Parkett</option>
+                <option value="Tak">Tak & Plåt</option>
+                <option value="Mark & Trädgård">Mark & Trädgård</option>
+                <option value="Städ">Städ & Hemservice</option>
+                <option value="Flytt & Transport">Flytt & Transport</option>
+                <option value="Lås & Säkerhet">Lås & Säkerhet</option>
+                <option value="Glas & Fönster">Glas & Fönster</option>
+                <option value="Ventilation">Ventilation & Kyla</option>
+                <option value="Solenergi">Solceller & Solenergi</option>
+                <option value="Fasad & Isolering">Fasad & Isolering</option>
+                <option value="Pool & Spa">Pool & Spa</option>
+                <option value="Demolering">Rivning & Demolering</option>
+                <option value="Stukatur">Stukatur & Puts</option>
+                <option value="Smide">Smide & Svetsning</option>
+                <option value="Möbelsnickeri">Möbelsnickeri & Inredning</option>
+                <option value="Konsult / IT">Konsult / IT</option>
+                <option value="Redovisning">Redovisning & Ekonomi</option>
+                <option value="Foto & Video">Foto & Video</option>
+                <option value="Event">Event & Catering</option>
+                <option value="Annan">Annan bransch</option>
+              </select>
             </div>
             <div class="grid3">
               <div class="field"><label>Timpris (exkl. moms)</label><input id="pHourlyRate" placeholder="650" type="number" min="0"></div>
@@ -4871,13 +4906,12 @@ function fillProfileForm(profile) {
   document.getElementById('pPaymentMethods').value = profile.payment_methods || '';
   document.getElementById('pWarranty').value = profile.warranty_text || '';
   document.getElementById('pAccountingMethod').value = profile.accounting_method || 'kontant';
-  // Fill industry chips
+  // Fill industry dropdown
   const industries = profile.industries ? JSON.parse(profile.industries) : [];
-  document.querySelectorAll('#profileIndustryChips input[type=checkbox]').forEach(cb => {
-    const on = industries.includes(cb.value);
-    cb.checked = on;
-    cb.closest('.chip').classList.toggle('on', on);
-  });
+  const industrySelect = document.getElementById('profileIndustry');
+  if (industrySelect && industries.length > 0) {
+    industrySelect.value = industries[0];
+  }
   // Pre-select defaults on generate page
   if (profile.default_vat) document.getElementById('vatRate').value = profile.default_vat;
   if (profile.default_pay_terms) document.getElementById('payTerms').value = profile.default_pay_terms;
@@ -4887,15 +4921,12 @@ function fillProfileForm(profile) {
   }
 }
 
-function toggleProfileChip(id, cb) {
-  document.getElementById(id).classList.toggle('on', cb.checked);
-}
-
 async function saveProfile() {
   const btn = document.querySelector('.save-btn');
   btn.textContent = 'Sparar...';
   btn.disabled = true;
-  const selectedIndustries = [...document.querySelectorAll('#profileIndustryChips input[type=checkbox]:checked')].map(cb => cb.value);
+  const selectedIndustry = document.getElementById('profileIndustry').value;
+  const selectedIndustries = selectedIndustry ? [selectedIndustry] : [];
   const updates = {
     company_name: document.getElementById('pCompany').value.trim(),
     org_number: document.getElementById('pOrg').value.trim(),
@@ -6450,7 +6481,7 @@ function toggleChip(id, cb) {
   document.getElementById(id).classList.toggle('on', cb.checked);
 }
 function setPrompt(t) { document.getElementById('jobPrompt').value = t; document.getElementById('jobPrompt').focus(); }
-var INDUSTRY_EXAMPLES = {'Bygg & Snickeri':['Bygga 20 kvm trädäck med räcke','Renovera källare 40 kvm','Sätta upp staket 30 meter','Bygga friggebod 15 kvm','Lägga nytt trägolv 60 kvm'],'El':['Byta elcentral i villa','Installera laddbox för elbil','Byta 8 eluttag och 4 strömbrytare','Dra el till nytt garage','LED-belysning i kontor'],'VVS':['Byta badrumsror och ny dusch','Installera ny varmvattenberedare','Byta radiatorer i 5 rum','Byta kran i kök','Golvvärme badrum 8 kvm'],'Städ':['Kontorsstädning 400 kvm varannan vecka','Storstädning villa 150 kvm','Fönsterputs 20 fönster','Trappstädning flerfamiljshus','Flyttstädning 3 rok'],'Mark & Trädgård':['Anlägga gräsmatta 200 kvm','Plantera häck 40 meter','Bygga altan 25 kvm','Fräsa tomt 500 kvm','Trädfällning och röjning'],'Måleri':['Måla om 3 rum 80 kvm','Tapetsera vardagsrum 30 kvm','Måla fasad villa','Lackera trägolv 70 kvm','Spackling efter vattenskada'],'Transport':['Flytt av 3 rok lägenhet','Transportera byggmaterial 2 ton','Kontorsflytt 500 kvm','Tömma och köra bort bohag','Möbeltransport'],'Konsult / IT':['Bygga webbplats för småföretag','IT-support och nätverk','Systemanalys och krav','Sociala medier 3 månader','Bokföring per kvartal']};
+var INDUSTRY_EXAMPLES = {'Bygg & Snickeri':['Bygga 20 kvm trädäck med räcke','Renovera källare 40 kvm','Sätta upp staket 30 meter','Bygga friggebod 15 kvm','Lägga nytt trägolv 60 kvm'],'El':['Byta elcentral i villa','Installera laddbox för elbil','Byta 8 eluttag och 4 strömbrytare','Dra el till nytt garage','LED-belysning i kontor'],'VVS':['Byta badrumsror och ny dusch','Installera ny varmvattenberedare','Byta radiatorer i 5 rum','Byta kran i kök','Golvvärme badrum 8 kvm'],'Måleri':['Måla om 3 rum 80 kvm','Tapetsera vardagsrum 30 kvm','Måla fasad villa','Lackera trägolv 70 kvm','Spackling efter vattenskada'],'Plattsättning':['Kakla badrum 8 kvm väggar och golv','Klinker i hall 15 kvm','Mosaik i dusch','Storformat kakel kök','Plattsättning balkong 6 kvm'],'Golv':['Lägga ekparkett 45 kvm','Slipa och lacka trägolv 60 kvm','Laminat i 3 rum','Vinylgolv kontor 100 kvm','Gjuta och avjämna golv 30 kvm'],'Tak':['Byta takpannor villa 120 kvm','Lägga plåttak garage','Takfönster installation 2 st','Tilläggsisolering vindsbjälklag','Hängränna och stuprör byte'],'Mark & Trädgård':['Anlägga gräsmatta 200 kvm','Plantera häck 40 meter','Bygga altan 25 kvm','Fräsa tomt 500 kvm','Trädfällning och röjning'],'Städ':['Kontorsstädning 400 kvm varannan vecka','Storstädning villa 150 kvm','Fönsterputs 20 fönster','Trappstädning flerfamiljshus','Flyttstädning 3 rok'],'Flytt & Transport':['Flytt av 3 rok lägenhet','Transportera byggmaterial 2 ton','Kontorsflytt 500 kvm','Tömma och köra bort bohag','Möbeltransport'],'Lås & Säkerhet':['Byta lås ytterdörr','Installera passersystem kontor','Kodlås och porttelefon BRF','Säkerhetsdörr villa','Nyckelservice 5 lägenheter'],'Glas & Fönster':['Byta 8 fönster villa','Inglasning balkong','Energiglas uppgradering','Glasdörr kontor','Spegel garderob efter mått'],'Ventilation':['OVK-besiktning flerbostadshus','Installera FTX-system villa','Köksfläkt och ventilationskanal','Ventilationsrengöring kontor','Luftvärmepump installation'],'Solenergi':['Solcellsanläggning 10 kW villa','Solpaneler tak BRF','Batterilagring 10 kWh','Laddbox + solceller paket','Optimering befintlig anläggning'],'Fasad & Isolering':['Putsa fasad villa 150 kvm','Tilläggsisolera fasad','Byta fasadpanel trä','Dränering och fuktskydd grund','Ventilerad fasad kontor'],'Pool & Spa':['Bygga pool 4x8 meter','Renovera poolstomme','Installera pooltak','Utomhus-spa installation','Poolservice och underhåll säsong'],'Demolering':['Riva innervägg 6 meter','Stambyte badrum rivning','Riva garage','Saneringsarbete före renovering','Håltagning betong'],'Stukatur':['Putsa innerväggar 50 kvm','Fasadputs villa','Dekorativ stuckatur','Betonglagning balkonger','Rappning källare'],'Smide':['Smidesräcke balkong 4 meter','Grind och staket smide','Trappräcke efter mått','Portar och galler','Konsolbärare och balkar'],'Möbelsnickeri':['Platsbyggd garderob 3 meter','Köksö efter mått','Bokhylla vägg-till-vägg','Walk-in-closet','Barnrum inredning'],'Konsult / IT':['Bygga webbplats för småföretag','IT-support och nätverk','Systemanalys och krav','Sociala medier 3 månader','Bokföring per kvartal'],'Redovisning':['Löpande bokföring enskild firma','Bokslut och årsredovisning AB','Deklaration enskild firma','Momsredovisning kvartalsvis','Löneadministration 5 anställda'],'Foto & Video':['Företagsfotografering halvdag','Produktfotografering 20 produkter','Reklamfilm 60 sekunder','Drönarfotografering fastighet','Porträttfotografering personal'],'Event':['Catering 50 personer buffé','Företagsevent planering','Bröllopskoordinering','Ljudutrustning hyra och rigg','Konferens heldag 80 deltagare']};
 var DEFAULT_EXAMPLES=['Bygga 20 kvm trädäck med räcke','Byta 5 eluttag i kök','Kontorsstädning 400 kvm','Måla om 3 rum 80 kvm','Byta badrumsror och ny dusch'];
 function renderExamplePills(override){var el=document.getElementById('examplePills');if(!el)return;var ex=[];if(override&&override!==''){ex=(INDUSTRY_EXAMPLES[override]||DEFAULT_EXAMPLES).slice(0,5);}else{var ind=currentProfile&&currentProfile.industries?JSON.parse(currentProfile.industries):[];if(ind.length>0){ind.forEach(function(i){var e=INDUSTRY_EXAMPLES[i]||[];ex=ex.concat(e.slice(0,3));});ex=ex.slice(0,5);}else{ex=DEFAULT_EXAMPLES;}}el.innerHTML=ex.map(function(e){return'<span class="ex-pill" onclick="setPrompt(this.textContent)">'+e+'</span>';}).join('');}
 
@@ -6489,14 +6520,30 @@ async function generateQuote() {
 
   // Check mismatch between industry and job
   const industryKeywords = {
-    'Städ': ['städ','rengör','tvätt','fönsterputsn','storstäd','kontor'],
-    'El': ['el','uttag','ledning','elcentral','belysning','kabel','lampa','säkring'],
-    'VVS': ['rör','vvs','dusch','badrum','toalett','radiator','värme','vatten','avlopp'],
-    'Bygg & Snickeri': ['bygg','snick','trä','vägg','golv','tak','dörr','fönster','däck','terrass'],
-    'Måleri': ['måla','puts','tapets','färg','spackel'],
-    'Mark & Trädgård': ['trädgård','gräs','häck','träd','mark','gång','altan','jord'],
-    'Transport': ['transport','flytt','frakt','leverans','kör'],
-    'Konsult / IT': ['konsult','it','system','webb','kod','program','analys','rådgivning']
+    'Städ': ['städ','rengör','tvätt','fönsterputsn','storstäd','kontor','hemservice'],
+    'El': ['el','uttag','ledning','elcentral','belysning','kabel','lampa','säkring','laddbox','solcell'],
+    'VVS': ['rör','vvs','dusch','badrum','toalett','radiator','värme','vatten','avlopp','blandare'],
+    'Bygg & Snickeri': ['bygg','snick','trä','vägg','golv','tak','dörr','fönster','däck','terrass','friggebod','attefall','garage'],
+    'Måleri': ['måla','puts','tapets','färg','spackel','fasad','lacka','slipa'],
+    'Plattsättning': ['kakel','klinker','platts','mosaik','fog','våtrum','kakla'],
+    'Golv': ['golv','parkett','laminat','vinyl','slipa','lacka golv','avjämna'],
+    'Tak': ['tak','plåt','pann','hängränna','stuprör','tätskikt','takfönster'],
+    'Mark & Trädgård': ['trädgård','gräs','häck','träd','mark','gång','altan','jord','sten','mur'],
+    'Flytt & Transport': ['transport','flytt','frakt','leverans','kör','bohag','möbel'],
+    'Lås & Säkerhet': ['lås','nyckel','passersystem','kodlås','säkerhet','larm','dörr'],
+    'Glas & Fönster': ['glas','fönster','inglasning','spegel','ruta','energiglas'],
+    'Ventilation': ['ventil','fläkt','ovk','ftx','kyla','luft','värmepump'],
+    'Solenergi': ['solcell','solpanel','batteri','solenergi','inverter','kwh'],
+    'Fasad & Isolering': ['fasad','isoler','dränering','putsning','tilläggsisoler','panel'],
+    'Pool & Spa': ['pool','spa','badtunna','pooltäckning','filter','klor'],
+    'Demolering': ['riv','demo','saner','håltagning','betong','stambyte'],
+    'Stukatur': ['stuk','puts','rappning','betonglag','dekor'],
+    'Smide': ['smid','svets','grind','räcke smide','stål','metall','konsol'],
+    'Möbelsnickeri': ['möbel','garderob','platsbygg','köksö','bokhylla','inredning','walk-in'],
+    'Konsult / IT': ['konsult','it','system','webb','kod','program','analys','rådgivning'],
+    'Redovisning': ['redovisning','bokföring','deklaration','lön','moms','bokslut','revision'],
+    'Foto & Video': ['foto','video','film','drönar','porträtt','produkt'],
+    'Event': ['event','cater','bröllop','konferens','ljud','fest']
   };
   const jobLower = jobText.toLowerCase();
   const selectedKws = industryKeywords[industry] || [];
