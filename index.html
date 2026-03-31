@@ -3809,13 +3809,7 @@ function updateUI(profile, used, total) {
   // Dölj komplett-only menyer för gratis/smart
   const isKomplett = plan === 'komplett';
   const isFreeUser = plan === 'free';
-  document.getElementById('sNav-suppliers').style.display = isKomplett ? 'flex' : 'none';
-  document.getElementById('sNav-bookkeeping').style.display = isKomplett ? 'flex' : 'none';
-  // Fakturor + Kunder & Artiklar synligt för smart + komplett
-  const invoiceNav = document.getElementById('sNav-invoices');
-  if (invoiceNav) invoiceNav.style.display = isFreeUser ? 'none' : 'flex';
-  const customersNav = document.getElementById('sNav-customers');
-  if (customersNav) customersNav.style.display = isFreeUser ? 'none' : 'flex';
+  // Alla menyer synliga — gating sker på respektive sida
 
   document.getElementById('sidebarPlan').textContent = PLAN_LABELS[plan];
   document.getElementById('sidebarQuotaCount').textContent = `${used} / ${limitStr} denna månad`;
@@ -7084,6 +7078,18 @@ function renderCharts() {
 let _customersData = [];
 async function loadCustomers() {
   if (!currentUser) return;
+  const custPlan = currentProfile?.plan || 'free';
+  if (custPlan === 'free') {
+    document.getElementById('regPanelCustomers').innerHTML = `
+      <div style="text-align:center;padding:3rem 1.5rem">
+        <div style="margin-bottom:1rem"><span class="ico" style="font-size:2rem;color:var(--gold)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span></div>
+        <div style="font-family:Fraunces,serif;font-size:1.3rem;margin-bottom:0.5rem">Kund- & artikelregister ingår i Smart</div>
+        <p style="color:#888;font-size:0.9rem;margin-bottom:1.5rem">Spara dina kunder och skapa en prislista — uppgradera till Smart för 99 kr/mån.</p>
+        <button onclick="openUpgradeModal()" class="gen-btn" style="padding:0.7rem 2rem;font-size:0.95rem">Uppgradera →</button>
+      </div>`;
+    document.getElementById('regPanelArticles').innerHTML = '';
+    return;
+  }
   try {
     const { data: customers } = await sb.from('customers').select('*').eq('user_id', currentUser.id).order('name');
     _customersData = customers || [];
