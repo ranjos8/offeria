@@ -2501,6 +2501,43 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <div id="adminNewUsersChart" style="height:120px;display:flex;align-items:flex-end;gap:4px;padding-top:0.5rem"></div>
             <div id="adminNewUsersLabels" style="display:flex;gap:4px;margin-top:0.3rem;font-size:0.65rem;color:#aaa"></div>
           </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-width:900px;margin-top:1rem">
+            <div class="gen-card">
+              <div class="card-label">Inloggningar senaste 14 dagarna</div>
+              <div id="adminLoginChart" style="height:120px;display:flex;align-items:flex-end;gap:4px;padding-top:0.5rem"></div>
+              <div id="adminLoginLabels" style="display:flex;gap:4px;margin-top:0.3rem;font-size:0.65rem;color:#aaa"></div>
+            </div>
+            <div class="gen-card">
+              <div class="card-label">Aktivitet senaste 14 dagarna</div>
+              <div id="adminActivityChart" style="height:120px;display:flex;align-items:flex-end;gap:4px;padding-top:0.5rem"></div>
+              <div id="adminActivityLabels" style="display:flex;gap:4px;margin-top:0.3rem;font-size:0.65rem;color:#aaa"></div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;max-width:900px;margin-top:1rem" id="adminActivityStats">
+            <div class="gen-card" style="text-align:center;padding:1.2rem">
+              <div style="font-size:2rem;font-weight:700;color:var(--gold)" id="statTotalLogins7d">—</div>
+              <div style="font-size:0.78rem;color:#888;margin-top:0.3rem">Inloggningar (7 dagar)</div>
+            </div>
+            <div class="gen-card" style="text-align:center;padding:1.2rem">
+              <div style="font-size:2rem;font-weight:700;color:#1565c0" id="statActiveUsers7d">—</div>
+              <div style="font-size:0.78rem;color:#888;margin-top:0.3rem">Aktiva användare (7d)</div>
+            </div>
+            <div class="gen-card" style="text-align:center;padding:1.2rem">
+              <div style="font-size:2rem;font-weight:700;color:#2e7d32" id="statTotalQuotes7d">—</div>
+              <div style="font-size:0.78rem;color:#888;margin-top:0.3rem">Offerter (7 dagar)</div>
+            </div>
+            <div class="gen-card" style="text-align:center;padding:1.2rem">
+              <div style="font-size:2rem;font-weight:700;color:#b8902e" id="statTotalInvoices7d">—</div>
+              <div style="font-size:0.78rem;color:#888;margin-top:0.3rem">Fakturor (7 dagar)</div>
+            </div>
+          </div>
+
+          <div class="gen-card" style="max-width:900px;margin-top:1rem">
+            <div class="card-label">Senaste aktivitet</div>
+            <div id="adminRecentActivity" style="margin-top:0.5rem;font-size:0.82rem"><div style="color:#aaa">Laddar...</div></div>
+          </div>
         </div>
 
         <!-- FLIK: ANVÄNDARE -->
@@ -3582,6 +3619,11 @@ const STRIPE_LINKS = {
 // API-nyckeln är nu säkert lagrad i Supabase Edge Function
 
 const PLAN_LIMITS = { free: 2, smart: 30, pro: 30, komplett: 100 };
+
+// Activity logging
+async function logActivity(action, detail) {
+  try { if (currentUser) await sb.from('activity_log').insert({ user_id: currentUser.id, action, detail }); } catch(e) {}
+}
 const INVOICE_LIMITS = { free: 0, smart: Infinity, pro: Infinity, komplett: Infinity };
 const PLAN_LABELS = { free: 'Gratis', smart: 'Smart', pro: 'Smart', komplett: 'Komplett' };
 
@@ -3772,7 +3814,11 @@ async function init() {
     }
     if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && !_loginHandled && !window._resetPasswordPending) {
       _loginHandled = true;
-      if (session?.user) await onLogin(session.user);
+      if (session?.user) {
+        await onLogin(session.user);
+        // Log login
+        try { await sb.from('login_log').insert({ user_id: session.user.id }); } catch(e) {}
+      }
     }
   });
 
@@ -4335,6 +4381,87 @@ async function loadAdminDash() {
   if (labels) {
     labels.innerHTML = days.map(d => `<div style="flex:1;text-align:center">${d.slice(5)}</div>`).join('');
   }
+
+  // === LOGIN & ACTIVITY ANALYTICS ===
+  try {
+    const d7ago = new Date(now - 7 * 86400000).toISOString();
+    const d14ago = new Date(now - 14 * 86400000).toISOString();
+
+    // Login chart (14 days)
+    const { data: logins } = await sb.from('login_log').select('logged_in_at, user_id').gte('logged_in_at', d14ago);
+    const loginDays = [];
+    const loginCounts = [];
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(now); d.setDate(d.getDate() - i);
+      const ds = d.toISOString().slice(0, 10);
+      loginDays.push(ds);
+      loginCounts.push((logins || []).filter(l => l.logged_in_at?.startsWith(ds)).length);
+    }
+    const loginMax = Math.max(...loginCounts, 1);
+    const loginChart = document.getElementById('adminLoginChart');
+    const loginLabels = document.getElementById('adminLoginLabels');
+    if (loginChart) {
+      loginChart.innerHTML = loginCounts.map(c => `
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+          <div style="font-size:0.65rem;color:#888">${c || ''}</div>
+          <div style="width:100%;background:#1565c0;border-radius:3px 3px 0 0;height:${Math.max(4, c/loginMax*100)}px;opacity:${c>0?1:0.2}"></div>
+        </div>`).join('');
+    }
+    if (loginLabels) loginLabels.innerHTML = loginDays.map(d => `<div style="flex:1;text-align:center">${d.slice(5)}</div>`).join('');
+
+    // Activity chart (14 days)
+    const { data: activities } = await sb.from('activity_log').select('created_at, action, user_id, detail').gte('created_at', d14ago).order('created_at', { ascending: false });
+    const actDays = [];
+    const actCounts = [];
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(now); d.setDate(d.getDate() - i);
+      const ds = d.toISOString().slice(0, 10);
+      actDays.push(ds);
+      actCounts.push((activities || []).filter(a => a.created_at?.startsWith(ds)).length);
+    }
+    const actMax = Math.max(...actCounts, 1);
+    const actChart = document.getElementById('adminActivityChart');
+    const actLabels = document.getElementById('adminActivityLabels');
+    if (actChart) {
+      actChart.innerHTML = actCounts.map(c => `
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+          <div style="font-size:0.65rem;color:#888">${c || ''}</div>
+          <div style="width:100%;background:#2e7d32;border-radius:3px 3px 0 0;height:${Math.max(4, c/actMax*100)}px;opacity:${c>0?1:0.2}"></div>
+        </div>`).join('');
+    }
+    if (actLabels) actLabels.innerHTML = actDays.map(d => `<div style="flex:1;text-align:center">${d.slice(5)}</div>`).join('');
+
+    // 7-day stats
+    const logins7d = (logins || []).filter(l => l.logged_in_at >= d7ago);
+    const uniqueUsers7d = new Set(logins7d.map(l => l.user_id)).size;
+    const quotes7d = (activities || []).filter(a => a.action === 'offert_skapad' && a.created_at >= d7ago).length;
+    const invoices7d = (activities || []).filter(a => a.action === 'faktura_skapad' && a.created_at >= d7ago).length;
+
+    document.getElementById('statTotalLogins7d').textContent = logins7d.length;
+    document.getElementById('statActiveUsers7d').textContent = uniqueUsers7d;
+    document.getElementById('statTotalQuotes7d').textContent = quotes7d;
+    document.getElementById('statTotalInvoices7d').textContent = invoices7d;
+
+    // Recent activity feed
+    const recentEl = document.getElementById('adminRecentActivity');
+    const recent = (activities || []).slice(0, 15);
+    if (recentEl) {
+      if (recent.length === 0) {
+        recentEl.innerHTML = '<div style="color:#aaa">Ingen aktivitet ännu.</div>';
+      } else {
+        const actionLabels = { offert_skapad: '📄 Offert', faktura_skapad: '💰 Faktura', kvitto_skannat: '📷 Kvitto', leverantor_skapad: '📦 Leverantörsfaktura' };
+        recentEl.innerHTML = recent.map(a => {
+          const email = (profiles || []).find(p => p.id === a.user_id)?.email || '';
+          const time = new Date(a.created_at).toLocaleString('sv-SE', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+          const label = actionLabels[a.action] || a.action;
+          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0;border-bottom:1px solid #f0ede6">
+            <div><strong>${label}</strong> ${a.detail ? '— ' + a.detail : ''}</div>
+            <div style="font-size:0.72rem;color:#aaa;white-space:nowrap">${time}</div>
+          </div>`;
+        }).join('');
+      }
+    }
+  } catch(e) { console.error('Analytics error:', e); }
 }
 
 // ── ADMIN ANVÄNDARE ──
@@ -5529,7 +5656,7 @@ async function createManualInvoice() {
     invoice_data: JSON.stringify({ items, vatRate, clientAddr, inclRot })
   });
   if (error) { console.error(error); return alert('Kunde inte spara faktura.'); }
-
+  logActivity('faktura_skapad', title || client);
   closeNewInvoiceModal();
   showPage('invoices');
 }
@@ -6770,6 +6897,7 @@ Rimliga svenska priser 2025.` }]
     });
     window._currentShareId = shareId;
     monthlyUsed++;
+    logActivity('offert_skapad', savedTitle);
     const { count: total } = await sb.from('quote_usage').select('*',{count:'exact',head:true}).eq('user_id',currentUser.id);
     updateUI(currentProfile, monthlyUsed, total||0);
 
