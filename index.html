@@ -950,6 +950,10 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   /* Drawer toggle - more prominent */
   #drawerToggle { padding: 0.5rem !important; }
   #drawerToggle svg { width: 24px; height: 24px; }
+
+  /* Hide company name and plan badge on mobile - shown in drawer instead */
+  #navUserName { display: none !important; }
+  #navPlanBadge { display: none !important; }
 }
 
 @media (max-width: 400px) {
@@ -7378,7 +7382,7 @@ function showMobileTabBar(show, plan, used, total) {
     if (quotaEl) quotaEl.textContent = used + ' / ' + total + ' offerter';
     const isKomplettPlan = (plan === 'Komplett' || plan === 'komplett');
     if (drawerUpBtn) drawerUpBtn.style.display = isKomplettPlan ? 'none' : 'block';
-    if (drawerPlanBox) drawerPlanBox.style.display = isKomplettPlan ? 'none' : 'block';
+    if (drawerPlanBox) drawerPlanBox.style.display = 'block';
   }
 }
 
