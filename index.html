@@ -4145,17 +4145,18 @@ async function doRegister() {
   const pass = document.getElementById('regPass').value;
   const company = document.getElementById('regCompany').value.trim();
   if (!email || !pass) return showError('Fyll i e-post och lösenord.');
+  if (pass.length < 6) return showError('Lösenordet måste vara minst 6 tecken.');
   const btn = document.getElementById('regBtn');
   btn.disabled = true; btn.textContent = 'Skapar konto…';
   const { data, error } = await sb.auth.signUp({
     email, password: pass,
     options: { data: { full_name: name, company_name: company } }
   });
-  btn.disabled = false; btn.textContent = 'Skapa konto gratis →';
-  if (error) return showError(error.message);
+  if (error) { btn.disabled = false; btn.textContent = 'Skapa konto gratis →'; return showError(error.message); }
 
-  // Vänta lite och försök uppdatera profilen
+  // Uppdatera profilen
   if (data?.user) {
+    btn.textContent = 'Kontot skapas…';
     await new Promise(r => setTimeout(r, 1500));
     try {
       await sb.from('profiles').upsert({
@@ -4165,10 +4166,17 @@ async function doRegister() {
         plan: 'free',
         email: email
       }, { onConflict: 'id', ignoreDuplicates: false });
-    } catch(e) {
-      // Profilen skapas av trigger — fortsätt ändå
-    }
+    } catch(e) {}
   }
+
+  // Stäng modal och visa bekräftelse
+  btn.disabled = false; btn.textContent = 'Skapa konto gratis →';
+  closeModal();
+  
+  // Visa välkomstmeddelande
+  setTimeout(() => {
+    alert('Välkommen till Offeria!\n\nDitt konto har skapats. Du är nu inloggad.');
+  }, 500);
 }
 
 async function doLogin() {
