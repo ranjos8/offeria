@@ -1268,6 +1268,11 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     </div>
 
     <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Hur fungerar e-signeringen?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">När du delar en offert via länk kan kunden öppna den i mobilen eller datorn och signera digitalt — utan att skapa ett konto. Signaturen sparas med tidsstämpel och IP-adress för juridisk giltighet. Du ser direkt i offertlistan när kunden har signerat. E-signering ingår i Smart och Komplett.</div></div>
+    </div>
+
+    <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">Kan jag redigera en offert efter att den skapats?<span class="faq-icon">+</span></div>
       <div class="faq-a"><div class="faq-a-inner">Ja. Alla rader, priser, antal och texter är redigerbara direkt i offerten. Summorna räknas om automatiskt. Du kan även lägga till nya rader, ta bort befintliga eller plocka in artiklar från ditt artikelregister.</div></div>
     </div>
@@ -1319,6 +1324,21 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     </div>
 
     <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Hur fungerar leverantörsfakturor?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Under Leverantörer registrerar du fakturor från dina leverantörer (Bauhaus, Ahlsell, Dahl m.fl.). Ange belopp, moms och förfallodatum — bokföringen sker automatiskt med rätt konton. Dashboarden visar förfallna leverantörsfakturor. Stödjer både faktura- och kontantmetoden. Ingår i Komplett.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Hur fungerar bankimporten?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Ladda ner en CSV-fil från din bank (SEB, Swedbank, Handelsbanken eller Nordea) och importera den i Offeria. Systemet läser av varje transaktion och föreslår rätt bokföringskonto automatiskt. Du granskar, justerar vid behov och bokför med ett klick. Ingår i Komplett.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Vad är AI Bokföringsassistenten?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">En AI-chatt i bokföringsvyn där du kan ställa frågor om bokföring, moms och avdrag. Fråga t.ex. "Hur bokför jag en privat insättning?", "Kan jag dra av arbetskläder?" eller "Vad är skillnaden på faktura- och kontantmetoden?". Du får svar direkt, på svenska, anpassat för småföretag. Ingår i Komplett.</div></div>
+    </div>
+
+    <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">Är Offeria ett riktigt bokföringsprogram?<span class="faq-icon">+</span></div>
       <div class="faq-a"><div class="faq-a-inner">Offeria är ett bokföringsverktyg som följer bokföringslagen och god redovisningssed. Det hanterar verifikationer, kontoplan, grundbok, huvudbok, resultat- och balansräkning, momsrapport och SIE-export. Vi rekommenderar att du anlitar en auktoriserad redovisningskonsult för bokslut och årsredovisning.</div></div>
     </div>
@@ -1333,12 +1353,27 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">Vad kostar Offeria?<span class="faq-icon">+</span></div>
-      <div class="faq-a"><div class="faq-a-inner">Gratisplanen ger dig 2 AI-offerter per månad utan kostnad. Smart (99 kr/mån) ger 30 offerter, e-signering och fakturering. Komplett (249 kr/mån) inkluderar 100 AI-offerter, leverantörsfakturor, bokföring, kvittoskanning, momsrapport och SIE-export. Ingen bindningstid på någon plan.</div></div>
+      <div class="faq-a"><div class="faq-a-inner">Gratisplanen ger dig 2 AI-offerter per månad utan kostnad. Smart (99 kr/mån) ger 30 AI-offerter, e-signering, fakturering med ROT/RUT, kreditfakturor, påminnelser och kund- & artikelregister. Komplett (249 kr/mån) ger 100 AI-offerter plus leverantörsfakturor, kvittoskanning med AI, komplett bokföring (BAS 2026), AI Bokföringsassistent, bankimport, momsrapport, SRU- och SIE-export. Ingen bindningstid på någon plan.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Hur fungerar gratisperioden?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Alla betalplaner (Smart och Komplett) har 30 dagars gratis provperiod. Du anger betaluppgifter vid registrering men debiteras inte förrän provperioden är slut. Du kan avbryta när som helst under provperioden utan kostnad. Gratisplanen kräver ingen betalinformation alls.</div></div>
     </div>
 
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">Kan jag byta plan?<span class="faq-icon">+</span></div>
       <div class="faq-a"><div class="faq-a-inner">Ja, du kan uppgradera eller nedgradera när som helst. Uppgraderingen aktiveras direkt. Vid nedgradering behåller du tillgång till den betalda periodens slut. All din data finns kvar oavsett plan.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Hur avslutar jag mitt konto?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Gå till Företagsprofil och klicka "Radera konto". Dina personuppgifter raderas inom 30 dagar. Bokföringsdata som krävs enligt bokföringslagen (verifikationer, fakturor, kvitton) behålls i anonymiserad form i 7 år — det är ett lagkrav. Exportera din bokföring som SIE-fil innan du avslutar om du vill ha en kopia.</div></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Hur hanteras mina personuppgifter (GDPR)?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">All data lagras krypterat i EU (Frankfurt). Du kan exportera all din data (SIE, PDF) och radera ditt konto när som helst. Vi delar aldrig information med tredje part för marknadsföring. Läs vår fullständiga integritetspolicy på offeria.se/integritetspolicy.html.</div></div>
     </div>
 
   </div>
@@ -10698,9 +10733,17 @@ async function bankImportCommit() {
 let aiChatHistory = [];
 
 function toggleAIChat() {
+  const panel = document.getElementById('aiChatPanel');
+  
+  // Om panelen redan är öppen — stäng den alltid
+  if (panel.classList.contains('active')) {
+    panel.classList.remove('active');
+    return;
+  }
+  
+  // Öppnar panelen
   const plan = currentProfile?.plan || 'free';
   if (plan !== 'komplett') {
-    const panel = document.getElementById('aiChatPanel');
     panel.classList.add('active');
     document.getElementById('aiChatMessages').innerHTML = `
       <div style="text-align:center;padding:2rem 1rem">
@@ -10713,12 +10756,9 @@ function toggleAIChat() {
     document.getElementById('aiChatInput').placeholder = 'Ingår i Komplett-planen';
     return;
   }
-  const panel = document.getElementById('aiChatPanel');
-  panel.classList.toggle('active');
   
-  if (panel.classList.contains('active')) {
-    document.getElementById('aiChatInput').focus();
-  }
+  panel.classList.add('active');
+  document.getElementById('aiChatInput').focus();
 }
 
 function handleAIChatKeydown(event) {
