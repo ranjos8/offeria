@@ -1333,7 +1333,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">Vad kostar Offeria?<span class="faq-icon">+</span></div>
-      <div class="faq-a"><div class="faq-a-inner">Gratisplanen ger dig 2 AI-offerter per månad utan kostnad. Pro (99 kr/mån) ger 10 offerter, företagsprofil och egen logotyp. Komplett (249 kr/mån) inkluderar obegränsade offerter, fakturering, bokföring, kvittoskanning, momsrapport och SIE-export. Ingen bindningstid på någon plan.</div></div>
+      <div class="faq-a"><div class="faq-a-inner">Gratisplanen ger dig 2 AI-offerter per månad utan kostnad. Smart (99 kr/mån) ger 30 offerter, e-signering och fakturering. Komplett (249 kr/mån) inkluderar 100 AI-offerter, leverantörsfakturor, bokföring, kvittoskanning, momsrapport och SIE-export. Ingen bindningstid på någon plan.</div></div>
     </div>
 
     <div class="faq-item">
@@ -3473,7 +3473,7 @@ const STRIPE_LINKS = {
 // API-nyckeln är nu säkert lagrad i Supabase Edge Function
 
 const PLAN_LIMITS = { free: 2, smart: 30, pro: 30, komplett: 100 };
-const INVOICE_LIMITS = { free: 0, pro: 0, komplett: Infinity };
+const INVOICE_LIMITS = { free: 0, smart: Infinity, pro: Infinity, komplett: Infinity };
 const PLAN_LABELS = { free: 'Gratis', smart: 'Smart', pro: 'Smart', komplett: 'Komplett' };
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
@@ -3821,7 +3821,7 @@ function updateUI(profile, used, total) {
       banner = document.createElement('div');
       banner.id = 'upgradeBanner';
       banner.style.cssText = 'background:linear-gradient(135deg,#0d0d0b,#1a1a18);color:white;padding:1rem 1.5rem;border-radius:12px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;box-sizing:border-box;width:100%;overflow:hidden';
-      banner.innerHTML = '<div><div style="font-family:Fraunces,serif;font-style:italic;font-size:1.1rem;color:#c4982e">Du har använt alla offerter denna månad</div><div style="font-size:0.82rem;color:#aaa;margin-top:0.2rem">Uppgradera till Pro för 99 kr/mån och få 10 offerter/månad</div></div><button onclick="openUpgradeModal()" style="background:#b8902e;color:white;border:none;padding:0.6rem 1.4rem;border-radius:8px;font-weight:700;font-size:0.9rem;cursor:pointer;white-space:nowrap">Uppgradera ✦</button>';
+      banner.innerHTML = '<div><div style="font-family:Fraunces,serif;font-style:italic;font-size:1.1rem;color:#c4982e">Du har använt alla offerter denna månad</div><div style="font-size:0.82rem;color:#aaa;margin-top:0.2rem">Uppgradera till Smart för 99 kr/mån och få 30 offerter/månad</div></div><button onclick="openUpgradeModal()" style="background:#b8902e;color:white;border:none;padding:0.6rem 1.4rem;border-radius:8px;font-weight:700;font-size:0.9rem;cursor:pointer;white-space:nowrap">Uppgradera ✦</button>';
       const genCard = document.querySelector('.gen-card');
       if (genCard) genCard.parentNode.insertBefore(banner, genCard);
     }
@@ -4353,7 +4353,7 @@ function previewEmail() {
   const previewContent = document.getElementById('emailPreviewContent');
   const sampleName = 'Erik Svensson';
   const sampleCompany = 'Svenssons Bygg AB';
-  const samplePlan = targetLabels[target] || 'Pro';
+  const samplePlan = targetLabels[target] || 'Smart';
 
   const rendered = body
     .replace(/{{name}}/g, sampleName)
@@ -4847,7 +4847,7 @@ async function checkInvoiceLimit() {
   const plan = currentProfile?.plan || 'free';
   const limit = INVOICE_LIMITS[plan];
   if (limit === 0) {
-    alert('Fakturering ingår i planen Komplett (249 kr/mån).\n\nUppgradera för att skapa fakturor.');
+    alert('Fakturering ingår i Smart (99 kr/mån) och Komplett (249 kr/mån).\n\nUppgradera för att skapa fakturor.');
     openUpgradeModal();
     return false;
   }
@@ -4903,13 +4903,13 @@ function statusLabel(s) {
 
 async function loadInvoices() {
   const plan = currentProfile?.plan || 'free';
-  if (plan !== 'komplett') {
+  if (plan === 'free') {
     document.getElementById('invSummary').style.display = 'none';
     document.getElementById('invoiceContent').innerHTML = `
       <div style="text-align:center;padding:3rem 1.5rem">
         <div style="margin-bottom:1rem"><span class="ico" style="font-size:2rem;color:var(--gold)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span></div>
-        <div style="font-family:Fraunces,serif;font-size:1.3rem;margin-bottom:0.5rem">Fakturering ingår i Obegränsat</div>
-        <p style="color:#888;font-size:0.9rem;margin-bottom:1.5rem">Skapa, skicka och följ upp fakturor – uppgradera till Obegränsat för 249 kr/mån.</p>
+        <div style="font-family:Fraunces,serif;font-size:1.3rem;margin-bottom:0.5rem">Fakturering ingår i Smart och Komplett</div>
+        <p style="color:#888;font-size:0.9rem;margin-bottom:1.5rem">Skapa, skicka och följ upp fakturor — uppgradera till Smart för 99 kr/mån.</p>
         <button onclick="openUpgradeModal()" class="gen-btn" style="padding:0.7rem 2rem;font-size:0.95rem">Uppgradera →</button>
       </div>`;
     return;
@@ -6812,16 +6812,22 @@ async function loadDashboard() {
 
   try {
     // Fetch all data in parallel
-    const [quotesRes, invoicesRes, suppRes, rowsRes] = await Promise.all([
+    const [quotesRes, invoicesRes, rowsRes] = await Promise.all([
       sb.from('quote_usage').select('total_amount,created_at,title,client_name,signature_status,share_id').eq('user_id', uid).order('created_at', { ascending: false }),
       sb.from('invoices').select('total_amount,status,due_date,created_at,client_name,title,invoice_number,reminder_count').eq('user_id', uid).order('created_at', { ascending: false }),
-      sb.from('supplier_invoices').select('total_amount,status,due_date,supplier_name').eq('user_id', uid),
       sb.from('verification_rows').select('account_number,debit,credit, verifications!inner(verification_date)').eq('user_id', uid)
     ]);
 
+    // Supplier query separat — kan faila om plan saknar tillgång
+    let suppData = [];
+    try {
+      const suppRes = await sb.from('supplier_invoices').select('total_amount,status,due_date,supplier_name').eq('user_id', uid);
+      suppData = suppRes.data || [];
+    } catch(e) {}
+
     const q = quotesRes.data || [];
     const inv = invoicesRes.data || [];
-    const supp = suppRes.data || [];
+    const supp = suppData;
     const allRows = rowsRes.data || [];
 
     // === CORE STATS ===
@@ -7511,6 +7517,18 @@ async function initBookkeeping() {
 
 async function loadBookkeeping() {
   if (!currentUser) return;
+  const bkPlan = currentProfile?.plan || 'free';
+  if (bkPlan !== 'komplett') {
+    const bkContent = document.getElementById('bkGrundbok');
+    if (bkContent) bkContent.innerHTML = `
+      <div style="text-align:center;padding:3rem 1.5rem">
+        <div style="margin-bottom:1rem"><span class="ico" style="font-size:2rem;color:var(--gold)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span></div>
+        <div style="font-family:Fraunces,serif;font-size:1.3rem;margin-bottom:0.5rem">Bokföring ingår i Komplett</div>
+        <p style="color:#888;font-size:0.9rem;margin-bottom:1.5rem">Komplett bokföring med BAS 2026, kvittoskanning, momsrapport, AI-assistent och mer — uppgradera till Komplett för 249 kr/mån.</p>
+        <button onclick="openUpgradeModal()" class="gen-btn" style="padding:0.7rem 2rem;font-size:0.95rem">Uppgradera →</button>
+      </div>`;
+    return;
+  }
   const yr = document.getElementById('bkYear')?.value || new Date().getFullYear();
   const mo = document.getElementById('bkMonth')?.value || 'all';
   let startDate = yr + '-01-01', endDate = yr + '-12-31';
@@ -9080,6 +9098,17 @@ let _supplierData = [];
 
 async function loadSuppliers() {
   if (!currentUser) return;
+  const plan = currentProfile?.plan || 'free';
+  if (plan !== 'komplett') {
+    document.getElementById('supplierContent').innerHTML = `
+      <div style="text-align:center;padding:3rem 1.5rem">
+        <div style="margin-bottom:1rem"><span class="ico" style="font-size:2rem;color:var(--gold)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span></div>
+        <div style="font-family:Fraunces,serif;font-size:1.3rem;margin-bottom:0.5rem">Leverantörsfakturor ingår i Komplett</div>
+        <p style="color:#888;font-size:0.9rem;margin-bottom:1.5rem">Registrera leverantörsfakturor, bokför automatiskt och håll koll på förfallodatum — uppgradera till Komplett för 249 kr/mån.</p>
+        <button onclick="openUpgradeModal()" class="gen-btn" style="padding:0.7rem 2rem;font-size:0.95rem">Uppgradera →</button>
+      </div>`;
+    return;
+  }
   const { data } = await sb.from('supplier_invoices').select('*').eq('user_id', currentUser.id).order('due_date', { ascending: true });
   _supplierData = (data || []).map(s => {
     if (s.status === 'unpaid' && s.due_date && new Date(s.due_date) < new Date()) s.status = 'overdue';
