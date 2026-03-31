@@ -7087,7 +7087,13 @@ async function loadCustomers() {
         <p style="color:#888;font-size:0.9rem;margin-bottom:1.5rem">Spara dina kunder och skapa en prislista — uppgradera till Smart för 99 kr/mån.</p>
         <button onclick="openUpgradeModal()" class="gen-btn" style="padding:0.7rem 2rem;font-size:0.95rem">Uppgradera →</button>
       </div>`;
-    document.getElementById('regPanelArticles').innerHTML = '';
+    document.getElementById('regPanelArticles').innerHTML = `
+      <div style="text-align:center;padding:3rem 1.5rem">
+        <div style="margin-bottom:1rem"><span class="ico" style="font-size:2rem;color:var(--gold)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span></div>
+        <div style="font-family:Fraunces,serif;font-size:1.3rem;margin-bottom:0.5rem">Kund- & artikelregister ingår i Smart</div>
+        <p style="color:#888;font-size:0.9rem;margin-bottom:1.5rem">Spara dina kunder och skapa en prislista — uppgradera till Smart för 99 kr/mån.</p>
+        <button onclick="openUpgradeModal()" class="gen-btn" style="padding:0.7rem 2rem;font-size:0.95rem">Uppgradera →</button>
+      </div>`;
     return;
   }
   try {
@@ -10692,6 +10698,21 @@ async function bankImportCommit() {
 let aiChatHistory = [];
 
 function toggleAIChat() {
+  const plan = currentProfile?.plan || 'free';
+  if (plan !== 'komplett') {
+    const panel = document.getElementById('aiChatPanel');
+    panel.classList.add('active');
+    document.getElementById('aiChatMessages').innerHTML = `
+      <div style="text-align:center;padding:2rem 1rem">
+        <div style="font-size:2rem;margin-bottom:0.5rem">🔒</div>
+        <div style="font-family:'Fraunces',serif;font-size:1.1rem;margin-bottom:0.4rem">AI-assistenten ingår i Komplett</div>
+        <p style="color:#888;font-size:0.85rem;margin-bottom:1rem">Fråga vad som helst om bokföring, moms och avdrag — uppgradera till Komplett för 249 kr/mån.</p>
+        <button onclick="openUpgradeModal()" class="gen-btn" style="padding:0.5rem 1.5rem;font-size:0.85rem">Uppgradera →</button>
+      </div>`;
+    document.getElementById('aiChatInput').disabled = true;
+    document.getElementById('aiChatInput').placeholder = 'Ingår i Komplett-planen';
+    return;
+  }
   const panel = document.getElementById('aiChatPanel');
   panel.classList.toggle('active');
   
@@ -10713,6 +10734,8 @@ function askSuggestion(question) {
 }
 
 async function sendAIMessage() {
+  const plan = currentProfile?.plan || 'free';
+  if (plan !== 'komplett') { toggleAIChat(); return; }
   const input = document.getElementById('aiChatInput');
   const question = input.value.trim();
   if (!question) return;
