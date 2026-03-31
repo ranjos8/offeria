@@ -922,6 +922,25 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   #page-bookkeeping > .tab-bar { display: none !important; }
   #bkTabsMobile { display: block !important; }
 
+  /* Admin tabs - dropdown on mobile */
+  #adminTabsDesktop { display: none !important; }
+  #adminTabsMobile { display: block !important; }
+
+  /* Admin stats grid on mobile */
+  #adminStatsGrid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.6rem !important; }
+  #adminStatsGrid .gen-card { padding: 0.8rem !important; }
+  #adminStatsGrid .gen-card div:first-child { font-size: 1.5rem !important; }
+  #adminActivityStats { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* Admin charts side by side → stacked */
+  #adminPanelDash > div[style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+
+  /* Admin user table — hide columns that overflow */
+  #userList table { font-size: 0.78rem; }
+  #userList table th:nth-child(3), #userList table td:nth-child(3) { display: none; }
+  #userList table th:nth-child(4), #userList table td:nth-child(4) { display: none; }
+  #userList table td:last-child button { font-size: 0.7rem !important; padding: 0.25rem 0.5rem !important; }
+
   /* Help context button - more prominent on mobile */
   .help-context-btn { width: 32px; height: 32px; font-size: 0.9rem; }
 
@@ -2482,8 +2501,8 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <div class="page-title">Admin</div>
         <div class="page-sub">Hantera Offeria — användare, AI, utskick och statistik</div>
 
-        <!-- Flikar -->
-        <div class="tab-bar" style="margin-bottom:1.2rem;flex-wrap:wrap;gap:0.3rem">
+        <!-- Flikar - desktop -->
+        <div id="adminTabsDesktop" class="tab-bar" style="margin-bottom:1.2rem;flex-wrap:wrap;gap:0.3rem">
           <button class="tab-btn active" id="adminTabDash" onclick="switchAdminTab('dash')">📊 Översikt</button>
           <button class="tab-btn" id="adminTabUsers" onclick="switchAdminTab('users')">👥 Användare</button>
           <button class="tab-btn" id="adminTabEmail" onclick="switchAdminTab('email')">📧 Utskick</button>
@@ -2491,6 +2510,18 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <button class="tab-btn" id="adminTabLog" onclick="switchAdminTab('log')">Kundernas frågor</button>
           <button class="tab-btn" id="adminTabBackup" onclick="switchAdminTab('backup')">💾 Backups</button>
           <button class="tab-btn" id="adminTabCosts" onclick="switchAdminTab('costs')">💰 Kostnader</button>
+        </div>
+        <!-- Flikar - mobile dropdown -->
+        <div id="adminTabsMobile" style="display:none;margin-bottom:1.2rem">
+          <select onchange="switchAdminTab(this.value);this.blur()" id="adminTabsMobileSelect" style="width:100%;padding:0.7rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:16px;background:white">
+            <option value="dash">📊 Översikt</option>
+            <option value="users">👥 Användare</option>
+            <option value="email">📧 Utskick</option>
+            <option value="kb">📚 Kunskapsdatabas</option>
+            <option value="log">💬 Kundernas frågor</option>
+            <option value="backup">💾 Backups</option>
+            <option value="costs">💰 Kostnader</option>
+          </select>
         </div>
 
         <!-- FLIK: ÖVERSIKT -->
@@ -4369,12 +4400,15 @@ function switchAdminTab(tab) {
     if (p) p.style.display = t === tab ? 'block' : 'none';
     if (b) b.classList.toggle('active', t === tab);
   });
+  // Sync mobile dropdown
+  const mobileSel = document.getElementById('adminTabsMobileSelect');
+  if (mobileSel) mobileSel.value = tab;
   if (tab === 'dash') loadAdminDash();
   if (tab === 'users') loadAdminUsers();
   if (tab === 'log') loadLog();
   if (tab === 'backup') loadBackupList();
   if (tab === 'costs') loadCosts();
-  if (tab === 'kb') {} // already loaded
+  if (tab === 'kb') {}
 }
 
 // ── ADMIN DASHBOARD ──
@@ -7232,25 +7266,43 @@ async function doForgotPassword() {
 
 async function deleteAccount() {
   if (!currentUser) return;
+  
+  // Steg 1: Påminn om nedladdning
+  const hasData = confirm(
+    '⚠️ Vill du ta bort ditt konto?\n\n' +
+    'Innan du fortsätter — har du laddat ner allt du behöver?\n\n' +
+    '📗 SIE-fil (Bokföring → SIE-export)\n' +
+    '📄 Offerter och fakturor (PDF)\n' +
+    '🧾 Kvitton\n\n' +
+    'Klicka "OK" för att fortsätta, eller "Avbryt" för att gå tillbaka och ladda ner dina filer först.'
+  );
+  if (!hasData) return;
+
+  // Steg 2: Förklara vad som händer
   const confirmed = confirm(
-    'Vill du ta bort ditt konto?\n\n' +
+    'Bekräfta borttagning:\n\n' +
     '• Dina personuppgifter (namn, e-post, företag) raderas enligt GDPR\n' +
     '• Bokföringsdata (verifikationer, fakturor) behålls anonymiserat i 7 år enligt bokföringslagen\n' +
-    '• Du kan exportera din bokföring som SIE-fil innan du tar bort kontot\n\n' +
-    'Detta går inte att ångra.'
+    '• Offerter och kundregister raderas permanent\n' +
+    '• Du förlorar tillgång till all data i Offeria\n\n' +
+    'Detta går INTE att ångra.'
   );
   if (!confirmed) return;
-  const email = prompt('Bekräfta med din e-postadress:');
-  if (email !== currentUser.email) { alert('E-postadressen stämmer inte.'); return; }
+
+  // Steg 3: Bekräfta med e-post
+  const email = prompt('Skriv din e-postadress för att bekräfta:');
+  if (!email || email.toLowerCase().trim() !== currentUser.email.toLowerCase().trim()) { 
+    alert('E-postadressen stämmer inte.'); 
+    return; 
+  }
   
   try {
-    // Anropa GDPR-säker borttagning (anonymiserar profil, behåller bokföring)
     const { error } = await sb.rpc('gdpr_delete_account', { p_user_id: currentUser.id });
     if (error) throw new Error(error.message);
     
     _userInitiatedSignOut = true;
     await sb.auth.signOut();
-    alert('Ditt konto har tagits bort.\n\nDina personuppgifter är raderade. Bokföringsdata behålls anonymiserat i 7 år enligt bokföringslagen.\n\nVälkommen tillbaka om du ändrar dig!');
+    alert('Ditt konto har tagits bort.\n\nDina personuppgifter är raderade. Bokföringsdata behålls anonymiserat i 7 år enligt bokföringslagen.\n\nTack för att du använde Offeria.');
     location.reload();
   } catch(err) {
     alert('Något gick fel: ' + err.message);
@@ -7321,9 +7373,12 @@ function showMobileTabBar(show, plan, used, total) {
     const planEl = document.getElementById('drawerPlanName');
     const quotaEl = document.getElementById('drawerQuotaText');
     const drawerUpBtn = document.getElementById('drawerUpgradeBtn');
+    const drawerPlanBox = document.getElementById('drawerPlanBox');
     if (planEl) planEl.textContent = plan || 'Gratis';
-    if (quotaEl) quotaEl.textContent = used + ' / ' + total + ' denna månad';
-    if (drawerUpBtn) drawerUpBtn.style.display = (plan === 'Komplett' || plan === 'komplett') ? 'none' : 'block';
+    if (quotaEl) quotaEl.textContent = used + ' / ' + total + ' offerter';
+    const isKomplettPlan = (plan === 'Komplett' || plan === 'komplett');
+    if (drawerUpBtn) drawerUpBtn.style.display = isKomplettPlan ? 'none' : 'block';
+    if (drawerPlanBox) drawerPlanBox.style.display = isKomplettPlan ? 'none' : 'block';
   }
 }
 
@@ -11930,11 +11985,11 @@ init();
   </div>
   
   <!-- Plan info -->
-  <div style="padding:1rem 1.5rem;background:#111;margin:1rem;border-radius:10px">
+  <div id="drawerPlanBox" style="padding:1rem 1.5rem;background:#111;margin:1rem;border-radius:10px">
     <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#666;margin-bottom:0.4rem">Din plan</div>
-    <div style="display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:baseline;gap:0.5rem;flex-wrap:wrap">
       <span id="drawerPlanName" style="font-family:Fraunces,serif;color:var(--gold-light);font-size:1.1rem">Gratis</span>
-      <span id="drawerQuotaText" style="font-size:0.78rem;color:#888"></span>
+      <span id="drawerQuotaText" style="font-size:0.72rem;color:#666"></span>
     </div>
     <button id="drawerUpgradeBtn" onclick="closeDrawer();openUpgradeModal()" style="margin-top:0.7rem;width:100%;padding:0.5rem;background:var(--gold);border:none;color:white;border-radius:6px;font-size:0.8rem;font-family:DM Sans,sans-serif;font-weight:600;cursor:pointer">↑ Uppgradera</button>
   </div>
