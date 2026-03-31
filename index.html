@@ -7378,9 +7378,9 @@ function showMobileTabBar(show, plan, used, total) {
     const quotaEl = document.getElementById('drawerQuotaText');
     const drawerUpBtn = document.getElementById('drawerUpgradeBtn');
     const drawerPlanBox = document.getElementById('drawerPlanBox');
-    if (planEl) planEl.textContent = plan || 'Gratis';
-    if (quotaEl) quotaEl.textContent = used + ' / ' + total + ' offerter';
     const isKomplettPlan = (plan === 'Komplett' || plan === 'komplett');
+    if (planEl) planEl.textContent = plan || 'Gratis';
+    if (quotaEl) quotaEl.textContent = isKomplettPlan ? '' : used + ' / ' + total + ' offerter';
     if (drawerUpBtn) drawerUpBtn.style.display = isKomplettPlan ? 'none' : 'block';
     if (drawerPlanBox) drawerPlanBox.style.display = 'block';
   }
