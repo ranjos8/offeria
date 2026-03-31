@@ -4276,7 +4276,7 @@ async function loadAdminUsers() {
   if (countEl) countEl.textContent = 'Laddar...';
 
   const { data } = await sb.from('profiles')
-    .select('id, email, full_name, company_name, plan, trial_ends_at, created_at, stripe_customer_id')
+    .select('id, email, full_name, company_name, plan, trial_ends_at, created_at, stripe_customer_id, admin_notes, last_sign_in_at')
     .order('created_at', { ascending: false });
 
   _adminUsers = data || [];
@@ -4296,6 +4296,9 @@ function filterUsers() {
   renderUserList();
 }
 
+const _adminPlanColor = { free:'#888', smart:'#1565c0', komplett:'#2e7d32', pro:'#1565c0' };
+const _adminPlanLabel = { free:'Gratis', smart:'Smart', komplett:'Komplett', pro:'Smart' };
+
 function renderUserList() {
   const el = document.getElementById('userList');
   const countEl = document.getElementById('userCount');
@@ -4303,8 +4306,8 @@ function renderUserList() {
 
   countEl.textContent = `${_adminUsersFiltered.length} av ${_adminUsers.length} användare`;
 
-  const planColor = { free:'#888', smart:'#1565c0', komplett:'#2e7d32', pro:'#1565c0' };
-  const planLabel = { free:'Gratis', smart:'Smart', komplett:'Komplett', pro:'Smart' };
+  const planColor = _adminPlanColor;
+  const planLabel = _adminPlanLabel;
   const now = new Date();
 
   // Bygg tabellen med createElement för att undvika HTML-injection och quote-konflikter
@@ -4328,30 +4331,37 @@ function renderUserList() {
     const inTrial = trialEnd && trialEnd > now;
     const daysLeft = inTrial ? Math.ceil((trialEnd - now) / 86400000) : 0;
     const regDate = u.created_at ? new Date(u.created_at).toLocaleDateString('sv-SE') : '—';
+    const lastLogin = u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString('sv-SE') : '—';
+    const isVip = u.admin_notes?.includes('[VIP]');
+    const isBeta = u.admin_notes?.includes('[BETA]');
+    const noteClean = (u.admin_notes || '').replace(/\[(VIP|BETA)\]\s*/g, '').trim();
 
     const tr = document.createElement('tr');
     tr.style.borderBottom = '1px solid var(--border)';
+    tr.style.cursor = 'pointer';
     tr.innerHTML = `
       <td style="padding:0.7rem 1rem">
-        <div style="font-weight:600">${u.company_name || u.full_name || '—'}</div>
+        <div style="font-weight:600">
+          ${isVip ? '<span style="font-size:0.7rem;background:#b8902e;color:white;padding:0.1rem 0.35rem;border-radius:3px;margin-right:0.3rem">VIP</span>' : ''}
+          ${isBeta ? '<span style="font-size:0.7rem;background:#1565c0;color:white;padding:0.1rem 0.35rem;border-radius:3px;margin-right:0.3rem">BETA</span>' : ''}
+          ${u.company_name || u.full_name || '—'}
+        </div>
         <div style="font-size:0.75rem;color:#888">${u.email || ''}</div>
+        ${noteClean ? '<div style="font-size:0.7rem;color:#b8902e;margin-top:0.2rem">📝 '+noteClean+'</div>' : ''}
       </td>
       <td style="padding:0.7rem 1rem">
         <span style="font-size:0.72rem;font-weight:700;color:white;background:${planColor[plan]||'#888'};padding:0.15rem 0.5rem;border-radius:4px">${planLabel[plan]||plan}</span>
       </td>
-      <td style="padding:0.7rem 1rem;color:#888">${regDate}</td>
+      <td style="padding:0.7rem 1rem;color:#888;font-size:0.8rem">
+        <div>Reg: ${regDate}</div>
+        <div>Senast: ${lastLogin}</div>
+      </td>
       <td style="padding:0.7rem 1rem">
         ${inTrial ? '<span style="font-size:0.75rem;color:#b8902e">'+daysLeft+' dagar kvar</span>' : '<span style="color:#ccc;font-size:0.75rem">—</span>'}
       </td>
-      <td style="padding:0.7rem 1rem;text-align:right"></td>`;
-
-    // Skapa select separat för att undvika quote-problem
-    const td = tr.querySelector('td:last-child');
-    const sel = document.createElement('select');
-    sel.style.cssText = 'padding:0.25rem 0.5rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.75rem;cursor:pointer';
-    sel.innerHTML = '<option value="">Ändra plan...</option><option value="free">→ Gratis</option><option value="smart">→ Smart</option><option value="komplett">→ Komplett</option>';
-    sel.addEventListener('change', function() { changeUserPlan(u.id, this.value, this); });
-    td.appendChild(sel);
+      <td style="padding:0.7rem 1rem;text-align:right">
+        <button onclick="openUserActions('${u.id}')" style="background:var(--ink);color:var(--gold-light);border:none;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.75rem;cursor:pointer;font-family:inherit">Hantera ▾</button>
+      </td>`;
     tbody.appendChild(tr);
   });
   table.appendChild(tbody);
@@ -4360,19 +4370,187 @@ function renderUserList() {
   el.appendChild(wrapper);
 }
 
-async function changeUserPlan(userId, newPlan, selectEl) {
-  if (!newPlan) return;
-  const user = _adminUsers.find(u => u.id === userId);
-  if (!confirm(`Ändra ${user?.email} till plan "${newPlan}"?\n\nDetta är gratis — ingen Stripe-faktura skapas.`)) {
-    selectEl.value = '';
-    return;
-  }
-  const { error } = await sb.from('profiles').update({ plan: newPlan }).eq('id', userId);
-  if (error) { alert('Fel: ' + error.message); selectEl.value = ''; return; }
-  // Uppdatera lokalt
+function openUserActions(userId) {
   const u = _adminUsers.find(x => x.id === userId);
+  if (!u) return;
+  const plan = u.plan || 'free';
+  const noteRaw = u.admin_notes || '';
+  const isVip = noteRaw.includes('[VIP]');
+  const isBeta = noteRaw.includes('[BETA]');
+  const noteClean = noteRaw.replace(/\[(VIP|BETA)\]\s*/g, '').trim();
+
+  const modal = document.createElement('div');
+  modal.id = 'userActionModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5)';
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+  modal.innerHTML = `
+    <div style="background:var(--paper);border-radius:16px;max-width:480px;width:90%;max-height:80vh;overflow-y:auto;padding:1.5rem;box-shadow:0 20px 40px rgba(0,0,0,0.15)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <div>
+          <div style="font-family:Fraunces,serif;font-size:1.1rem">${u.company_name || u.full_name || 'Användare'}</div>
+          <div style="font-size:0.8rem;color:#888">${u.email}</div>
+        </div>
+        <button onclick="document.getElementById('userActionModal').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#888">×</button>
+      </div>
+
+      <!-- Aktivitet -->
+      <div style="background:var(--cream);border-radius:10px;padding:0.8rem;margin-bottom:1rem;font-size:0.8rem;display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">
+        <div>📊 Plan: <strong>${_adminPlanLabel[plan]||plan}</strong></div>
+        <div>📅 Registrerad: ${u.created_at ? new Date(u.created_at).toLocaleDateString('sv-SE') : '—'}</div>
+        <div>🔑 Senaste inloggning: ${u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString('sv-SE') : '—'}</div>
+        <div>📄 Offerter: <span id="uaQuotes_${userId}">laddar...</span></div>
+        <div>💰 Fakturor: <span id="uaInvoices_${userId}">laddar...</span></div>
+        <div>📗 Verifikationer: <span id="uaVerifications_${userId}">laddar...</span></div>
+      </div>
+
+      <!-- Byt plan -->
+      <div style="margin-bottom:1rem">
+        <div style="font-weight:600;font-size:0.85rem;margin-bottom:0.4rem">Byt plan</div>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap">
+          <button onclick="adminSetPlan('${userId}','free')" class="gen-btn" style="padding:0.4rem 0.8rem;font-size:0.78rem;${plan==='free'?'opacity:0.4;pointer-events:none':''}">Gratis</button>
+          <button onclick="adminSetPlan('${userId}','smart')" class="gen-btn" style="padding:0.4rem 0.8rem;font-size:0.78rem;${plan==='smart'?'opacity:0.4;pointer-events:none':''}">Smart</button>
+          <button onclick="adminSetPlan('${userId}','komplett')" class="gen-btn" style="padding:0.4rem 0.8rem;font-size:0.78rem;${plan==='komplett'?'opacity:0.4;pointer-events:none':''}">Komplett</button>
+        </div>
+      </div>
+
+      <!-- Ge provperiod -->
+      <div style="margin-bottom:1rem">
+        <div style="font-weight:600;font-size:0.85rem;margin-bottom:0.4rem">Ge gratis provperiod</div>
+        <div style="display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap">
+          <select id="uaTrialPlan_${userId}" style="padding:0.35rem 0.6rem;border-radius:6px;border:1px solid var(--border);font-size:0.8rem;font-family:inherit">
+            <option value="smart">Smart</option>
+            <option value="komplett">Komplett</option>
+          </select>
+          <select id="uaTrialDays_${userId}" style="padding:0.35rem 0.6rem;border-radius:6px;border:1px solid var(--border);font-size:0.8rem;font-family:inherit">
+            <option value="30">30 dagar</option>
+            <option value="60">60 dagar</option>
+            <option value="90">90 dagar</option>
+            <option value="180">6 månader</option>
+            <option value="365">1 år</option>
+          </select>
+          <button onclick="adminGiveTrial('${userId}')" class="gen-btn" style="padding:0.4rem 0.8rem;font-size:0.78rem">Aktivera →</button>
+        </div>
+      </div>
+
+      <!-- Flaggor -->
+      <div style="margin-bottom:1rem">
+        <div style="font-weight:600;font-size:0.85rem;margin-bottom:0.4rem">Flaggor</div>
+        <div style="display:flex;gap:0.4rem">
+          <button onclick="adminToggleFlag('${userId}','VIP')" class="gen-btn" style="padding:0.4rem 0.8rem;font-size:0.78rem;${isVip?'background:#b8902e;color:white':''}">⭐ VIP ${isVip?'✓':''}</button>
+          <button onclick="adminToggleFlag('${userId}','BETA')" class="gen-btn" style="padding:0.4rem 0.8rem;font-size:0.78rem;${isBeta?'background:#1565c0;color:white':''}">🧪 Beta ${isBeta?'✓':''}</button>
+        </div>
+      </div>
+
+      <!-- Anteckning -->
+      <div style="margin-bottom:1rem">
+        <div style="font-weight:600;font-size:0.85rem;margin-bottom:0.4rem">Intern anteckning</div>
+        <textarea id="uaNote_${userId}" style="width:100%;min-height:60px;padding:0.5rem;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.82rem;resize:vertical">${noteClean}</textarea>
+        <button onclick="adminSaveNote('${userId}')" class="gen-btn" style="padding:0.4rem 0.8rem;font-size:0.78rem;margin-top:0.3rem">Spara anteckning</button>
+      </div>
+
+      <!-- Skicka mail -->
+      <div style="margin-bottom:0.5rem">
+        <div style="font-weight:600;font-size:0.85rem;margin-bottom:0.4rem">Skicka personligt meddelande</div>
+        <input id="uaMailSubject_${userId}" placeholder="Ämne" style="width:100%;padding:0.4rem 0.6rem;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.82rem;margin-bottom:0.3rem">
+        <textarea id="uaMailBody_${userId}" placeholder="Meddelande till ${u.full_name || u.email}..." style="width:100%;min-height:80px;padding:0.5rem;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.82rem;resize:vertical"></textarea>
+        <button onclick="adminSendMail('${userId}')" class="gen-btn" style="padding:0.4rem 0.8rem;font-size:0.78rem;margin-top:0.3rem">📧 Skicka mail</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+
+  // Ladda aktivitetsdata
+  loadUserActivity(userId);
+}
+
+async function loadUserActivity(userId) {
+  try {
+    const [q, inv, ver] = await Promise.all([
+      sb.from('quote_usage').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+      sb.from('invoices').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+      sb.from('verifications').select('id', { count: 'exact', head: true }).eq('user_id', userId)
+    ]);
+    const qEl = document.getElementById('uaQuotes_' + userId);
+    const iEl = document.getElementById('uaInvoices_' + userId);
+    const vEl = document.getElementById('uaVerifications_' + userId);
+    if (qEl) qEl.textContent = q.count ?? '—';
+    if (iEl) iEl.textContent = inv.count ?? '—';
+    if (vEl) vEl.textContent = ver.count ?? '—';
+  } catch(e) {}
+}
+
+async function adminSetPlan(userId, newPlan) {
+  const u = _adminUsers.find(x => x.id === userId);
+  if (!confirm(`Byt ${u?.email} till ${newPlan}?`)) return;
+  const { error } = await sb.from('profiles').update({ plan: newPlan }).eq('id', userId);
+  if (error) { alert('Fel: ' + error.message); return; }
   if (u) u.plan = newPlan;
+  document.getElementById('userActionModal')?.remove();
   filterUsers();
+}
+
+async function adminGiveTrial(userId) {
+  const plan = document.getElementById('uaTrialPlan_' + userId).value;
+  const days = parseInt(document.getElementById('uaTrialDays_' + userId).value);
+  const u = _adminUsers.find(x => x.id === userId);
+  if (!confirm(`Ge ${u?.email} ${days} dagars gratis ${plan}?`)) return;
+  const trialEnd = new Date(Date.now() + days * 86400000).toISOString();
+  const { error } = await sb.from('profiles').update({ plan: plan, trial_ends_at: trialEnd }).eq('id', userId);
+  if (error) { alert('Fel: ' + error.message); return; }
+  if (u) { u.plan = plan; u.trial_ends_at = trialEnd; }
+  document.getElementById('userActionModal')?.remove();
+  filterUsers();
+  alert(`✓ ${u?.email} har nu ${days} dagars gratis ${plan}`);
+}
+
+async function adminToggleFlag(userId, flag) {
+  const u = _adminUsers.find(x => x.id === userId);
+  let notes = u?.admin_notes || '';
+  const tag = `[${flag}]`;
+  if (notes.includes(tag)) {
+    notes = notes.replace(tag, '').trim();
+  } else {
+    notes = tag + ' ' + notes;
+  }
+  const { error } = await sb.from('profiles').update({ admin_notes: notes }).eq('id', userId);
+  if (error) { alert('Fel: ' + error.message); return; }
+  if (u) u.admin_notes = notes;
+  document.getElementById('userActionModal')?.remove();
+  openUserActions(userId);
+  filterUsers();
+}
+
+async function adminSaveNote(userId) {
+  const noteEl = document.getElementById('uaNote_' + userId);
+  const newNote = noteEl.value.trim();
+  const u = _adminUsers.find(x => x.id === userId);
+  // Bevara flaggor
+  let flags = '';
+  if (u?.admin_notes?.includes('[VIP]')) flags += '[VIP] ';
+  if (u?.admin_notes?.includes('[BETA]')) flags += '[BETA] ';
+  const fullNote = (flags + newNote).trim();
+  const { error } = await sb.from('profiles').update({ admin_notes: fullNote }).eq('id', userId);
+  if (error) { alert('Fel: ' + error.message); return; }
+  if (u) u.admin_notes = fullNote;
+  alert('✓ Anteckning sparad');
+}
+
+async function adminSendMail(userId) {
+  const u = _adminUsers.find(x => x.id === userId);
+  const subject = document.getElementById('uaMailSubject_' + userId).value.trim();
+  const body = document.getElementById('uaMailBody_' + userId).value.trim();
+  if (!subject || !body) { alert('Fyll i ämne och meddelande'); return; }
+  if (!confirm(`Skicka mail till ${u?.email}?\n\nÄmne: ${subject}`)) return;
+  try {
+    emailjs.send('service_f5de23t', 'template_fbh7cng', {
+      to_email: u.email,
+      from_name: 'Offeria',
+      subject: subject,
+      message: body
+    }, 'iUGAEbeer-pOBR8tV');
+    alert('✓ Mail skickat till ' + u.email);
+    document.getElementById('uaMailSubject_' + userId).value = '';
+    document.getElementById('uaMailBody_' + userId).value = '';
+  } catch(e) { alert('Fel vid mailsändning: ' + e.message); }
 }
 
 function exportUsersCSV() {
