@@ -1468,7 +1468,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <div class="app-page" id="page-generate">
         <div class="page-title" style="position:relative">Offerter <button class="help-context-btn" onclick="openContextHelp('generate')" title="Hjälp om offerter">?</button></div>
         <div class="tab-bar" style="display:flex;gap:0;margin-bottom:1.5rem;border-bottom:2px solid var(--border)">
-          <button class="tab-btn active" id="tabNewQuote" onclick="switchQuoteTab('new')">✦ AI-offert</button>
+          <button class="tab-btn active" id="tabNewQuote" onclick="switchQuoteTab('new')">AI-offert</button>
           <button class="tab-btn" id="tabManualQuote" onclick="switchQuoteTab('manual')">Manuell offert</button>
           <button class="tab-btn" id="tabHistory" onclick="switchQuoteTab('history')">Historik</button>
         </div>
@@ -1935,27 +1935,27 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
         <!-- Help navigation - dropdown on mobile, tabs on desktop -->
         <div id="helpTabsDesktop" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.5rem">
-          <button class="tab-btn active" onclick="showHelpSection('start',this)">🚀 Kom igång</button>
-          <button class="tab-btn" onclick="showHelpSection('quotes',this)">📝 Offerter</button>
-          <button class="tab-btn" onclick="showHelpSection('invoices',this)">📄 Fakturor</button>
-          <button class="tab-btn" onclick="showHelpSection('suppliers',this)">📦 Leverantörsfakturor</button>
-          <button class="tab-btn" onclick="showHelpSection('bookkeeping',this)">📊 Bokföring</button>
-          <button class="tab-btn" onclick="showHelpSection('receipts',this)">🧾 Kvittoskanning</button>
-          <button class="tab-btn" onclick="showHelpSection('vat',this)">🏛 Moms & SRU</button>
-          <button class="tab-btn" onclick="showHelpSection('customers',this)">👥 Kunder & artiklar</button>
-          <button class="tab-btn" onclick="showHelpSection('company',this)">🏢 Företagsprofil</button>
+          <button class="tab-btn active" onclick="showHelpSection('start',this)">Kom igång</button>
+          <button class="tab-btn" onclick="showHelpSection('quotes',this)">Offerter</button>
+          <button class="tab-btn" onclick="showHelpSection('invoices',this)">Fakturor</button>
+          <button class="tab-btn" onclick="showHelpSection('suppliers',this)">Leverantörsfakturor</button>
+          <button class="tab-btn" onclick="showHelpSection('bookkeeping',this)">Bokföring</button>
+          <button class="tab-btn" onclick="showHelpSection('receipts',this)">Kvittoskanning</button>
+          <button class="tab-btn" onclick="showHelpSection('vat',this)">Moms & SRU</button>
+          <button class="tab-btn" onclick="showHelpSection('customers',this)">Kunder & artiklar</button>
+          <button class="tab-btn" onclick="showHelpSection('company',this)">Företagsprofil</button>
         </div>
         <div id="helpTabsMobile" style="display:none;margin-bottom:1.5rem">
           <select onchange="showHelpSection(this.value);this.blur()" style="width:100%;padding:0.7rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:16px;background:white;appearance:auto">
-            <option value="start">🚀 Kom igång</option>
-            <option value="quotes">📝 Offerter</option>
-            <option value="invoices">📄 Fakturor</option>
-            <option value="suppliers">📦 Leverantörsfakturor</option>
-            <option value="bookkeeping">📊 Bokföring</option>
-            <option value="receipts">🧾 Kvittoskanning</option>
-            <option value="vat">🏛 Moms & SRU</option>
-            <option value="customers">👥 Kunder & artiklar</option>
-            <option value="company">🏢 Företagsprofil</option>
+            <option value="start">Kom igång</option>
+            <option value="quotes">Offerter</option>
+            <option value="invoices">Fakturor</option>
+            <option value="suppliers">Leverantörsfakturor</option>
+            <option value="bookkeeping">Bokföring</option>
+            <option value="receipts">Kvittoskanning</option>
+            <option value="vat">Moms & SRU</option>
+            <option value="customers">Kunder & artiklar</option>
+            <option value="company">Företagsprofil</option>
           </select>
         </div>
 
@@ -2006,7 +2006,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             </div>
 
             <div class="help-block" style="margin-top:1.5rem;padding:1rem;background:var(--paper);border-radius:8px">
-              <h4>💡 AI-assistenten</h4>
+              <h4>AI-assistenten</h4>
               <p>I bokföringsvyn hittar du en <strong>AI-chatt</strong> (pratbubbla-ikonen). Där kan du fråga vad som helst om bokföring, moms, avdrag och företagande. Till exempel:<br>
               • "Hur bokför jag en privat insättning?"<br>
               • "Vilka kostnader kan jag dra av?"<br>
@@ -2026,11 +2026,11 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <div class="help-block">
               <h4>Skapa AI-offert</h4>
               <ol class="help-list">
-                <li>Gå till <strong>Offerter → ✦ AI-offert</strong></li>
+                <li>Gå till <strong>Offerter → AI-offert</strong></li>
                 <li>Kontrollera <strong>AI-inställningar</strong> — bransch, momssats och betalningsvillkor (sparas från din profil)</li>
                 <li>Välj vad som ska inkluderas: <strong>ROT-avdrag</strong> (30% avdrag på arbetskostnad), <strong>Garanti</strong>, <strong>Material</strong> (detaljerad materiallista), <strong>Tidplan</strong></li>
                 <li>Beskriv jobbet med egna ord i textrutan. Tips: skriv kvm, antal, material och plats. Exempel: "Bygga trädäck 20 kvm med räcke, tryckimpregnerat virke, på baksidan av villa"</li>
-                <li>Klicka <strong>★ Generera offert</strong> — eller tryck <strong>🎤 Prata in</strong> för att diktera med rösten</li>
+                <li>Klicka <strong>★ Generera offert</strong> — eller tryck <strong>Prata in</strong> för att diktera med rösten</li>
                 <li>AI:n skapar offerten med rader, material, arbete, priser och moms</li>
               </ol>
               <div style="padding:0.8rem;background:#f0ede6;border-radius:6px;margin-top:0.8rem">
@@ -2270,7 +2270,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
             <div class="help-block">
               <h4>Lås period</h4>
-              <p>När en månad är bokförd och kontrollerad, klicka <strong>🔒 Lås period</strong>. Låsta verifikationer kan inte ändras — rättelse sker via ny rättelseverifikation. Detta följer bokföringslagen.</p>
+              <p>När en månad är bokförd och kontrollerad, klicka <strong>Lås period</strong>. Låsta verifikationer kan inte ändras — rättelse sker via ny rättelseverifikation. Detta följer bokföringslagen.</p>
             </div>
 
             <div class="help-block">
@@ -2279,7 +2279,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             </div>
 
             <div class="help-block" style="padding:1rem;background:var(--paper);border-radius:8px">
-              <h4>💡 AI Bokföringsassistent</h4>
+              <h4>AI Bokföringsassistent</h4>
               <p>I bokföringsvyn finns en <strong>AI-chatt</strong> (pratbubbla-ikonen nere till höger). Ställ frågor som:</p>
               <ul class="help-list">
                 <li>"Hur bokför jag representation?"</li>
@@ -2314,7 +2314,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
               <h4>Fota och bokför kvitto</h4>
               <ol class="help-list">
                 <li>Gå till <strong>Bokföring</strong></li>
-                <li>Klicka <strong>📷 Skanna kvitto</strong></li>
+                <li>Klicka <strong>Skanna kvitto</strong></li>
                 <li>Fota kvittot med mobilen eller välj en sparad bild</li>
                 <li>AI:n (OCR) läser av: <strong>butik/leverantör</strong>, <strong>datum</strong>, <strong>totalbelopp</strong> och <strong>momssats</strong></li>
                 <li>Offeria föreslår rätt kontokategori baserat på butiken (t.ex. Bauhaus → Material, Circle K → Drivmedel)</li>
@@ -2503,24 +2503,24 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
         <!-- Flikar - desktop -->
         <div id="adminTabsDesktop" class="tab-bar" style="margin-bottom:1.2rem;flex-wrap:wrap;gap:0.3rem">
-          <button class="tab-btn active" id="adminTabDash" onclick="switchAdminTab('dash')">📊 Översikt</button>
-          <button class="tab-btn" id="adminTabUsers" onclick="switchAdminTab('users')">👥 Användare</button>
-          <button class="tab-btn" id="adminTabEmail" onclick="switchAdminTab('email')">📧 Utskick</button>
+          <button class="tab-btn active" id="adminTabDash" onclick="switchAdminTab('dash')">Översikt</button>
+          <button class="tab-btn" id="adminTabUsers" onclick="switchAdminTab('users')">Användare</button>
+          <button class="tab-btn" id="adminTabEmail" onclick="switchAdminTab('email')">Utskick</button>
           <button class="tab-btn" id="adminTabKB" onclick="switchAdminTab('kb')">Kunskapsdatabas</button>
           <button class="tab-btn" id="adminTabLog" onclick="switchAdminTab('log')">Kundernas frågor</button>
-          <button class="tab-btn" id="adminTabBackup" onclick="switchAdminTab('backup')">💾 Backups</button>
-          <button class="tab-btn" id="adminTabCosts" onclick="switchAdminTab('costs')">💰 Kostnader</button>
+          <button class="tab-btn" id="adminTabBackup" onclick="switchAdminTab('backup')">Backups</button>
+          <button class="tab-btn" id="adminTabCosts" onclick="switchAdminTab('costs')">Kostnader</button>
         </div>
         <!-- Flikar - mobile dropdown -->
         <div id="adminTabsMobile" style="display:none;margin-bottom:1.2rem">
           <select onchange="switchAdminTab(this.value);this.blur()" id="adminTabsMobileSelect" style="width:100%;padding:0.7rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:16px;background:white">
-            <option value="dash">📊 Översikt</option>
-            <option value="users">👥 Användare</option>
-            <option value="email">📧 Utskick</option>
-            <option value="kb">📚 Kunskapsdatabas</option>
-            <option value="log">💬 Kundernas frågor</option>
-            <option value="backup">💾 Backups</option>
-            <option value="costs">💰 Kostnader</option>
+            <option value="dash">Översikt</option>
+            <option value="users">Användare</option>
+            <option value="email">Utskick</option>
+            <option value="kb">Kunskapsdatabas</option>
+            <option value="log">Kundernas frågor</option>
+            <option value="backup">Backups</option>
+            <option value="costs">Kostnader</option>
           </select>
         </div>
 
@@ -2702,7 +2702,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
               </div>
               <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
                 <button onclick="runManualBackup()" id="backupRunBtn" class="gen-btn" style="padding:0.5rem 1rem;font-size:0.85rem">▶ Kör backup nu</button>
-                <button onclick="cleanupOldBackups()" class="btn-sm btn-outline" style="padding:0.5rem 0.8rem;font-size:0.78rem">🧹 Rensa gamla</button>
+                <button onclick="cleanupOldBackups()" class="btn-sm btn-outline" style="padding:0.5rem 0.8rem;font-size:0.78rem">Rensa gamla</button>
               </div>
             </div>
           </div>
@@ -2780,7 +2780,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
           <!-- AI Kostnader (automatisk) -->
           <div class="gen-card" style="max-width:900px;margin-bottom:1rem">
-            <div style="font-weight:600;font-size:0.9rem;margin-bottom:0.8rem">🤖 AI-kostnader (Anthropic / Claude API)</div>
+            <div style="font-weight:600;font-size:0.9rem;margin-bottom:0.8rem">AI-kostnader (Anthropic / Claude API)</div>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.8rem;margin-bottom:0.8rem">
               <div style="text-align:center;padding:0.7rem;background:var(--paper);border-radius:8px">
                 <div style="font-size:1.5rem;font-weight:700;color:var(--gold)" id="costAiCalls">—</div>
@@ -2801,49 +2801,49 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <!-- Fasta kostnader (manuell input) -->
           <div class="gen-card" style="max-width:900px;margin-bottom:1rem">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem">
-              <div style="font-weight:600;font-size:0.9rem">📋 Fasta månadskostnader</div>
-              <button onclick="saveCostSettings()" class="btn-sm btn-outline" style="padding:0.3rem 0.7rem;font-size:0.75rem">💾 Spara</button>
+              <div style="font-weight:600;font-size:0.9rem">Fasta månadskostnader</div>
+              <button onclick="saveCostSettings()" class="btn-sm btn-outline" style="padding:0.3rem 0.7rem;font-size:0.75rem">Spara</button>
             </div>
             <div style="font-size:0.78rem;color:#888;margin-bottom:1rem">Fyll i dina faktiska kostnader. Sparas i din profil.</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem 1rem;font-size:0.85rem" id="costInputs">
               <div>
-                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">🌐 Domän (one.com)</label>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">Domän (one.com)</label>
                 <input type="number" id="costDomain" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem"> 
               </div>
               <div>
-                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">☁️ Supabase</label>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">Supabase</label>
                 <input type="number" id="costSupabase" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
               </div>
               <div>
-                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">⚡ Cloudflare</label>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">Cloudflare</label>
                 <input type="number" id="costCloudflare" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
               </div>
               <div>
-                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">💳 Stripe (avgifter)</label>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">Stripe (avgifter)</label>
                 <input type="number" id="costStripe" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
               </div>
               <div>
-                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">📧 EmailJS</label>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">EmailJS</label>
                 <input type="number" id="costEmail" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
               </div>
               <div>
-                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">🤖 AI (Anthropic)</label>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">AI (Anthropic)</label>
                 <input type="number" id="costAi" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
               </div>
               <div>
-                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">🏦 Bank & konto</label>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">Bank & konto</label>
                 <input type="number" id="costBank" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
               </div>
               <div>
-                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">📊 Redovisningskonsult</label>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">Redovisningskonsult</label>
                 <input type="number" id="costAccountant" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
               </div>
               <div>
-                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">📋 Revisor</label>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">Revisor</label>
                 <input type="number" id="costAuditor" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
               </div>
               <div>
-                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">📦 Övrigt</label>
+                <label style="font-size:0.72rem;color:#888;display:block;margin-bottom:0.2rem">Övrigt</label>
                 <input type="number" id="costOther" placeholder="0" style="width:100%;padding:0.5rem;border:1.5px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.85rem">
               </div>
             </div>
@@ -2851,7 +2851,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
           <!-- Sammanfattning -->
           <div class="gen-card" style="max-width:900px">
-            <div style="font-weight:600;font-size:0.9rem;margin-bottom:0.8rem">📊 Sammanfattning</div>
+            <div style="font-weight:600;font-size:0.9rem;margin-bottom:0.8rem">Sammanfattning</div>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.8rem">
               <div style="text-align:center;padding:0.8rem;background:var(--paper);border-radius:8px">
                 <div style="font-size:1.6rem;font-weight:700;color:#c62828" id="costTotalMonthly">0 kr</div>
@@ -2986,7 +2986,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <!-- Row 5: Personal notes -->
         <div class="dash-card-wide" style="margin-top:1rem">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <div class="card-label">📝 Mina anteckningar</div>
+            <div class="card-label">Mina anteckningar</div>
             <button id="dashNoteSaveBtn" onclick="saveDashNotes()" style="background:var(--ink);color:var(--gold-light);border:none;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.72rem;cursor:pointer;font-family:inherit;display:none">Spara</button>
           </div>
           <textarea id="dashNotes" placeholder="Skriv egna anteckningar här... (sparas automatiskt)" oninput="document.getElementById('dashNoteSaveBtn').style.display='inline-block'" style="width:100%;min-height:80px;padding:0.6rem;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.85rem;resize:vertical;margin-top:0.5rem;background:white;line-height:1.6"></textarea>
@@ -2999,8 +2999,8 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <div class="page-sub">Hantera dina kunder och din prislista</div>
 
         <div class="tab-bar" style="display:flex;gap:0;margin-bottom:1.5rem;border-bottom:2px solid var(--border)">
-          <button class="tab-btn active" id="regTabCustomers" onclick="switchRegTab('customers')">👥 Kunder</button>
-          <button class="tab-btn" id="regTabArticles" onclick="switchRegTab('articles')">📦 Artiklar</button>
+          <button class="tab-btn active" id="regTabCustomers" onclick="switchRegTab('customers')">Kunder</button>
+          <button class="tab-btn" id="regTabArticles" onclick="switchRegTab('articles')">Artiklar</button>
         </div>
 
         <div id="regPanelCustomers">
@@ -3032,17 +3032,17 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <button class="tab-btn" id="bkTabBalans" onclick="switchBkTab('balans')">Balans</button>
           <button class="tab-btn" id="bkTabMoms" onclick="switchBkTab('moms')">Moms</button>
           <button class="tab-btn" id="bkTabKonton" onclick="switchBkTab('konton')">Konton</button>
-          <button class="tab-btn" id="bkTabBankimport" onclick="switchBkTab('bankimport')">🏦 Bankimport</button>
+          <button class="tab-btn" id="bkTabBankimport" onclick="switchBkTab('bankimport')">Bankimport</button>
         </div>
         <div id="bkTabsMobile" style="display:none;margin-bottom:1.5rem">
           <select onchange="switchBkTab(this.value);this.blur()" id="bkTabsMobileSelect" style="width:100%;padding:0.7rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:16px;background:white">
-            <option value="grundbok">📗 Grundbok</option>
-            <option value="huvudbok">📘 Huvudbok</option>
-            <option value="resultat">📊 Resultaträkning</option>
-            <option value="balans">⚖️ Balansräkning</option>
-            <option value="moms">🏛 Momsrapport</option>
-            <option value="konton">📋 Kontoplan</option>
-            <option value="bankimport">🏦 Bankimport</option>
+            <option value="grundbok">Grundbok</option>
+            <option value="huvudbok">Huvudbok</option>
+            <option value="resultat">Resultaträkning</option>
+            <option value="balans">Balansräkning</option>
+            <option value="moms">Momsrapport</option>
+            <option value="konton">Kontoplan</option>
+            <option value="bankimport">Bankimport</option>
           </select>
         </div>
 
@@ -3504,13 +3504,13 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
   <div class="ai-chat-panel" id="aiChatPanel">
     <div class="ai-chat-header">
-      <h3>💬 Fråga AI om bokföring</h3>
+      <h3>Fråga AI om bokföring</h3>
       <button class="ai-chat-close" onclick="toggleAIChat()">×</button>
     </div>
 
     <div class="ai-chat-messages" id="aiChatMessages">
       <div class="ai-message assistant">
-        <div class="ai-message-avatar">🤖</div>
+        <div class="ai-message-avatar" style="width:28px;height:28px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.7rem;color:white;font-weight:700">AI</div>
         <div class="ai-message-content">
           <p><strong>Hej!</strong> Jag är din bokföringsassistent.</p>
           <p>Fråga mig om kontoplaner, verifikationer, momshantering, eller hur du ska bokföra olika händelser.</p>
@@ -3545,7 +3545,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     </div>
 
     <div class="ai-disclaimer">
-      ⚠️ AI ger vägledning, inte juridisk rådgivning. Konsultera revisor vid osäkerhet.
+      AI ger vägledning, inte juridisk rådgivning. Konsultera revisor vid osäkerhet.
     </div>
   </div>
 </div>
@@ -3736,7 +3736,7 @@ async function safeGetSession() {
  * Bokförings-disclaimer som visas innan export
  */
 function showBookkeepingDisclaimer(callback) {
-  const disclaimerText = `⚠️ VIKTIG INFORMATION OM BOKFÖRING
+  const disclaimerText = `VIKTIG INFORMATION OM BOKFÖRING
 
 Detta är ett hjälpmedel för bokföring, INTE en ersättning för professionell rådgivning.
 
@@ -3761,7 +3761,7 @@ async function init() {
     const plan = urlParams.get('plan') || 'smart';
     const planLabel = { smart: 'Smart', pro: 'Smart', komplett: 'Komplett' }[plan] || plan;
     setTimeout(() => {
-      alert(`🎉 Välkommen till ${planLabel}!\n\nDin 30-dagars gratisperiod har startat. Du behöver inte betala något förrän efter 30 dagar.`);
+      alert(`Välkommen till ${planLabel}!\n\nDin 30-dagars gratisperiod har startat. Du behöver inte betala något förrän efter 30 dagar.`);
     }, 1000);
     window.history.replaceState({}, '', window.location.pathname);
   }
@@ -4521,7 +4521,7 @@ async function loadAdminDash() {
       if (recent.length === 0) {
         recentEl.innerHTML = '<div style="color:#aaa">Ingen aktivitet ännu.</div>';
       } else {
-        const actionLabels = { offert_skapad: '📄 Offert', faktura_skapad: '💰 Faktura', kvitto_skannat: '📷 Kvitto', leverantor_skapad: '📦 Leverantörsfaktura' };
+        const actionLabels = { offert_skapad: 'Offert', faktura_skapad: 'Faktura', kvitto_skannat: 'Kvitto', leverantor_skapad: 'Leverantörsfaktura' };
         recentEl.innerHTML = recent.map(a => {
           const email = (profiles || []).find(p => p.id === a.user_id)?.email || '';
           const time = new Date(a.created_at).toLocaleString('sv-SE', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
@@ -4616,7 +4616,7 @@ function renderUserList() {
           ${u.company_name || u.full_name || '—'}
         </div>
         <div style="font-size:0.75rem;color:#888">${u.email || ''}</div>
-        ${noteClean ? '<div style="font-size:0.7rem;color:#b8902e;margin-top:0.2rem">📝 '+noteClean+'</div>' : ''}
+        ${noteClean ? '<div style="font-size:0.7rem;color:#b8902e;margin-top:0.2rem">'+noteClean+'</div>' : ''}
       </td>
       <td style="padding:0.7rem 1rem">
         <span style="font-size:0.72rem;font-weight:700;color:white;background:${planColor[plan]||'#888'};padding:0.15rem 0.5rem;border-radius:4px">${planLabel[plan]||plan}</span>
@@ -4664,12 +4664,12 @@ function openUserActions(userId) {
 
       <!-- Aktivitet -->
       <div style="background:var(--cream);border-radius:10px;padding:0.8rem;margin-bottom:1rem;font-size:0.8rem;display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">
-        <div>📊 Plan: <strong>${_adminPlanLabel[plan]||plan}</strong></div>
-        <div>📅 Registrerad: ${u.created_at ? new Date(u.created_at).toLocaleDateString('sv-SE') : '—'}</div>
-        <div>🔑 Senaste inloggning: ${u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString('sv-SE') : '—'}</div>
-        <div>📄 Offerter: <span id="uaQuotes_${userId}">laddar...</span></div>
-        <div>💰 Fakturor: <span id="uaInvoices_${userId}">laddar...</span></div>
-        <div>📗 Verifikationer: <span id="uaVerifications_${userId}">laddar...</span></div>
+        <div>Plan: <strong>${_adminPlanLabel[plan]||plan}</strong></div>
+        <div>Registrerad: ${u.created_at ? new Date(u.created_at).toLocaleDateString('sv-SE') : '—'}</div>
+        <div>Senaste inloggning: ${u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString('sv-SE') : '—'}</div>
+        <div>Offerter: <span id="uaQuotes_${userId}">laddar...</span></div>
+        <div>Fakturor: <span id="uaInvoices_${userId}">laddar...</span></div>
+        <div>Verifikationer: <span id="uaVerifications_${userId}">laddar...</span></div>
       </div>
 
       <!-- Byt plan -->
@@ -4706,8 +4706,8 @@ function openUserActions(userId) {
       <div style="margin-bottom:1rem">
         <div style="font-weight:600;font-size:0.85rem;margin-bottom:0.4rem">Flaggor</div>
         <div style="display:flex;gap:0.4rem">
-          <button onclick="adminToggleFlag('${userId}','VIP')" class="gen-btn" style="padding:0.4rem 0.8rem;font-size:0.78rem;${isVip?'background:#b8902e;color:white':''}">⭐ VIP ${isVip?'✓':''}</button>
-          <button onclick="adminToggleFlag('${userId}','BETA')" class="gen-btn" style="padding:0.4rem 0.8rem;font-size:0.78rem;${isBeta?'background:#1565c0;color:white':''}">🧪 Beta ${isBeta?'✓':''}</button>
+          <button onclick="adminToggleFlag('${userId}','VIP')" class="gen-btn" style="padding:0.4rem 0.8rem;font-size:0.78rem;${isVip?'background:#b8902e;color:white':''}">VIP ${isVip?'✓':''}</button>
+          <button onclick="adminToggleFlag('${userId}','BETA')" class="gen-btn" style="padding:0.4rem 0.8rem;font-size:0.78rem;${isBeta?'background:#1565c0;color:white':''}">Beta ${isBeta?'✓':''}</button>
         </div>
       </div>
 
@@ -4723,7 +4723,7 @@ function openUserActions(userId) {
         <div style="font-weight:600;font-size:0.85rem;margin-bottom:0.4rem">Skicka personligt meddelande</div>
         <input id="uaMailSubject_${userId}" placeholder="Ämne" style="width:100%;padding:0.4rem 0.6rem;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.82rem;margin-bottom:0.3rem">
         <textarea id="uaMailBody_${userId}" placeholder="Meddelande till ${u.full_name || u.email}..." style="width:100%;min-height:80px;padding:0.5rem;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.82rem;resize:vertical"></textarea>
-        <button onclick="adminSendMail('${userId}')" class="gen-btn" style="padding:0.4rem 0.8rem;font-size:0.78rem;margin-top:0.3rem">📧 Skicka mail</button>
+        <button onclick="adminSendMail('${userId}')" class="gen-btn" style="padding:0.4rem 0.8rem;font-size:0.78rem;margin-top:0.3rem">Skicka mail</button>
       </div>
     </div>`;
   document.body.appendChild(modal);
@@ -7271,9 +7271,9 @@ async function deleteAccount() {
   const hasData = confirm(
     '⚠️ Vill du ta bort ditt konto?\n\n' +
     'Innan du fortsätter — har du laddat ner allt du behöver?\n\n' +
-    '📗 SIE-fil (Bokföring → SIE-export)\n' +
-    '📄 Offerter och fakturor (PDF)\n' +
-    '🧾 Kvitton\n\n' +
+    'SIE-fil (Bokföring → SIE-export)\n' +
+    'Offerter och fakturor (PDF)\n' +
+    'Kvitton\n\n' +
     'Klicka "OK" för att fortsätta, eller "Avbryt" för att gå tillbaka och ladda ner dina filer först.'
   );
   if (!hasData) return;
@@ -7550,7 +7550,7 @@ async function loadDashboard() {
       const daysUntil = Math.floor((deadline - now2) / 86400000);
       if (daysUntil >= 0 && daysUntil <= 45) {
         const urgency = daysUntil <= 7 ? '#c62828' : daysUntil <= 14 ? '#e65100' : '#1565c0';
-        todos.push({ color: urgency, text: `📋 Momsdeklaration ${vd.q} — senast ${deadline.toLocaleDateString('sv-SE')} (${daysUntil === 0 ? 'idag!' : 'om ' + daysUntil + ' dagar'})`, action: 'Moms', page: 'bookkeeping' });
+        todos.push({ color: urgency, text: `Momsdeklaration ${vd.q} — senast ${deadline.toLocaleDateString('sv-SE')} (${daysUntil === 0 ? 'idag!' : 'om ' + daysUntil + ' dagar'})`, action: 'Moms', page: 'bookkeeping' });
       }
     });
 
@@ -7558,12 +7558,12 @@ async function loadDashboard() {
     const agDeadline = new Date(curYear, curMonth + 1, 12);
     const agDays = Math.floor((agDeadline - now2) / 86400000);
     if (agDays >= 0 && agDays <= 14) {
-      todos.push({ color: agDays <= 5 ? '#e65100' : '#1565c0', text: `📋 Skattedeklaration (AGI/moms) — senast ${agDeadline.toLocaleDateString('sv-SE')} (om ${agDays} dagar)`, action: 'Info', page: 'help' });
+      todos.push({ color: agDays <= 5 ? '#e65100' : '#1565c0', text: `Skattedeklaration (AGI/moms) — senast ${agDeadline.toLocaleDateString('sv-SE')} (om ${agDays} dagar)`, action: 'Info', page: 'help' });
     }
 
     // Preliminärskatt — betalas 12:e varje månad
     if (agDays >= 0 && agDays <= 7) {
-      todos.push({ color: '#e65100', text: `💰 Preliminärskatt (F-skatt) — betalas senast ${agDeadline.toLocaleDateString('sv-SE')}`, action: 'Info', page: 'help' });
+      todos.push({ color: '#e65100', text: `Preliminärskatt (F-skatt) — betalas senast ${agDeadline.toLocaleDateString('sv-SE')}`, action: 'Info', page: 'help' });
     }
 
     // Inkomstdeklaration (enskild firma) — senast 2 maj
@@ -7571,12 +7571,12 @@ async function loadDashboard() {
     const inkDays = Math.floor((inkDeadline - now2) / 86400000);
     if (inkDays >= 0 && inkDays <= 60) {
       const inkUrgency = inkDays <= 14 ? '#c62828' : inkDays <= 30 ? '#e65100' : '#1565c0';
-      todos.push({ color: inkUrgency, text: `📋 Inkomstdeklaration ${curYear - 1} — senast 2 maj ${curYear} (om ${inkDays} dagar)`, action: 'Info', page: 'help' });
+      todos.push({ color: inkUrgency, text: `Inkomstdeklaration ${curYear - 1} — senast 2 maj ${curYear} (om ${inkDays} dagar)`, action: 'Info', page: 'help' });
     }
 
     // Årsavslut — påminnelse i januari
     if (curMonth === 0) {
-      todos.push({ color: '#1565c0', text: `📊 Dags för årsavslut ${curYear - 1} — stäm av bokföringen och lås alla perioder`, action: 'Bokföring', page: 'bookkeeping' });
+      todos.push({ color: '#1565c0', text: `Dags för årsavslut ${curYear - 1} — stäm av bokföringen och lås alla perioder`, action: 'Bokföring', page: 'bookkeeping' });
     }
 
     const todoEl = document.getElementById('dashTodoList');
@@ -8434,7 +8434,7 @@ function renderGrundbok() {
     const rows = _bkRows.filter(r => r.verification_id === v.id);
     const totalDebet = rows.reduce((s, r) => s + parseFloat(r.debit || 0), 0);
     const isLocked = v.is_locked;
-    const lockIcon = isLocked ? ' <span style="color:#999;font-size:0.7em">🔒</span>' : '';
+    const lockIcon = isLocked ? ' <span style="color:#999;font-size:0.7em">■</span>' : '';
     const srcBadge = v.source_type !== 'manual' ? `<span style="font-size:0.62rem;background:var(--cream);padding:0.1rem 0.4rem;border-radius:4px;color:var(--gold);margin-left:0.3rem">${v.source_type}</span>` : '';
     html += `<div class="bk-card" onclick="viewVerification('${v.id}')">
       <div class="bk-card-top"><span class="bk-card-nr">V${v.verification_number}</span><span class="bk-card-date">${v.verification_date}</span></div>
@@ -9111,7 +9111,7 @@ function viewVerification(id) {
   const correctBtn = canCorrect
     ? `<button onclick="openCorrectionVerification('${v.id}', this)" style="background:none;border:1px solid #e65100;color:#e65100;border-radius:6px;padding:0.35rem 0.8rem;font-size:0.8rem;cursor:pointer;font-family:inherit" title="Skapar en motbokning enligt bokföringslagen">↩ Rätta</button>`
     : '';
-  const lockedNote = v.is_locked ? '<span style="font-size:0.75rem;color:#999;background:#f5f5f5;padding:0.2rem 0.6rem;border-radius:4px">🔒 Låst period</span>' : '';
+  const lockedNote = v.is_locked ? '<span style="font-size:0.75rem;color:#999;background:#f5f5f5;padding:0.2rem 0.6rem;border-radius:4px">Låst period</span>' : '';
   const lawNote = '<span style="font-size:0.72rem;color:#888">BFL: rättelse sker via motbokning</span>';
 
   const popup = document.createElement('div');
@@ -9132,7 +9132,7 @@ function viewVerification(id) {
       </tr></thead>
       <tbody>${rowsHtml}</tbody>
     </table>
-    ${v.attachment_url ? `<div style="margin-top:1rem"><a href="#" onclick="downloadReceipt('${v.attachment_url}');return false" style="color:var(--gold);font-size:0.85rem">📎 Visa kvitto</a></div>` : ''}
+    ${v.attachment_url ? `<div style="margin-top:1rem"><a href="#" onclick="downloadReceipt('${v.attachment_url}');return false" style="color:var(--gold);font-size:0.85rem">Visa kvitto</a></div>` : ''}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.2rem;padding-top:0.8rem;border-top:1px solid var(--border)">
       <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">${lockedNote}${lawNote}</div>
       ${correctBtn}
@@ -10598,7 +10598,7 @@ async function loadBackupList() {
     // Storage overview
     const storageData = await storageRes.json();
     if (storageData.success) {
-      const bucketLabels = { backups: '💾 Backups', receipts: '🧾 Kvitton', logos: '🖼 Logotyper' };
+      const bucketLabels = { backups: 'Backups', receipts: 'Kvitton', logos: 'Logotyper' };
       const bucketColors = { backups: 'var(--gold)', receipts: '#2e7d32', logos: '#1565c0' };
 
       document.getElementById('storageBar').style.width = Math.min(100, storageData.used_percent) + '%';
@@ -11332,7 +11332,7 @@ function toggleAIChat() {
     panel.classList.add('active');
     document.getElementById('aiChatMessages').innerHTML = `
       <div style="text-align:center;padding:2rem 1rem">
-        <div style="font-size:2rem;margin-bottom:0.5rem">🔒</div>
+        <div style="margin-bottom:0.5rem"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:36px;height:36px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
         <div style="font-family:'Fraunces',serif;font-size:1.1rem;margin-bottom:0.4rem">AI-assistenten ingår i Komplett</div>
         <p style="color:#888;font-size:0.85rem;margin-bottom:1rem">Fråga vad som helst om bokföring, moms och avdrag — uppgradera till Komplett för 249 kr/mån.</p>
         <button onclick="openUpgradeModal()" class="gen-btn" style="padding:0.5rem 1.5rem;font-size:0.85rem">Uppgradera →</button>
@@ -11532,7 +11532,7 @@ function addMessageToChat(role, content) {
 
   const avatar = document.createElement('div');
   avatar.className = 'ai-message-avatar';
-  avatar.textContent = role === 'user' ? '👤' : '🤖';
+  avatar.textContent = role === 'user' ? 'Du' : 'AI';
 
   const contentDiv = document.createElement('div');
   contentDiv.className = 'ai-message-content';
@@ -11579,7 +11579,7 @@ function showTypingIndicator() {
   typingDiv.id = id;
   typingDiv.className = 'ai-message assistant';
   typingDiv.innerHTML = `
-    <div class="ai-message-avatar">🤖</div>
+    <div class="ai-message-avatar" style="width:28px;height:28px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.7rem;color:white;font-weight:700">AI</div>
     <div class="ai-message-content">
       <div class="ai-typing-indicator">
         <div class="ai-typing-dot"></div>
@@ -11910,7 +11910,7 @@ init();
     
     <!-- Kontoinfo (visas efter kategorival) -->
     <div id="verAccountInfo" style="display:none;background:#f0f7ff;border:1px solid #b3d9ff;border-radius:8px;padding:0.8rem;margin-bottom:1rem;font-size:0.85rem">
-      <strong style="color:#0066cc">📋 Kontoring:</strong>
+      <strong style="color:#0066cc">Kontoring:</strong>
       <div id="verAccountInfoText" style="margin-top:0.3rem;color:#333"></div>
     </div>
     
