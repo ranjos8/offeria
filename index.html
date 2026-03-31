@@ -300,7 +300,7 @@ nav {
 .eyebrow { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.7rem; }
 .section-h { font-family: 'Fraunces', serif; font-size: clamp(1.8rem,3.5vw,2.8rem); letter-spacing: -1px; }
 .pricing-wrap .section-h { color: white; margin-bottom: 2.5rem; }
-.plans { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin-top: 2rem; }
+.plans { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 2rem; }
 .plan {
   background: #1a1a18; border: 1px solid #2a2a28;
   border-radius: 14px; padding: 1.8rem; text-align: left;
@@ -1149,72 +1149,65 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <div class="plans">
         <div class="plan">
           <div class="plan-name">Gratis</div>
-          <div class="plan-tagline">Prova utan kostnad</div>
+          <div class="plan-tagline">Testa magiken</div>
           <div><span class="plan-amount">0</span><span class="plan-period"> kr/mån</span></div>
           <ul class="plan-features">
             <li>2 AI-offerter per månad</li>
+            <li>Obegränsade manuella offerter</li>
             <li>Dela via länk &amp; PDF</li>
-            <li>Redigerbara rader</li>
             <li>ROT/RUT-beräkning</li>
+            <li>Redigerbara rader</li>
             <li style="color:#888;font-style:italic">Offeria-branding i offerten</li>
           </ul>
           <button class="plan-cta" onclick="openModal('register')">Kom igång gratis</button>
         </div>
         <div class="plan">
-          <div class="plan-name">Pro</div>
-          <div class="plan-tagline">För aktiva hantverkare</div>
+          <div class="plan-name">Smart</div>
+          <div class="plan-tagline">Vinn fler jobb</div>
           <div><span class="plan-amount">99</span><span class="plan-period"> kr/mån</span></div>
           <ul class="plan-features">
-            <li>10 AI-offerter per månad</li>
-            <li>Fullständig företagsprofil</li>
-            <li>Egen logotyp på offerter</li>
+            <li><strong>30 AI-offerter per månad</strong></li>
+            <li><strong>E-signering av offerter</strong></li>
+            <li><strong>Fakturering med ROT/RUT</strong></li>
+            <li>Kreditfakturor</li>
+            <li>Påminnelser med avgiftsberäkning</li>
+            <li>Röstinmatning (diktera offerten)</li>
+            <li>Egen logotyp — ingen Offeria-branding</li>
             <li>Kund- &amp; artikelregister</li>
             <li>Offerthistorik</li>
-            <li>Dela via länk &amp; PDF</li>
             <li>Ingen bindningstid</li>
           </ul>
-          <button class="plan-cta" onclick="openModal('register')">Prova Pro gratis i 30 dagar</button>
+          <button class="plan-cta" onclick="openModal('register')">Prova Smart gratis i 30 dagar</button>
         </div>
         <div class="plan featured">
           <div class="plan-name">Komplett</div>
-          <div class="plan-tagline">Allt du behöver</div>
+          <div class="plan-tagline">Hela företaget i en tjänst</div>
           <div><span class="plan-amount">249</span><span class="plan-period"> kr/mån</span></div>
           <ul class="plan-features">
-            <li>Obegränsade AI-offerter</li>
-            <li><strong>Fakturering &amp; kreditfaktura</strong></li>
-            <li><strong>E-signering av offerter</strong></li>
-            <li><strong>Automatiska påminnelser</strong></li>
-            <li><strong>Bokföring med BAS 2026</strong></li>
-            <li><strong>Leverantörsfakturor (faktura- &amp; kontantmetoden)</strong></li>
-            <li><strong>EU-inköp / Reverse charge</strong></li>
-            <li><strong>Fota kvitto — AI bokför automatiskt</strong></li>
+            <li><strong>100 AI-offerter per månad</strong></li>
+            <li><strong>Allt i Smart, plus:</strong></li>
+            <li><strong>Leverantörsfakturor</strong></li>
+            <li><strong>Kvittoskanning med AI (OCR)</strong></li>
+            <li><strong>Komplett bokföring (BAS 2026)</strong></li>
             <li><strong>AI Bokföringsassistent</strong></li>
+            <li>Bankimport (CSV)</li>
+            <li>Grundbok &amp; huvudbok</li>
             <li>Resultat- &amp; balansräkning</li>
             <li>Momsrapport (SKV 4700)</li>
             <li>SRU-export till Skatteverket</li>
-            <li>SIE-export till revisor</li>
-            <li>Korrigeringsverifikationer</li>
-            <li>Audit log (revisionsspår)</li>
-            <li>Dashboard &amp; statistik</li>
-            <li>ROT/RUT-avdrag</li>
-            <li>Egen logotyp</li>
+            <li>SIE-export &amp; import</li>
+            <li>Periodlåsning &amp; rättelseverifikationer</li>
+            <li>Dashboard med skattedatum</li>
+            <li>Automatisk daglig backup</li>
             <li>Ingen bindningstid</li>
           </ul>
           <button class="plan-cta" onclick="openModal('register')">Prova Komplett gratis i 30 dagar</button>
         </div>
-        <div class="plan">
-          <div class="plan-name">Skräddarsydd</div>
-          <div class="plan-tagline">För större företag</div>
-          <div><span class="plan-amount" style="font-size:1.3rem;letter-spacing:-0.01em">Kontakta oss</span></div>
-          <ul class="plan-features">
-            <li>Allt i Komplett</li>
-            <li>API-integration</li>
-            <li>Flera användare / team</li>
-            <li>Faktura istället för kort</li>
-            <li>Anpassningar efter era behov</li>
-          </ul>
-          <button class="plan-cta" onclick="window.location.href='kontakta-oss.html'">Kontakta oss</button>
-        </div>
+      </div>
+      <div style="max-width:600px;margin:2rem auto 0;text-align:center;padding:1.5rem;border:1px solid rgba(255,255,255,0.1);border-radius:12px;background:rgba(255,255,255,0.03)">
+        <div style="font-family:'Fraunces',serif;font-size:1rem;color:white;margin-bottom:0.3rem">Behöver ni mer?</div>
+        <div style="font-size:0.82rem;color:#888;line-height:1.7;margin-bottom:1rem">API-integration · Flera användare / team · Faktura istället för kort · Anpassningar efter era behov</div>
+        <a href="/kontakta-oss.html" style="color:var(--gold-light);font-size:0.85rem;font-weight:600;text-decoration:none">Kontakta oss →</a>
       </div>
     </div>
   </div>
@@ -2393,7 +2386,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             </div>
             <div class="gen-card" style="text-align:center;padding:1.2rem">
               <div style="font-size:2rem;font-weight:700;color:#1565c0" id="statProUsers">—</div>
-              <div style="font-size:0.78rem;color:#888;margin-top:0.3rem">Pro</div>
+              <div style="font-size:0.78rem;color:#888;margin-top:0.3rem">Smart</div>
             </div>
             <div class="gen-card" style="text-align:center;padding:1.2rem">
               <div style="font-size:2rem;font-weight:700;color:#2e7d32" id="statKomplettUsers">—</div>
@@ -2423,7 +2416,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
               <select id="userPlanFilter" onchange="filterUsers()" style="padding:0.6rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.88rem">
                 <option value="">Alla planer</option>
                 <option value="free">Gratis</option>
-                <option value="pro">Pro</option>
+                <option value="pro">Smart</option>
                 <option value="komplett">Komplett</option>
               </select>
               <button onclick="exportUsersCSV()" class="btn-sm btn-outline" style="padding:0.5rem 0.8rem;font-size:0.82rem">↓ Exportera CSV</button>
@@ -2441,7 +2434,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
               <select id="emailTarget" style="width:100%;padding:0.7rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.9rem">
                 <option value="all">Alla användare</option>
                 <option value="free">Gratisanvändare</option>
-                <option value="pro">Pro-användare</option>
+                <option value="pro">Smart-användare</option>
                 <option value="komplett">Komplett-användare</option>
                 <option value="paid">Betalande (Pro + Komplett)</option>
                 <option value="trial">Användare i provperiod</option>
@@ -3432,17 +3425,17 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <p style="color:#2e7d32;font-weight:600">✓ 30 dagars gratis provperiod — avbryt när som helst</p>
     </div>
     <div class="upgrade-plans">
-      <div class="uplan sel" id="uplan-pro" onclick="selectUPlan('pro')">
-        <div class="uplan-name">Pro</div>
+      <div class="uplan sel" id="uplan-smart" onclick="selectUPlan('smart')">
+        <div class="uplan-name">Smart</div>
         <div class="uplan-price">99 kr/mån</div>
         <div style="font-size:0.75rem;color:#2e7d32;margin-bottom:0.5rem;font-weight:600">Gratis i 30 dagar</div>
-        <div class="uplan-features">10 AI-offerter/månad<br>Fullständig företagsprofil<br>Egen logotyp<br>Kund- &amp; artikelregister<br>Offerthistorik<br>Ingen bindningstid</div>
+        <div class="uplan-features">30 AI-offerter/månad<br>E-signering<br>Fakturering med ROT/RUT<br>Kreditfakturor &amp; påminnelser<br>Egen logotyp<br>Kund- &amp; artikelregister<br>Ingen bindningstid</div>
       </div>
       <div class="uplan" id="uplan-komplett" onclick="selectUPlan('komplett')">
         <div class="uplan-name">Komplett</div>
         <div class="uplan-price">249 kr/mån</div>
         <div style="font-size:0.75rem;color:#2e7d32;margin-bottom:0.5rem;font-weight:600">Gratis i 30 dagar</div>
-        <div class="uplan-features">Obegränsade AI-offerter<br><strong>Fakturering &amp; kreditfaktura</strong><br><strong>Bokföring (BAS 2026)</strong><br><strong>Kvittoskanning</strong><br>Resultat- &amp; balansräkning<br>Momsrapport &amp; SIE-export<br>Dashboard &amp; statistik<br>ROT/RUT-avdrag<br>Ingen bindningstid</div>
+        <div class="uplan-features">100 AI-offerter/månad<br>Allt i Smart, plus:<br><strong>Leverantörsfakturor</strong><br><strong>Kvittoskanning med AI</strong><br><strong>Komplett bokföring (BAS 2026)</strong><br><strong>AI Bokföringsassistent</strong><br>Momsrapport &amp; SIE-export<br>Dashboard &amp; statistik<br>Ingen bindningstid</div>
       </div>
     </div>
     <div class="stripe-note">Betalning hanteras säkert av Stripe. Kortet debiteras inte förrän efter 30 dagar.</div>
@@ -3472,16 +3465,16 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 //  Stripe payment links – ersätt med dina riktiga länkar från Stripe Dashboard
 const STRIPE_LINKS = {
-  pro:       'https://buy.stripe.com/PRO_LINK',
+  smart:     'https://buy.stripe.com/PRO_LINK',
   komplett:  'https://buy.stripe.com/KOMPLETT_LINK'
 };
 
 // Anthropic API key – flytta till Supabase Edge Function i produktion!
 // API-nyckeln är nu säkert lagrad i Supabase Edge Function
 
-const PLAN_LIMITS = { free: 2, pro: 10, komplett: Infinity };
+const PLAN_LIMITS = { free: 2, smart: 30, pro: 30, komplett: 100 };
 const INVOICE_LIMITS = { free: 0, pro: 0, komplett: Infinity };
-const PLAN_LABELS = { free: 'Gratis', pro: 'Pro', komplett: 'Komplett' };
+const PLAN_LABELS = { free: 'Gratis', smart: 'Smart', pro: 'Smart', komplett: 'Komplett' };
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: {
@@ -3547,8 +3540,8 @@ async function init() {
   // Hantera redirect från Stripe Checkout
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('payment') === 'success') {
-    const plan = urlParams.get('plan') || 'pro';
-    const planLabel = { pro: 'Pro', komplett: 'Komplett' }[plan] || plan;
+    const plan = urlParams.get('plan') || 'smart';
+    const planLabel = { smart: 'Smart', pro: 'Smart', komplett: 'Komplett' }[plan] || plan;
     setTimeout(() => {
       alert(`🎉 Välkommen till ${planLabel}!\n\nDin 30-dagars gratisperiod har startat. Du behöver inte betala något förrän efter 30 dagar.`);
     }, 1000);
@@ -3844,8 +3837,9 @@ function updateUI(profile, used, total) {
   // Uppdatera plan-sektionen i Företagsprofil
   const planDescMap = {
     free: 'Gratisplan — 2 AI-offerter/månad',
-    pro: 'Pro — 10 AI-offerter/månad · 99 kr/mån',
-    komplett: 'Komplett — Obegränsat · 249 kr/mån'
+    smart: 'Smart — 30 AI-offerter/månad + fakturering · 99 kr/mån',
+    pro: 'Smart — 30 AI-offerter/månad + fakturering · 99 kr/mån',
+    komplett: 'Komplett — 100 AI-offerter/månad + hela företaget · 249 kr/mån'
   };
   const profilePlanName = document.getElementById('profilePlanName');
   const profilePlanDesc = document.getElementById('profilePlanDesc');
@@ -4189,15 +4183,15 @@ async function loadAdminDash() {
 
   const total = profiles.length;
   const free = profiles.filter(p => !p.plan || p.plan === 'free').length;
-  const pro = profiles.filter(p => p.plan === 'pro').length;
+  const smart = profiles.filter(p => p.plan === 'smart' || p.plan === 'pro').length;
   const komplett = profiles.filter(p => p.plan === 'komplett').length;
   const now = new Date();
   const trial = profiles.filter(p => p.trial_ends_at && new Date(p.trial_ends_at) > now && p.plan !== 'free').length;
-  const mrr = pro * 99 + komplett * 249;
+  const mrr = smart * 99 + komplett * 249;
 
   document.getElementById('statTotalUsers').textContent = total;
   document.getElementById('statFreeUsers').textContent = free;
-  document.getElementById('statProUsers').textContent = pro;
+  document.getElementById('statProUsers').textContent = smart;
   document.getElementById('statKomplettUsers').textContent = komplett;
   document.getElementById('statTrialUsers').textContent = trial;
   document.getElementById('statMRR').textContent = mrr.toLocaleString('sv-SE') + ' kr';
@@ -4262,8 +4256,8 @@ function renderUserList() {
 
   countEl.textContent = `${_adminUsersFiltered.length} av ${_adminUsers.length} användare`;
 
-  const planColor = { free:'#888', pro:'#1565c0', komplett:'#2e7d32' };
-  const planLabel = { free:'Gratis', pro:'Pro', komplett:'Komplett' };
+  const planColor = { free:'#888', smart:'#1565c0', komplett:'#2e7d32', pro:'#1565c0' };
+  const planLabel = { free:'Gratis', smart:'Smart', komplett:'Komplett', pro:'Smart' };
   const now = new Date();
 
   // Bygg tabellen med createElement för att undvika HTML-injection och quote-konflikter
@@ -4308,7 +4302,7 @@ function renderUserList() {
     const td = tr.querySelector('td:last-child');
     const sel = document.createElement('select');
     sel.style.cssText = 'padding:0.25rem 0.5rem;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:0.75rem;cursor:pointer';
-    sel.innerHTML = '<option value="">Ändra plan...</option><option value="free">→ Gratis</option><option value="pro">→ Pro (gratis)</option><option value="komplett">→ Komplett (gratis)</option>';
+    sel.innerHTML = '<option value="">Ändra plan...</option><option value="free">→ Gratis</option><option value="smart">→ Smart</option><option value="komplett">→ Komplett</option>';
     sel.addEventListener('change', function() { changeUserPlan(u.id, this.value, this); });
     td.appendChild(sel);
     tbody.appendChild(tr);
@@ -4352,7 +4346,7 @@ function previewEmail() {
   const subject = document.getElementById('emailSubject').value;
   const body = document.getElementById('emailBody').value;
   const target = document.getElementById('emailTarget').value;
-  const targetLabels = { all:'Alla användare', free:'Gratisanvändare', pro:'Pro-användare',
+  const targetLabels = { all:'Alla användare', free:'Gratisanvändare', pro:'Smart-användare',
     komplett:'Komplett-användare', paid:'Betalande användare', trial:'Provperiod-användare' };
 
   const previewBox = document.getElementById('emailPreviewBox');
@@ -4389,9 +4383,9 @@ async function sendBulkEmail() {
   let recipients = _adminUsers;
   const now = new Date();
   if (target === 'free') recipients = _adminUsers.filter(u => !u.plan || u.plan === 'free');
-  if (target === 'pro') recipients = _adminUsers.filter(u => u.plan === 'pro');
+  if (target === 'pro') recipients = _adminUsers.filter(u => u.plan === 'smart' || u.plan === 'pro');
   if (target === 'komplett') recipients = _adminUsers.filter(u => u.plan === 'komplett');
-  if (target === 'paid') recipients = _adminUsers.filter(u => u.plan === 'pro' || u.plan === 'komplett');
+  if (target === 'paid') recipients = _adminUsers.filter(u => u.plan === 'smart' || u.plan === 'pro' || u.plan === 'komplett');
   if (target === 'trial') recipients = _adminUsers.filter(u => u.trial_ends_at && new Date(u.trial_ends_at) > now);
 
   if (!recipients.length) { alert('Inga användare matchar vald grupp.'); return; }
@@ -6166,7 +6160,7 @@ function closeUpgradeModal() { document.getElementById('upgradeOverlay').classLi
 async function goToStripe() {
   const btn = document.getElementById('stripeCheckoutBtn');
   const errEl = document.getElementById('stripeCheckoutError');
-  const plan = window._selectedUPlan || 'pro';
+  const plan = window._selectedUPlan || 'smart';
   btn.textContent = 'Laddar Stripe...';
   btn.disabled = true;
   errEl.style.display = 'none';
@@ -6214,7 +6208,7 @@ async function openCustomerPortal() {
 }
 function selectUPlan(p) {
   window._selectedUPlan = p;
-  document.getElementById('uplan-pro')?.classList.toggle('sel', p === 'pro');
+  document.getElementById('uplan-smart')?.classList.toggle('sel', p === 'smart');
   document.getElementById('uplan-komplett')?.classList.toggle('sel', p === 'komplett');
 }
 
