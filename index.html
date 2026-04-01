@@ -3670,8 +3670,11 @@ const SUPABASE_URL = 'https://yfnmmcrvzcwcinwopnlj.supabase.co';
 
 // XSS-skydd: sanitera all user-generated HTML
 function sanitize(dirty) {
-  if (typeof DOMPurify !== 'undefined') return DOMPurify.sanitize(dirty, { ALLOWED_TAGS: ['b','strong','em','i','br','p','div','span','table','tr','td','th','thead','tbody','ul','ol','li','h1','h2','h3','h4','img','a','hr','sup','sub'], ALLOWED_ATTR: ['style','class','href','src','alt','colspan','rowspan','target'] });
-  // Fallback: strip all tags
+  if (typeof DOMPurify !== 'undefined') return DOMPurify.sanitize(dirty, { 
+    ALLOWED_TAGS: ['b','strong','em','i','br','p','div','span','table','tr','td','th','thead','tbody','ul','ol','li','h1','h2','h3','h4','img','a','hr','sup','sub','button','select','option','input','svg','line','rect','path','polyline','circle','defs','linearGradient','stop','text'], 
+    ALLOWED_ATTR: ['style','class','href','src','alt','colspan','rowspan','target','contenteditable','id','onclick','onchange','oninput','onblur','value','selected','type','placeholder','name','viewBox','xmlns','fill','stroke','stroke-width','stroke-linecap','stroke-linejoin','d','x','y','x1','y1','x2','y2','cx','cy','r','rx','ry','width','height','font-family','font-style','font-weight','font-size','letter-spacing','offset','stop-color','opacity','gradientUnits','points'],
+    ADD_ATTR: ['contenteditable']
+  });
   const el = document.createElement('div'); el.textContent = dirty; return el.innerHTML;
 }
 function escapeHtml(str) {
@@ -6966,7 +6969,9 @@ Rimliga svenska priser 2025.` }]
 
     // Render quote first so we can capture its HTML
     renderQuote(q);
-    recalc(); // Recalculate to fix any AI math errors
+    // recalc after a tick so modal is visible and DOM elements exist
+    await new Promise(r => setTimeout(r, 50));
+    recalc();
 
     // log usage + spara offert (after render so HTML is populated)
     await new Promise(r => setTimeout(r, 100)); // wait for DOM
