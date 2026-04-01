@@ -6793,7 +6793,7 @@ async function generateQuote() {
 
   const statuses = ['Analyserar uppdraget…','Beräknar material och arbetstid…','Formulerar offerttext…','Sätter samman dokumentet…'];
   let si = 0;
-  const interval = setInterval(() => { si=(si+1)%statuses.length; document.getElementById('statusText').textContent = statuses[si]; }, 1800);
+  const interval = setInterval(() => { si=(si+1)%statuses.length; const stEl = document.getElementById('statusText'); if (stEl) stEl.textContent = statuses[si]; }, 1800);
 
   const p = currentProfile || {};
   const company = p.company_name || 'Ditt Företag AB';
@@ -7075,11 +7075,16 @@ function recalc() {
     if (rotRow) rotRow.style.display = rot > 0 ? '' : 'none';
   }
   const final = info.inclRot && rot>0 ? incl-rot : incl;
-  document.getElementById('tot-sub').textContent = fmtSEK(sub);
-  document.getElementById('tot-vat').textContent = fmtSEK(vat);
-  document.getElementById('tot-incl').textContent = fmtSEK(incl);
-  document.getElementById('tot-final').textContent = fmtSEK(final);
-  document.getElementById('tot-final-lbl').textContent = info.inclRot&&rot>0?'ATT BETALA (efter ROT)':'ATT BETALA';
+  const totSub = document.getElementById('tot-sub');
+  const totVat = document.getElementById('tot-vat');
+  const totIncl = document.getElementById('tot-incl');
+  const totFinal = document.getElementById('tot-final');
+  const totFinalLbl = document.getElementById('tot-final-lbl');
+  if (totSub) totSub.textContent = fmtSEK(sub);
+  if (totVat) totVat.textContent = fmtSEK(vat);
+  if (totIncl) totIncl.textContent = fmtSEK(incl);
+  if (totFinal) totFinal.textContent = fmtSEK(final);
+  if (totFinalLbl) totFinalLbl.textContent = info.inclRot&&rot>0?'ATT BETALA (efter ROT)':'ATT BETALA';
 }
 
 function delRow(btn) { btn.closest('tr').remove(); recalc(); }
