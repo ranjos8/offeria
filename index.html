@@ -4040,11 +4040,13 @@ function updateUI(profile, used, total) {
   document.getElementById('sidebarQuotaBar').style.width = limit === Infinity ? '20%' : `${Math.min(100, used/limit*100)}%`;
   if (plan === 'komplett') document.getElementById('upgradeBtn').style.display = 'none';
 
-  document.getElementById('statTotal').textContent = total;
-  document.getElementById('statLeft').textContent = left;
+  const statTotalEl = document.getElementById('statTotal');
+  const statLeftEl = document.getElementById('statLeft');
+  if (statTotalEl) statTotalEl.textContent = total;
+  if (statLeftEl) statLeftEl.textContent = left;
 
   const qNote = document.getElementById('quotaNote');
-  if (plan !== 'komplett' && used >= limit) {
+  if (qNote && plan !== 'komplett' && used >= limit) {
     qNote.innerHTML = 'Veckogränsen nådd! <a onclick="openUpgradeModal()" style="color:var(--gold);font-weight:700;cursor:pointer;text-decoration:underline">Uppgradera nu →</a>';
     qNote.className = 'quota-note warn';
     document.getElementById('genBtn').disabled = true;
@@ -4059,10 +4061,11 @@ function updateUI(profile, used, total) {
       if (genCard) genCard.parentNode.insertBefore(banner, genCard);
     }
     banner.style.display = 'flex';
-  } else {
+  } else if (qNote) {
     qNote.textContent = `${left} ${limit === Infinity ? 'obegränsade' : ''} offerter kvar denna månad`;
     qNote.className = 'quota-note';
-    document.getElementById('genBtn').disabled = false;
+    const genBtn = document.getElementById('genBtn');
+    if (genBtn) genBtn.disabled = false;
     const banner = document.getElementById('upgradeBanner');
     if (banner) banner.style.display = 'none';
   }
