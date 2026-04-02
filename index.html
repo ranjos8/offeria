@@ -2987,13 +2987,24 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div id="dashTodoList" style="margin-top:0.5rem"><div style="padding:1rem;color:#aaa;font-size:0.85rem">Laddar...</div></div>
         </div>
 
-        <!-- Row 5: Personal notes -->
+        <!-- Row 5: Todo list + Notes -->
+        <div class="dash-card-wide" style="margin-top:1rem">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+            <div class="card-label">Att göra</div>
+          </div>
+          <div id="dashTodoItems" style="margin-bottom:0.5rem"></div>
+          <div style="display:flex;gap:0.4rem;align-items:center">
+            <input id="dashTodoInput" type="text" placeholder="Ny uppgift..." onkeydown="if(event.key==='Enter')addTodo()" style="flex:1;padding:0.5rem 0.8rem;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:16px;background:white">
+            <button onclick="addTodo()" style="background:var(--ink);color:var(--gold-light);border:none;padding:0.5rem 0.8rem;border-radius:8px;font-size:0.82rem;cursor:pointer;font-family:inherit;white-space:nowrap;min-height:40px">+ Lägg till</button>
+          </div>
+        </div>
+
         <div class="dash-card-wide" style="margin-top:1rem">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <div class="card-label">Mina anteckningar</div>
+            <div class="card-label">Anteckningar</div>
             <button id="dashNoteSaveBtn" onclick="saveDashNotes()" style="background:var(--ink);color:var(--gold-light);border:none;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.72rem;cursor:pointer;font-family:inherit;display:none">Spara</button>
           </div>
-          <textarea id="dashNotes" placeholder="Skriv egna anteckningar här... (sparas automatiskt)" oninput="document.getElementById('dashNoteSaveBtn').style.display='inline-block'" style="width:100%;min-height:80px;padding:0.6rem;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.85rem;resize:vertical;margin-top:0.5rem;background:white;line-height:1.6"></textarea>
+          <textarea id="dashNotes" placeholder="Egna anteckningar..." oninput="document.getElementById('dashNoteSaveBtn').style.display='inline-block'" style="width:100%;min-height:70px;padding:0.6rem;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.85rem;resize:vertical;margin-top:0.5rem;background:white;line-height:1.6"></textarea>
         </div>
       </div>
 
@@ -5347,12 +5358,34 @@ function renderHistoryTable(data) {
       <td>${r.title || '–'}</td>
       <td style="text-align:right;font-weight:600;color:var(--ink)">${parseAmountFromHtml(r.quote_html)}</td>
       <td>${sigBadge(r)}</td>
-      <td style="display:flex;gap:0.4rem;flex-wrap:wrap">
+      <td style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center">
         ${r.quote_html ? `<button class="btn-sm btn-outline" onclick="openHistoryQuote(${window._historyData.indexOf(r)})">Öppna</button>` : ''}
         ${r.quote_html ? `<button class="btn-sm btn-dark" onclick="printHistoryQuote(${window._historyData.indexOf(r)})">PDF</button>` : ''}
+        <button class="btn-sm" onclick="toggleQuoteNote(${window._historyData.indexOf(r)})" style="background:none;border:1px solid ${r.notes ? 'var(--gold)' : '#ddd'};color:${r.notes ? 'var(--gold)' : '#999'};border-radius:6px;padding:0.2rem 0.5rem;cursor:pointer;font-size:0.72rem;font-family:inherit" title="${r.notes || 'Lägg till anteckning'}">Ant.</button>
       </td>
-    </tr>`).join('')}</tbody>
+    </tr>
+    <tr id="quoteNote_${i}" style="display:none"><td colspan="6" style="padding:0.3rem 0.5rem;background:#fdf8ee">
+      <textarea placeholder="Anteckning om denna offert..." oninput="this.dataset.dirty='1'" style="width:100%;padding:0.4rem;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.82rem;resize:vertical;min-height:40px;background:white">${r.notes || ''}</textarea>
+      <button onclick="saveQuoteNote(${i})" style="margin-top:0.3rem;background:var(--ink);color:var(--gold-light);border:none;padding:0.3rem 0.7rem;border-radius:6px;font-size:0.72rem;cursor:pointer;font-family:inherit">Spara</button>
+    </td></tr>`).join('')}</tbody>
   </table>`;
+}
+
+function toggleQuoteNote(i) {
+  const row = document.getElementById('quoteNote_' + i);
+  if (row) row.style.display = row.style.display === 'none' ? '' : 'none';
+}
+
+async function saveQuoteNote(i) {
+  const row = document.getElementById('quoteNote_' + i);
+  const textarea = row?.querySelector('textarea');
+  if (!textarea || !window._historyData[i]) return;
+  const notes = textarea.value;
+  const { error } = await sb.from('quote_usage').update({ notes }).eq('id', window._historyData[i].id);
+  if (error) { alert('Fel: ' + error.message); return; }
+  window._historyData[i].notes = notes;
+  const btn = row.querySelector('button');
+  if (btn) { btn.textContent = 'Sparat!'; setTimeout(() => btn.textContent = 'Spara', 1500); }
 }
 
 function filterHistory() {
@@ -5521,8 +5554,12 @@ function renderInvoiceList(data) {
         <td style="text-align:right;font-weight:600">${amount}</td>
         <td style="white-space:nowrap;font-size:0.8rem;color:#888">${due}</td>
         <td>${statusLabel(status)}</td>
-        <td style="display:flex;gap:0.4rem;flex-wrap:wrap">${btns}</td>
-      </tr>`;
+        <td style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center">${btns} <button class="btn-sm" onclick="toggleInvNote(${i})" style="background:none;border:1px solid ${inv.notes ? 'var(--gold)' : '#ddd'};color:${inv.notes ? 'var(--gold)' : '#999'};border-radius:6px;padding:0.2rem 0.5rem;cursor:pointer;font-size:0.72rem;font-family:inherit" title="${inv.notes || 'Anteckning'}">Ant.</button></td>
+      </tr>
+      <tr id="invNote_${i}" style="display:none"><td colspan="7" style="padding:0.3rem 0.5rem;background:#fdf8ee">
+        <textarea placeholder="Anteckning om denna faktura..." style="width:100%;padding:0.4rem;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.82rem;resize:vertical;min-height:40px;background:white">${inv.notes || ''}</textarea>
+        <button onclick="saveInvNote(${i})" style="margin-top:0.3rem;background:var(--ink);color:var(--gold-light);border:none;padding:0.3rem 0.7rem;border-radius:6px;font-size:0.72rem;cursor:pointer;font-family:inherit">Spara</button>
+      </td></tr>`;
     }).join('')}</tbody>
   </table>
   <div class="inv-mobile-cards">${data.map((inv, i) => {
@@ -5551,6 +5588,23 @@ function filterInvoices() {
   if (q) filtered = filtered.filter(i => (i.client_name||'').toLowerCase().includes(q) || (i.title||'').toLowerCase().includes(q) || (i.invoice_number||'').toLowerCase().includes(q));
   if (status !== 'all') filtered = filtered.filter(i => getInvoiceStatus(i) === status);
   renderInvoiceList(filtered);
+}
+
+function toggleInvNote(i) {
+  const row = document.getElementById('invNote_' + i);
+  if (row) row.style.display = row.style.display === 'none' ? '' : 'none';
+}
+
+async function saveInvNote(i) {
+  const row = document.getElementById('invNote_' + i);
+  const textarea = row?.querySelector('textarea');
+  if (!textarea || !_invoiceData[i]) return;
+  const notes = textarea.value;
+  const { error } = await sb.from('invoices').update({ notes }).eq('id', _invoiceData[i].id);
+  if (error) { alert('Fel: ' + error.message); return; }
+  _invoiceData[i].notes = notes;
+  const btn = row.querySelector('button');
+  if (btn) { btn.textContent = 'Sparat!'; setTimeout(() => btn.textContent = 'Spara', 1500); }
 }
 
 async function markInvoicePaid(idx) {
@@ -7620,12 +7674,76 @@ async function loadDashboard() {
     window._chartYear = window._chartYear || yr;
     renderCharts();
 
-    // Load personal notes
+    // Load personal notes and todos
     loadDashNotes();
+    loadTodos();
 
   } catch(e) { console.error('Dashboard error:', e); }
 }
 
+// ===== TODO LIST =====
+let _todos = [];
+
+async function loadTodos() {
+  try {
+    const { data } = await sb.from('profiles').select('dashboard_todos').eq('id', currentUser.id).single();
+    _todos = [];
+    if (data?.dashboard_todos) {
+      try { _todos = JSON.parse(data.dashboard_todos); } catch(e) { _todos = []; }
+    }
+    renderTodos();
+  } catch(e) {}
+}
+
+function renderTodos() {
+  const el = document.getElementById('dashTodoItems');
+  if (!el) return;
+  if (_todos.length === 0) {
+    el.innerHTML = '<div style="padding:0.5rem 0;color:#aaa;font-size:0.82rem">Inga uppgifter</div>';
+    return;
+  }
+  el.innerHTML = _todos.map((t, i) => 
+    '<div style="display:flex;align-items:center;gap:0.6rem;padding:0.45rem 0;border-bottom:1px solid #f0ede6">' +
+      '<input type="checkbox" ' + (t.done ? 'checked' : '') + ' onchange="toggleTodo(' + i + ')" style="width:18px;height:18px;accent-color:var(--gold);flex-shrink:0;cursor:pointer">' +
+      '<span style="flex:1;font-size:0.85rem;' + (t.done ? 'text-decoration:line-through;color:#aaa' : 'color:var(--ink)') + '">' + escapeHtml(t.text) + '</span>' +
+      '<button onclick="deleteTodo(' + i + ')" style="background:none;border:none;color:#ccc;cursor:pointer;font-size:1rem;padding:0.2rem;line-height:1" title="Ta bort">×</button>' +
+    '</div>'
+  ).join('');
+}
+
+async function addTodo() {
+  const input = document.getElementById('dashTodoInput');
+  const text = input.value.trim();
+  if (!text) return;
+  _todos.unshift({ text, done: false, created: new Date().toISOString() });
+  input.value = '';
+  renderTodos();
+  await saveTodos();
+}
+
+async function toggleTodo(i) {
+  _todos[i].done = !_todos[i].done;
+  // Move completed to bottom
+  const done = _todos.filter(t => t.done);
+  const notDone = _todos.filter(t => !t.done);
+  _todos = [...notDone, ...done];
+  renderTodos();
+  await saveTodos();
+}
+
+async function deleteTodo(i) {
+  _todos.splice(i, 1);
+  renderTodos();
+  await saveTodos();
+}
+
+async function saveTodos() {
+  try {
+    await sb.from('profiles').update({ dashboard_todos: JSON.stringify(_todos) }).eq('id', currentUser.id);
+  } catch(e) {}
+}
+
+// ===== DASHBOARD NOTES =====
 async function loadDashNotes() {
   try {
     const { data } = await sb.from('profiles').select('dashboard_notes').eq('id', currentUser.id).single();
