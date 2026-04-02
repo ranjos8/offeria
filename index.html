@@ -6687,7 +6687,7 @@ function getQuoteText() {
 async function shareViaEmail() {
   const { title, client, total } = getQuoteText();
   const subject = `${title}${client && client !== 'Kund' ? ' – ' + client : ''}`;
-  const shareUrl = window._currentShareId ? `https://offeria.se/offert.html?id=${window._currentShareId}` : null;
+  const shareUrl = window._currentShareId ? `https://www.offeria.se/offert.html?id=${window._currentShareId}` : null;
   const linkLine = shareUrl ? `\n\nSe offerten online (länken är giltig i 30 dagar):\n${shareUrl}` : '';
   const body = `Hej,\n\nVänligen se vår offert: ${title}${client && client !== 'Kund' ? ' till ' + client : ''}.${total ? '\nBelopp: ' + total : ''}${linkLine}\n\nMed vänliga hälsningar`;
   window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
@@ -6695,7 +6695,7 @@ async function shareViaEmail() {
 
 async function shareNative() {
   const { title, client, total } = getQuoteText();
-  const shareUrl = window._currentShareId ? `https://offeria.se/offert.html?id=${window._currentShareId}` : 'https://offeria.se';
+  const shareUrl = window._currentShareId ? `https://www.offeria.se/offert.html?id=${window._currentShareId}` : 'https://offeria.se';
   const text = `${title}${client && client !== 'Kund' ? ' – ' + client : ''}${total ? ' – ' + total : ''}\n\nSe offerten här (giltig 30 dagar):\n${shareUrl}`;
   if (navigator.share) {
     try {
