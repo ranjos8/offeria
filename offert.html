@@ -2,14 +2,14 @@
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Offert – Offeria</title>
 <meta name="robots" content="noindex">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root { --ink: #0d0d0b; --paper: #f7f4ee; --cream: #ede8db; --gold: #b8902e; --gold-light: #e8d5a0; --border: #ddd8cc; }
-body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; }
+body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; -webkit-tap-highlight-color: transparent; }
 .quote-doc {
   background: white; border: 1px solid var(--border); border-radius: 16px;
   padding: 2.5rem 2.5rem; max-width: 750px; width: 100%;
@@ -38,8 +38,6 @@ table.qt tr:last-child td { border-bottom: none; }
 .q-terms { background: var(--cream); border-radius: 8px; padding: 1rem 1.2rem; font-size: 0.79rem; color: #666; margin-bottom: 1.5rem; }
 .q-terms h4 { font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.12em; color: #999; margin-bottom: 0.5rem; }
 .q-footer { display: flex; justify-content: space-between; align-items: flex-end; padding-top: 1.5rem; border-top: 1px solid var(--border); font-size: 0.78rem; color: #888; }
-.sig-block { text-align: center; }
-.sig-line { width: 180px; border-bottom: 1px solid #ccc; margin-bottom: 0.4rem; height: 40px; }
 .loading { text-align: center; padding: 4rem 2rem; }
 .loading h2 { font-family: 'Fraunces', serif; margin-bottom: 0.5rem; }
 .error { text-align: center; padding: 4rem 2rem; color: #999; }
@@ -56,19 +54,38 @@ table.qt tr:last-child td { border-bottom: none; }
 .sign-sub { font-size: 0.85rem; color: #888; margin-bottom: 1.5rem; }
 .sign-field { margin-bottom: 1rem; }
 .sign-field label { display: block; font-size: 0.78rem; font-weight: 600; color: #555; margin-bottom: 0.3rem; }
-.sign-field input { width: 100%; padding: 0.7rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.92rem; background: var(--paper); }
+.sign-field input { width: 100%; padding: 0.7rem 1rem; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 16px; background: var(--paper); }
 .sign-field input:focus { outline: none; border-color: var(--gold); }
 .sign-check { display: flex; align-items: flex-start; gap: 0.6rem; margin: 1.2rem 0; font-size: 0.85rem; color: #444; line-height: 1.5; }
 .sign-check input[type="checkbox"] { width: 20px; height: 20px; margin-top: 0.1rem; accent-color: var(--gold); flex-shrink: 0; }
 .sign-btn {
   width: 100%; padding: 0.9rem; background: var(--gold); color: white; border: none;
   border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 1rem;
-  font-weight: 700; cursor: pointer; transition: background 0.15s;
+  font-weight: 700; cursor: pointer; transition: background 0.15s; min-height: 48px;
 }
 .sign-btn:hover { background: #a07d26; }
 .sign-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.sign-btn-outline {
+  width: 100%; padding: 0.7rem; background: transparent; color: var(--gold); 
+  border: 1.5px solid var(--gold); border-radius: 10px; font-family: 'DM Sans', sans-serif; 
+  font-size: 0.9rem; font-weight: 600; cursor: pointer; margin-top: 0.6rem; min-height: 44px;
+}
+.sign-btn-outline:hover { background: #fdf8ee; }
 .sign-decline { display: block; text-align: center; margin-top: 0.8rem; font-size: 0.82rem; color: #999; cursor: pointer; text-decoration: underline; }
 .sign-decline:hover { color: #c62828; }
+
+/* Verification code input */
+.code-input {
+  display: flex; gap: 0.5rem; justify-content: center; margin: 1rem 0;
+}
+.code-input input {
+  width: 48px; height: 56px; text-align: center; font-size: 1.5rem; font-weight: 700;
+  border: 2px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif;
+  background: white;
+}
+.code-input input:focus { outline: none; border-color: var(--gold); background: #fdf8ee; }
+.code-sent-msg { text-align: center; font-size: 0.85rem; color: #2e7d32; margin-bottom: 1rem; }
+.code-resend { text-align: center; font-size: 0.8rem; color: var(--gold); cursor: pointer; text-decoration: underline; margin-top: 0.5rem; }
 
 /* Signed confirmation */
 .signed-badge {
@@ -86,6 +103,12 @@ table.qt tr:last-child td { border-bottom: none; }
 }
 .declined-badge h3 { font-family: 'Fraunces', serif; font-size: 1.1rem; color: #c62828; margin-bottom: 0.4rem; }
 
+/* Steps indicator */
+.sign-steps { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+.sign-step { flex: 1; text-align: center; padding: 0.5rem; border-radius: 8px; font-size: 0.72rem; font-weight: 600; color: #999; background: #f5f0e8; }
+.sign-step.active { background: var(--gold); color: white; }
+.sign-step.done { background: #e8f5e9; color: #2e7d32; }
+
 @media (max-width: 640px) {
   body { padding: 0.5rem; }
   .quote-doc { padding: 1.2rem; border-radius: 8px; font-size: 0.82rem; }
@@ -100,6 +123,7 @@ table.qt tr:last-child td { border-bottom: none; }
   table.qt th, table.qt td { padding: 0.5rem 0.4rem; }
   .q-totals-box { width: 100%; min-width: unset; }
   .q-footer { flex-direction: column; gap: 1rem; align-items: flex-start; }
+  .code-input input { width: 42px; height: 48px; font-size: 1.3rem; }
 }
 @media print {
   body { padding: 0; background: white; }
@@ -120,7 +144,7 @@ table.qt tr:last-child td { border-bottom: none; }
 <div id="signatureArea"></div>
 
 <div class="brand-footer">
-  <a href="https://offeria.se">Offeria</a>
+  <a href="https://www.offeria.se">Offeria</a>
   <span style="font-size:0.72rem;color:#ccc;margin-left:0.3rem">– Offert, faktura &amp; bokföring</span>
 </div>
 
@@ -128,9 +152,15 @@ table.qt tr:last-child td { border-bottom: none; }
 <script>
 const SUPABASE_URL = 'https://yfnmmcrvzcwcinwopnlj.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmbm1tY3J2emN3Y2lud29wbmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MzY4NjQsImV4cCI6MjA4NzUxMjg2NH0.MpF3oRLWwXkmrjEGJ0Qqrsw_87FixbaNHmHmPxFyXKc';
+const EMAILJS_SERVICE = 'service_f5de23t';
+const EMAILJS_KEY = 'iUGAEbeer-pOBR8tV';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let _currentShareId = null;
+let _quoteData = null;
+let _verificationCode = null;
+let _verifiedEmail = null;
+let _ownerEmail = null;
 
 async function loadQuote() {
   const container = document.getElementById('quoteContainer');
@@ -144,9 +174,10 @@ async function loadQuote() {
   }
 
   try {
+    // Get quote with owner info
     const { data, error } = await sb
       .from('quote_usage')
-      .select('quote_html, title, client_name, created_at, signature_name, signature_date, signature_status')
+      .select('quote_html, title, client_name, total_amount, created_at, signature_name, signature_date, signature_status, user_id')
       .eq('share_id', _currentShareId)
       .single();
 
@@ -155,53 +186,38 @@ async function loadQuote() {
       return;
     }
 
+    _quoteData = data;
+
+    // Get owner email for notification
+    if (data.user_id) {
+      const { data: profile } = await sb.from('profiles').select('email, company_name').eq('id', data.user_id).single();
+      if (profile) {
+        _ownerEmail = profile.email;
+        _quoteData.ownerCompany = profile.company_name || '';
+      }
+    }
+
     // Clean the HTML
     let html = data.quote_html || '';
     html = html.replace(/<select[^>]*class="row-type-select"[^>]*>[\s\S]*?<\/select>/gi, '');
     html = html.replace(/<th[^>]*>Typ<\/th>/gi, '');
     html = html.replace(/\s*contenteditable="true"/gi, '');
     html = html.replace(/<div class="edit-hint">[\s\S]*?<\/div>/gi, '');
-    html = html.replace(/<div class="add-row-btn">[\s\S]*?<\/div>/gi, '');
+    html = html.replace(/<button[^>]*class="add-row-btn"[^>]*>[\s\S]*?<\/button>/gi, '');
     html = html.replace(/<button[^>]*class="del-row-btn"[^>]*>[\s\S]*?<\/button>/gi, '');
-    html = html.replace(/<button[^>]*onclick="openCustomerPickerForQuote\(\)"[^>]*>[\s\S]*?<\/button>/gi, '');
-    html = html.replace(/<button[^>]*onclick="openArticlePicker\(\)"[^>]*>[\s\S]*?<\/button>/gi, '');
+    html = html.replace(/<button[^>]*onclick="openCustomerPickerForQuote[^"]*"[^>]*>[\s\S]*?<\/button>/gi, '');
+    html = html.replace(/<button[^>]*onclick="openArticlePicker[^"]*"[^>]*>[\s\S]*?<\/button>/gi, '');
 
     container.innerHTML = '<div class="quote-doc">' + html + '</div>';
     document.title = (data.title || 'Offert') + ' – Offeria';
 
     // Show signature section based on status
     if (data.signature_status === 'signed') {
-      const signDate = new Date(data.signature_date).toLocaleDateString('sv-SE', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-      signArea.innerHTML = `<div class="signed-badge">
-        <h3>Offerten är godkänd</h3>
-        <p>Signerad av <strong>${data.signature_name}</strong> den ${signDate}</p>
-      </div>`;
+      showSignedBadge(data.signature_name, data.signature_date);
     } else if (data.signature_status === 'declined') {
-      signArea.innerHTML = `<div class="declined-badge">
-        <h3>Offerten har avböjts</h3>
-        <p>Kontakta avsändaren för mer information.</p>
-      </div>`;
+      signArea.innerHTML = '<div class="declined-badge"><h3>Offerten har avböjts</h3><p>Kontakta avsändaren för mer information.</p></div>';
     } else {
-      // Show signature form
-      signArea.innerHTML = `<div class="sign-section">
-        <div class="sign-title">Godkänn offerten</div>
-        <div class="sign-sub">Granska offerten ovan och signera digitalt nedan.</div>
-        <div class="sign-field">
-          <label>Ditt namn *</label>
-          <input type="text" id="signName" placeholder="Förnamn Efternamn">
-        </div>
-        <div class="sign-field">
-          <label>E-post (valfritt)</label>
-          <input type="email" id="signEmail" placeholder="din@epost.se">
-        </div>
-        <div class="sign-check">
-          <input type="checkbox" id="signConsent">
-          <span>Jag har granskat offerten och godkänner villkoren. Jag förstår att detta utgör en digital signatur.</span>
-        </div>
-        <button class="sign-btn" id="signBtn" onclick="signQuote()">Godkänn offert</button>
-        <span class="sign-decline" onclick="declineQuote()">Avböj offert</span>
-        <p style="font-size:0.72rem;color:#bbb;text-align:center;margin-top:1rem">Din signatur sparas med namn, datum och tidpunkt. Detta är juridiskt bindande.</p>
-      </div>`;
+      showStep1();
     }
 
   } catch (e) {
@@ -210,43 +226,243 @@ async function loadQuote() {
   }
 }
 
-async function signQuote() {
+function showSignedBadge(name, date) {
+  const signDate = new Date(date).toLocaleDateString('sv-SE', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  document.getElementById('signatureArea').innerHTML = 
+    '<div class="signed-badge"><h3>Offerten är godkänd</h3>' +
+    '<p>Signerad av <strong>' + name + '</strong> den ' + signDate + '</p></div>';
+}
+
+// STEP 1: Namn + E-post + Skicka verifieringskod
+function showStep1() {
+  document.getElementById('signatureArea').innerHTML = 
+    '<div class="sign-section">' +
+      '<div class="sign-steps">' +
+        '<div class="sign-step active">1. Uppgifter</div>' +
+        '<div class="sign-step">2. Verifiera</div>' +
+        '<div class="sign-step">3. Signera</div>' +
+      '</div>' +
+      '<div class="sign-title">Godkänn offerten</div>' +
+      '<div class="sign-sub">Granska offerten ovan och signera digitalt nedan.</div>' +
+      '<div class="sign-field">' +
+        '<label>Ditt namn *</label>' +
+        '<input type="text" id="signName" placeholder="Förnamn Efternamn">' +
+      '</div>' +
+      '<div class="sign-field">' +
+        '<label>E-post * (för verifiering och kvitto)</label>' +
+        '<input type="email" id="signEmail" placeholder="din@epost.se">' +
+      '</div>' +
+      '<div class="sign-field">' +
+        '<label>Telefonnummer</label>' +
+        '<input type="tel" id="signPhone" placeholder="070-123 45 67">' +
+      '</div>' +
+      '<button class="sign-btn" onclick="sendVerificationCode()">Skicka verifieringskod</button>' +
+      '<span class="sign-decline" onclick="declineQuote()">Avböj offert</span>' +
+    '</div>';
+}
+
+// Send verification code via EmailJS
+async function sendVerificationCode() {
   const name = document.getElementById('signName').value.trim();
-  const email = document.getElementById('signEmail')?.value.trim() || '';
-  const consent = document.getElementById('signConsent').checked;
+  const email = document.getElementById('signEmail').value.trim();
 
   if (!name) return alert('Ange ditt namn.');
+  if (!email || !email.includes('@')) return alert('Ange en giltig e-postadress.');
+
+  // Generate 6-digit code
+  _verificationCode = String(Math.floor(100000 + Math.random() * 900000));
+  _verifiedEmail = email;
+
+  const btn = document.querySelector('.sign-btn');
+  btn.disabled = true;
+  btn.textContent = 'Skickar kod...';
+
+  try {
+    await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        service_id: EMAILJS_SERVICE,
+        template_id: 'template_fbh7cng',
+        user_id: EMAILJS_KEY,
+        template_params: {
+          to_email: email,
+          to_name: name,
+          from_name: 'Offeria',
+          subject: 'Din verifieringskod för offert',
+          message: 'Din verifieringskod är: ' + _verificationCode + '\n\nAnge denna kod för att godkänna offerten "' + (_quoteData?.title || 'Offert') + '".\n\nKoden gäller i 10 minuter.'
+        }
+      })
+    });
+
+    showStep2(name, email);
+  } catch (err) {
+    console.error('Email error:', err);
+    alert('Kunde inte skicka verifieringskod. Försök igen.');
+    btn.disabled = false;
+    btn.textContent = 'Skicka verifieringskod';
+  }
+}
+
+// STEP 2: Enter verification code
+function showStep2(name, email) {
+  const phone = document.getElementById('signPhone')?.value.trim() || '';
+  
+  document.getElementById('signatureArea').innerHTML = 
+    '<div class="sign-section">' +
+      '<div class="sign-steps">' +
+        '<div class="sign-step done">1. Uppgifter</div>' +
+        '<div class="sign-step active">2. Verifiera</div>' +
+        '<div class="sign-step">3. Signera</div>' +
+      '</div>' +
+      '<div class="sign-title">Ange verifieringskod</div>' +
+      '<div class="code-sent-msg">En 6-siffrig kod har skickats till <strong>' + email + '</strong></div>' +
+      '<div class="code-input">' +
+        '<input type="text" maxlength="1" inputmode="numeric" oninput="codeNext(this,0)" onkeydown="codePrev(event,0)">' +
+        '<input type="text" maxlength="1" inputmode="numeric" oninput="codeNext(this,1)" onkeydown="codePrev(event,1)">' +
+        '<input type="text" maxlength="1" inputmode="numeric" oninput="codeNext(this,2)" onkeydown="codePrev(event,2)">' +
+        '<input type="text" maxlength="1" inputmode="numeric" oninput="codeNext(this,3)" onkeydown="codePrev(event,3)">' +
+        '<input type="text" maxlength="1" inputmode="numeric" oninput="codeNext(this,4)" onkeydown="codePrev(event,4)">' +
+        '<input type="text" maxlength="1" inputmode="numeric" oninput="codeNext(this,5)" onkeydown="codePrev(event,5)">' +
+      '</div>' +
+      '<div id="codeError" style="text-align:center;color:#c62828;font-size:0.82rem;display:none"></div>' +
+      '<button class="sign-btn" onclick="verifyCode()">Verifiera</button>' +
+      '<div class="code-resend" onclick="resendCode()">Fick du ingen kod? Skicka igen</div>' +
+    '</div>';
+
+  // Store data for later
+  window._signName = name;
+  window._signEmail = email;
+  window._signPhone = phone;
+
+  // Focus first input
+  setTimeout(() => document.querySelector('.code-input input')?.focus(), 100);
+}
+
+// Code input helpers
+function codeNext(el, i) {
+  if (el.value.length === 1) {
+    const inputs = document.querySelectorAll('.code-input input');
+    if (inputs[i + 1]) inputs[i + 1].focus();
+  }
+}
+function codePrev(e, i) {
+  if (e.key === 'Backspace' && !e.target.value) {
+    const inputs = document.querySelectorAll('.code-input input');
+    if (inputs[i - 1]) { inputs[i - 1].focus(); inputs[i - 1].value = ''; }
+  }
+}
+
+function resendCode() {
+  _verificationCode = String(Math.floor(100000 + Math.random() * 900000));
+  fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      service_id: EMAILJS_SERVICE,
+      template_id: 'template_fbh7cng',
+      user_id: EMAILJS_KEY,
+      template_params: {
+        to_email: window._signEmail,
+        to_name: window._signName,
+        from_name: 'Offeria',
+        subject: 'Din verifieringskod för offert (ny)',
+        message: 'Din nya verifieringskod är: ' + _verificationCode + '\n\nAnge denna kod för att godkänna offerten.\n\nKoden gäller i 10 minuter.'
+      }
+    })
+  });
+  alert('En ny kod har skickats till ' + window._signEmail);
+}
+
+function verifyCode() {
+  const inputs = document.querySelectorAll('.code-input input');
+  const entered = Array.from(inputs).map(i => i.value).join('');
+  const errEl = document.getElementById('codeError');
+
+  if (entered.length !== 6) {
+    errEl.textContent = 'Ange alla 6 siffror.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  if (entered !== _verificationCode) {
+    errEl.textContent = 'Fel kod. Försök igen eller klicka "Skicka igen".';
+    errEl.style.display = 'block';
+    inputs.forEach(i => { i.value = ''; i.style.borderColor = '#c62828'; });
+    inputs[0].focus();
+    return;
+  }
+
+  // Code correct - show step 3
+  showStep3();
+}
+
+// STEP 3: Confirm and sign
+function showStep3() {
+  document.getElementById('signatureArea').innerHTML = 
+    '<div class="sign-section">' +
+      '<div class="sign-steps">' +
+        '<div class="sign-step done">1. Uppgifter</div>' +
+        '<div class="sign-step done">2. Verifiera</div>' +
+        '<div class="sign-step active">3. Signera</div>' +
+      '</div>' +
+      '<div class="sign-title">Bekräfta signering</div>' +
+      '<div class="sign-sub">E-post verifierad. Granska uppgifterna och godkänn.</div>' +
+      '<div style="background:var(--cream);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1.2rem;font-size:0.88rem">' +
+        '<div><strong>Namn:</strong> ' + window._signName + '</div>' +
+        '<div><strong>E-post:</strong> ' + window._signEmail + ' <span style="color:#2e7d32;font-size:0.75rem;font-weight:600">Verifierad</span></div>' +
+        (window._signPhone ? '<div><strong>Telefon:</strong> ' + window._signPhone + '</div>' : '') +
+        '<div><strong>Offert:</strong> ' + (_quoteData?.title || 'Offert') + '</div>' +
+      '</div>' +
+      '<div class="sign-check">' +
+        '<input type="checkbox" id="signConsent">' +
+        '<span>Jag har granskat offerten och godkänner villkoren. Jag förstår att detta utgör en juridiskt bindande digital signatur.</span>' +
+      '</div>' +
+      '<button class="sign-btn" onclick="signQuote()">Godkänn offert</button>' +
+      '<p style="font-size:0.72rem;color:#bbb;text-align:center;margin-top:1rem">Signatur sparas med namn, verifierad e-post, IP-adress, datum och tidpunkt.</p>' +
+    '</div>';
+}
+
+async function signQuote() {
+  const consent = document.getElementById('signConsent').checked;
   if (!consent) return alert('Du måste godkänna villkoren för att signera.');
 
-  const btn = document.getElementById('signBtn');
+  const btn = document.querySelector('.sign-btn');
   btn.disabled = true;
   btn.textContent = 'Signerar...';
 
   try {
-    // Get client IP for audit trail
-    let clientIp = '';
+    // Get client IP
+    let clientIp = 'unknown';
     try {
       const ipRes = await fetch('https://api.ipify.org?format=json');
       const ipData = await ipRes.json();
-      clientIp = ipData.ip || '';
-    } catch(e) { clientIp = 'unknown'; }
+      clientIp = ipData.ip || 'unknown';
+    } catch(e) {}
+
+    const signDate = new Date().toISOString();
 
     const { error } = await sb.from('quote_usage').update({
-      signature_name: name,
-      signature_date: new Date().toISOString(),
+      signature_name: window._signName,
+      signature_email: window._signEmail,
+      signature_phone: window._signPhone || null,
+      signature_date: signDate,
       signature_ip: clientIp,
-      signature_status: 'signed'
+      signature_status: 'signed',
+      signature_verified: true
     }).eq('share_id', _currentShareId);
 
     if (error) throw error;
 
-    // Replace sign section with confirmation
-    const signDate = new Date().toLocaleDateString('sv-SE', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-    document.getElementById('signatureArea').innerHTML = `<div class="signed-badge">
-      <h3>Offerten är godkänd!</h3>
-      <p>Signerad av <strong>${name}</strong> den ${signDate}</p>
-      <p style="margin-top:0.5rem;font-size:0.8rem;color:#888">Avsändaren har fått en bekräftelse.</p>
-    </div>`;
+    // Send confirmation to customer
+    sendSignConfirmationToCustomer(window._signName, window._signEmail, signDate);
+
+    // Send notification to quote owner
+    if (_ownerEmail) {
+      sendSignNotificationToOwner(window._signName, window._signEmail, signDate);
+    }
+
+    showSignedBadge(window._signName, signDate);
 
   } catch (err) {
     console.error('Sign error:', err);
@@ -254,6 +470,47 @@ async function signQuote() {
     btn.disabled = false;
     btn.textContent = 'Godkänn offert';
   }
+}
+
+function sendSignConfirmationToCustomer(name, email, date) {
+  const dateStr = new Date(date).toLocaleDateString('sv-SE', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      service_id: EMAILJS_SERVICE,
+      template_id: 'template_fbh7cng',
+      user_id: EMAILJS_KEY,
+      template_params: {
+        to_email: email,
+        to_name: name,
+        from_name: _quoteData?.ownerCompany || 'Offeria',
+        subject: 'Bekräftelse: Du har godkänt offerten "' + (_quoteData?.title || 'Offert') + '"',
+        message: 'Hej ' + name + ',\n\nDu har godkänt offerten "' + (_quoteData?.title || 'Offert') + '".\n\nSignerad: ' + dateStr + '\n\nDu kan se offerten här:\nhttps://www.offeria.se/offert.html?id=' + _currentShareId + '\n\nVid frågor, kontakta avsändaren direkt.'
+      }
+    })
+  }).catch(e => console.error('Customer email error:', e));
+}
+
+function sendSignNotificationToOwner(name, email, date) {
+  const dateStr = new Date(date).toLocaleDateString('sv-SE', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const amount = _quoteData?.total_amount ? Number(_quoteData.total_amount).toLocaleString('sv-SE') + ' kr' : '';
+  fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      service_id: EMAILJS_SERVICE,
+      template_id: 'template_fbh7cng',
+      user_id: EMAILJS_KEY,
+      template_params: {
+        to_email: _ownerEmail,
+        to_name: _quoteData?.ownerCompany || '',
+        from_name: 'Offeria',
+        subject: 'Offert godkänd! "' + (_quoteData?.title || 'Offert') + '" signerad av ' + name,
+        message: 'Goda nyheter!\n\n' + name + ' (' + email + ') har godkänt din offert.\n\nOffert: ' + (_quoteData?.title || 'Offert') + '\n' + (amount ? 'Belopp: ' + amount + '\n' : '') + 'Signerad: ' + dateStr + '\n\nLogga in på Offeria för att skapa faktura:\nhttps://www.offeria.se'
+      }
+    })
+  }).catch(e => console.error('Owner email error:', e));
 }
 
 async function declineQuote() {
@@ -265,10 +522,27 @@ async function declineQuote() {
       signature_date: new Date().toISOString()
     }).eq('share_id', _currentShareId);
 
-    document.getElementById('signatureArea').innerHTML = `<div class="declined-badge">
-      <h3>Offerten har avböjts</h3>
-      <p>Avsändaren har fått en notis.</p>
-    </div>`;
+    // Notify owner about decline
+    if (_ownerEmail) {
+      fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service_id: EMAILJS_SERVICE,
+          template_id: 'template_fbh7cng',
+          user_id: EMAILJS_KEY,
+          template_params: {
+            to_email: _ownerEmail,
+            to_name: _quoteData?.ownerCompany || '',
+            from_name: 'Offeria',
+            subject: 'Offert avböjd: "' + (_quoteData?.title || 'Offert') + '"',
+            message: 'Tyvärr — kunden har avböjt offerten "' + (_quoteData?.title || 'Offert') + '".\n\nLogga in på Offeria för att se detaljer:\nhttps://www.offeria.se'
+          }
+        })
+      }).catch(() => {});
+    }
+
+    document.getElementById('signatureArea').innerHTML = '<div class="declined-badge"><h3>Offerten har avböjts</h3><p>Avsändaren har fått en notis.</p></div>';
   } catch (err) {
     alert('Kunde inte avböja. Försök igen.');
   }
