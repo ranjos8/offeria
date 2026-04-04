@@ -4642,10 +4642,10 @@ function renderUserList() {
         <div style="font-weight:600">
           ${isVip ? '<span style="font-size:0.7rem;background:#b8902e;color:white;padding:0.1rem 0.35rem;border-radius:3px;margin-right:0.3rem">VIP</span>' : ''}
           ${isBeta ? '<span style="font-size:0.7rem;background:#1565c0;color:white;padding:0.1rem 0.35rem;border-radius:3px;margin-right:0.3rem">BETA</span>' : ''}
-          ${u.company_name || u.full_name || '—'}
+          ${escapeHtml(u.company_name || u.full_name || '—')}
         </div>
-        <div style="font-size:0.75rem;color:#888">${u.email || ''}</div>
-        ${noteClean ? '<div style="font-size:0.7rem;color:#b8902e;margin-top:0.2rem">'+noteClean+'</div>' : ''}
+        <div style="font-size:0.75rem;color:#888">${escapeHtml(u.email || '')}</div>
+        ${noteClean ? '<div style="font-size:0.7rem;color:#b8902e;margin-top:0.2rem">'+escapeHtml(noteClean)+'</div>' : ''}
       </td>
       <td style="padding:0.7rem 1rem">
         <span style="font-size:0.72rem;font-weight:700;color:white;background:${planColor[plan]||'#888'};padding:0.15rem 0.5rem;border-radius:4px">${planLabel[plan]||plan}</span>
@@ -7081,8 +7081,8 @@ function buildRow(it) {
     <option value="material" ${isMaterial ? 'selected' : ''}>Material</option>
   </select></td>` : '';
   return `<tr>
-    <td><span class="editable" contenteditable="true">${cleanDesc}</span></td>
-    <td><span class="editable" contenteditable="true">${it.qty}</span></td>
+    <td><span class="editable" contenteditable="true">${escapeHtml(cleanDesc)}</span></td>
+    <td><span class="editable" contenteditable="true">${escapeHtml(it.qty)}</span></td>
     <td style="text-align:right"><span class="editable unit-price" contenteditable="true">${fmtSEK(it.unitPrice)}</span></td>
     <td style="text-align:right;font-weight:500"><span class="row-total">${fmtSEK(it.total)}</span></td>
     ${typeCell}
@@ -7201,11 +7201,11 @@ function renderQuote(q) {
       ${logoHtml}
     </div>
     <div class="q-meta-row">
-      <div class="q-offer-title">${q.title} <span class="valid-badge">Giltig 30 dagar</span></div>
+      <div class="q-offer-title">${escapeHtml(q.title)} <span class="valid-badge">Giltig 30 dagar</span></div>
       <div class="q-meta"><strong>Nr:</strong> ${info.quoteNum}<br><strong>Datum:</strong> ${info.dateStr}<br><strong>Giltig till:</strong> ${info.validStr}</div>
     </div>
-    <div class="q-client"><div class="lbl">Kund <button onclick="openCustomerPickerForQuote()" style="font-size:0.65rem;background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:0.15rem 0.5rem;cursor:pointer;color:var(--gold);font-family:inherit;margin-left:0.5rem"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span> Välj kund</button></div><strong class="editable" contenteditable="true" id="quoteClientName">${q.clientName}</strong><br><span class="editable" contenteditable="true" id="quoteClientAddr">${q.clientAddress}</span></div>
-    <div class="q-intro">${q.introduction}</div>
+    <div class="q-client"><div class="lbl">Kund <button onclick="openCustomerPickerForQuote()" style="font-size:0.65rem;background:var(--cream);border:1px solid var(--border);border-radius:4px;padding:0.15rem 0.5rem;cursor:pointer;color:var(--gold);font-family:inherit;margin-left:0.5rem"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span> Välj kund</button></div><strong class="editable" contenteditable="true" id="quoteClientName">${escapeHtml(q.clientName)}</strong><br><span class="editable" contenteditable="true" id="quoteClientAddr">${escapeHtml(q.clientAddress)}</span></div>
+    <div class="q-intro">${escapeHtml(q.introduction)}</div>
     <div class="edit-hint"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></span> Klicka på rad för att redigera – summor räknas om automatiskt${info.inclRot ? '. Ändra Arbete/Material per rad för korrekt ROT-avdrag.' : ''}</div>
     <table class="qt">
       <thead><tr><th style="width:${info.inclRot?'38':'44'}%">Beskrivning</th><th>Antal</th><th style="text-align:right">À-pris</th><th style="text-align:right">Summa</th>${info.inclRot?'<th style="width:70px;text-align:center;font-size:0.62rem">Typ</th>':''}<th style="width:26px"></th></tr></thead>
@@ -7222,10 +7222,10 @@ function renderQuote(q) {
         <div class="trow final-row"><span id="tot-final-lbl">${finalLabel}</span><span id="tot-final">${fmtSEK(finalTotal)}</span></div>
       </div>
     </div>
-    ${q.timeline?`<div class="q-terms" style="margin-bottom:1rem"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:0.85em;height:0.85em;vertical-align:-0.1em;display:inline-block"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Tidplan</h4><p class="editable" contenteditable="true">${q.timeline}</p></div>`:''}
-    ${q.materials?`<div class="q-terms" style="margin-bottom:1rem"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:0.85em;height:0.85em;vertical-align:-0.1em;display:inline-block"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Material</h4><p class="editable" contenteditable="true">${q.materials}</p></div>`:''}
-    <div class="q-terms"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:0.85em;height:0.85em;vertical-align:-0.1em;display:inline-block"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Villkor & betalning</h4><p class="editable" contenteditable="true">• Betalningsvillkor: ${info.payterms}${q.warrantyText ? '<br>• ' + q.warrantyText : ''}<br>${q.terms}</p></div>
-    <p class="editable" contenteditable="true" style="font-size:0.82rem;color:#555;margin-bottom:1.5rem;font-style:italic">${q.closingNote}</p>
+    ${q.timeline?`<div class="q-terms" style="margin-bottom:1rem"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:0.85em;height:0.85em;vertical-align:-0.1em;display:inline-block"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Tidplan</h4><p class="editable" contenteditable="true">${escapeHtml(q.timeline)}</p></div>`:''}
+    ${q.materials?`<div class="q-terms" style="margin-bottom:1rem"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:0.85em;height:0.85em;vertical-align:-0.1em;display:inline-block"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Material</h4><p class="editable" contenteditable="true">${escapeHtml(q.materials)}</p></div>`:''}
+    <div class="q-terms"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:0.85em;height:0.85em;vertical-align:-0.1em;display:inline-block"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Villkor & betalning</h4><p class="editable" contenteditable="true">• Betalningsvillkor: ${escapeHtml(info.payterms)}${q.warrantyText ? '<br>• ' + escapeHtml(q.warrantyText) : ''}<br>${escapeHtml(q.terms)}</p></div>
+    <p class="editable" contenteditable="true" style="font-size:0.82rem;color:#555;margin-bottom:1.5rem;font-style:italic">${escapeHtml(q.closingNote)}</p>
     <div class="q-footer">
       <div><strong>${info.company}</strong><br>${info.phone} ${info.email}${credentialsHtml ? `<br><span style='font-size:0.72rem;color:#aaa'>${credentialsHtml}</span>` : ''}</div>
 
@@ -9027,11 +9027,15 @@ function openNewVerification() {
 function closeVerModal() { document.getElementById('verificationModalOverlay').style.display = 'none'; }
 
 async function saveVerification() {
+  const btn = document.querySelector('[onclick="saveVerification()"]');
+  if (btn?.disabled) return;
+  if (btn) { btn.disabled = true; btn.textContent = 'Sparar...'; }
+  try {
   const date = document.getElementById('verDate').value;
   const desc = document.getElementById('verDesc').value.trim();
   const counterpart = document.getElementById('verCounterpart').value.trim();
   const cat = document.getElementById('verCategory').value;
-  if (!date || !desc) return alert('Ange datum och beskrivning.');
+  if (!date || !desc) { if (btn) { btn.disabled = false; btn.textContent = 'Spara verifikation'; } return alert('Ange datum och beskrivning.'); }
 
   // Bygg fullständig beskrivning med motpart
   const fullDesc = counterpart ? `${desc} (${counterpart})` : desc;
@@ -9236,6 +9240,8 @@ async function saveVerification() {
 
   closeVerModal();
   loadBookkeeping();
+  } catch(e) { console.error('Save verification error:', e); alert('Fel: ' + e.message); }
+  finally { if (btn) { btn.disabled = false; btn.textContent = 'Spara verifikation'; } }
 }
 
 function viewVerification(id) {
