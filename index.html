@@ -940,7 +940,9 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
   #userList table { font-size: 0.78rem; }
   #userList table th:nth-child(3), #userList table td:nth-child(3) { display: none; }
   #userList table th:nth-child(4), #userList table td:nth-child(4) { display: none; }
-  #userList table td:last-child button { font-size: 0.7rem !important; padding: 0.25rem 0.5rem !important; }
+  #userList table th:nth-child(5), #userList table td:nth-child(5) { display: none; }
+  #userList table tr { cursor: pointer; }
+  #userList table tr:active { background: #f5f0e8; }
 
   /* Help context button - more prominent on mobile */
   .help-context-btn { width: 32px; height: 32px; font-size: 0.9rem; }
@@ -4574,7 +4576,7 @@ async function loadAdminUsers() {
     .select('id, email, full_name, company_name, plan, trial_ends_at, created_at, stripe_customer_id, admin_notes, last_sign_in_at')
     .order('created_at', { ascending: false });
 
-  _adminUsers = data || [];
+  _adminUsers = (data || []).filter(u => !u.email?.includes('@removed.offeria.se'));
   filterUsers();
 }
 
@@ -4644,7 +4646,7 @@ function renderUserList() {
         <div style="font-size:0.75rem;color:#888">${escapeHtml(u.email || '')}</div>
         ${noteClean ? '<div style="font-size:0.7rem;color:#b8902e;margin-top:0.2rem">'+escapeHtml(noteClean)+'</div>' : ''}
       </td>
-      <td style="padding:0.7rem 1rem">
+      <td style="padding:0.7rem 0.5rem">
         <span style="font-size:0.72rem;font-weight:700;color:white;background:${planColor[plan]||'#888'};padding:0.15rem 0.5rem;border-radius:4px">${planLabel[plan]||plan}</span>
       </td>
       <td style="padding:0.7rem 1rem;color:#888;font-size:0.8rem">
@@ -4654,9 +4656,10 @@ function renderUserList() {
       <td style="padding:0.7rem 1rem">
         ${inTrial ? '<span style="font-size:0.75rem;color:#b8902e">'+daysLeft+' dagar kvar</span>' : '<span style="color:#ccc;font-size:0.75rem">—</span>'}
       </td>
-      <td style="padding:0.7rem 1rem;text-align:right">
-        <button onclick="openUserActions('${u.id}')" style="background:var(--ink);color:var(--gold-light);border:none;padding:0.3rem 0.8rem;border-radius:6px;font-size:0.75rem;cursor:pointer;font-family:inherit">Hantera ▾</button>
+      <td style="padding:0.7rem 0.5rem;text-align:right">
+        <button onclick="event.stopPropagation();openUserActions('${u.id}')" style="background:var(--ink);color:var(--gold-light);border:none;padding:0.35rem 0.7rem;border-radius:6px;font-size:0.72rem;cursor:pointer;font-family:inherit;white-space:nowrap">Hantera</button>
       </td>`;
+    tr.onclick = () => openUserActions(u.id);
     tbody.appendChild(tr);
   });
   table.appendChild(tbody);
