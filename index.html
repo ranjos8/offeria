@@ -631,14 +631,15 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 .save-ok { color: var(--teal); font-size: 0.82rem; margin-left: 1rem; display: none; }
 
 /* upgrade modal */
-.upgrade-modal { max-width: 560px; }
-.upgrade-plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; padding: 1.5rem 2rem; }
-.uplan { border: 1.5px solid var(--border); border-radius: 12px; padding: 1.2rem; cursor: pointer; transition: all 0.15s; }
+.upgrade-modal { max-width: 620px; }
+.upgrade-plans { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1.5rem 2rem; }
+.uplan { border: 1.5px solid var(--border); border-radius: 12px; padding: 1.4rem; cursor: pointer; transition: all 0.15s; }
 .uplan:hover { border-color: var(--gold); }
 .uplan.sel { border-color: var(--gold); background: #fffaee; }
-.uplan-name { font-family: 'Fraunces', serif; font-size: 1rem; margin-bottom: 0.2rem; }
-.uplan-price { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.6rem; }
-.uplan-features { font-size: 0.72rem; color: #666; line-height: 1.6; }
+.uplan-name { font-family: 'Fraunces', serif; font-size: 1.1rem; margin-bottom: 0.3rem; }
+.uplan-price { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.5rem; }
+.uplan-trial { font-size: 0.82rem; color: var(--gold); font-weight: 600; margin-bottom: 0.6rem; }
+.uplan-features { font-size: 0.78rem; color: #555; line-height: 1.8; }
 .stripe-note { padding: 0 2rem 1.5rem; font-size: 0.78rem; color: var(--muted); text-align: center; }
 .stripe-btn {
   display: block; margin: 0 2rem 1.5rem; padding: 0.85rem;
@@ -798,7 +799,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
   /* Upgrade modal mobile */
   .upgrade-modal { max-width: 95vw; margin: 1rem; }
-  .upgrade-plans { grid-template-columns: 1fr !important; gap: 0.6rem; padding: 1rem 1.2rem; }
+  .upgrade-plans { grid-template-columns: 1fr !important; gap: 0.8rem; padding: 1rem 1.2rem; }
   .uplan { padding: 1rem; }
   .stripe-btn { margin: 0 1.2rem 1.2rem; width: calc(100% - 2.4rem); min-height: 48px; }
   .stripe-note { padding: 0 1.2rem 1rem; }
@@ -3646,19 +3647,19 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     <button class="modal-close" onclick="closeUpgradeModal()">✕</button>
     <div class="modal-head">
       <div style="font-family:'Fraunces',serif;font-size:1.2rem;color:var(--gold-light)">Uppgradera din plan</div>
-      <p style="color:#2e7d32;font-weight:600">✓ 30 dagars gratis provperiod — avbryt när som helst</p>
+      <p style="color:var(--gold);font-weight:600">✓ 30 dagars gratis provperiod — avbryt när som helst</p>
     </div>
     <div class="upgrade-plans">
       <div class="uplan sel" id="uplan-smart" onclick="selectUPlan('smart')">
         <div class="uplan-name">Smart</div>
         <div class="uplan-price">99 kr/mån <span style="font-size:0.7rem;color:#999;font-weight:400">exkl. moms</span></div>
-        <div style="font-size:0.75rem;color:#2e7d32;margin-bottom:0.5rem;font-weight:600">Gratis i 30 dagar</div>
+        <div class="uplan-trial">Gratis i 30 dagar</div>
         <div class="uplan-features">30 AI-offerter/månad<br>E-signering<br>Fakturering med ROT/RUT<br>Kreditfakturor &amp; påminnelser<br>Egen logotyp<br>Kund- &amp; artikelregister<br>Ingen bindningstid</div>
       </div>
       <div class="uplan" id="uplan-komplett" onclick="selectUPlan('komplett')">
         <div class="uplan-name">Komplett</div>
         <div class="uplan-price">249 kr/mån <span style="font-size:0.7rem;color:#999;font-weight:400">exkl. moms</span></div>
-        <div style="font-size:0.75rem;color:#2e7d32;margin-bottom:0.5rem;font-weight:600">Gratis i 30 dagar</div>
+        <div class="uplan-trial">Gratis i 30 dagar</div>
         <div class="uplan-features">100 AI-offerter/månad<br>Allt i Smart, plus:<br><strong>Leverantörsfakturor</strong><br><strong>Kvittoskanning med AI</strong><br><strong>Komplett bokföring (BAS 2026)</strong><br><strong>AI Bokföringsassistent</strong><br>Momsrapport &amp; SIE-export<br>Dashboard &amp; statistik<br>Ingen bindningstid</div>
       </div>
     </div>
