@@ -34,10 +34,10 @@ footer p { color: #555; font-size: 0.75rem; margin-top: 0.5rem; }
 </nav>
 <div class="content">
   <h1>Integritetspolicy</h1>
-  <p class="updated">Senast uppdaterad: mars 2026</p>
+  <p class="updated">Senast uppdaterad: april 2026</p>
 
   <h2>1. Personuppgiftsansvarig</h2>
-  <p>Offeria ("vi", "oss") är personuppgiftsansvarig för behandlingen av dina personuppgifter som sker i samband med att du använder vår tjänst. Kontakta oss på <a href="mailto:info@offeria.se" style="color:var(--gold)">info@offeria.se</a> vid frågor.</p>
+  <p>Techtrix AB, org.nr 559577-6591 ("Offeria", "vi", "oss"), är personuppgiftsansvarig för behandlingen av dina personuppgifter som sker i samband med att du använder vår tjänst. Kontakta oss på <a href="mailto:info@offeria.se" style="color:var(--gold)">info@offeria.se</a> vid frågor.</p>
 
   <h2>2. Vilka uppgifter vi samlar in</h2>
   <table>
@@ -58,7 +58,9 @@ footer p { color: #555; font-size: 0.75rem; margin-top: 0.5rem; }
   <p><strong>Berättigat intresse</strong> (GDPR Art. 6.1f) — tekniska uppgifter för säkerhet och drift.</p>
 
   <h2>4. Var lagras data?</h2>
-  <p>All data lagras inom EU (Frankfurt, Tyskland) via Supabase, som är vår teknikleverantör och databehandlare. Data överförs aldrig till länder utanför EU/EES. Supabase har ett giltigt databehandlaravtal (DPA) som uppfyller GDPR:s krav.</p>
+  <p>Dina uppgifter lagras huvudsakligen inom EU/EES. Vår primära databas och fillagring driftas av Supabase i Frankfurt, Tyskland.</p>
+  <p>Vissa underbiträden har säte i USA, vilket innebär att begränsad överföring av data till tredjeland kan ske. Detta gäller specifikt Anthropic (AI-offertgenerering) och Stripe (betalningshantering). Dessa överföringar skyddas av godkända skyddsåtgärder, inklusive EU-U.S. Data Privacy Framework och standardavtalsklausuler (SCC) i enlighet med GDPR kapitel V.</p>
+  <p>Vid AI-offertgenerering skickas enbart den jobbeskrivning du anger till Anthropic. Inga personuppgifter, kunddata eller bokföringsuppgifter överförs. Anthropic sparar inte den data som skickas via API:et.</p>
 
   <h2>5. Hur länge sparas data?</h2>
   <table>
@@ -74,22 +76,24 @@ footer p { color: #555; font-size: 0.75rem; margin-top: 0.5rem; }
   <p>Enligt GDPR har du rätt att:</p>
   <p><strong>Få tillgång</strong> till dina personuppgifter — du kan exportera all data via SIE-fil och PDF-nedladdning.</p>
   <p><strong>Rätta</strong> felaktiga uppgifter — redigera i Företagsprofil eller kontakta oss.</p>
-  <p><strong>Radera</strong> dina uppgifter — du kan avsluta ditt konto. Observera att bokföringsdata som omfattas av lagstadgad arkiveringsplikt (7 år) inte kan raderas före lagringstidens slut (GDPR Art. 17.3b).</p>
+  <p><strong>Radera</strong> dina uppgifter — du kan avsluta ditt konto. Observera att bokföringsdata som omfattas av lagstadgad arkiveringsplikt (7 år) inte kan raderas före lagringstidens slut (GDPR Art. 17.3b). Bokföringsdata anonymiseras vid kontoavslutning.</p>
   <p><strong>Invända</strong> mot behandling — kontakta oss.</p>
   <p><strong>Dataportabilitet</strong> — exportera din bokföring som SIE-fil, ladda ner offerter och fakturor som PDF.</p>
 
-  <h2>7. Bokföring och personuppgifter</h2>
-  <p>När du använder bokföringsfunktionen i Offeria agerar du som personuppgiftsansvarig för de personuppgifter som förekommer i dina verifikationer, fakturor och kundregister. Offeria agerar som databehandlare och behandlar dessa uppgifter enbart enligt dina instruktioner och för att tillhandahålla Tjänsten.</p>
+  <h2>7. Personuppgiftsbiträde</h2>
+  <p>När du använder bokföringsfunktionen i Offeria agerar du som personuppgiftsansvarig för de personuppgifter som förekommer i dina verifikationer, fakturor och kundregister. Offeria agerar som personuppgiftsbiträde och behandlar dessa uppgifter enbart enligt dina instruktioner och för att tillhandahålla Tjänsten.</p>
   <p>Kvittobilder som du laddar upp lagras krypterat i en privat lagringsbucket. Varje användare har bara åtkomst till sina egna filer.</p>
 
-  <h2>8. Tredjepartsleverantörer</h2>
+  <h2>8. Underbiträden</h2>
   <table>
-    <tr><th>Leverantör</th><th>Ändamål</th><th>Plats</th></tr>
-    <tr><td>Supabase</td><td>Databas, autentisering, fillagring</td><td>EU (Frankfurt)</td></tr>
-    <tr><td>Cloudflare</td><td>Webbhosting, CDN, DDoS-skydd</td><td>Globalt CDN, ingen datalagring</td></tr>
-    <tr><td>Stripe</td><td>Betalningshantering</td><td>EU/USA (PCI DSS-certifierat)</td></tr>
-    <tr><td>Anthropic (Claude)</td><td>AI-offertgenerering</td><td>USA (inga personuppgifter sparas)</td></tr>
+    <tr><th>Underbiträde</th><th>Ändamål</th><th>Plats</th><th>Skyddsåtgärd</th></tr>
+    <tr><td>Supabase</td><td>Databas, autentisering, fillagring</td><td>EU (Frankfurt)</td><td>PUB-avtal, data inom EU</td></tr>
+    <tr><td>Cloudflare</td><td>Webbhosting, CDN, DDoS-skydd</td><td>Globalt CDN</td><td>SCC, ingen permanent datalagring</td></tr>
+    <tr><td>Stripe</td><td>Betalningshantering</td><td>EU/USA</td><td>EU-U.S. DPF, PCI DSS, SCC</td></tr>
+    <tr><td>Anthropic (Claude)</td><td>AI-offertgenerering</td><td>USA</td><td>EU-U.S. DPF, SCC, inga personuppgifter sparas</td></tr>
+    <tr><td>EmailJS</td><td>Transaktionsmail</td><td>EU</td><td>PUB-avtal</td></tr>
   </table>
+  <p>Vi har personuppgiftsbiträdesavtal (PUB-avtal) med samtliga underbiträden. Vid överföring till USA säkerställs skyddet genom EU-U.S. Data Privacy Framework och/eller standardavtalsklausuler (SCC) enligt GDPR Art. 46.</p>
 
   <h2>9. Säkerhet</h2>
   <p>Vi skyddar din data med krypterad överföring (HTTPS/TLS), krypterad lagring, radnivåsäkerhet (RLS) i databasen så att varje användare bara ser sin egen data, och säker autentisering med krypterade lösenord.</p>
@@ -105,7 +109,7 @@ footer p { color: #555; font-size: 0.75rem; margin-top: 0.5rem; }
 </div>
 <footer>
   <a href="/">Offeria</a>
-  <p>© 2025–2026 Offeria. Alla rättigheter förbehållna.</p>
+  <p>&copy; 2025–2026 Offeria · Techtrix AB · Org.nr 559577-6591</p>
 </footer>
 </body>
 </html>
