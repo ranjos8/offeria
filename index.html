@@ -6923,7 +6923,7 @@ async function generateQuote() {
       signal: controller.signal,
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514', max_tokens: 3000,
+        model: 'claude-sonnet-4-6', max_tokens: 3000,
         system: `Du är expert på svenska offerter för hantverkare och tjänsteföretag. Svara ALLTID med ENBART giltig JSON – ingen markdown, inga kommentarer, inget före eller efter JSON-objektet.
 
 PRISSÄTTNINGSREGLER:
