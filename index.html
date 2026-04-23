@@ -1204,9 +1204,9 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div class="plan-tagline">Vinn fler jobb</div>
           <div><span class="plan-amount">99</span><span class="plan-period"> kr/mån</span><div style="font-size:0.65rem;color:#999;margin-top:0.2rem">exkl. moms</div></div>
           <ul class="plan-features">
-            <li><strong>30 AI-offerter per månad</strong></li>
-            <li><strong>E-signering av offerter</strong></li>
-            <li><strong>Fakturering med ROT/RUT</strong></li>
+            <li>30 AI-offerter per månad</li>
+            <li>E-signering av offerter</li>
+            <li>Fakturering med ROT/RUT</li>
             <li>Kreditfakturor</li>
             <li>Påminnelser med avgiftsberäkning</li>
             <li>Röstinmatning (diktera offerten)</li>
@@ -1222,12 +1222,12 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <div class="plan-tagline">Hela företaget i en tjänst</div>
           <div><span class="plan-amount">249</span><span class="plan-period"> kr/mån</span><div style="font-size:0.65rem;color:#999;margin-top:0.2rem">exkl. moms</div></div>
           <ul class="plan-features">
-            <li><strong>100 AI-offerter per månad</strong></li>
-            <li><strong>Allt i Smart, plus:</strong></li>
-            <li><strong>Leverantörsfakturor</strong></li>
-            <li><strong>Kvittoskanning med AI (OCR)</strong></li>
-            <li><strong>Komplett bokföring (BAS 2026)</strong></li>
-            <li><strong>AI Bokföringsassistent</strong></li>
+            <li>100 AI-offerter per månad</li>
+            <li>Allt i Smart, plus:</li>
+            <li>Leverantörsfakturor</li>
+            <li>Kvittoskanning med AI (OCR)</li>
+            <li>Komplett bokföring (BAS 2026)</li>
+            <li>AI Bokföringsassistent</li>
             <li>Bankimport (CSV)</li>
             <li>Grundbok &amp; huvudbok</li>
             <li>Resultat- &amp; balansräkning</li>
@@ -1235,6 +1235,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <li>SRU-export till Skatteverket</li>
             <li>SIE-export &amp; import</li>
             <li>Periodlåsning &amp; rättelseverifikationer</li>
+            <li>Bjud in revisor / redovisningskonsult</li>
             <li>Dashboard med skattedatum</li>
             <li>Automatisk daglig backup</li>
             <li>Ingen bindningstid</li>
@@ -1412,6 +1413,9 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">Hur hanteras mina personuppgifter (GDPR)?<span class="faq-icon">+</span></div>
       <div class="faq-a"><div class="faq-a-inner">All data lagras krypterat i EU (Frankfurt). Du kan exportera all din data (SIE, PDF) och radera ditt konto när som helst. Vi delar aldrig information med tredje part för marknadsföring. Läs vår fullständiga integritetspolicy på offeria.se/integritetspolicy.html.</div></div>
+
+      <div class="faq-q" onclick="toggleFaq(this)">Kan min revisor få tillgång till bokföringen?<span class="faq-icon">+</span></div>
+      <div class="faq-a"><div class="faq-a-inner">Ja! Under Företagsprofil kan du bjuda in din revisor eller redovisningskonsult. Du väljer behörighetsnivå: läsåtkomst (granska, kommentera, exportera SIE) eller läs & skriv (även bokföra åt dig). Revisorn behöver bara ett gratis Offeria-konto. Du kan återkalla åtkomsten när som helst. Allt loggas för full spårbarhet. Ingår i Komplett.</div></div>
     </div>
 
   </div>
@@ -1971,6 +1975,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           <button class="tab-btn" onclick="showHelpSection('vat',this)">Moms & SRU</button>
           <button class="tab-btn" onclick="showHelpSection('customers',this)">Kunder & artiklar</button>
           <button class="tab-btn" onclick="showHelpSection('company',this)">Företagsprofil</button>
+          <button class="tab-btn" onclick="showHelpSection('accountant',this)">Revisor</button>
         </div>
         <div id="helpTabsMobile" style="display:none;margin-bottom:1.5rem">
           <select onchange="showHelpSection(this.value);this.blur()" style="width:100%;padding:0.7rem 1rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:16px;background:white;appearance:auto">
@@ -1983,6 +1988,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <option value="vat">Moms & SRU</option>
             <option value="customers">Kunder & artiklar</option>
             <option value="company">Företagsprofil</option>
+            <option value="accountant">Revisor</option>
           </select>
         </div>
 
@@ -2522,6 +2528,50 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
           </div>
         </div>
       </div>
+
+        <!-- REVISOR & REDOVISNINGSKONSULT -->
+        <div class="help-section" id="helpAccountant" style="display:none">
+          <div class="gen-card" style="max-width:760px">
+            <h3 style="font-family:'Fraunces',serif;font-size:1.2rem;margin-bottom:1rem">Revisor & Redovisningskonsult</h3>
+            <p style="color:#666;margin-bottom:1.2rem">Du kan ge din revisor eller redovisningskonsult direkt åtkomst till din bokföring i Offeria. Allt sker digitalt, säkert och spårbart.</p>
+
+            <div class="help-block">
+              <h4>Bjud in revisor</h4>
+              <p>Gå till <strong>Företagsprofil</strong> och scrolla ner till sektionen <strong>Revisor / Redovisningskonsult</strong>. Ange revisorns e-postadress, välj behörighetsnivå och klicka <strong>Bjud in</strong>. Revisorn får ett mail med en länk och kan acceptera inbjudan under "Mina klienter" i sitt Offeria-konto.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Behörighetsnivåer</h4>
+              <p><strong>Läsåtkomst (revisor)</strong> — kan granska verifikationer, resultat- och balansräkning, momsrapport. Kan lämna kommentarer och exportera SIE-filer. Kan inte ändra, skapa eller ta bort verifikationer.</p>
+              <p><strong>Läs & skriv (redovisningskonsult)</strong> — allt ovan plus möjlighet att skapa nya verifikationer och rätta befintliga via motbokning. Lämpligt om din konsult sköter den löpande bokföringen åt dig.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Vad revisorn ser</h4>
+              <p>Revisorn ser din bokföring: verifikationer, kontoplan, resultaträkning, balansräkning och momsrapport. Revisorn kan <strong>inte</strong> se ditt lösenord, betalningsuppgifter eller andra användares data.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Spårbarhet (revisorslogg)</h4>
+              <p>Allt din revisor gör loggas automatiskt — vilka verifikationer som granskats, kommentarer som lämnats, SIE-filer som exporterats och verifikationer som skapats. Du hittar loggen under <strong>Företagsprofil → Revisorslogg</strong>. Verifikationer skapade av en konsult markeras med <em>consultant</em> som källa och konsultens e-post.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Återkalla åtkomst</h4>
+              <p>Du kan återkalla revisorns åtkomst när som helst under <strong>Företagsprofil → Revisor / Redovisningskonsult</strong>. Klicka <strong>Återkalla</strong> — revisorn förlorar omedelbart tillgång till all din data.</p>
+            </div>
+
+            <div class="help-block">
+              <h4>Kostar det något?</h4>
+              <p>Revisorsåtkomst ingår i <strong>Komplett-planen</strong> (249 kr/mån). Revisorn behöver bara ett gratis Offeria-konto för att acceptera inbjudan — de behöver inte betala.</p>
+            </div>
+
+            <div class="help-block" style="padding:1rem;background:var(--paper);border-radius:8px">
+              <h4>Juridisk grund</h4>
+              <p>Funktionen följer bokföringslagen (BFL): revisorer har granskningsrätt (5 kap 7§) utan att kunna ändra, redovisningskonsulter kan bokföra på uppdrag (5 kap 1§). Rättelser sker alltid via motbokning — aldrig radering. All åtkomst loggas enligt GDPR. Du förblir personuppgiftsansvarig för din bokföringsdata.</p>
+            </div>
+          </div>
+        </div>
 
       <!-- ACCOUNTANT CLIENTS PAGE -->
       <div class="app-page" id="page-accountant-clients">
@@ -3735,7 +3785,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
         <div class="uplan-name">Komplett</div>
         <div class="uplan-price">249 kr/mån <span style="font-size:0.7rem;color:#999;font-weight:400">exkl. moms</span></div>
         <div class="uplan-trial">Gratis i 30 dagar</div>
-        <div class="uplan-features">100 AI-offerter/månad<br>Allt i Smart, plus:<br><strong>Leverantörsfakturor</strong><br><strong>Kvittoskanning med AI</strong><br><strong>Komplett bokföring (BAS 2026)</strong><br><strong>AI Bokföringsassistent</strong><br>Momsrapport &amp; SIE-export<br>Dashboard &amp; statistik<br>Ingen bindningstid</div>
+        <div class="uplan-features">100 AI-offerter/månad<br>Allt i Smart, plus:<br>Leverantörsfakturor<br>Kvittoskanning med AI<br>Komplett bokföring (BAS 2026)<br>AI Bokföringsassistent<br>Momsrapport &amp; SIE-export<br>Dashboard &amp; statistik<br>Ingen bindningstid</div>
       </div>
     </div>
     <div class="stripe-note">Betalning hanteras säkert av Stripe. Kortet debiteras inte förrän efter 30 dagar.</div>
@@ -6660,7 +6710,7 @@ function switchRegTab(tab) {
 }
 
 function showHelpSection(id, btn) {
-  const sections = { start:'helpStart', quotes:'helpQuotes', invoices:'helpInvoices', suppliers:'helpSuppliers', bookkeeping:'helpBookkeeping', receipts:'helpReceipts', vat:'helpVat', customers:'helpCustomers', company:'helpCompany' };
+  const sections = { start:'helpStart', quotes:'helpQuotes', invoices:'helpInvoices', suppliers:'helpSuppliers', bookkeeping:'helpBookkeeping', receipts:'helpReceipts', vat:'helpVat', customers:'helpCustomers', company:'helpCompany', accountant:'helpAccountant' };
   Object.values(sections).forEach(s => {
     const el = document.getElementById(s);
     if (el) { el.style.display = 'none'; el.classList.remove('active'); }
@@ -12129,7 +12179,9 @@ async function loadAccountantClients() {
   }
 
   el.innerHTML = html;
-  if (hasActive) sb.from('accountant_audit_log').insert({ accountant_user_id: currentUser.id, client_user_id: accesses[0]?.client_user_id, action: 'login' }).then(() => {});
+  if (hasActive && !_accClientData.length) {
+    _accClientData = [];
+  }
 }
 
 async function acceptAccInvite(token) {
