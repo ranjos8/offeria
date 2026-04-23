@@ -12007,9 +12007,10 @@ async function loadActiveAccountants() {
   const el = document.getElementById('revisorActiveList');
   if (!el) return;
   const { data: accesses } = await sb.from('accountant_access').select('id, accountant_user_id, role, granted_at, is_active').eq('client_user_id', currentUser.id);
-  const { data: invites } = await sb.from('accountant_invites').select('id, accountant_email, status, created_at').eq('client_user_id', currentUser.id).in('status', ['pending']);
+  const { data: invites } = await sb.from('accountant_invites').select('id, accountant_email, status, created_at, role').eq('client_user_id', currentUser.id);
+  const allInvites = invites || [];
   const activeAccess = (accesses || []).filter(a => a.is_active);
-  const pendingInvites = invites || [];
+  const pendingInvites = allInvites.filter(i => i.status === 'pending');
   if (activeAccess.length === 0 && pendingInvites.length === 0) {
     el.innerHTML = '<div style="font-size:0.82rem;color:#aaa;padding:0.5rem 0">Ingen revisor kopplad. Bjud in nedan.</div>';
     const logEl = document.getElementById('revisorAuditLog');
@@ -12018,9 +12019,12 @@ async function loadActiveAccountants() {
   }
   let html = '';
   for (const a of activeAccess) {
-    const { data: accProfile } = await sb.from('profiles').select('email, full_name, company_name, accountant_title, accountant_firm').eq('id', a.accountant_user_id).single();
-    const name = accProfile?.accountant_firm || accProfile?.full_name || accProfile?.email || 'Revisor';
-    const title = accProfile?.accountant_title || (accProfile?.email || '');
+    // Hämta e-post från invites (säkrare än att fråga revisorns profil via RLS)
+    const matchInvite = allInvites.find(i => i.status === 'accepted');
+    const accEmail = matchInvite?.accountant_email || '';
+    const { data: accProfile } = await sb.from('profiles').select('email, full_name, accountant_title, accountant_firm').eq('id', a.accountant_user_id).single();
+    const name = accProfile?.accountant_firm || accEmail || 'Revisor';
+    const title = accProfile?.accountant_title || '';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.8rem;background:#e8f5e9;border:1px solid #c8e6c9;border-radius:8px;margin-bottom:0.5rem"><div><div style="font-weight:600;font-size:0.88rem;color:#2e7d32">' + escapeHtml(name) + '</div><div style="font-size:0.72rem;color:#888">' + escapeHtml(title) + ' · Aktiv sedan ' + new Date(a.granted_at).toLocaleDateString('sv-SE') + ' · ' + (a.role === 'read_write' ? 'Läs & skriv' : 'Läsåtkomst') + '</div></div><button onclick="revokeAccountantAccess(\'' + a.accountant_user_id + '\')" style="background:none;border:1px solid #c62828;color:#c62828;border-radius:6px;padding:0.3rem 0.7rem;font-size:0.75rem;cursor:pointer;font-family:inherit">Återkalla</button></div>';
   }
   for (const inv of pendingInvites) {
