@@ -6702,7 +6702,9 @@ async function sendWelcomeEmail(toEmail, name) {
         template_params: {
           to_email: toEmail,
           to_name: name || 'där',
-          from_name: 'Offeria'
+          from_name: 'Offeria',
+          subject: 'Välkommen till Offeria, ' + (name || '') + '!',
+          message: 'Hej ' + (name || 'där') + '!\n\nVälkommen till Offeria – nu är ditt konto redo.\n\nSå här kommer du igång:\n1. Fyll i din företagsprofil (namn, org.nr, logotyp)\n2. Beskriv ett jobb med egna ord\n3. Få en komplett offert på sekunder\n\nLogga in på https://offeria.se'
         }
       })
     });
@@ -11939,6 +11941,10 @@ async function sendAccountantInvite() {
   const email = document.getElementById('revisorEmail')?.value?.trim();
   if (!email || !email.includes('@')) { alert('Ange en giltig e-postadress.'); return; }
   if (!currentUser) return;
+  const btn = document.querySelector('[onclick="sendAccountantInvite()"]');
+  const origText = btn?.textContent;
+  if (btn) { btn.disabled = true; btn.textContent = 'Skickar inbjudan...'; btn.style.opacity = '0.6'; }
+  try {
   const { data: existing } = await sb.from('accountant_invites')
     .select('id,status').eq('client_user_id', currentUser.id).eq('accountant_email', email).in('status', ['pending', 'accepted']);
   if (existing && existing.length > 0) {
@@ -11972,6 +11978,9 @@ async function sendAccountantInvite() {
   document.getElementById('revisorEmail').value = '';
   alert('Inbjudan skickad till ' + email + '!\n\nRevisorn får ett mail med en länk för att acceptera.');
   loadActiveAccountants();
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = origText || 'Bjud in revisor'; btn.style.opacity = ''; }
+  }
 }
 
 async function loadActiveAccountants() {
