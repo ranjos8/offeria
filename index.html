@@ -11952,22 +11952,22 @@ async function sendAccountantInvite() {
   const inviteUrl = 'https://www.offeria.se/?invite=' + invite.invite_token;
   const companyName = currentProfile?.company_name || 'Ett företag';
   try {
-    const emailRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    await fetch('https://api.emailjs.com/api/v1.0/email/send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         service_id: 'service_f5de23t',
-        template_id: 'template_fbh7cng',
+        template_id: 'template_welcome',
         user_id: 'iUGAEbeer-pOBR8tV',
         template_params: {
           to_email: email,
+          to_name: '',
           from_name: companyName + ' via Offeria',
-          subject: companyName + ' bjuder in dig som revisor',
+          subject: companyName + ' bjuder in dig som revisor i Offeria',
           message: 'Hej!\n\n' + companyName + ' vill ge dig åtkomst till sin bokföring i Offeria.\n\nKlicka här för att acceptera:\n' + inviteUrl + '\n\nOm du inte har ett konto i Offeria kan du skapa ett gratis — välj sedan länken igen.\n\nDenna inbjudan ger enbart läsåtkomst till bokföringen.\n\nMed vänliga hälsningar,\nOfferia'
         }
       })
     });
-    console.log('EmailJS response:', emailRes.status, await emailRes.text());
   } catch(e) { console.warn('Email send failed:', e); }
   document.getElementById('revisorEmail').value = '';
   alert('Inbjudan skickad till ' + email + '!\n\nRevisorn får ett mail med en länk för att acceptera.');
