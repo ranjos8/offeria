@@ -11952,7 +11952,7 @@ async function sendAccountantInvite() {
   const inviteUrl = 'https://www.offeria.se/?invite=' + invite.invite_token;
   const companyName = currentProfile?.company_name || 'Ett företag';
   try {
-    await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    const emailRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -11967,6 +11967,7 @@ async function sendAccountantInvite() {
         }
       })
     });
+    console.log('EmailJS response:', emailRes.status, await emailRes.text());
   } catch(e) { console.warn('Email send failed:', e); }
   document.getElementById('revisorEmail').value = '';
   alert('Inbjudan skickad till ' + email + '!\n\nRevisorn får ett mail med en länk för att acceptera.');
