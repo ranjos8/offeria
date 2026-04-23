@@ -4068,23 +4068,51 @@ async function onLogin(user) {
   try { fillProfileForm(profile); } catch(e) {}
   renderExamplePills();
 
-  // Hantera väntande revisor-inbjudan
+  // Hantera väntande revisor-inbjudan — fråga användaren först
   if (window._pendingInviteToken) {
     const token = window._pendingInviteToken;
     window._pendingInviteToken = null;
+    // Hämta info om inbjudan för att visa vem som bjuder in
     try {
-      const { data: result, error } = await sb.rpc('accept_accountant_invite', { p_invite_token: token });
-      if (error) {
-        alert('Kunde inte acceptera inbjudan: ' + error.message);
-      } else if (result?.error) {
-        alert(result.error);
+      const { data: inviteInfo } = await sb.from('accountant_invites')
+        .select('client_user_id, role, accountant_email')
+        .eq('invite_token', token)
+        .eq('status', 'pending')
+        .single();
+      if (inviteInfo) {
+        const { data: clientProfile } = await sb.from('profiles')
+          .select('company_name, full_name')
+          .eq('id', inviteInfo.client_user_id)
+          .single();
+        const clientName = clientProfile?.company_name || clientProfile?.full_name || 'Ett företag';
+        const roleText = inviteInfo.role === 'read_write' ? 'läs- och skrivåtkomst (redovisningskonsult)' : 'läsåtkomst (revisor)';
+        const accepted = confirm(
+          clientName + ' vill ge dig ' + roleText + ' till sin bokföring i Offeria.\n\n' +
+          'Du kommer kunna:\n' +
+          '• Granska verifikationer, resultat- och balansräkning\n' +
+          '• Lämna kommentarer och exportera SIE-filer\n' +
+          (inviteInfo.role === 'read_write' ? '• Skapa verifikationer och bokföra\n' : '') +
+          '\nVill du acceptera inbjudan?'
+        );
+        if (accepted) {
+          const { data: result, error } = await sb.rpc('accept_accountant_invite', { p_invite_token: token });
+          if (error) {
+            alert('Kunde inte acceptera inbjudan: ' + error.message);
+          } else if (result?.error) {
+            alert(result.error);
+          } else {
+            alert('Inbjudan accepterad! Du har nu tillgång till ' + clientName + ' under "Mina klienter".');
+            const { data: updatedProfile } = await sb.from('profiles').select('*').eq('id', user.id).single();
+            if (updatedProfile) { currentProfile = updatedProfile; updateUI(updatedProfile, monthlyUsed, total || 0); }
+            showPage('accountant-clients');
+          }
+        } else {
+          alert('Inbjudan avböjd. Du kan acceptera senare via samma länk.');
+        }
       } else {
-        alert('Inbjudan accepterad! Du har nu tillgång till klientens bokföring under "Mina klienter".');
-        const { data: updatedProfile } = await sb.from('profiles').select('*').eq('id', user.id).single();
-        if (updatedProfile) { currentProfile = updatedProfile; updateUI(updatedProfile, monthlyUsed, total || 0); }
-        showPage('accountant-clients');
+        alert('Inbjudan hittades inte, har redan accepterats, eller tillhör en annan e-postadress.');
       }
-    } catch(e) { console.error('Invite accept error:', e); }
+    } catch(e) { console.error('Invite check error:', e); }
   }
 
   // Ladda revisorslista i profilen
