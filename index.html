@@ -1891,12 +1891,17 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
             <div id="revisorActiveList" style="margin-bottom:1rem"></div>
             <div style="display:flex;gap:0.6rem;align-items:end;flex-wrap:wrap">
               <div class="field" style="flex:1;min-width:200px;margin:0"><label>Revisorns e-post</label><input id="revisorEmail" type="email" placeholder="revisor@byrå.se"></div>
-              <button onclick="sendAccountantInvite()" class="gen-btn" style="padding:0.6rem 1.2rem;font-size:0.85rem;white-space:nowrap;min-height:44px">Bjud in revisor</button>
+              <div class="field" style="min-width:160px;margin:0"><label>Behörighet</label>
+                <select id="revisorRole" style="width:100%;padding:0.6rem 0.8rem;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:0.85rem">
+                  <option value="read">Läsåtkomst (revisor)</option>
+                  <option value="read_write">Läs & skriv (redovisningskonsult)</option>
+                </select>
+              </div>
+              <button onclick="sendAccountantInvite()" class="gen-btn" style="padding:0.6rem 1.2rem;font-size:0.85rem;white-space:nowrap;min-height:44px">Bjud in</button>
             </div>
-            <div style="font-size:0.72rem;color:#888;margin-top:0.5rem;line-height:1.5">
-              Revisorn får <strong>enbart läsåtkomst</strong> till din bokföring — kan inte ändra, ta bort eller skapa verifikationer.
-              Revisorn kan lämna kommentarer och exportera SIE-filer. Du kan återkalla åtkomsten när som helst.
-              Allt revisorn gör loggas enligt GDPR och BFL.
+            <div id="revisorRoleInfo" style="font-size:0.72rem;color:#888;margin-top:0.5rem;line-height:1.5">
+              <strong>Läsåtkomst:</strong> Kan granska bokföring, lämna kommentarer och exportera SIE-filer. Kan inte ändra eller skapa verifikationer.<br>
+              <strong>Läs & skriv:</strong> Kan även skapa verifikationer och bokföra åt dig. Lämpligt för redovisningskonsulter som sköter löpande bokföring.
             </div>
             <div id="revisorAuditLog" style="margin-top:1rem;display:none">
               <div style="font-weight:600;font-size:0.82rem;margin-bottom:0.5rem;color:#555">Revisorslogg</div>
@@ -11952,9 +11957,11 @@ async function sendAccountantInvite() {
     return;
   }
   const { data: invite, error } = await sb.from('accountant_invites').insert({
-    client_user_id: currentUser.id, accountant_email: email, role: 'read'
+    client_user_id: currentUser.id, accountant_email: email, role: document.getElementById('revisorRole')?.value || 'read'
   }).select().single();
   if (error) { alert('Kunde inte skicka inbjudan: ' + error.message); return; }
+  const selectedRole = document.getElementById('revisorRole')?.value || 'read';
+  const roleLabel = selectedRole === 'read_write' ? 'läs- och skrivåtkomst' : 'läsåtkomst';
   const inviteUrl = 'https://www.offeria.se/?invite=' + invite.invite_token;
   const companyName = currentProfile?.company_name || 'Ett företag';
   try {
@@ -11969,14 +11976,14 @@ async function sendAccountantInvite() {
           to_email: email,
           to_name: '',
           from_name: companyName + ' via Offeria',
-          subject: companyName + ' bjuder in dig som revisor i Offeria',
-          message: 'Hej!\n\n' + companyName + ' vill ge dig åtkomst till sin bokföring i Offeria.\n\nKlicka här för att acceptera:\n' + inviteUrl + '\n\nOm du inte har ett konto i Offeria kan du skapa ett gratis — välj sedan länken igen.\n\nDenna inbjudan ger enbart läsåtkomst till bokföringen.\n\nMed vänliga hälsningar,\nOfferia'
+          subject: companyName + ' bjuder in dig som ' + (selectedRole === 'read_write' ? 'redovisningskonsult' : 'revisor') + ' i Offeria',
+          message: 'Hej!\n\n' + companyName + ' vill ge dig ' + roleLabel + ' till sin bokföring i Offeria.\n\nKlicka här för att acceptera:\n' + inviteUrl + '\n\nOm du inte har ett konto i Offeria kan du skapa ett gratis — välj sedan länken igen.\n\nDenna inbjudan ger ' + roleLabel + ' till bokföringen.\n\nMed vänliga hälsningar,\nOfferia'
         }
       })
     });
   } catch(e) { console.warn('Email send failed:', e); }
   document.getElementById('revisorEmail').value = '';
-  alert('Inbjudan skickad till ' + email + '!\n\nRevisorn får ett mail med en länk för att acceptera.');
+  alert('Inbjudan skickad till ' + email + ' (' + roleLabel + ')!\n\nRevisorn/konsulten får ett mail med en länk för att acceptera.');
   loadActiveAccountants();
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = origText || 'Bjud in revisor'; btn.style.opacity = ''; }
@@ -12002,7 +12009,7 @@ async function loadActiveAccountants() {
     const { data: accProfile } = await sb.from('profiles').select('email, full_name, company_name, accountant_title, accountant_firm').eq('id', a.accountant_user_id).single();
     const name = accProfile?.accountant_firm || accProfile?.company_name || accProfile?.full_name || accProfile?.email || 'Revisor';
     const title = accProfile?.accountant_title || '';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.8rem;background:#e8f5e9;border:1px solid #c8e6c9;border-radius:8px;margin-bottom:0.5rem"><div><div style="font-weight:600;font-size:0.88rem;color:#2e7d32">' + escapeHtml(name) + '</div><div style="font-size:0.72rem;color:#888">' + escapeHtml(title) + ' · Aktiv sedan ' + new Date(a.granted_at).toLocaleDateString('sv-SE') + '</div></div><button onclick="revokeAccountantAccess(\'' + a.accountant_user_id + '\')" style="background:none;border:1px solid #c62828;color:#c62828;border-radius:6px;padding:0.3rem 0.7rem;font-size:0.75rem;cursor:pointer;font-family:inherit">Återkalla</button></div>';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.8rem;background:#e8f5e9;border:1px solid #c8e6c9;border-radius:8px;margin-bottom:0.5rem"><div><div style="font-weight:600;font-size:0.88rem;color:#2e7d32">' + escapeHtml(name) + '</div><div style="font-size:0.72rem;color:#888">' + escapeHtml(title) + ' · Aktiv sedan ' + new Date(a.granted_at).toLocaleDateString('sv-SE') + ' · ' + (a.role === 'read_write' ? 'Läs & skriv' : 'Läsåtkomst') + '</div></div><button onclick="revokeAccountantAccess(\'' + a.accountant_user_id + '\')" style="background:none;border:1px solid #c62828;color:#c62828;border-radius:6px;padding:0.3rem 0.7rem;font-size:0.75rem;cursor:pointer;font-family:inherit">Återkalla</button></div>';
   }
   for (const inv of pendingInvites) {
     html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.8rem;background:var(--cream);border:1px solid var(--border);border-radius:8px;margin-bottom:0.5rem"><div><div style="font-weight:600;font-size:0.88rem;color:var(--gold)">' + escapeHtml(inv.accountant_email) + '</div><div style="font-size:0.72rem;color:#888">Inbjudan skickad ' + new Date(inv.created_at).toLocaleDateString('sv-SE') + ' — väntar på svar</div></div><button onclick="cancelAccountantInvite(\'' + inv.id + '\')" style="background:none;border:1px solid #888;color:#888;border-radius:6px;padding:0.3rem 0.7rem;font-size:0.75rem;cursor:pointer;font-family:inherit">Avbryt</button></div>';
@@ -12057,7 +12064,7 @@ async function loadAccountantClients() {
     if (!clientProfile) continue;
     _accClientData.push({ ...a, profile: clientProfile });
     const name = clientProfile.company_name || clientProfile.full_name || 'Klient';
-    html += '<div class="cust-card" onclick="openAccClientView(\'' + a.client_user_id + '\')" style="cursor:pointer"><div class="cust-name">' + escapeHtml(name) + '</div><div class="cust-info">' + (clientProfile.org_number||'') + ' · ' + (clientProfile.email||'') + '</div><div class="cust-stats">Åtkomst sedan ' + new Date(a.granted_at).toLocaleDateString('sv-SE') + ' · Läsåtkomst</div></div>';
+    html += '<div class="cust-card" onclick="openAccClientView(\'' + a.client_user_id + '\')" style="cursor:pointer"><div class="cust-name">' + escapeHtml(name) + '</div><div class="cust-info">' + (clientProfile.org_number||'') + ' · ' + (clientProfile.email||'') + '</div><div class="cust-stats">Åtkomst sedan ' + new Date(a.granted_at).toLocaleDateString('sv-SE') + ' · ' + (a.role === 'read_write' ? 'Läs & skriv' : 'Läsåtkomst') + '</div></div>';
   }
   html += '</div>';
   el.innerHTML = html;
