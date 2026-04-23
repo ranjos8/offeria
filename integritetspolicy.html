@@ -48,6 +48,7 @@ footer p { color: #555; font-size: 0.75rem; margin-top: 0.5rem; }
     <tr><td>Fakturadata</td><td>Fakturanummer, belopp, kunduppgifter</td><td>Fakturering och betaluppföljning</td></tr>
     <tr><td>Bokföringsdata</td><td>Verifikationer, konteringar, kvittobilder</td><td>Bokföring enligt bokföringslagen</td></tr>
     <tr><td>Kundregister</td><td>Dina kunders namn, e-post, adress</td><td>Hantera kundrelationer</td></tr>
+    <tr><td>Revisorsåtkomst</td><td>Revisorns e-post, åtkomstlogg, kommentarer</td><td>Ge revisor/konsult tillgång till bokföring</td></tr>
     <tr><td>Tekniska uppgifter</td><td>IP-adress, webbläsartyp</td><td>Säkerhet och felsökning</td></tr>
   </table>
 
@@ -70,6 +71,7 @@ footer p { color: #555; font-size: 0.75rem; margin-top: 0.5rem; }
     <tr><td>Fakturor</td><td>7 år efter räkenskapsårets slut</td><td>Bokföringslagen</td></tr>
     <tr><td>Verifikationer &amp; kvitton</td><td>7 år efter räkenskapsårets slut</td><td>Bokföringslagen</td></tr>
     <tr><td>Tekniska loggar</td><td>90 dagar</td><td>Säkerhet och felsökning</td></tr>
+    <tr><td>Revisorslogg (audit log)</td><td>7 år efter räkenskapsårets slut</td><td>Bokföringslagen, GDPR spårbarhet</td></tr>
   </table>
 
   <h2>6. Dina rättigheter</h2>
@@ -84,7 +86,18 @@ footer p { color: #555; font-size: 0.75rem; margin-top: 0.5rem; }
   <p>När du använder bokföringsfunktionen i Offeria agerar du som personuppgiftsansvarig för de personuppgifter som förekommer i dina verifikationer, fakturor och kundregister. Offeria agerar som personuppgiftsbiträde och behandlar dessa uppgifter enbart enligt dina instruktioner och för att tillhandahålla Tjänsten.</p>
   <p>Kvittobilder som du laddar upp lagras krypterat i en privat lagringsbucket. Varje användare har bara åtkomst till sina egna filer.</p>
 
-  <h2>8. Underbiträden</h2>
+  <h2>8. Delning med revisor eller redovisningskonsult</h2>
+  <p>Du kan bjuda in en revisor eller redovisningskonsult och ge dem åtkomst till din bokföringsdata i Offeria. Detta är en funktion du aktiverar själv — ingen tredje part får åtkomst utan ditt uttryckliga medgivande.</p>
+  <p><strong>Vad revisorn/konsulten kan se:</strong> Verifikationer, bokföringsrader, kontoplan, fakturor, leverantörsfakturor, offerter, kundregister och företagsprofil (namn, org.nr). Revisorn kan <em>inte</em> se ditt lösenord, betalningsuppgifter (Stripe) eller andra användares data.</p>
+  <p><strong>Behörighetsnivåer:</strong></p>
+  <p><em>Läsåtkomst (revisor)</em> — kan granska bokföring, lämna kommentarer och exportera SIE-filer. Kan inte ändra, skapa eller ta bort verifikationer.</p>
+  <p><em>Läs- och skrivåtkomst (redovisningskonsult)</em> — kan även skapa verifikationer och bokföra. Lämpligt för konsulter som sköter löpande bokföring åt dig.</p>
+  <p><strong>Spårbarhet:</strong> Allt en revisor eller konsult gör loggas i en åtkomstlogg (audit log) — vilka data som granskats, kommentarer som lämnats, och SIE-filer som exporterats. Loggen är tillgänglig för dig som klient.</p>
+  <p><strong>Återkallning:</strong> Du kan återkalla åtkomsten när som helst. Revisorn/konsulten förlorar omedelbart tillgång till all din data.</p>
+  <p><strong>Rättslig grund:</strong> Berättigat intresse (GDPR Art. 6.1f) — du har en bokföringsskyldighet enligt bokföringslagen och behöver kunna ge din revisor tillgång. Behandlingen är också nödvändig för fullgörande av avtal (Art. 6.1b) mellan dig och din revisor/konsult.</p>
+  <p><strong>Personuppgiftsansvar:</strong> Du som klient förblir personuppgiftsansvarig. Revisorn/konsulten behandlar personuppgifter i din bokföring under eget personuppgiftsansvar i sin yrkesroll, i enlighet med god revisionssed och redovisningssed.</p>
+
+  <h2>9. Underbiträden</h2>
   <table>
     <tr><th>Underbiträde</th><th>Ändamål</th><th>Plats</th><th>Skyddsåtgärd</th></tr>
     <tr><td>Supabase</td><td>Databas, autentisering, fillagring</td><td>EU (Frankfurt)</td><td>PUB-avtal, data inom EU</td></tr>
@@ -95,16 +108,16 @@ footer p { color: #555; font-size: 0.75rem; margin-top: 0.5rem; }
   </table>
   <p>Vi har personuppgiftsbiträdesavtal (PUB-avtal) med samtliga underbiträden. Vid överföring till USA säkerställs skyddet genom EU-U.S. Data Privacy Framework och/eller standardavtalsklausuler (SCC) enligt GDPR Art. 46.</p>
 
-  <h2>9. Säkerhet</h2>
+  <h2>10. Säkerhet</h2>
   <p>Vi skyddar din data med krypterad överföring (HTTPS/TLS), krypterad lagring, radnivåsäkerhet (RLS) i databasen så att varje användare bara ser sin egen data, och säker autentisering med krypterade lösenord.</p>
 
-  <h2>10. Cookies</h2>
+  <h2>11. Cookies</h2>
   <p>Offeria använder funktionella cookies som är nödvändiga för inloggning och sessionhantering. Vi använder inga spårnings- eller marknadsföringscookies. Se vår <a href="/cookies.html" style="color:var(--gold)">cookiepolicy</a> för detaljer.</p>
 
-  <h2>11. Ändringar</h2>
+  <h2>12. Ändringar</h2>
   <p>Vi kan uppdatera denna policy. Väsentliga ändringar meddelas via e-post eller i Tjänsten.</p>
 
-  <h2>12. Kontakt och klagomål</h2>
+  <h2>13. Kontakt och klagomål</h2>
   <p>Kontakta oss på <a href="mailto:info@offeria.se" style="color:var(--gold)">info@offeria.se</a>. Du har också rätt att lämna klagomål till Integritetsskyddsmyndigheten (IMY), <a href="https://www.imy.se" style="color:var(--gold)" target="_blank">imy.se</a>.</p>
 </div>
 <footer>
