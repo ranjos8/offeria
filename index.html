@@ -9165,12 +9165,15 @@ function openNewVerification() {
   </div>`;
   document.getElementById('verificationModalOverlay').style.display = 'flex';
 }
-function closeVerModal() { document.getElementById('verificationModalOverlay').style.display = 'none'; }
+function closeVerModal() { window._accVerOverride = null; document.getElementById('verificationModalOverlay').style.display = 'none'; }
 
 async function saveVerification() {
   const btn = document.querySelector('[onclick="saveVerification()"]');
   if (btn?.disabled) return;
   if (btn) { btn.disabled = true; btn.textContent = 'Sparar...'; }
+  // Support accountant creating verifications for client
+  const targetUserId = window._accVerOverride || currentUser.id;
+  const isAccOverride = !!window._accVerOverride;
   try {
   const date = document.getElementById('verDate').value;
   const desc = document.getElementById('verDesc').value.trim();
@@ -9341,7 +9344,7 @@ async function saveVerification() {
 
   // Get next verification number
   const yr = parseInt(date.slice(0, 4));
-  const { data: numData } = await sb.rpc('get_next_verification_number', { p_user_id: currentUser.id, p_year: yr });
+  const { data: numData } = await sb.rpc('get_next_verification_number', { p_user_id: targetUserId, p_year: yr });
   const verNum = numData || 1;
 
   // Upload receipt if present
@@ -9351,23 +9354,23 @@ async function saveVerification() {
     let file = fileInput.files[0];
     if (file.size > 5 * 1024 * 1024) { alert('Filen är för stor (max 5 MB). Välj en mindre fil.'); return; }
     if (file.type.startsWith('image/')) file = await compressImageForStorage(file, 200);
-    const path = `${currentUser.id}/V${verNum}_${file.name}`;
+    const path = `${targetUserId}/V${verNum}_${file.name}`;
     const { error: uploadErr } = await sb.storage.from('receipts').upload(path, file);
     if (!uploadErr) attachmentUrl = path;
   }
 
   // Insert verification
   const { data: ver, error: verErr } = await sb.from('verifications').insert({
-    user_id: currentUser.id, verification_number: verNum, verification_date: date,
-    description: fullDesc, source_type: 'manual', attachment_url: attachmentUrl,
-    created_by: currentUser.email
+    user_id: targetUserId, verification_number: verNum, verification_date: date,
+    description: fullDesc, source_type: isAccOverride ? 'consultant' : 'manual', attachment_url: attachmentUrl,
+    created_by: currentUser.email + (isAccOverride ? ' (konsult)' : '')
   }).select().single();
 
   if (verErr) return alert('Fel: ' + verErr.message);
 
   // Insert rows
   const rowInserts = rows.map(r => ({
-    verification_id: ver.id, user_id: currentUser.id,
+    verification_id: ver.id, user_id: targetUserId,
     account_number: r.account_number, debit: r.debit, credit: r.credit, vat_code: r.vat_code || null
   }));
   const { error: rowErr } = await sb.from('verification_rows').insert(rowInserts);
@@ -9375,12 +9378,18 @@ async function saveVerification() {
 
   // Audit log
   await sb.from('bookkeeping_audit_log').insert({
-    user_id: currentUser.id, action: 'create', entity_type: 'verification',
-    entity_id: ver.id, details: { verification_number: verNum, rows: rows.length }
+    user_id: targetUserId, action: 'create', entity_type: 'verification',
+    entity_id: ver.id, details: { verification_number: verNum, rows: rows.length, created_by: currentUser.email }
   });
 
   closeVerModal();
-  loadBookkeeping();
+  // Reload correct view
+  if (isAccOverride) {
+    window._accVerOverride = null;
+    await loadAccClientBookkeeping();
+  } else {
+    loadBookkeeping();
+  }
   } catch(e) { console.error('Save verification error:', e); alert('Fel: ' + e.message); }
   finally { if (btn) { btn.disabled = false; btn.textContent = 'Spara verifikation'; } }
 }
