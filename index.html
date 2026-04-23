@@ -12061,7 +12061,7 @@ async function loadAccountantClients() {
   }
   html += '</div>';
   el.innerHTML = html;
-  await sb.from('accountant_audit_log').insert({ accountant_user_id: currentUser.id, client_user_id: accesses[0]?.client_user_id, action: 'login' }).catch(() => {});
+  sb.from('accountant_audit_log').insert({ accountant_user_id: currentUser.id, client_user_id: accesses[0]?.client_user_id, action: 'login' }).then(() => {});
 }
 
 async function openAccClientView(clientUserId) {
@@ -12076,7 +12076,7 @@ async function openAccClientView(clientUserId) {
   const yrSel = document.getElementById('accClientYear');
   yrSel.innerHTML = '';
   for (let y = yearNow; y >= yearNow - 5; y--) yrSel.innerHTML += '<option value="' + y + '">' + y + '</option>';
-  await sb.from('accountant_audit_log').insert({ accountant_user_id: currentUser.id, client_user_id: clientUserId, action: 'view_verifications' }).catch(() => {});
+  sb.from('accountant_audit_log').insert({ accountant_user_id: currentUser.id, client_user_id: clientUserId, action: 'view_verifications' }).then(() => {});
   await loadAccClientBookkeeping();
 }
 
@@ -12197,7 +12197,7 @@ async function addAccComment() {
   if (!comment) { alert('Skriv en kommentar.'); return; }
   const { error } = await sb.from('accountant_comments').insert({ accountant_user_id: currentUser.id, client_user_id: _accSelectedClient, comment, status });
   if (error) { alert('Fel: ' + error.message); return; }
-  await sb.from('accountant_audit_log').insert({ accountant_user_id: currentUser.id, client_user_id: _accSelectedClient, action: 'add_comment', details: { status } }).catch(() => {});
+  sb.from('accountant_audit_log').insert({ accountant_user_id: currentUser.id, client_user_id: _accSelectedClient, action: 'add_comment', details: { status } }).then(() => {});
   document.getElementById('accNewComment').value = '';
   loadAccComments();
 }
@@ -12210,7 +12210,7 @@ async function resolveAccComment(commentId) {
 async function accExportSIE() {
   if (!_accSelectedClient) return;
   const yr = document.getElementById('accClientYear')?.value || new Date().getFullYear();
-  await sb.from('accountant_audit_log').insert({ accountant_user_id: currentUser.id, client_user_id: _accSelectedClient, action: 'export_sie', details: { year: yr } }).catch(() => {});
+  sb.from('accountant_audit_log').insert({ accountant_user_id: currentUser.id, client_user_id: _accSelectedClient, action: 'export_sie', details: { year: yr } }).then(() => {});
   const client = _accClientData.find(c => c.client_user_id === _accSelectedClient);
   const clientProfile = client?.profile || {};
   const { data: vers } = await sb.from('verifications').select('*').eq('user_id', _accSelectedClient).gte('verification_date', yr + '-01-01').lte('verification_date', yr + '-12-31').order('verification_number');
