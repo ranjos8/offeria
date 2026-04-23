@@ -2526,16 +2526,18 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
       <!-- ACCOUNTANT CLIENTS PAGE -->
       <div class="app-page" id="page-accountant-clients">
         <div class="page-title">Mina klienter</div>
-        <div class="page-sub">Granska bokföring för dina klientföretag — enbart läsåtkomst (BFL 5 kap.)</div>
+        <div class="page-sub" id="accPageSub">Granska bokföring för dina klientföretag</div>
         <div id="accClientList"><div class="empty-state" style="padding:3rem"><p>Inga klienter ännu. Be dina klienter bjuda in dig via Offeria.</p></div></div>
         <div id="accClientView" style="display:none">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem">
             <div>
               <span style="font-family:'Fraunces',serif;font-size:1.1rem" id="accClientName"></span>
               <span style="font-size:0.78rem;color:#888;margin-left:0.5rem" id="accClientOrg"></span>
+              <span id="accClientRoleBadge" style="font-size:0.68rem;font-weight:600;padding:0.15rem 0.5rem;border-radius:4px;margin-left:0.5rem"></span>
             </div>
-            <div style="display:flex;gap:0.5rem;align-items:center">
+            <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
               <select id="accClientYear" onchange="loadAccClientBookkeeping()" style="padding:0.5rem 0.8rem;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:0.85rem"></select>
+              <button id="accNewVerBtn" onclick="openAccNewVerification()" class="gen-btn" style="display:none;padding:0.4rem 1rem;font-size:0.78rem">+ Ny verifikation</button>
               <button onclick="accExportSIE()" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem">SIE-export</button>
               <button onclick="closeAccClientView()" class="btn-sm btn-outline" style="font-size:0.78rem;padding:0.4rem 0.8rem">Tillbaka</button>
             </div>
@@ -12053,6 +12055,12 @@ async function loadAccountantClients() {
   if (!el) return;
   viewEl.style.display = 'none';
   const { data: accesses } = await sb.from('accountant_access').select('client_user_id, role, granted_at').eq('accountant_user_id', currentUser.id).eq('is_active', true);
+  // Update page subtitle
+  const subEl = document.getElementById('accPageSub');
+  if (subEl) {
+    const hasRW = (accesses || []).some(a => a.role === 'read_write');
+    subEl.textContent = hasRW ? 'Granska och bokför för dina klientföretag' : 'Granska bokföring för dina klientföretag — enbart läsåtkomst (BFL 5 kap.)';
+  }
   if (!accesses || accesses.length === 0) {
     el.innerHTML = '<div class="empty-state" style="padding:3rem"><div style="margin-bottom:1rem"><span class="ico" style="font-size:2rem;color:var(--gold)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span></div><p>Inga klienter ännu.</p><p style="font-size:0.82rem;color:#888;margin-top:0.3rem">Be dina klienter bjuda in dig via Offeria.</p></div>';
     return;
@@ -12075,10 +12083,21 @@ async function openAccClientView(clientUserId) {
   _accSelectedClient = clientUserId;
   const client = _accClientData.find(c => c.client_user_id === clientUserId);
   if (!client) return;
+  window._accSelectedRole = client.role || 'read';
+  const isReadWrite = window._accSelectedRole === 'read_write';
   document.getElementById('accClientList').style.display = 'none';
   document.getElementById('accClientView').style.display = 'block';
   document.getElementById('accClientName').textContent = client.profile.company_name || client.profile.full_name || 'Klient';
   document.getElementById('accClientOrg').textContent = client.profile.org_number || '';
+  const badge = document.getElementById('accClientRoleBadge');
+  if (isReadWrite) {
+    badge.textContent = 'Läs & skriv';
+    badge.style.cssText = 'font-size:0.68rem;font-weight:600;padding:0.15rem 0.5rem;border-radius:4px;margin-left:0.5rem;background:#e3f2fd;color:#1565c0';
+  } else {
+    badge.textContent = 'Läsåtkomst';
+    badge.style.cssText = 'font-size:0.68rem;font-weight:600;padding:0.15rem 0.5rem;border-radius:4px;margin-left:0.5rem;background:#e8f5e9;color:#2e7d32';
+  }
+  document.getElementById('accNewVerBtn').style.display = isReadWrite ? '' : 'none';
   const yearNow = new Date().getFullYear();
   const yrSel = document.getElementById('accClientYear');
   yrSel.innerHTML = '';
@@ -12116,6 +12135,10 @@ async function loadAccClientBookkeeping() {
   }
   const { data: accounts } = await sb.from('chart_of_accounts').select('*').eq('user_id', _accSelectedClient).order('sort_order');
   const accts = accounts || _bkAccounts || [];
+  // Store for accViewVerification/accCorrectVerification
+  window._accLoadedVers = vers || [];
+  window._accLoadedRows = rows;
+  window._accLoadedAccounts = accts;
   const fmt = n => Number(n).toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const fmtK = n => Number(n).toLocaleString('sv-SE', { maximumFractionDigits: 0 });
 
@@ -12127,14 +12150,19 @@ async function loadAccClientBookkeeping() {
     const grandDebet = rows.reduce((s, r) => s + (parseFloat(r.debit) || 0), 0);
     const grandKredit = rows.reduce((s, r) => s + (parseFloat(r.credit) || 0), 0);
     let html = '<div style="font-size:0.8rem;color:#888;margin-bottom:0.5rem"><strong>' + vers.length + '</strong> verifikationer · Debet: <strong>' + fmt(grandDebet) + ' kr</strong> · Kredit: <strong>' + fmt(grandKredit) + ' kr</strong>' + (Math.abs(grandDebet - grandKredit) > 0.01 ? '<span style="color:#c62828;font-weight:600"> (Ej balans)</span>' : '') + '</div>';
-    html += '<table class="history-table"><thead><tr><th>Nr</th><th>Datum</th><th>Beskrivning</th><th style="text-align:right">Debet</th><th style="text-align:right">Kredit</th></tr></thead><tbody>';
+    const isRW = window._accSelectedRole === 'read_write';
+    html += '<table class="history-table"><thead><tr><th>Nr</th><th>Datum</th><th>Beskrivning</th><th style="text-align:right">Debet</th><th style="text-align:right">Kredit</th><th></th></tr></thead><tbody>';
     vers.forEach(v => {
       const vRows = rows.filter(r => r.verification_id === v.id);
       const totalD = vRows.reduce((s, r) => s + (parseFloat(r.debit) || 0), 0);
-      html += '<tr style="background:' + (v.is_locked ? '#f9f9f7' : 'white') + '"><td style="font-weight:700;font-size:0.8rem">V' + v.verification_number + '</td><td style="font-size:0.8rem">' + v.verification_date + '</td><td>' + escapeHtml(v.description) + (v.source_type !== 'manual' ? ' <span style="font-size:0.65rem;background:var(--cream);padding:0.1rem 0.4rem;border-radius:4px;color:var(--gold)">' + v.source_type + '</span>' : '') + '</td><td style="text-align:right;font-size:0.82rem">' + fmt(totalD) + '</td><td style="text-align:right;font-size:0.82rem">' + fmt(totalD) + '</td></tr>';
+      let actionBtns = '<button onclick="accViewVerification(\'' + v.id + '\')" style="background:none;border:1px solid var(--border);border-radius:6px;padding:0.2rem 0.5rem;cursor:pointer;font-size:0.72rem;font-family:inherit;color:var(--gold)">Visa</button>';
+      if (isRW && !v.is_locked) {
+        actionBtns += ' <button onclick="accCorrectVerification(\'' + v.id + '\')" style="background:none;border:1px solid #e65100;border-radius:6px;padding:0.2rem 0.5rem;cursor:pointer;font-size:0.72rem;font-family:inherit;color:#e65100">Rätta</button>';
+      }
+      html += '<tr style="background:' + (v.is_locked ? '#f9f9f7' : 'white') + '"><td style="font-weight:700;font-size:0.8rem">V' + v.verification_number + '</td><td style="font-size:0.8rem">' + v.verification_date + '</td><td>' + escapeHtml(v.description) + (v.source_type !== 'manual' ? ' <span style="font-size:0.65rem;background:var(--cream);padding:0.1rem 0.4rem;border-radius:4px;color:var(--gold)">' + v.source_type + '</span>' : '') + '</td><td style="text-align:right;font-size:0.82rem">' + fmt(totalD) + '</td><td style="text-align:right;font-size:0.82rem">' + fmt(totalD) + '</td><td>' + actionBtns + '</td></tr>';
       vRows.forEach(r => {
         const accName = accts.find(a => a.account_number === r.account_number)?.account_name || '';
-        html += '<tr style="font-size:0.78rem;color:#888"><td></td><td></td><td style="padding-left:1.5rem">' + r.account_number + ' ' + accName + '</td><td style="text-align:right">' + (parseFloat(r.debit) > 0 ? fmt(r.debit) : '') + '</td><td style="text-align:right">' + (parseFloat(r.credit) > 0 ? fmt(r.credit) : '') + '</td></tr>';
+        html += '<tr style="font-size:0.78rem;color:#888"><td></td><td></td><td style="padding-left:1.5rem">' + r.account_number + ' ' + accName + '</td><td style="text-align:right">' + (parseFloat(r.debit) > 0 ? fmt(r.debit) : '') + '</td><td style="text-align:right">' + (parseFloat(r.credit) > 0 ? fmt(r.credit) : '') + '</td><td></td></tr>';
       });
     });
     html += '</tbody></table>';
@@ -12246,6 +12274,87 @@ async function accExportSIE() {
   a.click();
   URL.revokeObjectURL(a.href);
 }
+
+// === ACCOUNTANT: View, correct, and create verifications for clients ===
+
+function accViewVerification(id) {
+  // Reuse data already loaded
+  const v = window._accLoadedVers?.find(x => x.id === id);
+  if (!v) return;
+  const rows = (window._accLoadedRows || []).filter(r => r.verification_id === id);
+  const accts = window._accLoadedAccounts || [];
+  const fmt = n => Number(n).toLocaleString('sv-SE', { minimumFractionDigits: 2 });
+  const rowsHtml = rows.map(r => {
+    const acc = accts.find(a => a.account_number === r.account_number);
+    return '<tr><td style="padding:0.4rem">' + r.account_number + ' ' + (acc?.account_name || '') + '</td><td style="text-align:right;padding:0.4rem">' + (parseFloat(r.debit) > 0 ? fmt(r.debit) : '') + '</td><td style="text-align:right;padding:0.4rem">' + (parseFloat(r.credit) > 0 ? fmt(r.credit) : '') + '</td></tr>';
+  }).join('');
+  const isRW = window._accSelectedRole === 'read_write';
+  const canCorrect = isRW && !v.is_locked;
+  const popup = document.createElement('div');
+  popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center';
+  popup.onclick = (e) => { if (e.target === popup) popup.remove(); };
+  popup.innerHTML = '<div style="background:white;border-radius:12px;max-width:520px;width:90%;padding:1.5rem;box-shadow:0 20px 60px rgba(0,0,0,0.3)">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem"><h3 style="margin:0">V' + v.verification_number + '</h3><button onclick="this.closest(\'[style*=position]\').remove()" style="background:none;border:none;font-size:1.3rem;cursor:pointer">✕</button></div>' +
+    '<div style="font-size:0.85rem;color:#888;margin-bottom:0.3rem">' + v.verification_date + ' · ' + v.source_type + (v.is_locked ? ' · Låst' : '') + '</div>' +
+    '<div style="font-size:0.95rem;margin-bottom:1rem">' + escapeHtml(v.description) + '</div>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:0.85rem"><thead><tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:0.4rem">Konto</th><th style="text-align:right;padding:0.4rem">Debet</th><th style="text-align:right;padding:0.4rem">Kredit</th></tr></thead><tbody>' + rowsHtml + '</tbody></table>' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.2rem;padding-top:0.8rem;border-top:1px solid var(--border)">' +
+    '<span style="font-size:0.72rem;color:#888">' + (v.is_locked ? 'Låst period' : 'BFL: rättelse via motbokning') + '</span>' +
+    (canCorrect ? '<button onclick="this.closest(\'[style*=position]\').remove();accCorrectVerification(\'' + id + '\')" style="background:none;border:1px solid #e65100;color:#e65100;border-radius:6px;padding:0.35rem 0.8rem;font-size:0.8rem;cursor:pointer;font-family:inherit">↩ Rätta</button>' : '') +
+    '</div></div>';
+  document.body.appendChild(popup);
+}
+
+async function accCorrectVerification(id) {
+  if (window._accSelectedRole !== 'read_write') { alert('Du har bara läsåtkomst.'); return; }
+  const v = window._accLoadedVers?.find(x => x.id === id);
+  if (!v) return;
+  if (v.is_locked) { alert('Verifikationen är låst och kan inte rättas.'); return; }
+  const rows = (window._accLoadedRows || []).filter(r => r.verification_id === id);
+  if (!confirm('Rätta verifikation V' + v.verification_number + '?\n\nEn rättelseverifikation med omvända debet/kredit skapas enligt BFL 5 kap.\n\nFortsätt?')) return;
+
+  const yr = new Date().getFullYear();
+  const today = new Date().toISOString().slice(0, 10);
+  const { data: numD } = await sb.rpc('get_next_verification_number', { p_user_id: _accSelectedClient, p_year: yr });
+  const verNum = numD || 1;
+
+  const { data: ver, error } = await sb.from('verifications').insert({
+    user_id: _accSelectedClient, verification_number: verNum, verification_date: today,
+    description: 'Rättelse av V' + v.verification_number + ' – ' + v.description,
+    source_type: 'correction', created_by: currentUser.email + ' (konsult)'
+  }).select().single();
+
+  if (error) { alert('Fel: ' + error.message); return; }
+
+  await sb.from('verification_rows').insert(
+    rows.map(r => ({
+      verification_id: ver.id, user_id: _accSelectedClient,
+      account_number: r.account_number,
+      debit: parseFloat(r.credit) || 0,
+      credit: parseFloat(r.debit) || 0
+    }))
+  );
+
+  sb.from('accountant_audit_log').insert({
+    accountant_user_id: currentUser.id, client_user_id: _accSelectedClient,
+    action: 'correction', details: { corrects: id, original_number: v.verification_number }
+  }).then(() => {});
+
+  alert('Rättelseverifikation V' + verNum + ' skapad.\n\nBokför nu rätt verifikation med + Ny verifikation.');
+  await loadAccClientBookkeeping();
+}
+
+function openAccNewVerification() {
+  if (window._accSelectedRole !== 'read_write') { alert('Du har bara läsåtkomst.'); return; }
+  if (!_accSelectedClient) return;
+  // Open the standard verification modal but override save to use client's user_id
+  window._accVerOverride = _accSelectedClient;
+  openNewVerification();
+  document.getElementById('verModalTitle').textContent = 'Ny verifikation (för klient)';
+}
+
+// Override saveVerification to handle client context
+const _origSaveVerification = typeof saveVerification === 'function' ? saveVerification : null;
 
 init();
 </script>
