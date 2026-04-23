@@ -4068,51 +4068,10 @@ async function onLogin(user) {
   try { fillProfileForm(profile); } catch(e) {}
   renderExamplePills();
 
-  // Hantera väntande revisor-inbjudan — fråga användaren först
+  // Hantera väntande revisor-inbjudan — visa meddelande, acceptera under "Mina klienter"
   if (window._pendingInviteToken) {
-    const token = window._pendingInviteToken;
     window._pendingInviteToken = null;
-    // Hämta info om inbjudan för att visa vem som bjuder in
-    try {
-      const { data: inviteInfo } = await sb.from('accountant_invites')
-        .select('client_user_id, role, accountant_email')
-        .eq('invite_token', token)
-        .eq('status', 'pending')
-        .single();
-      if (inviteInfo) {
-        const { data: clientProfile } = await sb.from('profiles')
-          .select('company_name, full_name')
-          .eq('id', inviteInfo.client_user_id)
-          .single();
-        const clientName = clientProfile?.company_name || clientProfile?.full_name || 'Ett företag';
-        const roleText = inviteInfo.role === 'read_write' ? 'läs- och skrivåtkomst (redovisningskonsult)' : 'läsåtkomst (revisor)';
-        const accepted = confirm(
-          clientName + ' vill ge dig ' + roleText + ' till sin bokföring i Offeria.\n\n' +
-          'Du kommer kunna:\n' +
-          '• Granska verifikationer, resultat- och balansräkning\n' +
-          '• Lämna kommentarer och exportera SIE-filer\n' +
-          (inviteInfo.role === 'read_write' ? '• Skapa verifikationer och bokföra\n' : '') +
-          '\nVill du acceptera inbjudan?'
-        );
-        if (accepted) {
-          const { data: result, error } = await sb.rpc('accept_accountant_invite', { p_invite_token: token });
-          if (error) {
-            alert('Kunde inte acceptera inbjudan: ' + error.message);
-          } else if (result?.error) {
-            alert(result.error);
-          } else {
-            alert('Inbjudan accepterad! Du har nu tillgång till ' + clientName + ' under "Mina klienter".');
-            const { data: updatedProfile } = await sb.from('profiles').select('*').eq('id', user.id).single();
-            if (updatedProfile) { currentProfile = updatedProfile; updateUI(updatedProfile, monthlyUsed, total || 0); }
-            showPage('accountant-clients');
-          }
-        } else {
-          alert('Inbjudan avböjd. Du kan acceptera senare via samma länk.');
-        }
-      } else {
-        alert('Inbjudan hittades inte, har redan accepterats, eller tillhör en annan e-postadress.');
-      }
-    } catch(e) { console.error('Invite check error:', e); }
+    alert('Du har en inbjudan att granska bokföring.\n\nGå till "Mina klienter" i menyn för att se och acceptera inbjudan.');
   }
 
   // Ladda revisorslista i profilen
@@ -4173,11 +4132,25 @@ function updateUI(profile, used, total) {
   const adminNav = document.getElementById('sNav-admin');
   if (adminNav) adminNav.style.display = profile?.is_admin ? 'flex' : 'none';
 
-  // Visa "Mina klienter" bara för revisorer
+  // Visa "Mina klienter" om revisorn har klienter ELLER väntande inbjudningar
   const accNav = document.getElementById('sNav-accountant-clients');
-  if (accNav) accNav.style.display = profile?.is_accountant ? 'flex' : 'none';
   const dAccNav = document.getElementById('dNav-accountant-clients');
-  if (dAccNav) dAccNav.style.display = profile?.is_accountant ? 'flex' : 'none';
+  if (accNav || dAccNav) {
+    let showAccNav = profile?.is_accountant;
+    if (!showAccNav && currentUser) {
+      // Kolla om det finns väntande inbjudningar för denna e-post
+      sb.from('accountant_invites').select('id', { count: 'exact', head: true })
+        .eq('accountant_email', currentUser.email).eq('status', 'pending')
+        .then(({ count }) => {
+          if (count > 0) {
+            if (accNav) accNav.style.display = 'flex';
+            if (dAccNav) dAccNav.style.display = 'flex';
+          }
+        });
+    }
+    if (accNav) accNav.style.display = showAccNav ? 'flex' : 'none';
+    if (dAccNav) dAccNav.style.display = showAccNav ? 'flex' : 'none';
+  }
   const drawerAdminNav = document.getElementById('dNav-admin');
   if (drawerAdminNav) drawerAdminNav.style.display = profile?.is_admin ? 'flex' : 'none';
 
@@ -12091,29 +12064,85 @@ async function loadAccountantClients() {
   const viewEl = document.getElementById('accClientView');
   if (!el) return;
   viewEl.style.display = 'none';
+
+  // Hämta väntande inbjudningar
+  const { data: pendingInvites } = await sb.from('accountant_invites')
+    .select('id, invite_token, client_user_id, role, created_at')
+    .eq('accountant_email', currentUser.email).eq('status', 'pending');
+
+  // Hämta aktiva klienter
   const { data: accesses } = await sb.from('accountant_access').select('client_user_id, role, granted_at').eq('accountant_user_id', currentUser.id).eq('is_active', true);
+
   // Update page subtitle
   const subEl = document.getElementById('accPageSub');
   if (subEl) {
     const hasRW = (accesses || []).some(a => a.role === 'read_write');
-    subEl.textContent = hasRW ? 'Granska och bokför för dina klientföretag' : 'Granska bokföring för dina klientföretag — enbart läsåtkomst (BFL 5 kap.)';
+    subEl.textContent = hasRW ? 'Granska och bokför för dina klientföretag' : 'Granska bokföring för dina klientföretag';
   }
-  if (!accesses || accesses.length === 0) {
+
+  const hasPending = pendingInvites && pendingInvites.length > 0;
+  const hasActive = accesses && accesses.length > 0;
+
+  if (!hasPending && !hasActive) {
     el.innerHTML = '<div class="empty-state" style="padding:3rem"><div style="margin-bottom:1rem"><span class="ico" style="font-size:2rem;color:var(--gold)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span></div><p>Inga klienter ännu.</p><p style="font-size:0.82rem;color:#888;margin-top:0.3rem">Be dina klienter bjuda in dig via Offeria.</p></div>';
     return;
   }
-  _accClientData = [];
-  let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem">';
-  for (const a of accesses) {
-    const { data: clientProfile } = await sb.from('profiles').select('company_name, org_number, email, full_name').eq('id', a.client_user_id).single();
-    if (!clientProfile) continue;
-    _accClientData.push({ ...a, profile: clientProfile });
-    const name = clientProfile.company_name || clientProfile.full_name || 'Klient';
-    html += '<div class="cust-card" onclick="openAccClientView(\'' + a.client_user_id + '\')" style="cursor:pointer"><div class="cust-name">' + escapeHtml(name) + '</div><div class="cust-info">' + (clientProfile.org_number||'') + ' · ' + (clientProfile.email||'') + '</div><div class="cust-stats">Åtkomst sedan ' + new Date(a.granted_at).toLocaleDateString('sv-SE') + ' · ' + (a.role === 'read_write' ? 'Läs & skriv' : 'Läsåtkomst') + '</div></div>';
+
+  let html = '';
+
+  // Väntande inbjudningar
+  if (hasPending) {
+    html += '<div style="margin-bottom:1.5rem"><div style="font-weight:600;font-size:0.9rem;margin-bottom:0.8rem;color:var(--gold)">Väntande inbjudningar</div>';
+    for (const inv of pendingInvites) {
+      const { data: clientProfile } = await sb.from('profiles').select('company_name, full_name, org_number').eq('id', inv.client_user_id).single();
+      const name = clientProfile?.company_name || clientProfile?.full_name || 'Ett företag';
+      const orgNr = clientProfile?.org_number || '';
+      const roleText = inv.role === 'read_write' ? 'Läs & skriv (redovisningskonsult)' : 'Läsåtkomst (revisor)';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:1rem;background:var(--cream);border:1.5px solid var(--gold-light);border-radius:10px;margin-bottom:0.6rem;flex-wrap:wrap;gap:0.5rem">' +
+        '<div><div style="font-weight:600;font-size:0.95rem">' + escapeHtml(name) + '</div>' +
+        '<div style="font-size:0.78rem;color:#888">' + orgNr + ' · ' + roleText + ' · Inbjudan ' + new Date(inv.created_at).toLocaleDateString('sv-SE') + '</div></div>' +
+        '<div style="display:flex;gap:0.5rem">' +
+        '<button onclick="acceptAccInvite(\'' + inv.invite_token + '\')" class="gen-btn" style="padding:0.5rem 1rem;font-size:0.82rem">Acceptera</button>' +
+        '<button onclick="declineAccInvite(\'' + inv.id + '\')" style="background:none;border:1px solid #888;color:#888;border-radius:6px;padding:0.5rem 1rem;font-size:0.82rem;cursor:pointer;font-family:inherit">Avböj</button>' +
+        '</div></div>';
+    }
+    html += '</div>';
   }
-  html += '</div>';
+
+  // Aktiva klienter
+  if (hasActive) {
+    if (hasPending) html += '<div style="font-weight:600;font-size:0.9rem;margin-bottom:0.8rem">Aktiva klienter</div>';
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem">';
+    _accClientData = [];
+    for (const a of accesses) {
+      const { data: clientProfile } = await sb.from('profiles').select('company_name, org_number, email, full_name').eq('id', a.client_user_id).single();
+      if (!clientProfile) continue;
+      _accClientData.push({ ...a, profile: clientProfile });
+      const name = clientProfile.company_name || clientProfile.full_name || 'Klient';
+      html += '<div class="cust-card" onclick="openAccClientView(\'' + a.client_user_id + '\')" style="cursor:pointer"><div class="cust-name">' + escapeHtml(name) + '</div><div class="cust-info">' + (clientProfile.org_number||'') + ' · ' + (clientProfile.email||'') + '</div><div class="cust-stats">Åtkomst sedan ' + new Date(a.granted_at).toLocaleDateString('sv-SE') + ' · ' + (a.role === 'read_write' ? 'Läs & skriv' : 'Läsåtkomst') + '</div></div>';
+    }
+    html += '</div>';
+  }
+
   el.innerHTML = html;
-  sb.from('accountant_audit_log').insert({ accountant_user_id: currentUser.id, client_user_id: accesses[0]?.client_user_id, action: 'login' }).then(() => {});
+  if (hasActive) sb.from('accountant_audit_log').insert({ accountant_user_id: currentUser.id, client_user_id: accesses[0]?.client_user_id, action: 'login' }).then(() => {});
+}
+
+async function acceptAccInvite(token) {
+  if (!confirm('Acceptera inbjudan?\n\nDu får tillgång till klientens bokföring.')) return;
+  const { data: result, error } = await sb.rpc('accept_accountant_invite', { p_invite_token: token });
+  if (error) { alert('Fel: ' + error.message); return; }
+  if (result?.error) { alert(result.error); return; }
+  alert('Inbjudan accepterad!');
+  const { data: updatedProfile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+  if (updatedProfile) { currentProfile = updatedProfile; updateUI(updatedProfile, monthlyUsed, 0); }
+  loadAccountantClients();
+}
+
+async function declineAccInvite(inviteId) {
+  if (!confirm('Avböj inbjudan?\n\nKlienten kan bjuda in dig igen om du ändrar dig.')) return;
+  await sb.from('accountant_invites').update({ status: 'declined' }).eq('id', inviteId);
+  loadAccountantClients();
 }
 
 async function openAccClientView(clientUserId) {
