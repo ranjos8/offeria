@@ -12019,8 +12019,8 @@ async function loadActiveAccountants() {
   let html = '';
   for (const a of activeAccess) {
     const { data: accProfile } = await sb.from('profiles').select('email, full_name, company_name, accountant_title, accountant_firm').eq('id', a.accountant_user_id).single();
-    const name = accProfile?.accountant_firm || accProfile?.company_name || accProfile?.full_name || accProfile?.email || 'Revisor';
-    const title = accProfile?.accountant_title || '';
+    const name = accProfile?.accountant_firm || accProfile?.full_name || accProfile?.email || 'Revisor';
+    const title = accProfile?.accountant_title || (accProfile?.email || '');
     html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.8rem;background:#e8f5e9;border:1px solid #c8e6c9;border-radius:8px;margin-bottom:0.5rem"><div><div style="font-weight:600;font-size:0.88rem;color:#2e7d32">' + escapeHtml(name) + '</div><div style="font-size:0.72rem;color:#888">' + escapeHtml(title) + ' · Aktiv sedan ' + new Date(a.granted_at).toLocaleDateString('sv-SE') + ' · ' + (a.role === 'read_write' ? 'Läs & skriv' : 'Läsåtkomst') + '</div></div><button onclick="revokeAccountantAccess(\'' + a.accountant_user_id + '\')" style="background:none;border:1px solid #c62828;color:#c62828;border-radius:6px;padding:0.3rem 0.7rem;font-size:0.75rem;cursor:pointer;font-family:inherit">Återkalla</button></div>';
   }
   for (const inv of pendingInvites) {
@@ -12051,7 +12051,7 @@ async function loadAccountantAuditLog() {
   const { data: logs } = await sb.from('accountant_audit_log').select('action, created_at, details').eq('client_user_id', currentUser.id).order('created_at', { ascending: false }).limit(20);
   if (!logs || logs.length === 0) { logEl.style.display = 'none'; return; }
   logEl.style.display = 'block';
-  const actionLabels = { accept_invite:'Accepterade inbjudan', access_revoked:'Åtkomst återkallad', view_verifications:'Granskade verifikationer', view_report:'Öppnade rapport', export_sie:'Exporterade SIE-fil', add_comment:'Kommenterade', login:'Loggade in' };
+  const actionLabels = { accept_invite:'Accepterade inbjudan', access_revoked:'Åtkomst återkallad', view_verifications:'Granskade verifikationer', view_report:'Öppnade rapport', export_sie:'Exporterade SIE-fil', add_comment:'Kommenterade', login:'Loggade in', correction:'Rättade verifikation', create_verification:'Skapade verifikation' };
   contentEl.innerHTML = logs.map(l => {
     const date = new Date(l.created_at).toLocaleString('sv-SE', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
     return '<div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid #f0ede6;font-size:0.78rem"><span style="color:#555">' + (actionLabels[l.action]||l.action) + '</span><span style="color:#aaa">' + date + '</span></div>';
