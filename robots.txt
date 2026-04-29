@@ -1,0 +1,6 @@
+# robots.txt for offeria.se
+# Allow all bots, including AI assistants
+User-agent: *
+Allow: /
+
+Sitemap: https://offeria.se/sitemap.xml
