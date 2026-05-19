@@ -993,22 +993,7 @@ table.qt tr:nth-child(even) td { background: #fbfaf8; }
 
 <!-- ===== NAV ===== -->
 <nav>
-  <svg onclick="goHome()" style="cursor:pointer;display:block;flex-shrink:0" width="174" height="40" viewBox="0 0 174 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="lg" x1="46" y1="0" x2="174" y2="0" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stop-color="#0d0d0b"/>
-        <stop offset="100%" stop-color="#c4982e"/>
-      </linearGradient>
-    </defs>
-    <rect x="7" y="4" width="22" height="30" rx="2.5" fill="#e8d5a0" opacity="0.7"/>
-    <rect x="4" y="2" width="22" height="30" rx="2.5" fill="#f5f0e8" stroke="#d8d0c0" stroke-width="1"/>
-    <rect x="1" y="0" width="22" height="30" rx="2.5" fill="white" stroke="#c8c0b0" stroke-width="1"/>
-    <line x1="4.5" y1="8" x2="19.5" y2="8" stroke="#b8902e" stroke-width="1.8" stroke-linecap="round"/>
-    <line x1="4.5" y1="13" x2="19.5" y2="13" stroke="#ddd8cc" stroke-width="1.2" stroke-linecap="round"/>
-    <line x1="4.5" y1="18" x2="16" y2="18" stroke="#ddd8cc" stroke-width="1.2" stroke-linecap="round"/>
-    <line x1="4.5" y1="23" x2="18" y2="23" stroke="#ddd8cc" stroke-width="1.2" stroke-linecap="round"/>
-    <text x="31" y="29" font-family="Fraunces, serif" font-style="italic" font-weight="700" font-size="28" fill="url(#lg)" letter-spacing="-0.8">Offeria</text>
-  </svg>
+  <img src="/assets/offeria-logo-light.svg" alt="Offeria" onclick="goHome()" style="cursor:pointer;display:block;flex-shrink:0;height:40px;width:auto">
   <div class="nav-right">
     <div id="navUserArea" style="display:none; align-items:center; gap:0.8rem;">
       <span class="nav-user" id="navUserName"></span>
@@ -12787,7 +12772,7 @@ init();
 <div id="leftDrawer" style="position:fixed;top:0;left:-280px;width:280px;height:100%;background:var(--ink);z-index:301;transition:left 0.28s ease;display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)">
   <!-- Drawer header -->
   <div style="padding:1.2rem 1.5rem;border-bottom:1px solid #2a2a28;display:flex;align-items:center;justify-content:space-between">
-    <span style="font-family:Fraunces,serif;font-style:italic;font-size:1.2rem;color:var(--gold-light)">Offeria</span>
+    <img src="/assets/offeria-logo-dark.svg" alt="Offeria" style="height:32px;width:auto;display:block">
     <button onclick="closeDrawer()" style="background:none;border:none;color:#888;font-size:1.4rem;cursor:pointer;padding:0.2rem">✕</button>
   </div>
   
