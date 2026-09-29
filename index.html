@@ -6359,10 +6359,16 @@ async function toggleInvoicePaid() {
 async function deleteInvoice(idx) {
   const inv = _invoiceData[idx];
   if (!inv) return;
-  if (inv.status !== 'draft') return alert('Bara utkast kan tas bort. Bekräftade fakturor måste krediteras.');
-  const ok = confirm('Vill du ta bort detta utkast?\n\nDetta går inte att ångra.');
-  if (!ok) return;
-  await sb.from('invoices').delete().eq('id', inv.id);
+  if (inv.status !== 'draft' || inv.invoice_number) return alert('Bara utkast utan fakturanummer kan tas bort. Bekräftade fakturor måste krediteras.');
+  if (!confirm('Vill du ta bort detta utkast?\n\nDetta går inte att ångra.')) return;
+
+  const { data, error } = await sb.from('invoices').delete().eq('id', inv.id).select();
+  if (error || !data || data.length === 0) {
+    console.error('Radering misslyckades', error);
+    alert('Kunde inte ta bort utkastet. ' + (error?.message || 'Databasen tillät inte raderingen.'));
+    return;
+  }
+
   _invoiceData.splice(idx, 1);
   updateInvoiceSummary();
   filterInvoices();
@@ -6370,12 +6376,18 @@ async function deleteInvoice(idx) {
 
 async function deleteCurrentInvoice() {
   if (!_currentInvoice) return;
-  if (_currentInvoice.status !== 'draft') return alert('Bara utkast kan tas bort. Bekräftade fakturor måste krediteras.');
+  if (_currentInvoice.status !== 'draft' || _currentInvoice.invoice_number) return alert('Bara utkast utan fakturanummer kan tas bort. Bekräftade fakturor måste krediteras.');
+  if (!confirm('Vill du ta bort detta utkast?\n\nDetta går inte att ångra.')) return;
+
   const idx = _invoiceData.indexOf(_currentInvoice);
-  const ok = confirm('Vill du ta bort detta utkast?\n\nDetta går inte att ångra.');
-  if (!ok) return;
-  await sb.from('invoices').delete().eq('id', _currentInvoice.id);
-  _invoiceData.splice(idx, 1);
+  const { data, error } = await sb.from('invoices').delete().eq('id', _currentInvoice.id).select();
+  if (error || !data || data.length === 0) {
+    console.error('Radering misslyckades', error);
+    alert('Kunde inte ta bort utkastet. ' + (error?.message || 'Databasen tillät inte raderingen.'));
+    return;
+  }
+
+  if (idx > -1) _invoiceData.splice(idx, 1);
   closeInvoiceModal();
   updateInvoiceSummary();
   filterInvoices();
