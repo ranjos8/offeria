@@ -5680,7 +5680,8 @@ function renderInvoiceList(data) {
   }
   el.innerHTML = `<table class="history-table">
     <thead><tr><th>Nr</th><th>Kund</th><th>Titel</th><th style="text-align:right">Belopp</th><th>Förfaller</th><th>Status</th><th></th></tr></thead>
-    <tbody>${data.map((inv, i) => {
+    <tbody>${data.map((inv) => {
+      const i = _invoiceData.indexOf(inv);
       const status = getInvoiceStatus(inv);
       const due = inv.due_date ? new Date(inv.due_date).toLocaleDateString('sv-SE') : '–';
       const amount = inv.total_amount ? Number(inv.total_amount).toLocaleString('sv-SE') + ' kr' : '–';
@@ -5689,6 +5690,7 @@ function renderInvoiceList(data) {
       const canCredit = ['sent','paid','overdue'].includes(status);
       let btns = `<button class="btn-sm btn-outline" onclick="openInvoiceView(${i})">Öppna</button>`;
       if (isDraft) {
+        btns += ` <button class="btn-sm btn-outline" style="background:var(--gold);color:white;border-color:var(--gold)" onclick="editDraftFromList(${i})">Redigera</button>`;
         btns += ` <button class="btn-sm btn-outline" style="background:#2e7d32;color:white;border-color:#2e7d32" onclick="confirmInvoice(${i})">Bekräfta</button>`;
         btns += ` <button class="btn-sm" onclick="deleteInvoice(${i})" style="background:none;border:1px solid #ddd;color:#999;border-radius:6px;padding:0.25rem 0.6rem;cursor:pointer;font-size:0.75rem;font-family:DM Sans,sans-serif">Ta bort</button>`;
       }
@@ -5716,14 +5718,15 @@ function renderInvoiceList(data) {
       </td></tr>`;
     }).join('')}</tbody>
   </table>
-  <div class="inv-mobile-cards">${data.map((inv, i) => {
+  <div class="inv-mobile-cards">${data.map((inv) => {
+    const i = _invoiceData.indexOf(inv);
     const status = getInvoiceStatus(inv);
     const amount = inv.total_amount ? Number(inv.total_amount).toLocaleString('sv-SE') + ' kr' : '–';
     const isDraft = status === 'draft';
     const isLocked = ['sent','paid','overdue','credited','credit_note'].includes(status);
     const canCredit = ['sent','paid','overdue'].includes(status);
     let btns = `<button class="btn-sm btn-outline" onclick="openInvoiceView(${i})">Öppna</button>`;
-    if (isDraft) btns += ` <button class="btn-sm btn-outline" style="background:#2e7d32;color:white;border-color:#2e7d32" onclick="confirmInvoice(${i})">Bekräfta</button><button class="btn-sm" onclick="deleteInvoice(${i})" style="background:none;border:1px solid #ddd;color:#999;border-radius:6px;cursor:pointer;font-family:inherit">×</button>`;
+    if (isDraft) btns += ` <button class="btn-sm btn-outline" style="background:var(--gold);color:white;border-color:var(--gold)" onclick="editDraftFromList(${i})">Redigera</button><button class="btn-sm btn-outline" style="background:#2e7d32;color:white;border-color:#2e7d32" onclick="confirmInvoice(${i})">Bekräfta</button><button class="btn-sm" onclick="deleteInvoice(${i})" style="background:none;border:1px solid #ddd;color:#999;border-radius:6px;cursor:pointer;font-family:inherit">×</button>`;
     if (isLocked && status !== 'paid' && status !== 'credited' && status !== 'credit_note') btns += ` <button class="inv-mark-btn" onclick="markInvoicePaid(${i})">✓ Betald</button>`;
     if (status === 'paid') btns += ` <button class="inv-mark-btn undo" onclick="markInvoiceUnpaid(${i})">↩</button>`;
     if (canCredit) btns += ` <button class="btn-sm" onclick="createCreditInvoice(${i})" style="background:none;border:1px solid #6a1b9a;color:#6a1b9a;border-radius:6px;cursor:pointer;font-family:inherit">Kreditera</button>`;
@@ -5787,6 +5790,8 @@ function openNewInvoiceModal() {
   document.getElementById('invClient').value = '';
   document.getElementById('invClientAddr').value = '';
   document.getElementById('invTitle').value = '';
+  const remarkBox = document.getElementById('invRemark');
+  if (remarkBox) remarkBox.value = '';
   document.getElementById('invRows').innerHTML = `
     <div class="inv-row-entry" style="display:grid;grid-template-columns:2fr 0.7fr 1fr;gap:0.5rem;margin-bottom:0.5rem;align-items:end">
       <div class="field" style="margin:0"><label style="font-size:0.7rem">Beskrivning</label><input class="inv-desc" placeholder="Arbete..."></div>
@@ -5875,6 +5880,7 @@ function buildInvoiceHtml(info, invoiceData) {
       ${inclRot && rotAmount > 0 ? `<div class="trow"><span>Totalt (inkl. moms)</span><span>${Number(totalInclVat).toLocaleString('sv-SE')} kr</span></div><div class="trow rot-row"><span>ROT-avdrag (30% av arbete)</span><span>- ${Number(rotAmount).toLocaleString('sv-SE')} kr</span></div>` : ''}
       <div class="trow final-row"><span>${isCredit ? 'ER TILLGODO' : (inclRot && rotAmount > 0 ? 'ATT BETALA (efter ROT)' : 'ATT BETALA')}</span><span>${Number(total).toLocaleString('sv-SE')} kr</span></div>
     </div></div>
+    ${invoiceData.remark ? `<div class="q-terms" style="margin-bottom:1rem"><h4>Anmärkning</h4><div style="white-space:pre-wrap">${escapeHtml(invoiceData.remark)}</div></div>` : ''}
     ${!isCredit ? `<div class="q-terms"><h4>Betalningsinformation</h4>
       ${info.bankgiro ? `Bankgiro: <strong>${info.bankgiro}</strong><br>` : ''}
       Ange fakturanummer <strong>${invoiceData.invoiceNumber}</strong> som referens vid betalning.<br>
@@ -5892,6 +5898,7 @@ async function createManualInvoice() {
   if (!(await checkInvoiceLimit())) return;
   const client = document.getElementById('invClient').value.trim();
   const clientAddr = document.getElementById('invClientAddr').value.trim();
+  const remark = (document.getElementById('invRemark')?.value || '').trim();
   const title = document.getElementById('invTitle').value.trim();
   if (!client || !title) return alert('Fyll i kund och titel.');
 
@@ -5935,7 +5942,8 @@ async function createManualInvoice() {
     dateStr: now.toISOString().slice(0, 10),
     dueStr: due.toISOString().slice(0, 10),
     payTermsLabel: payDays + ' dagar netto',
-    inclRot
+    inclRot,
+    remark
   };
 
   const invoiceHtml = buildInvoiceHtml(info, invoiceData);
@@ -5951,7 +5959,7 @@ async function createManualInvoice() {
     due_date: due.toISOString().slice(0, 10),
     payment_terms: payDays + ' dagar netto',
     share_id: crypto.randomUUID(),
-    invoice_data: JSON.stringify({ items, vatRate, clientAddr, inclRot })
+    invoice_data: JSON.stringify({ items, vatRate, clientAddr, inclRot, remark })
   });
   if (error) { console.error(error); return alert('Kunde inte spara faktura.'); }
   logActivity('faktura_skapad', title || client);
@@ -6082,6 +6090,13 @@ function openInvoiceView(idx) {
   document.getElementById('invoiceModalOverlay').classList.add('open');
 }
 
+function editDraftFromList(idx) {
+  const inv = _invoiceData[idx];
+  if (!inv || inv.status !== 'draft' || inv.invoice_number) return;
+  openInvoiceView(idx);
+  editCurrentDraft();
+}
+
 function confirmCurrentInvoice() {
   if (!_currentInvoice) return;
   const idx = _invoiceData.indexOf(_currentInvoice);
@@ -6193,8 +6208,21 @@ async function editCurrentDraft() {
     : 'Redigeringsläge — klicka på rader för att ändra. Summor räknas om automatiskt.';
   doc.prepend(hint);
 
-  // Store ROT state
+  // Fält för rubrik, kundadress och anmärkning
+  const fieldsPanel = document.createElement('div');
+  fieldsPanel.id = 'invDraftFields';
+  fieldsPanel.style.cssText = 'background:#fffaee;border:1px solid var(--gold-light);border-radius:10px;padding:1rem;margin-bottom:1rem';
+  fieldsPanel.innerHTML = '<div class="field" style="margin-bottom:0.7rem"><label>Rubrik</label><input id="invEditTitle"></div>' +
+    '<div class="field" style="margin-bottom:0.7rem"><label>Kundadress</label><input id="invEditAddr"></div>' +
+    '<div class="field" style="margin:0"><label>Anmärkning / meddelande till kunden (visas på fakturan)</label><textarea id="invEditRemark" rows="3" placeholder="T.ex. referens, arbetsplats eller övrig information till kunden"></textarea></div>';
+  hint.after(fieldsPanel);
+  fieldsPanel.querySelector('#invEditTitle').value = inv.title || '';
+  fieldsPanel.querySelector('#invEditAddr').value = invData.clientAddr || '';
+  fieldsPanel.querySelector('#invEditRemark').value = invData.remark || '';
+
+  // Store ROT state och momssats
   doc.dataset.inclRot = hasRot ? '1' : '0';
+  doc.dataset.vatRate = String(invData.vatRate || 25);
 
   // Change toolbar buttons
   const btnsEl = document.getElementById('invModalBtns');
@@ -6207,7 +6235,7 @@ async function editCurrentDraft() {
 function recalcInvoiceDraft() {
   const doc = document.getElementById('invoiceDoc');
   if (!doc) return;
-  const vatRate = 25;
+  const vatRate = parseFloat(doc.dataset.vatRate) || 25;
   const hasRot = doc.dataset.inclRot === '1';
   let subtotal = 0;
   let arbeteSub = 0;
@@ -6295,7 +6323,16 @@ async function saveDraftInline(andConfirm) {
 
   const clientName = doc.querySelector('.q-client strong')?.textContent?.trim() || inv.client_name;
 
+  // Läs rubrik, adress och anmärkning innan redigeringsfälten tas bort
+  const fTitle = doc.querySelector('#invEditTitle');
+  const fAddr = doc.querySelector('#invEditAddr');
+  const fRemark = doc.querySelector('#invEditRemark');
+  const newTitle = (fTitle && fTitle.value.trim()) || inv.title;
+  const newAddr = fAddr ? fAddr.value.trim() : null;
+  const newRemark = fRemark ? fRemark.value.trim() : null;
+
   // Clean up edit UI
+  doc.querySelector('#invDraftFields')?.remove();
   doc.querySelector('#invDraftHint')?.remove();
   doc.querySelector('#invDraftAddRow')?.remove();
   doc.querySelectorAll('[contenteditable]').forEach(el => {
@@ -6321,18 +6358,28 @@ async function saveDraftInline(andConfirm) {
     email: p.email || '', website: p.website || '', address: p.address || '', bankgiro: p.bankgiro || ''
   };
   const invoiceDataNew = {
-    title: inv.title, clientName, clientAddress: invData.clientAddr || '',
+    title: newTitle, clientName,
+    clientAddress: (newAddr !== null ? newAddr : (invData.clientAddr || '')),
+    remark: (newRemark !== null ? newRemark : (invData.remark || '')),
     items, vatRate, invoiceNumber: 'UTKAST',
     dateStr: inv.created_at?.slice(0, 10) || new Date().toISOString().slice(0, 10),
     dueStr: inv.due_date || '', payTermsLabel: inv.payment_terms || '30 dagar netto', inclRot
   };
   const invoiceHtml = buildInvoiceHtml(info, invoiceDataNew);
 
-  await sb.from('invoices').update({
-    client_name: clientName, total_amount: total,
+  const newInvoiceData = JSON.stringify({ items, vatRate, clientAddr: invoiceDataNew.clientAddress, inclRot, remark: invoiceDataNew.remark });
+  const { data: savedRows, error: saveErr } = await sb.from('invoices').update({
+    title: newTitle, client_name: clientName, total_amount: total,
     invoice_html: invoiceHtml,
-    invoice_data: JSON.stringify({ items, vatRate, clientAddr: invData.clientAddr || '', inclRot })
-  }).eq('id', inv.id);
+    invoice_data: newInvoiceData
+  }).eq('id', inv.id).select();
+  if (saveErr || !savedRows || savedRows.length === 0) {
+    console.error('Kunde inte spara utkast', saveErr);
+    alert('Kunde inte spara utkastet. ' + (saveErr?.message || 'Databasen tillät inte ändringen.') + '\n\nStäng fakturan och försök igen.');
+    return;
+  }
+  // Uppdatera den lokala kopian så att "Spara & bekräfta" använder de nya raderna
+  Object.assign(inv, { title: newTitle, client_name: clientName, total_amount: total, invoice_html: invoiceHtml, invoice_data: newInvoiceData });
 
   if (andConfirm) {
     closeInvoiceModal();
@@ -6425,7 +6472,8 @@ async function confirmInvoice(idx) {
       items: invoiceData.items, vatRate: invoiceData.vatRate || 25,
       invoiceNumber, dateStr: new Date().toISOString().slice(0, 10),
       dueStr: inv.due_date, payTermsLabel: inv.payment_terms || '30 dagar netto',
-      inclRot: invoiceData.inclRot || false
+      inclRot: invoiceData.inclRot || false,
+      remark: invoiceData.remark || ''
     };
     newHtml = buildInvoiceHtml(info, invData);
   } else {
@@ -12556,6 +12604,7 @@ init();
           <select id="invRot"><option value="0">Nej</option><option value="1">Ja (30% av arbete)</option></select>
         </div>
       </div>
+      <div class="field" style="margin:0.5rem 0 0"><label>Anmärkning / meddelande till kunden (valfritt, visas på fakturan)</label><textarea id="invRemark" rows="3" placeholder="T.ex. referens, arbetsplats eller övrig information till kunden"></textarea></div>
       <button onclick="createManualInvoice()" class="stripe-btn" style="margin:1rem 0 0;width:100%">Skapa faktura →</button>
     </div>
   </div>
