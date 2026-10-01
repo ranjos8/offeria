@@ -6562,25 +6562,125 @@ async function createCreditInvoice(idx) {
   showPage('invoices');
 }
 
-function downloadInvoicePDF() {
-  const box = document.getElementById('invoiceModalBox');
-  const toolbar = box.querySelector('.quote-toolbar');
-  toolbar.style.display = 'none';
-  // Add page break avoidance
-  const pdfStyle = document.createElement('style');
-  pdfStyle.textContent = '.q-terms, .q-totals, .q-footer, .q-client, .q-header, .q-meta-row, table.qt tr { page-break-inside: avoid !important; break-inside: avoid !important; }';
-  box.appendChild(pdfStyle);
-  html2pdf().from(box).set({
-    margin: 0, filename: (_currentInvoice?.invoice_number || 'faktura') + '.pdf',
-    html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  }).save().then(() => { toolbar.style.display = ''; pdfStyle.remove(); });
+// Sidbrytning: håll ihop rutor, summor och tabellrader så inget klyvs mellan två sidor
+const PDF_AVOID_SELECTORS = ['.q-header', '.q-meta-row', '.q-client', '.q-terms', '.q-totals', '.q-footer', 'table.qt tr'];
+const PDF_AVOID_CSS = '.q-terms, .q-totals, .q-footer, .q-client, .q-header, .q-meta-row, table.qt tr { page-break-inside: avoid !important; break-inside: avoid !important; }';
+
+function invoicePdfOptions(filename) {
+  return {
+    margin: [12, 0, 12, 0],
+    filename: filename,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['css', 'legacy'], avoid: PDF_AVOID_SELECTORS }
+  };
 }
 
-function shareInvoiceEmail() {
+// Skapar fakturans PDF. mode 'save' = ladda ner, 'blob' = returnera filen (för e-post)
+async function renderInvoicePdf(mode) {
+  const box = document.getElementById('invoiceModalBox');
+  const toolbar = box.querySelector('.quote-toolbar');
+  const filename = (_currentInvoice?.invoice_number || 'faktura') + '.pdf';
+  toolbar.style.display = 'none';
+  const pdfStyle = document.createElement('style');
+  pdfStyle.textContent = PDF_AVOID_CSS;
+  box.appendChild(pdfStyle);
+  try {
+    const worker = html2pdf().set(invoicePdfOptions(filename)).from(box);
+    if (mode === 'blob') return await worker.outputPdf('blob');
+    await worker.save();
+  } finally {
+    toolbar.style.display = '';
+    pdfStyle.remove();
+  }
+}
+
+function downloadInvoicePDF() {
+  renderInvoicePdf('save').catch(err => {
+    console.error(err);
+    alert('Kunde inte skapa PDF: ' + (err?.message || err));
+  });
+}
+
+// E-post: mailto kan inte bifoga filer, så vi skapar PDF:en först och låter användaren dela den (bifogas automatiskt)
+async function shareInvoiceEmail() {
   if (!_currentInvoice) return;
-  const subject = encodeURIComponent('Faktura ' + (_currentInvoice.invoice_number || ''));
-  const body = encodeURIComponent('Hej,\n\nBifogat finner du faktura ' + (_currentInvoice.invoice_number || '') + '.\n\nVänliga hälsningar,\n' + (currentProfile?.company_name || ''));
-  window.open('mailto:?subject=' + subject + '&body=' + body);
+  const inv = _currentInvoice;
+  const nr = inv.invoice_number || 'faktura';
+  const filename = nr + '.pdf';
+  const subject = 'Faktura ' + nr;
+  const body = 'Hej,\n\nBifogat finner du faktura ' + nr + '.\n\nVänliga hälsningar,\n' + (currentProfile?.company_name || '');
+
+  document.getElementById('invSendDialog')?.remove();
+  const dlg = document.createElement('div');
+  dlg.id = 'invSendDialog';
+  dlg.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:10001;display:flex;align-items:center;justify-content:center;padding:1rem';
+  dlg.innerHTML = '<div style="background:white;border-radius:14px;max-width:420px;width:100%;padding:1.5rem;box-shadow:0 20px 60px rgba(0,0,0,0.3)" id="invSendBody"></div>';
+  document.body.appendChild(dlg);
+  const bodyEl = dlg.querySelector('#invSendBody');
+  const closeDlg = () => dlg.remove();
+  dlg.addEventListener('click', e => { if (e.target === dlg) closeDlg(); });
+
+  bodyEl.innerHTML = '<div style="text-align:center;padding:1rem"><div style="display:inline-block;width:24px;height:24px;border:3px solid var(--border);border-top:3px solid var(--gold);border-radius:50%;animation:spin 0.8s linear infinite"></div><div style="margin-top:0.8rem;font-size:0.9rem;color:#555">Skapar PDF…</div></div>';
+
+  let blob;
+  try {
+    blob = await renderInvoicePdf('blob');
+  } catch (err) {
+    console.error(err);
+    bodyEl.innerHTML = '<p style="font-size:0.9rem;margin-bottom:1rem">Kunde inte skapa PDF. Försök igen.</p><button id="invSendClose" class="gen-btn" style="width:100%;padding:0.7rem">Stäng</button>';
+    bodyEl.querySelector('#invSendClose').addEventListener('click', closeDlg);
+    return;
+  }
+
+  try { await ensureCustomersLoaded(); } catch (e) {}
+  const cust = (_customersData || []).find(c => (c.name || '').trim().toLowerCase() === (inv.client_name || '').trim().toLowerCase());
+  const to = (cust?.email || '').trim();
+
+  const file = new File([blob], filename, { type: 'application/pdf' });
+  const canShareFile = !!(navigator.canShare && navigator.canShare({ files: [file] }));
+
+  bodyEl.innerHTML =
+    '<div style="font-family:Fraunces,serif;font-size:1.2rem;margin-bottom:0.4rem">PDF klar</div>' +
+    '<p style="font-size:0.85rem;color:#666;margin-bottom:1rem;line-height:1.5">' +
+      (canShareFile
+        ? 'Tryck på den gröna knappen och välj din e-postapp. PDF:en bifogas automatiskt.'
+        : 'Din webbläsare kan inte bifoga filen automatiskt. Gör så här: 1. Ladda ner PDF:en. 2. Öppna e-post och bifoga den.') +
+    '</p>' +
+    (canShareFile ? '<button id="invSendShare" class="gen-btn" style="width:100%;padding:0.8rem;margin-bottom:0.6rem;background:#2e7d32;border-color:#2e7d32">Välj e-postapp (PDF bifogas)</button>' : '') +
+    '<button id="invSendDownload" class="btn-sm btn-outline" style="width:100%;padding:0.7rem;margin-bottom:0.6rem">' + (canShareFile ? 'Eller: ' : '1. ') + 'Ladda ner PDF</button>' +
+    '<button id="invSendMail" class="btn-sm btn-outline" style="width:100%;padding:0.7rem;margin-bottom:0.8rem">' + (canShareFile ? 'Eller: öppna e-post utan bilaga' : '2. Öppna e-post') + '</button>' +
+    '<button id="invSendClose" style="width:100%;background:none;border:none;color:#888;cursor:pointer;font-family:inherit;padding:0.4rem">Stäng</button>';
+
+  bodyEl.querySelector('#invSendClose').addEventListener('click', closeDlg);
+
+  const shareBtn = bodyEl.querySelector('#invSendShare');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', async () => {
+      try {
+        await navigator.share({ files: [file], title: subject, text: body });
+        closeDlg();
+      } catch (err) {
+        if (err && err.name !== 'AbortError') alert('Kunde inte dela filen: ' + (err.message || err));
+      }
+    });
+  }
+
+  bodyEl.querySelector('#invSendDownload').addEventListener('click', () => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  });
+
+  bodyEl.querySelector('#invSendMail').addEventListener('click', () => {
+    window.location.href = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  });
 }
 
 function getCleanQuoteHTML(html) {
@@ -6894,8 +6994,8 @@ function downloadPDF(html, filename) {
   // Prevent page breaks inside elements
   const style = document.createElement('style');
   style.textContent = '.q-terms, .q-totals, .q-footer, .q-client, .q-header, .q-meta-row, table.qt tr { page-break-inside: avoid !important; break-inside: avoid !important; } .q-terms { page-break-before: auto; } .q-totals { page-break-before: auto; }';
-  box.appendChild(style);
   box.innerHTML = cleanHtml;
+  box.appendChild(style);
   box.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
   overlay.appendChild(box);
   document.body.appendChild(overlay);
@@ -6906,7 +7006,8 @@ function downloadPDF(html, filename) {
       filename: name,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'], avoid: PDF_AVOID_SELECTORS }
     }).save().then(() => document.body.removeChild(overlay));
   }, 600);
 }
